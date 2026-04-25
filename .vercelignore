@@ -1,0 +1,4 @@
+# Not used by the Next app at repo root; shrinks upload size for faster Vercel deploys
+upload
+skills
+mini-services

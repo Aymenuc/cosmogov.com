@@ -1,0 +1,1055 @@
+// CosmoGov - Interstellar Civic OS
+// Full database schema for governance platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Pooled connection (Supabase "Transaction" pooler, port 6543) for serverless on Vercel
+  url       = env("DATABASE_URL")
+  // Direct connection for `prisma migrate` / CLI (Supabase "Session" / port 5432)
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  avatarUrl     String?
+  passwordHash  String?
+  plan          String   @default("community") // community, team, guild, enterprise
+  role          String   @default("user") // user, gov_official, admin, super_admin
+  totalXp       Int      @default(0)
+  level         Int      @default(1)
+  streak        Int      @default(0)
+  ageGroup      String?  // youth, young_adult, adult, senior
+  interests     String   @default("[]") // JSON array of interest tags
+  bio           String?
+  countryId     String?  // ISO 3166-1 numeric code (from countries-states-cities)
+  countryName   String?  // Country name for quick display
+  stateId       String?  // State/region ID
+  stateName     String?  // State name for quick display
+  cityId        String?  // City ID
+  cityName      String?  // City name for quick display
+  latitude      Float?   // User's location latitude
+  longitude     Float?   // User's location longitude
+  lastActiveAt  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  memberships      Membership[]
+  proposals        Proposal[]
+  votes            Vote[]
+  gameResults      GameResult[]
+  comments         Comment[]
+  notifications    Notification[]
+  aiChats          AiChat[]
+  createdProcesses  ParticipatoryProcess[] @relation("ProcessCreator")
+  createdOrgs      Organization[]        @relation("OrgCreator")
+  contactMessages  ContactMessage[]
+  adminLogs        AdminLog[]            @relation("AdminActor")
+  billingRecords   BillingRecord[]       @relation("BillingUser")
+  chatRooms        ChatRoom[]            @relation("ChatRoomCreator")
+  chatMessages     ChatMessage[]
+  chatMemberships  ChatMember[]
+  cosmicReputation CosmicReputation?
+  processProposals  ProcessProposal[]
+  processComments   ProcessComment[]
+  proposalEndorsements ProposalEndorsement[]
+  budgetProjects    BudgetProject[]
+  budgetVotes       BudgetVote[]
+  milestones        ImplementationMilestone[]
+  initiatives       CitizenInitiative[]
+  initiativeSignatures InitiativeSignature[]
+  createdAssemblies Assembly[]             @relation("AssemblyCreator")
+  assemblyMemberships AssemblyMember[]
+  createdMeetings   Meeting[]              @relation("MeetingCreator")
+  meetingAttendances MeetingAttendee[]
+  createdDebates    DebateSession[]        @relation("DebateCreator")
+  debateParticipants DebateParticipant[]
+  debateMessages   DebateMessage[]
+  legislationCreated Legislation[]         @relation("LegislationCreator")
+  legislationComments LegislationComment[]
+  legislationAmendments LegislationAmendment[]
+  legislationVotes LegislationVote[]
+  surveysCreated   Survey[]               @relation("SurveyCreator")
+  sortitionCreated SortitionPool[]        @relation("SortitionCreator")
+  sortitionCandidates SortitionCandidate[]
+  bindingProposalsCreated BindingProposal[] @relation("BindingProposalCreator")
+  bindingProposalSignatures BindingProposalSignature[]
+  surveyResponses  SurveyResponse[]
+  pushSubscriptions PushSubscription[]
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  avatarUrl   String?
+  coverUrl    String?
+  category    String?  // tech, education, government, nonprofit, community, enterprise
+  plan        String   @default("community")
+  memberCount Int      @default(0)
+  countryId   String?  // Organization's country
+  countryName String?
+  stateId     String?
+  stateName   String?
+  cityId      String?
+  cityName    String?
+  latitude    Float?
+  longitude   Float?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User         @relation("OrgCreator", fields: [createdBy], references: [id])
+  memberships Membership[]
+  proposals   Proposal[]
+  invitations Invitation[]
+  participatoryProcesses ParticipatoryProcess[]
+}
+
+model Membership {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String   @default("member") // admin, moderator, member
+  joinedAt       DateTime @default(now())
+
+  user           User         @relation(fields: [userId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([userId, organizationId])
+}
+
+model Invitation {
+  id             String   @id @default(cuid())
+  organizationId String
+  token          String   @unique
+  email          String?
+  usedAt         DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Proposal {
+  id             String   @id @default(cuid())
+  organizationId String?
+  title          String
+  description    String
+  category       String?  // governance, finance, operations, community, policy
+  countryId      String?  // Proposal's country
+  countryName    String?
+  stateId        String?
+  stateName      String?
+  cityId         String?
+  cityName       String?
+  latitude       Float?
+  longitude      Float?
+  votingType     String   @default("yes_no") // yes_no, single_choice, ranked_choice
+  options        String   @default("[]") // JSON array of options
+  status         String   @default("active") // draft, active, closed, cancelled
+  isAnonymous    Boolean  @default(false)
+  quorum         Int      @default(10)
+  aiAnalysis     String?  // AI-generated analysis
+  closesAt       DateTime?
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  creator        User          @relation(fields: [createdBy], references: [id])
+  votes          Vote[]
+  comments       Comment[]
+}
+
+model Vote {
+  id         String   @id @default(cuid())
+  proposalId String
+  voterId    String
+  option     String
+  confidence Int?
+  reasoning  String?
+  createdAt  DateTime @default(now())
+
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
+  voter      User     @relation(fields: [voterId], references: [id])
+
+  @@unique([proposalId, voterId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  proposalId String
+  authorId   String
+  content    String
+  createdAt  DateTime @default(now())
+
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
+  author     User     @relation(fields: [authorId], references: [id])
+}
+
+model GameCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique // cognitive, strategic, analytical, social, creative
+  description String?
+  icon        String?
+  color       String?
+  minAge      Int      @default(13)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  games       GameDefinition[]
+}
+
+model GameDefinition {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  tagline      String
+  description  String
+  icon         String
+  accentColor  String
+  categoryId   String
+  difficulty   String   @default("medium") // easy, medium, hard, expert
+  minAge       Int      @default(13)
+  xpRangeMin   Int      @default(30)
+  xpRangeMax   Int      @default(200)
+  roundCount   Int      @default(3)
+  gameData     String   @default("{}") // JSON: rounds, scenarios, etc.
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category     GameCategory @relation(fields: [categoryId], references: [id])
+}
+
+model GameResult {
+  id         String   @id @default(cuid())
+  userId     String
+  gameSlug   String   @default("neural-consensus")
+  gameType   String   @default("neural_consensus") // legacy identifier
+  score      Int      @default(0)
+  xpEarned   Int      @default(0)
+  accuracy   Float?
+  details    String   @default("{}") // JSON game-specific data
+  duration   Int?     // seconds played
+  createdAt  DateTime @default(now())
+
+  user       User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // vote, proposal, game, system, mention, admin, gov_response
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user      User @relation(fields: [userId], references: [id])
+}
+
+model AiChat {
+  id        String   @id @default(cuid())
+  userId    String
+  mode      String   @default("chat") // chat, proposal_draft, analysis, coaching
+  messages  String   @default("[]") // JSON array of {role, content}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User @relation(fields: [userId], references: [id])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  category  String   @default("general") // general, support, sales, partnership, feedback
+  priority  String   @default("normal") // low, normal, high, urgent
+  status    String   @default("new") // new, read, replied, resolved, archived
+  reply     String?
+  repliedAt DateTime?
+  repliedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User?    @relation(fields: [repliedBy], references: [id])
+}
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  action    String   // user_ban, content_moderate, settings_change, billing_update, etc.
+  target    String?  // target entity ID
+  details   String   @default("{}") // JSON details of action
+  createdAt DateTime @default(now())
+
+  actor     User @relation("AdminActor", fields: [actorId], references: [id])
+}
+
+model BillingRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  plan        String   // team, guild, enterprise
+  amount      Int      // in cents
+  currency    String   @default("usd")
+  status      String   @default("pending") // pending, paid, failed, refunded
+  periodStart DateTime
+  periodEnd   DateTime
+  stripeId    String?
+  createdAt   DateTime @default(now())
+
+  user        User @relation("BillingUser", fields: [userId], references: [id])
+}
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model ChatRoom {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  category    String   @default("general") // general, governance, games, ideas, support, announcements
+  type        String   @default("public") // public, private, org_only
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User          @relation("ChatRoomCreator", fields: [createdBy], references: [id])
+  messages    ChatMessage[]
+  members     ChatMember[]
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  content   String
+  type      String   @default("text") // text, system, emoji, link
+  createdAt DateTime @default(now())
+
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model ChatMember {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  role      String   @default("member") // admin, moderator, member
+  lastReadAt DateTime @default(now())
+  joinedAt  DateTime @default(now())
+
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([roomId, userId])
+}
+
+model CosmicReputation {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  score               Int      @default(0) // 0-1000
+  tier                String   @default("Stardust") // Stardust, Nova, Pulsar, Quasar, Nebula
+  participationScore  Float    @default(0) // how active
+  qualityScore        Float    @default(0) // vote quality
+  consistencyScore    Float    @default(0) // streak & reliability
+  influenceScore      Float    @default(0) // impact on outcomes
+  expertiseScore      Float    @default(0) // game performance
+  badges              String   @default("[]") // JSON array of badge IDs
+  verifiedAt          DateTime?
+  updatedAt           DateTime @updatedAt
+
+  user                User     @relation(fields: [userId], references: [id])
+}
+
+// ─── e-Participation Framework ───
+// Inspired by Decidim: Participatory Processes, Budgeting, Accountability, Initiatives, Assemblies
+
+model ParticipatoryProcess {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  description     String
+  shortDescription String?
+  organizationId  String?
+  scope           String   @default("city") // city, district, organization, global
+  bannerUrl       String?
+  category        String?  // urban_planning, budget, policy, community, environment, education
+  currentPhase    String   @default("information") // information, proposal, deliberation, voting, implementation, evaluation, closed
+  phases          String   @default("[]") // JSON: [{id, name, startAt, endAt, description, status}]
+  totalBudget     Int      @default(0) // in cents, if this process involves budgeting
+  currency        String   @default("USD")
+  isPublic        Boolean  @default(true)
+  allowProposals  Boolean  @default(true)
+  allowComments   Boolean  @default(true)
+  countryId       String?  // ISO country code for geo-tagging
+  countryName     String?
+  stateId         String?
+  stateName       String?
+  cityId          String?
+  cityName        String?
+  latitude        Float?   // For map positioning
+  longitude       Float?
+  createdBy       String
+  startsAt        DateTime?
+  endsAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization    Organization?   @relation(fields: [organizationId], references: [id])
+  creator         User            @relation("ProcessCreator", fields: [createdBy], references: [id])
+  processProposals ProcessProposal[]
+  budgetProjects  BudgetProject[]
+  milestones      ImplementationMilestone[]
+  meetings        Meeting[]
+  assemblies      Assembly[]
+  initiatives     CitizenInitiative[]
+  legislation     Legislation[]
+  surveys         Survey[]
+  bindingProposals BindingProposal[]
+}
+
+model ProcessProposal {
+  id              String   @id @default(cuid())
+  processId       String
+  title           String
+  description     String
+  category        String?  // infrastructure, social, environment, technology, culture, health
+  budgetRequested Int?     // in cents
+  status          String   @default("draft") // draft, published, accepted, rejected, implemented
+  supportCount    Int      @default(0) // number of endorsements
+  oppositionCount Int      @default(0)
+  aiAnalysis      String?  // AI-generated impact assessment
+  mapLatitude     Float?
+  mapLongitude    Float?
+  mapAddress      String?
+  attachments     String   @default("[]") // JSON array of file URLs
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess @relation(fields: [processId], references: [id])
+  creator         User                 @relation(fields: [createdBy], references: [id])
+  endorsements    ProposalEndorsement[]
+  comments        ProcessComment[]
+  milestones      ImplementationMilestone[]
+}
+
+model ProposalEndorsement {
+  id         String   @id @default(cuid())
+  proposalId String
+  userId     String
+  type       String   @default("support") // support, oppose, neutral
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  proposal   ProcessProposal @relation(fields: [proposalId], references: [id])
+  user       User            @relation(fields: [userId], references: [id])
+
+  @@unique([proposalId, userId])
+}
+
+model ProcessComment {
+  id         String   @id @default(cuid())
+  proposalId String
+  authorId   String
+  content    String
+  parentId   String?  // for threaded replies
+  createdAt  DateTime @default(now())
+
+  proposal   ProcessProposal @relation(fields: [proposalId], references: [id])
+  author     User            @relation(fields: [authorId], references: [id])
+}
+
+model BudgetProject {
+  id              String   @id @default(cuid())
+  processId       String
+  title           String
+  description     String
+  category        String?  // infrastructure, social, environment, technology, culture, health
+  budgetRequested Int      @default(0) // in cents
+  budgetApproved  Int      @default(0) // in cents, after voting
+  status          String   @default("proposed") // proposed, shortlisted, approved, rejected, implementing, completed
+  mapLatitude     Float?
+  mapLongitude    Float?
+  mapAddress      String?
+  voteCount       Int      @default(0)
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess @relation(fields: [processId], references: [id])
+  creator         User                 @relation(fields: [createdBy], references: [id])
+  budgetVotes     BudgetVote[]
+  milestones      ImplementationMilestone[]
+}
+
+model BudgetVote {
+  id         String   @id @default(cuid())
+  projectId  String
+  userId     String
+  amount     Int      @default(0) // how much budget the user allocates (in cents)
+  createdAt  DateTime @default(now())
+
+  project    BudgetProject @relation(fields: [projectId], references: [id])
+  user       User          @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+model ImplementationMilestone {
+  id          String   @id @default(cuid())
+  processId   String
+  proposalId  String?  // can belong to a proposal or budget project
+  projectId   String?  // can belong to a budget project
+  title       String
+  description String?
+  status      String   @default("pending") // pending, in_progress, completed, delayed, cancelled
+  progress    Int      @default(0) // 0-100 percentage
+  dueDate     DateTime?
+  completedAt DateTime?
+  evidence    String   @default("[]") // JSON: [{type, url, description, date}]
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  process     ParticipatoryProcess @relation(fields: [processId], references: [id])
+  proposal    ProcessProposal?     @relation(fields: [proposalId], references: [id])
+  project     BudgetProject?       @relation(fields: [projectId], references: [id])
+  creator     User                 @relation(fields: [createdBy], references: [id])
+}
+
+model CitizenInitiative {
+  id              String   @id @default(cuid())
+  processId       String?  // can be standalone or part of a process
+  title           String
+  description     String
+  type            String   @default("petition") // petition, referendum, recall, proposal
+  signatureGoal   Int      @default(1000) // threshold to force response
+  signatureCount  Int      @default(0)
+  status          String   @default("collecting") // collecting, threshold_reached, government_response, voting, enacted, rejected, expired
+  governmentResponse String? // official response when threshold is reached
+  respondedBy     String?  // user ID of the government official who responded
+  responseDate    DateTime?
+  closesAt        DateTime?
+  countryId       String?  // Geo-tagging for location-based discovery
+  countryName     String?
+  stateId         String?
+  stateName       String?
+  cityId          String?
+  cityName        String?
+  latitude        Float?
+  longitude       Float?
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess? @relation(fields: [processId], references: [id])
+  creator         User                  @relation(fields: [createdBy], references: [id])
+  signatures      InitiativeSignature[]
+}
+
+model InitiativeSignature {
+  id           String   @id @default(cuid())
+  initiativeId String
+  userId       String
+  comment      String?  // optional reason for signing
+  createdAt    DateTime @default(now())
+
+  initiative   CitizenInitiative @relation(fields: [initiativeId], references: [id])
+  user         User              @relation(fields: [userId], references: [id])
+
+  @@unique([initiativeId, userId])
+}
+
+model Assembly {
+  id              String   @id @default(cuid())
+  processId       String?  // can be part of a process or standalone
+  name            String
+  slug            String   @unique
+  description     String
+  purpose         String   @default("deliberation") // deliberation, advisory, decision_making, working_group
+  scope           String   @default("general") // general, neighborhood, thematic, sectoral
+  meetingCadence  String   @default("monthly") // weekly, biweekly, monthly, quarterly, ad_hoc
+  memberCount     Int      @default(0)
+  isPublic        Boolean  @default(true)
+  countryId       String?  // Geo-tagging for local assemblies
+  countryName     String?
+  stateId         String?
+  stateName       String?
+  cityId          String?
+  cityName        String?
+  latitude        Float?
+  longitude       Float?
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess? @relation(fields: [processId], references: [id])
+  creator         User                  @relation("AssemblyCreator", fields: [createdBy], references: [id])
+  members         AssemblyMember[]
+  meetings        Meeting[]
+  debateSessions  DebateSession[]
+}
+
+model AssemblyMember {
+  id         String   @id @default(cuid())
+  assemblyId String
+  userId     String
+  role       String   @default("member") // coordinator, facilitator, member, observer
+  joinedAt   DateTime @default(now())
+
+  assembly   Assembly @relation(fields: [assemblyId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([assemblyId, userId])
+}
+
+model Meeting {
+  id            String   @id @default(cuid())
+  processId     String?  // can belong to a process
+  assemblyId    String?  // or an assembly
+  title         String
+  description   String?
+  type          String   @default("hybrid") // in_person, virtual, hybrid
+  address       String?  // physical location
+  videoUrl      String?  // video call link
+  livestreamUrl String?  // for public streaming
+  startsAt      DateTime
+  endsAt        DateTime?
+  attendeeCount Int      @default(0)
+  maxAttendees  Int?
+  status        String   @default("scheduled") // scheduled, live, completed, cancelled
+  agenda        String   @default("[]") // JSON: [{item, duration, presenter}]
+  minutes       String?  // meeting minutes/notes
+  recordingUrl  String?  // recording after meeting
+  countryId     String?  // Geo-tagging for local meetings
+  countryName   String?
+  stateId       String?
+  stateName     String?
+  cityId        String?
+  cityName      String?
+  latitude      Float?
+  longitude     Float?
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  process       ParticipatoryProcess? @relation(fields: [processId], references: [id])
+  assembly      Assembly?             @relation(fields: [assemblyId], references: [id])
+  creator       User                  @relation("MeetingCreator", fields: [createdBy], references: [id])
+  attendees     MeetingAttendee[]
+  debateSessions DebateSession[]
+}
+
+model MeetingAttendee {
+  id         String   @id @default(cuid())
+  meetingId  String
+  userId     String
+  role       String   @default("attendee") // organizer, presenter, attendee
+  attended   Boolean  @default(false)
+  rsvpAt     DateTime @default(now())
+
+  meeting    Meeting @relation(fields: [meetingId], references: [id])
+  user       User    @relation(fields: [userId], references: [id])
+
+  @@unique([meetingId, userId])
+}
+
+// ─── AI Agent System ───
+// 6 Specialized AI Agents that power participation, moderation, and accessibility
+// Nexus (Moderator), Lumen (Facilitator), Synthesis (Summarizer),
+// Concord (Consensus Builder), Babel (Translator), Aegis (Accessibility)
+
+model AiAgent {
+  id           String   @id @default(cuid())
+  type         String   @unique // moderator, facilitator, summarizer, consensus, translator, accessibility
+  name         String   // Nexus, Lumen, Synthesis, Concord, Babel, Aegis
+  description  String
+  personality  String   @default("{}") // JSON: personality traits, tone, approach
+  capabilities String   @default("[]") // JSON: list of capabilities
+  avatarConfig String   @default("{}") // JSON: visual config (colors, shape, animations, glow effects)
+  systemPrompt String   @default("")   // The system prompt that defines this agent's behavior
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  interventions AiAgentIntervention[]
+}
+
+model DebateSession {
+  id              String   @id @default(cuid())
+  assemblyId      String?  // can be linked to an assembly
+  meetingId       String?  // or a meeting
+  title           String
+  description     String?
+  topic           String   // the main topic/question being debated
+  status          String   @default("waiting") // waiting, active, paused, summarizing, closed
+  phase           String   @default("opening") // opening, debate, deliberation, consensus, closing
+  maxParticipants Int      @default(50)
+  participantCount Int     @default(0)
+  isPublic        Boolean  @default(true)
+  aiAgentsActive  String   @default("[]") // JSON: list of active agent types
+  consensusLevel  Float    @default(0) // 0-1 how close to consensus
+  energyLevel     Float    @default(0.5) // 0-1 debate energy/intensity
+  summary         String?  // AI-generated summary
+  consensusReport String?  // AI-generated consensus analysis
+  countryId       String?  // Geo-tagging for local debates
+  countryName     String?
+  stateId         String?
+  stateName       String?
+  cityId          String?
+  cityName        String?
+  latitude        Float?
+  longitude       Float?
+  createdBy       String
+  startsAt        DateTime?
+  endsAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  assembly       Assembly?          @relation(fields: [assemblyId], references: [id])
+  meeting        Meeting?           @relation(fields: [meetingId], references: [id])
+  creator        User               @relation("DebateCreator", fields: [createdBy], references: [id])
+  participants   DebateParticipant[]
+  messages       DebateMessage[]
+  interventions  AiAgentIntervention[]
+}
+
+model DebateParticipant {
+  id           String   @id @default(cuid())
+  sessionId    String
+  userId       String?  // null for AI agents
+  agentType    String?  // for AI agent participants: moderator, facilitator, etc.
+  displayName  String
+  avatarUrl    String?
+  role         String   @default("participant") // facilitator, participant, observer, ai_agent
+  position     String   @default("{}") // JSON: {x, y, orbitRadius, angle} for animation
+  stance       String   @default("neutral") // neutral, support, oppose, unsure
+  speaking     Boolean  @default(false)
+  handRaised   Boolean  @default(false)
+  isMuted      Boolean  @default(false)
+  language     String   @default("en") // preferred language
+  complexityPref String @default("standard") // simple, standard, expert
+  joinedAt     DateTime @default(now())
+  leftAt       DateTime?
+
+  session      DebateSession @relation(fields: [sessionId], references: [id])
+  user         User?         @relation(fields: [userId], references: [id])
+  messages     DebateMessage[]
+
+  @@unique([sessionId, userId])
+}
+
+model DebateMessage {
+  id            String   @id @default(cuid())
+  sessionId     String
+  participantId String?
+  userId        String?  // null for AI messages
+  agentType     String?  // which AI agent sent this
+  content       String
+  simplifiedContent String? // Aegis simplified version
+  translatedContent String? // Babel translated version
+  targetLang    String?  // language code if translated
+  type          String   @default("statement") // statement, question, rebuttal, agreement, summary, moderation, intervention, translation, simplification, consensus_report
+  sentiment     String   @default("neutral") // neutral, positive, negative, mixed
+  metadata      String   @default("{}") // JSON: translation, simplification level, sentiment score, etc.
+  reactions     String   @default("{}") // JSON: {agree: count, disagree: count, insightful: count}
+  isPinned      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  session       DebateSession @relation(fields: [sessionId], references: [id])
+  participant   DebateParticipant? @relation(fields: [participantId], references: [id])
+  user          User?         @relation(fields: [userId], references: [id])
+}
+
+model AiAgentIntervention {
+  id          String   @id @default(cuid())
+  sessionId   String
+  agentType   String   // which agent intervened
+  agentId     String?  // link to AiAgent config
+  triggerType String   // toxicity_detected, off_topic, quiet_participant, summarize_request, consensus_opportunity, language_barrier, complexity_barrier, custom
+  triggerData String   @default("{}") // JSON: data that triggered the intervention
+  response    String   // what the agent said/did
+  impact      String   @default("{}") // JSON: measured impact of intervention
+  createdAt   DateTime @default(now())
+
+  session     DebateSession @relation(fields: [sessionId], references: [id])
+  agent       AiAgent?      @relation(fields: [agentId], references: [id])
+}
+
+// ─── Must-Have Features (Competitive Parity) ───
+// Legislation Tracker, Surveys/Polls, Sortition, Binding Proposals
+
+model Legislation {
+  id              String   @id @default(cuid())
+  processId       String?  // can be part of a process
+  title           String
+  description     String
+  billNumber      String?  // official bill number (e.g., "HB-2026-042")
+  status          String   @default("draft") // draft, review, public_comment, amendment, voting, passed, rejected, enacted
+  category        String?  // finance, civil_rights, environment, infrastructure, education, health, housing, transportation
+  sponsorName     String?  // primary sponsor name
+  sponsorId       String?  // primary sponsor user ID
+  cosponsors      String   @default("[]") // JSON array of co-sponsor names
+  fullText        String?  // the full text of the legislation
+  summaryAi       String?  // AI-generated plain-language summary
+  currentVersion  Int      @default(1)
+  versions        String   @default("[]") // JSON: [{version, text, changes, date}]
+  commentCount    Int      @default(0)
+  supportCount    Int      @default(0)
+  opposeCount     Int      @default(0)
+  amendmentCount  Int      @default(0)
+  quorumRequired  Int      @default(100) // minimum votes for binding decision
+  votingOpensAt   DateTime?
+  votingClosesAt  DateTime?
+  enactedAt       DateTime?
+  countryId       String?
+  countryName     String?
+  stateId         String?
+  stateName       String?
+  cityId          String?
+  cityName        String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess? @relation(fields: [processId], references: [id])
+  creator         User                  @relation("LegislationCreator", fields: [createdBy], references: [id])
+  comments        LegislationComment[]
+  amendments      LegislationAmendment[]
+  votes           LegislationVote[]
+}
+
+model LegislationComment {
+  id             String   @id @default(cuid())
+  legislationId  String
+  userId         String
+  content        String
+  sectionRef     String?  // e.g., "Section 3.2" — reference to specific section
+  type           String   @default("comment") // comment, suggestion, question, objection, support
+  parentCommentId String? // for threaded replies
+  aiSentiment    String?  // AI-analyzed sentiment: positive, negative, neutral, mixed
+  createdAt      DateTime @default(now())
+
+  legislation    Legislation @relation(fields: [legislationId], references: [id])
+  user           User        @relation(fields: [userId], references: [id])
+
+  @@index([legislationId])
+}
+
+model LegislationAmendment {
+  id             String   @id @default(cuid())
+  legislationId  String
+  userId         String
+  title          String
+  description    String
+  sectionRef     String?  // which section this amends
+  originalText   String?
+  proposedText   String?
+  rationale      String?
+  status         String   @default("proposed") // proposed, seconded, under_review, accepted, rejected, incorporated
+  secondCount    Int      @default(0)
+  supportCount   Int      @default(0)
+  opposeCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  legislation    Legislation @relation(fields: [legislationId], references: [id])
+  proposer       User        @relation(fields: [userId], references: [id])
+
+  @@index([legislationId])
+}
+
+model LegislationVote {
+  id             String   @id @default(cuid())
+  legislationId  String
+  userId         String
+  position       String   // support, oppose, abstain
+  reasoning      String?
+  confidence     Int?
+  createdAt      DateTime @default(now())
+
+  legislation    Legislation @relation(fields: [legislationId], references: [id])
+  user           User        @relation(fields: [userId], references: [id])
+
+  @@unique([legislationId, userId])
+}
+
+model Survey {
+  id              String   @id @default(cuid())
+  processId       String?  // can be part of a process
+  title           String
+  description     String
+  status          String   @default("draft") // draft, active, paused, closed, analyzed
+  anonymous       Boolean  @default(true)
+  allowMultiple   Boolean  @default(false) // allow multiple submissions per user
+  questionCount   Int      @default(0)
+  responseCount   Int      @default(0)
+  targetAudience  String   @default("all") // all, registered, district_residents, assembly_members
+  category        String?  // community, infrastructure, budget, environment, safety, education
+  closesAt        DateTime?
+  aiSummary       String?  // AI-generated summary of responses
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess? @relation(fields: [processId], references: [id])
+  creator         User                  @relation("SurveyCreator", fields: [createdBy], references: [id])
+  questions       SurveyQuestion[]
+  responses       SurveyResponse[]
+}
+
+model SurveyQuestion {
+  id              String   @id @default(cuid())
+  surveyId        String
+  text            String
+  type            String   @default("single_choice") // single_choice, multiple_choice, text, rating, scale, yes_no, ranking
+  options         String   @default("[]") // JSON: [{id, label, icon}] for choice questions
+  required        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  allowOther      Boolean  @default(false) // allow "other" free-text
+  minRating       Int?     // for rating/scale questions
+  maxRating       Int?
+  aiInsight       String?  // AI-generated insight for this question's responses
+  createdAt       DateTime @default(now())
+
+  survey          Survey @relation(fields: [surveyId], references: [id])
+
+  @@index([surveyId])
+}
+
+model SurveyResponse {
+  id              String   @id @default(cuid())
+  surveyId        String
+  userId          String?
+  answers         String   @default("[]") // JSON: [{questionId, value, otherText}]
+  completedAt     DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  survey          Survey @relation(fields: [surveyId], references: [id])
+  user            User?   @relation(fields: [userId], references: [id])
+
+  @@index([surveyId])
+}
+
+model SortitionPool {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  purpose         String   // citizen_assembly, jury, advisory_panel, working_group, review_committee
+  selectionSize   Int      @default(25) // number of people to select
+  candidateCount  Int      @default(0)
+  status          String   @default("recruiting") // recruiting, selection, selected, active, completed
+  criteria        String   @default("{}") // JSON: {ageMin, ageMax, residency, demographics, skills}
+  demographicTargets String @default("{}") // JSON: {age: {youth: 0.2, adult: 0.5, senior: 0.3}, gender: {balanced: true}, etc.}
+  selectionMethod String   @default("stratified_random") // simple_random, stratified_random, weighted_random
+  selectedMembers String   @default("[]") // JSON: [{userId, name, demographic}] once selected
+  selectionDate   DateTime?
+  termStartsAt    DateTime?
+  termEndsAt      DateTime?
+  assemblyId      String?  // optionally create an assembly from the selection
+  processId       String?  // optionally link to a process
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  candidates      SortitionCandidate[]
+  creator         User                  @relation("SortitionCreator", fields: [createdBy], references: [id])
+}
+
+model SortitionCandidate {
+  id              String   @id @default(cuid())
+  poolId          String
+  userId          String
+  status          String   @default("volunteered") // volunteered, verified, selected, declined, alternate
+  demographics    String   @default("{}") // JSON: {ageGroup, gender, district, occupation}
+  motivation      String?  // why they want to participate
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  pool            SortitionPool @relation(fields: [poolId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@unique([poolId, userId])
+}
+
+model BindingProposal {
+  id              String   @id @default(cuid())
+  processId       String?  // can be part of a process
+  title           String
+  description     String
+  category        String?  // finance, environment, infrastructure, social, education, health, housing
+  type            String   @default("binding_proposal") // binding_proposal, binding_referendum, citizen_bill
+  signatureGoal   Int      @default(5000) // threshold for binding response
+  signatureCount  Int      @default(0)
+  status          String   @default("collecting") // collecting, threshold_reached, government_review, government_response, scheduled_vote, passed, rejected, enacted
+  isBinding       Boolean  @default(true)
+  governmentResponse String? // official government response
+  respondedBy     String?  // user ID of the government official who responded
+  responseDate    DateTime?
+  responseDeadline DateTime? // legal deadline for government response
+  voteDate        DateTime? // scheduled vote date if it goes to vote
+  enactmentDate   DateTime? // when it becomes law/policy
+  legalReference  String?  // reference to the law/policy that requires the binding response
+  impactAssessment String? // impact analysis
+  countryId       String?
+  countryName     String?
+  stateId         String?
+  stateName       String?
+  cityId          String?
+  cityName        String?
+  latitude        Float?
+  longitude       Float?
+  closesAt        DateTime?
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  process         ParticipatoryProcess? @relation(fields: [processId], references: [id])
+  creator         User                  @relation("BindingProposalCreator", fields: [createdBy], references: [id])
+  signatures      BindingProposalSignature[]
+}
+
+model BindingProposalSignature {
+  id              String   @id @default(cuid())
+  proposalId      String
+  userId          String
+  comment         String?
+  verified        Boolean  @default(false) // identity verification status
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  proposal        BindingProposal @relation(fields: [proposalId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+
+  @@unique([proposalId, userId])
+}
+
+model PushSubscription {
+  id          String   @id @default(cuid())
+  userId      String
+  endpoint    String   @unique
+  p256dh      String
+  auth        String
+  keys        String?  // JSON: {p256dh, auth} — full subscription keys for web-push
+  createdAt   DateTime @default(now())
+
+  user        User @relation(fields: [userId], references: [id])
+}

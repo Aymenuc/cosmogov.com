@@ -1,0 +1,57 @@
+{
+  "$description": "Machine-readable reference for automating Z AI (z-ai-web-dev-sdk) setup in CosmoGov. Human instructions: ai-api-configuration.md",
+  "sdk": {
+    "package": "z-ai-web-dev-sdk",
+    "npm": "z-ai-web-dev-sdk",
+    "apiShape": "OpenAI-style chat: POST {baseUrl}/chat/completions with Authorization: Bearer {apiKey}"
+  },
+  "configPriority": [
+    "1. Environment variables (best for Vercel / CI): Z_AI_BASE_URL + Z_AI_API_KEY required together",
+    "2. Else: JSON file .z-ai-config in order — project root (cwd), $HOME, /etc (SDK default)"
+  ],
+  "environmentVariables": {
+    "Z_AI_BASE_URL": {
+      "required": "when not using .z-ai-config on disk",
+      "description": "Base URL of the Z AI API (no trailing path; SDK appends /chat/completions).",
+      "example": "https://api.example.com/v1"
+    },
+    "Z_AI_API_KEY": {
+      "required": "with Z_AI_BASE_URL",
+      "description": "Sent as Authorization: Bearer ...",
+      "sensitive": true
+    },
+    "Z_AI_CHAT_ID": { "required": false, "description": "Optional. Sent as X-Chat-Id header." },
+    "Z_AI_USER_ID": { "required": false, "description": "Optional. Sent as X-User-Id header." },
+    "Z_AI_TOKEN": { "required": false, "description": "Optional. Sent as X-Token header.", "sensitive": true }
+  },
+  "fileConfig": {
+    "filename": ".z-ai-config",
+    "gitignore": true,
+    "jsonShape": {
+      "baseUrl": "string, required",
+      "apiKey": "string, required",
+      "chatId": "string, optional",
+      "userId": "string, optional",
+      "token": "string, optional"
+    },
+    "exampleFileInRepo": ".z-ai-config.example"
+  },
+  "code": {
+    "clientFactory": "src/lib/z-ai-client.ts",
+    "export": "createZAI()",
+    "openAICompatible": "src/lib/ai-completions.ts — export chatCompletionsCreate(); used by /api/ai/* when URL is NVIDIA integrate or Z_AI_USE_OPENAI_COMPAT=1"
+  },
+  "nvidiaOpenAI": {
+    "Z_AI_BASE_URL": "https://integrate.api.nvidia.com/v1",
+    "Z_AI_MODEL": "deepseek-ai/deepseek-v4-pro",
+    "notes": "Do not commit nvapi keys. Use env / Vercel only."
+  },
+  "nextApiRoutesUsingAI": [
+    "POST /api/ai/chat",
+    "POST /api/ai/debate/[id]/messages (agent replies)"
+  ],
+  "vercel": {
+    "addToEnvironment": ["Z_AI_BASE_URL", "Z_AI_API_KEY", "Z_AI_TOKEN", "Z_AI_CHAT_ID", "Z_AI_USER_ID"],
+    "note": "Set secrets in Vercel Project Settings → Environment Variables. Do not commit .z-ai-config with real keys."
+  }
+}
