@@ -5,44 +5,44 @@ redesign is built, the exact design system, the defects that must be fixed first
 and the roadmap in build order.
 
 Everything here was checked against the code on `redesign/civic-experience` at
-commit `cbb9b8f` (14 Nov 2026) by reading it. Nothing was run against a live
-database. Where a claim was not verified, it says so.
+commit `cf56cb8` (14 Nov 2026) by reading it. Nothing was run against a live
+database or a live model. Where a claim was not verified, it says so.
 
-## 0. Start here: the missions commit
+## 0. Start here: where the code stands
 
-The newest work is **not described from code in this file**. The owner reports
-that Codex committed it as `cf56cb8` on `redesign/civic-experience`, one commit
-after `cbb9b8f`. When this file was last updated, GitHub still ended at `cbb9b8f`
-and had no object `cf56cb8`, so the commit existed only in Codex's workspace.
+The newest commit is `cf56cb8`, "Build community-directed AI mission studio with
+shared plans and tools" (Codex, 14 Nov 2026). It is on GitHub. It did two things.
 
-What the owner says it contains (reported, not verified):
+**It added Mission Studio.** Read `MISSION_STUDIO.md` first; this is the short version.
 
-- A **mission** has a plan and tasks.
-- **AI can turn a mission into a working community form**, for example
-  collecting repair skills or equipment offers. Responses are saved alongside the
-  mission's plan and tasks.
-- **AI drafts show their references and their unanswered questions.**
-- **People choose** which plans and tools become part of the mission.
-- The visual direction stays warm and colourful (section 5 applies unchanged).
+- A **mission** is a goal a person or a community wants done. It lives at
+  `/dashboard/missions`, with a public, clearly illustrative demo at `/missions/demo`.
+- Members add **contributions**: perspectives, constraints and sources (up to 40
+  per mission).
+- A mission manager can run four **AI steps**, each on request:
+  **Scout** (research), **Bridge** (perspectives), **Maker** (a plan of tasks) and
+  **Studio** (a participation form). These are four prompts to one configured
+  model. They are not autonomous agents and take no external action.
+- Every output is an **AI draft** that lists findings with references, and
+  questions it could not answer. A finding that cites an unknown reference causes
+  the whole output to be rejected by code.
+- A manager **adopts** a plan (its tasks go to the action board) or **publishes**
+  a form (members can respond). Adoption is refused if contributions changed
+  after the draft was made.
+- Members **claim, release and complete tasks**, and **answer published forms**
+  (one response each, which they can update or delete).
 
-Do this before anything else:
+**It replaced the forgeable session cookie** with HMAC-signed, expiring tokens
+(`src/lib/session-token.ts`). Production now needs `SESSION_SECRET`. See 6.1.
 
-1. Run `git fetch origin redesign/civic-experience` and `git cat-file -t cf56cb8`.
-   - If you are the agent that holds `cf56cb8` locally and it is not on GitHub,
-     push it: `git push origin redesign/civic-experience`. Nothing else can be
-     reviewed, deployed or handed over until it is.
-   - If the commit is on neither side, stop and ask the owner where it is.
-2. Read the whole diff: `git show --stat cf56cb8`, then the files.
-3. Review it against the checklist in section 7.0 and record what you find.
-4. Update this file from what you read: the repository map (section 3), the
-   defect list (section 6), section 7.0 and the status table (section 10). Replace
-   every "reported, not verified" statement about missions with what the code does.
+How this file was checked against that commit: every mission file was read, and
+`node --test scripts/check-session.cjs` was run (4 of 4 pass). The mission test
+suite (`scripts/check-missions.cjs`), the build and a live model were **not** run.
+Section 7.0 records the review, line by line.
 
-Until step 4 is done, treat every statement about missions in this file as the
-owner's description of intent, not as a description of the code.
-
-Related files: `DESIGN.md` (what the redesign changed and how it was verified),
-`worklog.md` (history of earlier agents), `agent-ctx/` (notes per feature).
+Related files: `MISSION_STUDIO.md` (the mission workspace), `DESIGN.md` (what the
+redesign changed and how it was verified), `worklog.md` (history of earlier
+agents; not updated for missions), `agent-ctx/` (notes per older feature).
 
 ---
 
@@ -66,8 +66,9 @@ Three rules follow from that and override any feature idea:
 The product now has two threads, and both matter:
 
 - **Missions** are the current thread (section 0 and 7.0). A community names
-  something it wants done, AI drafts a plan, tasks and a form to gather what is
-  needed, and people choose what to keep. This is where the three rules are
+  something it wants done and adds what it knows. On request, AI researches it,
+  maps the perspectives, drafts a plan of tasks and drafts a form to gather what
+  is needed. People choose what to adopt. This is where the three rules are
   tested most directly: the AI drafts, shows its references and what it does not
   know, and a person decides.
 - **Provable integrity** is the thread underneath. The platform already has
@@ -86,11 +87,11 @@ Do not add further modules beyond missions until the defects in section 6 are fi
 |---|---|
 | Framework | Next.js `^16.1.1`, App Router, React 19, `output: "standalone"` |
 | Language | TypeScript 5. `next.config.ts` sets `typescript.ignoreBuildErrors: true` |
-| Styling | Tailwind CSS 4 via `@import "tailwindcss"` plus three hand-written stylesheets (section 5.7) |
+| Styling | Tailwind CSS 4 via `@import "tailwindcss"` plus four hand-written stylesheets (section 5.7) |
 | Components | shadcn/ui (48 files in `src/components/ui`), Radix, `lucide-react` icons, `framer-motion` |
-| Data | Prisma `^6.11.1` on Supabase Postgres. One migration: `prisma/migrations/20260425120000_init` |
-| Auth | Hand-rolled cookie session in `src/lib/auth.ts`. `next-auth` is installed but **not used anywhere** |
-| AI | `src/lib/ai-completions.ts`, OpenAI-shaped chat completions through the Z AI SDK or an NVIDIA-compatible endpoint |
+| Data | Prisma `^6.11.1` on Supabase Postgres. Two migrations: `20260425120000_init` and `20261114120000_mission_studio` |
+| Auth | HMAC-signed session cookie: `src/lib/session-token.ts` and `src/lib/auth.ts`. Needs `SESSION_SECRET` in production. `next-auth` is installed but **not used anywhere** |
+| AI | `src/lib/ai-completions.ts`, OpenAI-shaped chat completions through the Z AI SDK or an NVIDIA-compatible endpoint. Mission prompts and optional web search are in `src/lib/missions/ai.ts` |
 | Maps | Leaflet and `react-leaflet` |
 | Email / push | `src/lib/email.ts` (stub, SMTP or Resend), `src/lib/push-notifications.ts` (VAPID) |
 
@@ -100,8 +101,9 @@ npm run dev               # port 3000, writes dev.log
 npm run build:next        # next build + copy static into standalone
 npm run build             # prisma migrate deploy, then build:next — needs DATABASE_URL
 npm run lint
-node --test scripts/check-voting.cjs   # 8 isolated tests of the vote route, no database
+node --test scripts/check-session.cjs scripts/check-voting.cjs   # session signing and vote rules, no database
 node scripts/check-redesign.cjs        # Playwright UI checks against a running server
+node scripts/check-missions.cjs        # mission API and browser tests on a disposable PostgreSQL
 ```
 
 Notes on these commands:
@@ -109,6 +111,10 @@ Notes on these commands:
 - `check-redesign.cjs` needs a server already running, Playwright and Chromium.
   `COSMOGOV_TEST_URL` and `COSMOGOV_TEST_ARTIFACTS` override its defaults. It
   intercepts API calls with fixtures, so it proves the interface, not the data layer.
+- `check-missions.cjs` starts its own PostgreSQL, applies both migrations, starts
+  the real application and uses a local model fixture; it never calls a paid
+  model. Install `embedded-postgres` outside the repository and pass its module
+  path as `COSMOGOV_EMBEDDED_PG`. It also needs Playwright and Chromium.
 - If Turbopack is blocked on the host, `npx next build --webpack` builds the same source.
 - A passing build does **not** mean the code typechecks, because build errors are
   ignored. Run `npx tsc --noEmit` and compare against the baseline in `DESIGN.md`
@@ -117,6 +123,11 @@ Notes on these commands:
   tests. Follow the pattern in `scripts/check-voting.cjs` or add Vitest, and say
   which you chose in the PR.
 - Environment variables are listed in `.env.example`. Never commit `.env`.
+  `SESSION_SECRET` (32 or more random characters) is required in production.
+  `MISSION_WEB_SEARCH=1` turns on web search for the Scout step and only works
+  with the Z AI SDK, not with an OpenAI-compatible endpoint.
+- AI runs are synchronous. The run route sets `maxDuration = 120`; the host must
+  allow a request that long.
 
 **This is not the Next.js in your training data.** Before writing routing, caching
 or request-handling code, read the matching guide in `node_modules/next/dist/docs/`.
@@ -132,6 +143,8 @@ src/app/page.tsx                      landing page (602 lines)
 src/app/auth/{login,signup}           account entry, uses components/AuthExperience.tsx
 src/app/dashboard/layout.tsx          workspace shell: sidebar, top bar, command menu
 src/app/dashboard/page.tsx            the civic desk
+src/app/dashboard/missions/           Mission Studio: list page and [id] = the mission room
+src/app/missions/demo/                public, illustrative mission demo (no login, no AI)
 src/app/dashboard/proposals/          list, new, [id] = the decision room, [id]/edit
 src/app/dashboard/participation/      processes, budget, initiatives, binding-proposals,
                                       legislation, surveys, assemblies, meetings,
@@ -139,23 +152,31 @@ src/app/dashboard/participation/      processes, budget, initiatives, binding-pr
 src/app/dashboard/{decisions,chat,assembly-hall,explore,pulse,analytics}
 src/app/dashboard/{ai-agents,assistant,games,leaderboards,reputation}
 src/app/dashboard/{gov-portal,admin,organizations,cosmic-map,search,settings}
-src/app/api/**/route.ts               84 route handlers, one folder per resource
-src/app/{globals,civic,community}.css the three style layers
+src/app/api/**/route.ts               92 route handlers, one folder per resource
+src/app/api/missions/                 missions, contributions, runs (AI steps), accept,
+                                      tasks, tools/[runId]/responses
+src/app/{globals,civic,community,missions}.css   the four style layers
 src/components/                       Brand, SiteHeader, Footer, CommonsArt, ProposalCard,
                                       CommandMenu, StartProcessDialog, WorkspaceContext,
                                       AuthExperience, OfficialResponseBadge, ui/
-src/lib/auth.ts                       session cookie (defective — section 6)
+src/components/missions/              MissionRoom (1,329 lines), MissionToolForm, MissionPreview
+src/lib/missions/                     types (the four steps), validation (zod schemas),
+                                      ai (prompts, search), server (access rules), demo
+src/lib/session-token.ts              signing and verifying session tokens
+src/lib/auth.ts                       password hashing, createSession, getSession
 src/lib/civic.ts                      CivicProposal type, isOpen(), deadlineLabel(), voteLabel
 src/lib/categories.ts                 the 10 topic categories and legacy mapping
 src/lib/ai-completions.ts             the only place that calls a model
-prisma/schema.prisma                  50 models
-scripts/                              migrate-deploy, check-voting, check-redesign
+prisma/schema.prisma                  55 models (5 for missions)
+scripts/                              migrate-deploy, check-session, check-voting,
+                                      check-redesign, check-missions
 ```
 
 Workspace navigation (defined in `src/app/dashboard/layout.tsx`):
 
-- Main links: My civic desk, Explore participation, Proposals & voting, My
-  communities, Community map, Accountability.
+- Main links: My civic desk, Mission studio, Explore participation, Proposals &
+  voting, My communities, Community map, Accountability.
+- The civic desk's main call to action is now "Start a mission".
 - Tool groups: **Participation tools**, **Community & insights**, **Learn & grow**.
 - Every existing feature must stay reachable. Add new pages to a group; do not
   remove entries.
@@ -180,7 +201,8 @@ Workspace navigation (defined in `src/app/dashboard/layout.tsx`):
 - **Prefer a rule to a prompt.** If something can be written as a function with a
   test (a tally, a quota, a threshold), it must not be a model's judgement.
 - **Keep all AI calls behind `chatCompletionsCreate`.** Do not import a provider
-  SDK in a route or a component.
+  SDK in a route or a component. The one existing exception is web search in
+  `src/lib/missions/ai.ts`; do not add a second.
 - **Do not invent data.** No fabricated statistics, testimonials, customer names
   or locations. Illustrative content carries a visible "example" label, as the
   landing page preview already does.
@@ -316,7 +338,7 @@ Loaded from Google Fonts in `src/app/layout.tsx`.
 
 ### 5.7 CSS architecture
 
-Three stylesheets load in this order in `src/app/layout.tsx`:
+Four stylesheets load in this order in `src/app/layout.tsx`:
 
 1. `globals.css` — Tailwind import, shadcn tokens, and **legacy utilities** from
    the dark theme (`.glass-card*`, `.glow-*`, `.text-gradient*`, starfield,
@@ -326,6 +348,8 @@ Three stylesheets load in this order in `src/app/layout.tsx`:
    surface. Breakpoints: 1200, 1150, 1000, 760, 550, 480px.
 3. `community.css` (about 880 lines) — the colour and personality layer. It
    overrides `civic.css` and is where colour decisions live.
+4. `missions.css` (about 1,850 lines) — everything for Mission Studio, layout
+   and colour together. Keep mission styles here; see 5.12 for what to fix in it.
 
 Rules for new work:
 
@@ -355,7 +379,11 @@ Rules for new work:
 
 ### 5.9 Voice
 
-- Plain, warm, second person. "Have your say", "View decision", "Big ideas. Local magic."
+- Plain, warm, second person. "Have your say", "View decision", "Start a mission".
+  The landing headline is now "Big ideas. Meet your team."
+- **"AI team" is a figure of speech; keep it honest.** Scout, Bridge, Maker and
+  Studio are four requested steps on one model. Never describe them as agents
+  that act on their own, remember people, contact anyone or decide anything.
 - Name the rule beside the action: voting method, closing time, threshold and who
   can see what appear before a person votes or signs.
 - State outcomes precisely: "Voting ended", "Threshold reached", "Awaiting official
@@ -394,32 +422,51 @@ Target WCAG 2.2 AA. For every interface change:
   until there is a redirect plan.
 - **`DESIGN.md` mentions `artifacts/colorful` screenshots** that are not in the repository.
 
-### 5.12 AI drafts, mission plans and community forms
+### 5.12 Mission Studio: how it looks now, and what to bring into line
 
-These rules apply the system above to the missions work. Check the existing
-mission screens against them and bring them into line.
+What exists (`src/app/missions.css`, loaded last, about 1,850 lines):
 
-- **An AI draft always looks like a draft.** Use the AI callout pair: fill
-  `#fff0c3`, border `#f2dd9d`, text `#745214`, with a visible "AI draft" label
-  and a spark icon. Once a person accepts it, it becomes a normal white card and
-  the label changes to who accepted it and when.
-- **References and unanswered questions sit with the draft**, not behind a
-  toggle. References are a short numbered list in the body font, each linking to
-  its source. Unanswered questions use the peach pair (`#ffe7df` / `#a44231`) so
-  they read as "needs a person", never as an error.
-- **Choosing is an equal choice.** "Add to mission" and "Leave out" have the
-  same size and weight; nothing is pre-selected, and declining a draft is one tap.
-- **Forms are reading surfaces.** White card, 18px radius, inputs at 12px radius
-  with a visible label above each field (never placeholder-only), help text in
-  muted ink at 14px or larger, errors in `#bf4054` with an icon and a sentence
-  that says how to fix it.
-- **Say who will see the answers** directly above the submit button, in plain
-  words, using the sky pair (`#e1f3ff` / `#226784`).
-- **Task and plan status use the tint pairs**: to do lilac, in progress sun,
-  done mint, blocked peach. Status is always text plus colour, never colour alone.
-- Submit is the primary violet pill. One primary button per form.
-- Forms must work at 390px with touch targets of at least 44px, and be fully
-  usable by keyboard and screen reader.
+- **Step colours** follow the tint pairs: Scout mint, Bridge peach, Maker lilac,
+  Studio sun. Keep this mapping everywhere a step is shown.
+- **An AI draft is labelled** "AI DRAFT · REVIEW WITH YOUR COMMUNITY" with a
+  spark icon, and gains an "Adopted" mark once accepted. The demo says
+  "ILLUSTRATIVE AI DRAFT".
+- **Questions the AI could not answer** sit in a sun block (`#fff3ce`, heading
+  `#775718`) directly under the findings.
+- **References** are numbered beside each finding and listed in a collapsed
+  "References behind this draft" panel, with a note that a reference identifies
+  the supplied context and does not prove the claim.
+- **The adopt bar** is lilac with one primary button ("Adopt this plan" or
+  "Publish this tool") and a confirmation dialog that says what adopting does
+  and does not do.
+- **The generated form** is a soft lilac card (`#f7f3ff`, border `#ded1f3`,
+  17px radius) with a visible label above each field, a `select` for choices and
+  a `textarea` for text. Above the button it says: "Your name and response are
+  visible to people with access to this mission."
+
+Bring into line (each is a small pull request):
+
+- **The draft label is 8px.** It is the most important label on the page. Make
+  it at least 12px, and give the whole draft the AI callout treatment from 5.3
+  (`#fff0c3`, border `#f2dd9d`, text `#745214`) until it is adopted.
+- **Small text.** `missions.css` has 42 declarations at 7 to 10px (3 at 7px, 6 at
+  8px, 8 at 9px, 25 at 10px). Raise labels to 12px and body to 14px.
+- **Two greys fail contrast**: `#8a7895` (3.97 on paper, 4.04 on white) and
+  `#887594` (4.11, 4.18), both used at 10 to 11px for effort estimates, source
+  details, empty columns, field help and response details. Replace with
+  `--muted-foreground #706779` or darker. `#796a86` passes on white (4.98) but
+  not on lilac (4.12).
+- **About 45 distinct hex values**, many a shade away from a token (`#fff3ce`,
+  `#fff3cd`, `#fff1d5`, `#fff1d0` beside the token `#fff0c3`). Replace
+  near-duplicates with the tokens in 5.2 and 5.3.
+- **The selected-step outline `#9a7be2`** is 3.27 on paper; that is acceptable
+  for a border but pair it with the existing `aria-pressed` and a text cue.
+- **Task status** should be text plus a tint: open lilac, claimed sun, done mint.
+  Never colour alone.
+- **Breakpoints** are only 1150 and 760px. Check the workbench at 1024 and 390px.
+- **Error text in forms** uses `.form-error`; keep `#bf4054` with an icon and a
+  sentence that says how to fix it.
+- Keep one primary button per form, 44px touch targets, and full keyboard use.
 
 ---
 
@@ -429,30 +476,28 @@ These are defects in the current code. A civic platform that asks people to trus
 its results cannot ship them. Do them in this order, each as its own pull request
 with tests. The repository is public, so treat every value in source as known.
 
-### 6.1 Sessions can be forged — critical
+### 6.1 Sessions — fixed in `cf56cb8`, with follow-ups
 
-`src/lib/auth.ts`: the cookie is `base64("userId:timestamp:random")` with no
-signature, and `getSession()` reads the user id out of it and trusts it. User ids
-are returned by the API (`creator.id`, `voterId` in `GET /api/proposals`), so
-anyone can build a cookie for any account, including an admin.
+The unsigned cookie is gone. `src/lib/session-token.ts` issues
+`v1.<payload>.<HMAC-SHA256>` tokens with a 30-day expiry, compares signatures in
+constant time, and rejects malformed, oversized, expired and future-dated tokens.
+`getSession()` verifies the token and then loads the user, so a deleted user loses
+access. `scripts/check-session.cjs` covers this (4 tests, passing).
 
-Steps:
+What you must do and know:
 
-1. Add a `Session` model: `id`, `userId`, `tokenHash` (unique), `expiresAt`,
-   `createdAt`, `lastSeenAt`, optional `userAgent`. Write the migration.
-2. On login and signup, generate 32 random bytes with `crypto.randomBytes`, set
-   the hex value as the cookie, and store only its SHA-256 hash.
-3. `getSession()` hashes the cookie, looks up the row, rejects if missing or
-   expired, then loads the user.
-4. Logout deletes the row. Add "sign out everywhere" (delete all rows for a user).
-5. Keep `httpOnly`, `sameSite: 'lax'`, `secure` in production. Shorten lifetime
-   to 14 days with sliding renewal.
-6. Update `parseSession` in `src/middleware.ts` so it only checks that a cookie
-   exists; real checks stay in handlers.
-7. Old cookies stop working on deploy. Say so in the PR; that is intended.
-
-Done when: a test proves a cookie built from a known user id is rejected, and a
-real login still works for citizen, official and admin.
+1. **Set `SESSION_SECRET` before deploying.** It must be at least 32 random
+   characters and identical on every worker. In production, sign-in and sign-up
+   fail without it. Generate one with `openssl rand -base64 48`. Never commit it.
+2. **Everyone is signed out on deploy.** Old cookies no longer verify. That is intended.
+3. **There is no revocation.** Tokens are stateless: logout only clears the
+   cookie, a copied token works until it expires, and changing a password does
+   not end other sessions. Follow-up: add a `sessionVersion` integer on `User`,
+   put it in the token, bump it on password change and on "sign out everywhere",
+   and reject tokens with an older version.
+4. **30 days is long for a civic platform.** Consider 14 days with renewal on use.
+5. Rotating `SESSION_SECRET` signs everyone out; document that as the emergency
+   response to a suspected leak.
 
 ### 6.2 Open seed and setup routes — critical
 
@@ -470,6 +515,9 @@ database and issued by an admin (the `Invitation` model already exists). Rotate
 anything that was ever deployed with the old values.
 
 ### 6.3 Votes and emails are exposed
+
+Since 6.1 was fixed, a leaked user id can no longer be turned into a session,
+but this is still a privacy defect.
 
 `GET /api/proposals` returns each creator's email and every vote as
 `{ voterId, option }`, including for proposals marked `isAnonymous`. The vote
@@ -511,96 +559,120 @@ only what it does.
 Each item lists what to build, the data it needs, and when it is done. Keep the
 order: later items depend on the trust established by earlier ones.
 
-### 7.0 Missions and AI-drafted community forms (current work — verify, then harden)
+### 7.0 Mission Studio — built; review results and what to do next
 
-This is the work in `cf56cb8` (section 0). The description below is the owner's;
-the checklist is what the code must satisfy. Go through it against the real
-diff, mark each line pass or fail in the pull request, and fix the failures
-before building anything new on top.
+Built in `cf56cb8`. This is the review of that code against the product rules.
+**Pass** means the code does it. **Gap** means it does not yet.
 
 **The form definition**
 
-- [ ] The AI returns a form as data, and the server validates it with `zod`
-      against a fixed list of field types (short text, long text, single choice,
-      multiple choice, number, date, yes/no, contact). Anything else is rejected,
-      not rendered.
-- [ ] Limits are enforced in code: number of fields, label and option length,
-      number of options.
-- [ ] No AI-drafted form, plan or task is visible to the community until a
-      person with rights on the mission accepts it. The acceptance is stored:
-      who, when, and which draft version.
-- [ ] An accepted form is versioned. Editing it after responses exist creates a
-      new version; old responses stay tied to the version they answered.
-- [ ] The AI does not add fields asking for health, religion, ethnicity,
-      political opinion, identity documents or financial details. If a person
-      adds one, the form shows a warning and requires a stated reason.
+- Pass — The form is data, validated by `zod` (`toolSchema` in
+  `src/lib/missions/validation.ts`). Only `text` and `choice` fields exist. No
+  generated code runs anywhere.
+- Pass — Limits are enforced in code: 1 to 6 fields, ids `f1` to `f6`, labels to
+  120 characters, 2 to 8 unique options per choice.
+- Pass — A form takes responses only after a manager publishes it, and tasks
+  exist only after a manager adopts the plan. `acceptedAt` and `reviewedBy` are stored.
+- Pass — A published form is an immutable run. A new form is a new run, and
+  responses are tied to the run they answered.
+- Gap — A person cannot edit a draft form, add or remove a field, or build one
+  by hand. The only choices are publish as drafted or run Studio again.
+- Gap — A published form cannot be closed or unpublished.
+- Gap — "Do not ask for names, contact details, addresses, health data or
+  political affiliations" exists only as an instruction in the prompt. Nothing in
+  code checks field labels, and a free-text answer can hold anything.
 
 **The AI draft**
 
-- [ ] All model calls go through `chatCompletionsCreate` in
-      `src/lib/ai-completions.ts`.
-- [ ] Mission text and form answers are treated as untrusted input: they are
-      passed as content to analyse, never as instructions, and model output is
-      never executed, never used as HTML, and never decides permissions.
-- [ ] Every reference shown on a draft resolves to something real (a record in
-      the database or a URL that was actually supplied). References that cannot
-      be resolved are dropped by code before display, not left to the model.
-- [ ] Unanswered questions are stored with the draft and shown, and a draft with
-      open questions can still be declined or edited.
-- [ ] A failed or empty model response produces a clear message and a way to
-      build the form by hand. The feature works without AI.
-- [ ] The draft records which model and prompt version produced it.
+- Pass — Model calls go through `chatCompletionsCreate`. One exception to know:
+  web search calls the Z AI SDK directly in `src/lib/missions/ai.ts`.
+- Pass — Mission content is sent as JSON data under a system prompt that says it
+  is untrusted. Output is parsed by schema and never used as HTML (no
+  `dangerouslySetInnerHTML` in mission components). Source links must be `http`
+  or `https` without credentials and open with `rel="noopener"`.
+- Pass — Every finding must cite a known source id or the whole output is
+  rejected. Note what this proves: the excerpt exists, not that the finding
+  follows from it. The interface says so; keep that sentence.
+- Pass — Unanswered questions are stored with the draft and shown.
+- Pass — A failed run is recorded with a clear message and never replaced by
+  canned content. Contributions are kept.
+- Gap — The run does not record which model or prompt version produced it.
+- To decide — Contributor names are sent to the model with each contribution
+  (`author` in the evidence). Either drop names before the call or say so in the
+  privacy notice.
 
 **Responses**
 
-- [ ] The submit route checks the session and the mission's eligibility rule in
-      the handler, validates the answers against the stored form version, and is
-      rate limited.
-- [ ] Reading responses is restricted in the handler to the mission's organisers.
-      A participant can read, edit and delete their own response.
-- [ ] The form states who will see the answers and how long they are kept
-      before the person submits (section 5.12), and the stored response records
-      that notice version.
-- [ ] One response per person per form unless the form allows several, enforced
-      by a database constraint and not only in the interface.
-- [ ] Responses can be exported by organisers and deleted with the mission.
-      Responses are never sent to the model unless the organiser asks for a
-      summary, and then without names or contact details.
-- [ ] No points, levels or reputation are awarded for responding.
+- Pass — The submit route checks the session and mission access, validates
+  answers against the stored form, and rejects unknown fields.
+- Pass — One response per person per form, enforced by a database constraint. A
+  person can update or delete their own.
+- Pass — Responses are not sent to the model.
+- Pass — No points or reputation are awarded anywhere in missions.
+- To decide — **Every member with access to the mission sees every response with
+  the author's name**, not only organisers. The form says so above the button.
+  This fits a skills board; it does not fit anything sensitive. See question 5.
+- Gap — The form does not say how long answers are kept.
+- Gap — No export of responses for organisers.
+- Gap — No route deletes a mission, so the cascade that would remove its
+  responses can never run.
+- Gap — No rate limit on responses or contributions (AI runs are limited to 12
+  per person per hour, and contributions are capped at 40 per mission).
 
 **Plans and tasks**
 
-- [ ] A task has an owner, a status and a history of who changed it.
-- [ ] AI-suggested tasks are drafts until accepted, like forms.
-- [ ] A mission page shows the plan, the tasks, the form and a count of
-      responses, with each AI-drafted part labelled until accepted.
+- Pass — A task has a status and an assignee. Claiming is atomic, so two people
+  cannot take the same task. Only the assignee or a manager can complete or release it.
+- Pass — Adopting a plan creates each task exactly once, inside a serialisable transaction.
+- Gap — No history of who changed a task and when.
+
+**Access**
+
+- Pass — A private mission is visible to its creator only. A community mission
+  is visible to current members; someone who leaves the community loses access,
+  including the creator. Others get "not found", not "forbidden".
+- Pass — Only the creator or a community admin or moderator can run AI steps
+  and adopt outputs.
 
 **Engineering**
 
-- [ ] The schema change ships as a Prisma migration (section 4), not `db push`.
-- [ ] New logic has tests: form validation, reference filtering, the response
-      permission checks.
-- [ ] Missions are reachable from the workspace navigation and the command menu.
-- [ ] `DESIGN.md` and `worklog.md` describe the feature.
+- Pass — The schema ships as a migration, `20261114120000_mission_studio`.
+- Pass — Tests exist: `scripts/check-missions.cjs` (real API and browser tests
+  on a disposable PostgreSQL with a local model fixture) and
+  `scripts/check-session.cjs`. Only the session tests were re-run for this review.
+- Pass — Missions are in the workspace navigation, the command menu, the civic
+  desk and the landing page.
+- Gap — AI runs are synchronous and need up to 120 seconds. If the server worker
+  is killed, the run is lost and shown as timed out. Check the hosting plan's
+  function time limit before promising this works in production.
+- Gap — `worklog.md` has no entry for this work.
 
-Why section 6 matters more now: form responses are personal data (names, skills,
-what people own, how to reach them). With the forgeable session cookie (6.1),
-anyone could submit as someone else or read an organiser's view. Fix 6.1 before
-any real community uses a mission form.
+**Next steps, in order**
 
-Next steps once the checklist passes:
+1. **Set `SESSION_SECRET` and deploy to a staging database.** Run
+   `npm run db:migrate:deploy`, then `scripts/check-missions.cjs`, then one real
+   mission end to end with the real model. Nothing here has been proven against a
+   live provider.
+2. **Let people edit a draft form before publishing**, and build one by hand.
+   Reuse `toolSchema` to validate the edited form. This is the largest gap
+   against "people decide": today they can only accept or reject.
+3. **Close, unpublish and delete.** Close a form to new responses, unpublish it,
+   and delete a mission with everything in it. Add CSV export for managers.
+4. **A code check for sensitive questions.** Reject or flag field labels that
+   match a short list (name, phone, email, address, health, religion, politics,
+   identity number) before a form can be published, and show the reason.
+5. **Record the model and prompt version** on `MissionRun`.
+6. **Decide who sees responses** (question 5) and add a per-form setting if the
+   answer is "it depends". State retention on the form.
+7. **Task history.** A small `MissionTaskEvent` table: task, actor, action, time.
+8. **Fix the design items in 5.12**, starting with the 8px draft label.
+9. **Matching.** Suggest which offers fit which tasks using a rule over form
+   fields; a person confirms every match.
+10. **Follow-through.** Link completed mission tasks to the accountability
+    tracker (7.5), and let a community save an adopted plan and form as a template.
 
-1. **Matching.** Turn responses into offers and needs, and suggest which offers
-   fit which tasks. The suggestion is a rule over form fields first; a model may
-   only help word the suggestion. A person confirms every match.
-2. **Follow-through.** Link mission tasks to the accountability tracker (7.5) so
-   a finished mission shows what was done with what people offered.
-3. **Templates.** Let a community save an accepted form and plan as a template
-   others can start from, with the original credited.
-4. **Languages.** Mission forms are the first content to translate (7.6).
-
-Done when: every checklist line is marked pass in a merged pull request, and
-section 0 of this file has been rewritten from the code.
+Done when: the gaps above are closed or explicitly accepted by the owner, and a
+real mission has run end to end on staging.
 
 ### 7.1 Verifiable sortition (smallest build, strongest demo)
 
@@ -771,7 +843,8 @@ risk; get a proper classification before marketing AI features to public bodies.
 - [ ] Works at 1440, 1024, 768 and 390px, by mouse and by keyboard.
 - [ ] Uses only the tokens and tint pairs in section 5; contrast checked.
 - [ ] Authorisation and input validation are in the route handler.
-- [ ] New logic has tests, and `node --test scripts/check-voting.cjs` still passes.
+- [ ] New logic has tests, and `node --test scripts/check-session.cjs scripts/check-voting.cjs` still passes.
+- [ ] Mission changes: `scripts/check-missions.cjs` passes, or the PR says it was not run.
 - [ ] `npm run lint` passes and `npx tsc --noEmit` shows no new diagnostics.
 - [ ] `npm run build:next` passes.
 - [ ] Schema changes ship as a migration.
@@ -792,7 +865,8 @@ Commit messages: `type(scope): description`, for example
   unless the code enforces exactly that.
 - Reintroduce the dark space theme, gradients on text, glow effects or glass cards.
 - Add an HTTP route that seeds, resets or migrates data.
-- Show an AI-drafted form, plan or task to the community before a person accepts it.
+- Let a form take responses, or tasks reach the action board, before a manager adopts them.
+- Remove the "AI draft" label or the references from an output that has not been adopted.
 - Collect a response without first telling the person who will see it.
 - Render a form field type that is not on the validated list.
 - Leave a commit unpushed at the end of a session.
@@ -803,13 +877,12 @@ Update this table in the same pull request as the work.
 
 | Item | Status |
 |---|---|
-| 6.1 Stored sessions | Not started |
+| 6.1 Signed sessions | Done in `cf56cb8`. Follow-ups open: set `SESSION_SECRET`, add revocation |
 | 6.2 Seed routes and official codes | Not started |
 | 6.3 Vote and email exposure | Not started |
 | 6.4 Tally integrity | Not started |
 | 6.5 Hardening | Not started |
-| 0 Missions commit `cf56cb8` on GitHub | Not pushed when last checked |
-| 7.0 Missions and community forms | Built by Codex (reported); not reviewed against the checklist |
+| 7.0 Mission Studio | Built in `cf56cb8` and reviewed. Open gaps listed in 7.0; not yet run on staging |
 | 7.1 Verifiable sortition | Not started |
 | 7.2 Consensus mapping | Not started |
 | 7.3 Verified identity | Not started |
@@ -831,6 +904,10 @@ Ask before building the part they affect; do not guess.
    voting (6.4)?
 4. Which AI provider and region should production use? It affects data
    residency for any public-sector customer.
-5. For mission forms: who may see responses (organisers only, or all mission
-   members), and how long are they kept? The form must say so before submit (7.0).
-6. Who may accept an AI draft into a mission: its creator only, or any organiser?
+5. For mission forms: today every member with access to the mission sees every
+   response with the author's name. Is that right for all forms, or should a
+   form be able to limit answers to organisers? And how long are answers kept?
+6. Does the hosting plan allow a request to run for 120 seconds? Mission AI
+   steps need it (section 2).
+7. May contributor names be sent to the AI provider with their contributions,
+   or should they be removed first (7.0)?
