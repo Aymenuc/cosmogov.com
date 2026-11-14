@@ -158,3 +158,23 @@ Stage Summary:
 - Signup page supports government official registration with verification codes
 - Push notification toggle in settings page
 - All features compile and build successfully
+
+---
+Task: Landing page redesign (14 Nov 2026)
+
+Work Log:
+- Replaced the static hero preview with an interactive mission board (`src/components/landing/MissionBoard.tsx`, data in `missions.ts`): three illustrative goals, four AI steps, references and open questions on each draft, and equal adopt / leave-out choices. No model is called.
+- Replaced the three-step "how it works" grid with a scroll-drawn mission path (`MissionPath.tsx`) and six original SVG illustrations (`StepArt.tsx`). Motion is skipped under reduced motion.
+- Replaced the stock-photo section with a wall of mission ideas.
+- Added `src/app/landing.css`, loaded only by the landing page. Raised all landing text to 12px or more, and header and footer text to 13px or more.
+- Removed the unused `MissionPreview` component and the style rules for removed sections (about 440 lines across `civic.css`, `community.css`, `missions.css`).
+- Header link order now matches the page: How it works, Platform, Pricing.
+- Added two FAQ entries: whether the AI steps are independent agents, and whether a draft can be wrong.
+- Extended `scripts/check-redesign.cjs` to cover the mission board.
+
+Verification:
+- `node scripts/check-redesign.cjs`: 11 of 11 pass. `node --test scripts/check-session.cjs scripts/check-voting.cjs`: 12 of 12 pass.
+- ESLint clean on changed files. `tsc --noEmit` still reports the 16 pre-existing diagnostics and no new ones.
+- No horizontal overflow at 390, 768, 1024 and 1440px. Reduced-motion screenshots were byte-identical before and after the style removal.
+- `npx next build` passes.
+- Not run: `scripts/check-missions.cjs` (needs a disposable PostgreSQL).

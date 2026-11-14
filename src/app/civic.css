@@ -431,53 +431,6 @@ h2 em {
   font-weight: 600;
   color: var(--civic-accent);
 }
-.floating-outcome {
-  position: absolute;
-  left: -19px;
-  bottom: 13px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 20px;
-  background: #fffefa;
-  border: 1px solid #d7d5de;
-  border-radius: 9px;
-  box-shadow: 0 9px 30px #29243c0b;
-  min-width: 255px;
-}
-.floating-outcome > div {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #e5e2ee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5c576c;
-}
-.floating-outcome > span {
-  font-size: 10px;
-  line-height: 1.6;
-  color: #6a657d;
-}
-.floating-outcome strong {
-  font-weight: 600;
-  color: var(--civic-ink);
-}
-.floating-outcome .tiny-star {
-  margin-left: 18px;
-  font-size: 27px;
-  color: #9f6a40;
-}
-.visual-coordinate {
-  position: absolute;
-  right: 22px;
-  bottom: -12px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 8px;
-  letter-spacing: 0.7px;
-  color: #69637c;
-}
 .platform-ribbon {
   border-block: 1px solid var(--civic-line);
 }
@@ -646,115 +599,6 @@ h2 em {
   color: #6b657e;
   line-height: 1.8;
   max-width: 360px;
-}
-.how-section {
-  background: #e3e0ed;
-  border-block: 1px solid #dad6e7;
-}
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 50px;
-  margin-top: 58px;
-}
-.step-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #c8c5d2;
-  padding-bottom: 23px;
-  margin-bottom: 23px;
-}
-.step-top span {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 12px;
-  color: #676179;
-}
-.step-top svg {
-  color: #69637c;
-}
-.steps-grid h3 {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -0.5px;
-  line-height: 1.4;
-  max-width: 240px;
-}
-.steps-grid p {
-  font-size: 12px;
-  line-height: 1.9;
-  color: #69637c;
-  margin-top: 13px;
-  max-width: 300px;
-}
-.mission-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 90px;
-  align-items: center;
-}
-.mission-image {
-  position: relative;
-  height: 430px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.mission-image > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.mission-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(transparent 40%, #221d329c);
-}
-.mission-image > div {
-  position: absolute;
-  bottom: 28px;
-  left: 28px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  color: #e5e2ee;
-  font-size: 12px;
-  line-height: 1.7;
-}
-.mission-image strong {
-  font-weight: 600;
-}
-.mission-copy h2 {
-  margin: 18px 0 25px;
-}
-.mission-copy > p {
-  font-size: 13px;
-  line-height: 1.9;
-  color: #6b657e;
-  margin: 13px 0;
-  max-width: 390px;
-}
-.mission-copy > .text-link {
-  margin-top: 14px;
-}
-.mission-values {
-  display: flex;
-  gap: 28px;
-  border-top: 1px solid var(--civic-line);
-  margin-top: 30px;
-  padding-top: 24px;
-}
-.mission-values span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 9px;
-  line-height: 1.5;
-}
-.mission-values svg {
-  color: #67617a;
-  flex: none;
 }
 .pricing-section {
   background: #eae8f1;
@@ -3002,18 +2846,12 @@ h2 em {
   .orbit-label {
     left: 15px;
   }
-  .floating-outcome {
-    left: -5px;
-  }
   .feature-panel {
     padding: 35px;
     gap: 35px;
   }
   .ribbon-inner > span {
     padding-right: 25px;
-  }
-  .mission-section {
-    gap: 55px;
   }
   .workspace-topbar {
     padding-inline: 25px;
@@ -3103,11 +2941,6 @@ h2 em {
   .preview-photo {
     height: 140px;
   }
-  .floating-outcome {
-    bottom: 15px;
-    min-width: 225px;
-    padding: 12px 16px;
-  }
   .ribbon-inner {
     gap: 20px;
     flex-wrap: wrap;
@@ -3128,16 +2961,6 @@ h2 em {
   }
   .feature-copy h3 {
     font-size: 28px;
-  }
-  .mission-section {
-    gap: 40px;
-  }
-  .mission-image {
-    height: 385px;
-  }
-  .mission-values {
-    gap: 14px;
-    flex-wrap: wrap;
   }
   .pricing-card {
     padding: 24px 20px;
@@ -3377,15 +3200,6 @@ h2 em {
   .preview-bottom > a {
     font-size: 10px;
   }
-  .floating-outcome {
-    left: -8px;
-    bottom: 12px;
-  }
-  .visual-coordinate {
-    font-size: 7px;
-    bottom: -9px;
-    right: 10px;
-  }
   .ribbon-inner {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -3474,38 +3288,6 @@ h2 em {
   .supporting-features p {
     font-size: 12px;
     max-width: 100%;
-  }
-  .steps-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    margin-top: 35px;
-  }
-  .step-top {
-    padding-bottom: 17px;
-    margin-bottom: 17px;
-  }
-  .steps-grid h3 {
-    max-width: 100%;
-    font-size: 19px;
-  }
-  .steps-grid p {
-    font-size: 13px;
-    max-width: 450px;
-  }
-  .mission-section {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
-  .mission-image {
-    height: 350px;
-  }
-  .mission-copy > p {
-    font-size: 13px;
-    max-width: 100%;
-  }
-  .mission-values {
-    font-size: 11px;
-    gap: 25px;
   }
   .pricing-grid {
     grid-template-columns: 1fr;

@@ -225,6 +225,31 @@ async function fixtures(context) {
   await check("Homepage, feature tabs, pricing and FAQ", async () => {
     await page.goto(base, { waitUntil: "networkidle", timeout: 120000 });
     await page.getByRole("heading", { name: /Big ideas/ }).waitFor();
+    // The hero's mission board: drafts show references and an open question,
+    // and only a person's choice adds anything to the mission.
+    const board = page.locator(".mission-board");
+    await board.getByText("Illustrative mission", { exact: true }).waitFor();
+    await board.getByText("Still to check", { exact: true }).waitFor();
+    assert.equal(await board.locator(".board-references li").count(), 2);
+    assert.equal(await board.locator(".board-choices").count(), 0);
+    await board.getByRole("button", { name: /Next: Bridge/ }).click();
+    await board.getByRole("button", { name: /Next: Maker/ }).click();
+    const choices = board.locator(".board-choices button");
+    assert.equal(await choices.count(), 2);
+    const [adopt, leave] = await Promise.all([
+      choices.nth(0).boundingBox(),
+      choices.nth(1).boundingBox(),
+    ]);
+    assert.equal(adopt.height, leave.height);
+    await board.getByRole("button", { name: "Adopt it", exact: true }).click();
+    await board.getByText("Adopted by you", { exact: true }).waitFor();
+    await board.getByRole("button", { name: "Undo", exact: true }).click();
+    assert.equal(await board.getByText("Adopted by you").count(), 0);
+    await page.getByRole("button", { name: "Make a crossing safer" }).click();
+    await board
+      .getByRole("heading", { name: "A safer way across Elm Street." })
+      .waitFor();
+    assert.equal(await page.locator(".mission-path .path-stop").count(), 6);
     await page.getByRole("tab", { name: "Participatory budgets" }).click();
     await page
       .getByRole("heading", { name: "Decide where the budget goes." })

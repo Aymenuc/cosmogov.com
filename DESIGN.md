@@ -6,7 +6,7 @@ Cosmogov connects a citizen's contribution with a visible decision process: disc
 
 The visual identity invites people into community life: an original spark mark, bold Manrope typography, warm cream, vivid violet, coral, sunshine yellow, mint, and sky blue. An original geometric illustration of neighbors appears on the homepage, civic desk, and account entry. Topic colors help people scan proposals; voting choices keep neutral, equally weighted presentation. Decorative entrance motion runs once and respects reduced-motion preferences. The shared theme covers existing app surfaces; primary pages have new layouts and interaction patterns.
 
-The homepage leads with “Big ideas. Meet your team.” and conversational language. The civic desk uses a friendly personal greeting, a colorful invitation to contribute, and distinct participation cards. Decision rooms retain quiet reading surfaces, visible rules, and clear labels.
+The homepage leads with “Big ideas. Meet your team.” and conversational language. Its hero is a working miniature of a mission: a visitor picks one of three example goals, steps through Scout, Bridge, Maker and Studio, sees each draft’s references and open question, and chooses whether a plan or a form joins the mission. The two choices are the same size, and nothing is preselected. Below it, “How a mission moves” is a six-stop path whose dotted trail is drawn by scroll position; each AI step is illustrated as a tool and carries its house rule, and people are illustrated as people. A wall of mission ideas replaces the former stock photograph. All landing text is 12px or larger. Landing styles live in `src/app/landing.css`, loaded by the page only. The civic desk uses a friendly personal greeting, a colorful invitation to contribute, and distinct participation cards. Decision rooms retain quiet reading surfaces, visible rules, and clear labels.
 
 ## New behavior
 
@@ -21,7 +21,7 @@ The homepage leads with “Big ideas. Meet your team.” and conversational lang
 
 ## Scope and data
 
-Existing participation routes and backend integrations are retained. Mission Studio adds PostgreSQL models and a migration, documented in [MISSION_STUDIO.md](./MISSION_STUDIO.md). The landing page's Riverside preview is explicitly illustrative. Screenshots under `artifacts/colorful` use isolated test fixtures, not customer records. The remaining city photograph is downloaded locally from Unsplash and depicts a street rather than a claimed customer location; the community artwork and spark mark are original SVGs in the source.
+Existing participation routes and backend integrations are retained. Mission Studio adds PostgreSQL models and a migration, documented in [MISSION_STUDIO.md](./MISSION_STUDIO.md). The landing page's example missions and Riverside preview are fixed, explicitly illustrative content; the landing page never calls a model. Screenshots under `artifacts/colorful` use isolated test fixtures, not customer records. The landing page no longer uses a photograph (`public/images/city.jpg` and `park.jpg` are now unreferenced); the community artwork, the six mission-path illustrations and the spark mark are original SVGs in the source.
 
 ## Verification
 
