@@ -215,3 +215,13 @@ Task: Editable mission forms within Claude’s redesign (14 Nov 2026)
 - Added a migration for form origin and source-version lineage. Form save routes enforce manager access, shared validation, source membership, context revisions and a separate 60-draft hourly limit. Manual saves do not consume paid AI run quota.
 - Extended the real-database and browser suite for manual creation, invalid schemas, source-version access, revision preservation, publication and the editor layouts.
 - Verification: production Webpack build passed (109 static pages). All 26 disposable-PostgreSQL/API/browser mission checks passed, including the three migrations, manual authoring, version preservation, input/access validation, publish/respond flows and editor sizes at 390/768/1024/1440px. All 13 production browser checks passed, including Claude’s interactive landing board, illustrated scrolling path, stickers, garden and mission starters, plus editing and publishing an AI form in the public example. Seven sticker rules, four session rules and eight voting rules passed. Targeted editor/route/schema lint passed. The typecheck retains the same 16 existing errors. External AI/search providers and a deployed staging database were not exercised.
+
+---
+Task: Civic integrity recommendations (14 Nov 2026)
+
+- Removed HTTP seed handlers and public official codes. Added administrator-issued hashed, expiring, email-bound invitations and eligibility review controls.
+- Proposal reads return totals and the caller’s own ballot. Creator emails and other ballots are omitted; proposal edits require creator/moderator access and content/rules lock after voting starts.
+- Removed voting XP and unsupported ranked-choice creation/submission. Added persistent throttles and logout/all-session revocation.
+- Budget allowance and signature counts use serializable transactions. Reviewed signatures, not unverified submissions, determine formal-response thresholds. Removed unsupported legal-binding claims.
+- Added admin invitation/review UI and “Sign out everywhere,” preserving the shared redesign. Enabled React strict mode.
+- Verification: 35 disposable-database/API/browser checks passed, including nine new integrity checks covering every exported admin and government handler; nine vote rule tests and four session tests passed. Final combined build and browser regression checks will follow the mission-controls work.

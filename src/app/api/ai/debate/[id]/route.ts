@@ -15,7 +15,7 @@ export async function GET(
     const debate = await db.debateSession.findUnique({
       where: { id },
       include: {
-        creator: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        creator: { select: { id: true, name: true, avatarUrl: true } },
         assembly: { select: { id: true, name: true, slug: true } },
         meeting: { select: { id: true, title: true } },
         participants: {
@@ -100,7 +100,7 @@ export async function PATCH(
       where: { id },
       data: updateData,
       include: {
-        creator: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        creator: { select: { id: true, name: true, avatarUrl: true } },
       },
     });
 

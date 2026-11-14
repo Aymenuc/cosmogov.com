@@ -1,42 +1,69 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getSession } from '@/lib/auth';
-
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-  const { id } = await params;
-
-  const { option, confidence, reasoning } = await req.json();
-  if (!option) return NextResponse.json({ error: 'Option is required' }, { status: 400 });
-
-  // A stale page must not submit a vote after the decision window closes.
-  const proposal = await db.proposal.findUnique({ where: { id } });
-  if (!proposal) return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
-  if (proposal.status !== 'active' || (proposal.closesAt && proposal.closesAt <= new Date())) {
-    return NextResponse.json({ error: 'Voting is no longer open for this proposal.' }, { status: 409 });
-  }
-  let options: string[];
-  try { options = JSON.parse(proposal.options || '["For","Against"]'); }
-  catch { return NextResponse.json({ error: 'This proposal’s voting options are unavailable.' }, { status: 409 }); }
-  if (!Array.isArray(options) || !options.includes(option)) {
-    return NextResponse.json({ error: 'Choose one of this proposal’s voting options.' }, { status: 400 });
-  }
-
-  // Check if already voted
-  const existing = await db.vote.findUnique({ where: { proposalId_voterId: { proposalId: id, voterId: session.id } } });
-  if (existing) {
-    // Update vote
-    const vote = await db.vote.update({ where: { id: existing.id }, data: { option, confidence, reasoning } });
+import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { apiUser, apiFailure, ApiError, rateLimit } from "@/lib/api-server";
+import { accessProposal } from "@/lib/proposals-server";
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const user = await apiUser();
+    await rateLimit("proposal-vote", user.id, 120, 3600);
+    const { id } = await params;
+    await accessProposal(id, user.id);
+    const data = z
+      .object({
+        option: z.string().trim().min(1).max(160),
+        confidence: z.number().int().min(1).max(5).nullish(),
+        reasoning: z.string().trim().max(2000).nullish(),
+      })
+      .parse(await req.json());
+    const vote = await db.$transaction(
+      async (tx) => {
+        const proposal = await tx.proposal.findUniqueOrThrow({ where: { id } });
+        if (
+          proposal.status !== "active" ||
+          (proposal.closesAt && proposal.closesAt <= new Date())
+        )
+          throw new ApiError(
+            409,
+            "Voting is no longer open for this proposal.",
+          );
+        if (
+          !["yes_no", "single_choice", "multiple_choice"].includes(
+            proposal.votingType,
+          )
+        )
+          throw new ApiError(
+            409,
+            "This voting method is not available. The organizer must select a supported method before voting.",
+          );
+        let options: unknown;
+        try {
+          options = JSON.parse(proposal.options);
+        } catch {
+          throw new ApiError(
+            409,
+            "This proposal’s voting options are unavailable.",
+          );
+        }
+        if (!Array.isArray(options) || !options.includes(data.option))
+          throw new ApiError(
+            400,
+            "Choose one of this proposal’s voting options.",
+          );
+        return tx.vote.upsert({
+          where: { proposalId_voterId: { proposalId: id, voterId: user.id } },
+          create: { proposalId: id, voterId: user.id, ...data },
+          update: data,
+        });
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
     return NextResponse.json(vote);
+  } catch (error) {
+    return apiFailure(error);
   }
-
-  const vote = await db.vote.create({
-    data: { proposalId: id, voterId: session.id, option, confidence, reasoning },
-  });
-
-  // Award XP
-  await db.user.update({ where: { id: session.id }, data: { totalXp: { increment: 10 } } });
-
-  return NextResponse.json(vote, { status: 201 });
 }

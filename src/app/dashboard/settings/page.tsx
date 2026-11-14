@@ -1,4 +1,5 @@
 'use client';
+import SessionControls from '@/components/SessionControls';
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -176,6 +177,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
+          <SessionControls />
           <Card className="bg-card border-cosmic-rose/10">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-2 flex items-center gap-2 text-cosmic-rose">

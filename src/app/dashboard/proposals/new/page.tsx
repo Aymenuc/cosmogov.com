@@ -115,7 +115,6 @@ export default function CreateProposalPage() {
                   <SelectContent>
                     <SelectItem value="yes_no">Yes / No</SelectItem>
                     <SelectItem value="single_choice">Single Choice</SelectItem>
-                    <SelectItem value="ranked_choice">Ranked Choice</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

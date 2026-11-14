@@ -299,7 +299,7 @@ async function fixtures(context) {
       timeout: 120000,
     });
     await page.getByRole("button", { name: /Government official/ }).click();
-    await page.getByLabel("Government verification code").waitFor();
+    await page.getByLabel("Official invitation code").waitFor();
     await page.getByLabel("Your name").fill("Alex");
     await page.getByLabel("Email address").fill("alex@example.test");
     await page.getByLabel("Password", { exact: true }).fill("Example123");

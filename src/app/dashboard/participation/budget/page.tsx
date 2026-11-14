@@ -78,6 +78,7 @@ export default function BudgetPage() {
   const [selectedProcess, setSelectedProcess] = useState<string>('all');
   const [availableProcesses, setAvailableProcesses] = useState<{ id: string; title: string; totalBudget: number }[]>([]);
   const [showSubmitted, setShowSubmitted] = useState(false);
+  const [allocationError, setAllocationError] = useState('');
 
   useEffect(() => {
     fetchBudgetData();
@@ -95,7 +96,8 @@ export default function BudgetPage() {
       if (res.ok) {
         const data = await res.json();
         setProjects(data.projects);
-        if (data.budgetPool) setBudgetPool(data.budgetPool);
+        setBudgetPool(data.budgetPool || null);
+        setUserAllocations(Object.fromEntries(data.projects.flatMap((project: BudgetProject) => project.budgetVotes.map(vote => [project.id, vote.amount]))));
 
         // Extract unique processes from projects
         const procs = new Map<string, { id: string; title: string; totalBudget: number }>();
@@ -113,7 +115,8 @@ export default function BudgetPage() {
 
   async function handleAllocate(projectId: string) {
     const amount = allocationInputs[projectId];
-    if (!amount || parseFloat(amount) <= 0) return;
+    if (amount === undefined || amount.trim() === "" || !Number.isFinite(Number(amount)) || Number(amount) < 0) return;
+    setAllocationError('');
 
     setSubmitting(projectId);
     try {
@@ -132,7 +135,7 @@ export default function BudgetPage() {
         await fetchBudgetData();
       } else {
         const data = await res.json();
-        console.error(data.error);
+        setAllocationError(data.error || 'This allocation could not be saved.');
       }
     } catch (err) {
       console.error(err);
@@ -141,12 +144,13 @@ export default function BudgetPage() {
     }
   }
 
-  const totalUserAllocated = Object.values(userAllocations).reduce((s, a) => s + a, 0);
+  const totalUserAllocated = budgetPool?.allocated ?? Object.values(userAllocations).reduce((s, a) => s + a, 0);
   const userBudgetRemaining = budgetPool ? budgetPool.remaining : 0;
   const allocatedProjects = Object.entries(userAllocations).filter(([, amount]) => amount > 0);
 
   return (
-    <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
+    <div className="space-y-6 budget-workspace">
+      {allocationError && <p role="alert" className="form-error">{allocationError}</p>}
       {/* Back Navigation */}
       <Link href="/dashboard/participation" className="inline-flex items-center gap-2 text-sm text-cosmic-muted hover:text-cosmic-teal transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Participation Hub
@@ -154,7 +158,7 @@ export default function BudgetPage() {
 
       {/* Budget Pool Hero */}
       <div className="relative overflow-hidden rounded-2xl glass-card-amber p-8">
-        <div className="absolute inset-0 starfield opacity-20" />
+
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Wallet className="w-5 h-5 text-cosmic-amber" />
@@ -164,7 +168,7 @@ export default function BudgetPage() {
             Allocate <span className="text-gradient-warm">Community Funds</span>
           </h1>
           <p className="text-cosmic-muted text-sm max-w-2xl mb-6">
-            Your voice decides where the money goes. Allocate budget to the projects you believe in most. Every dollar you assign is a vote for your community&apos;s future.
+            Each participant can allocate up to the process budget across its projects. Allocations express priorities; they do not spend money or approve a project.
           </p>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -175,13 +179,13 @@ export default function BudgetPage() {
               </p>
             </div>
             <div className="glass-card p-4 rounded-xl">
-              <span className="text-xs text-cosmic-muted">Community Allocated</span>
+              <span className="text-xs text-cosmic-muted">Your allocated allowance</span>
               <p className="text-xl font-bold text-cosmic-teal font-heading">
                 {budgetPool ? formatCurrency(budgetPool.allocated, budgetPool.currency) : '$0'}
               </p>
             </div>
             <div className="glass-card p-4 rounded-xl">
-              <span className="text-xs text-cosmic-muted">Remaining</span>
+              <span className="text-xs text-cosmic-muted">Your remaining allowance</span>
               <p className="text-xl font-bold text-foreground font-heading">
                 {budgetPool ? formatCurrency(budgetPool.remaining, budgetPool.currency) : '$0'}
               </p>

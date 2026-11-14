@@ -72,8 +72,8 @@ interface Stats {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  binding_proposal: { label: 'Binding Proposal', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Gavel },
-  binding_referendum: { label: 'Binding Referendum', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Scale },
+  binding_proposal: { label: 'Formal proposal', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Gavel },
+  binding_referendum: { label: 'Referendum request', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Scale },
   citizen_bill: { label: 'Citizen Bill', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: FileSignature },
 };
 
@@ -90,7 +90,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 const TYPE_TABS = [
   { key: 'all', label: 'All Types' },
-  { key: 'binding_proposal', label: 'Binding Proposal' },
+  { key: 'binding_proposal', label: 'Formal proposal' },
   { key: 'binding_referendum', label: 'Referendum' },
   { key: 'citizen_bill', label: 'Citizen Bill' },
 ];
@@ -223,14 +223,14 @@ export default function BindingProposalsPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Gavel className="w-5 h-5 text-cosmic-rose" />
-            <span className="text-cosmic-rose text-sm font-semibold tracking-wider uppercase">Binding Proposals</span>
+            <span className="text-cosmic-rose text-sm font-semibold tracking-wider uppercase">Formal response proposals</span>
           </div>
           <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Your Voice Has{' '}
             <span className="text-gradient-rose">Real Power</span>
           </h1>
           <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            When citizens reach the signature threshold, the government is legally required to respond. Your voice has real power.
+            Collect support for a formal response. Only signatures reviewed for eligibility count toward the threshold; legal duties depend on your local rules.
           </p>
 
           {/* Stats */}
@@ -263,10 +263,10 @@ export default function BindingProposalsPage() {
           </div>
           <div>
             <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              Binding = Government MUST Respond
+              A threshold is a request for a formal response
             </h3>
             <p className="text-xs text-cosmic-muted mt-0.5">
-              When a binding proposal reaches its signature threshold, the government is legally obligated to provide an official response within the deadline.
+              A reviewed signature threshold records support for a response. It does not establish a legal duty or approve the proposal.
             </p>
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function BindingProposalsPage() {
           className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90"
           onClick={() => setCreateDialogOpen(true)}
         >
-          <Plus className="w-4 h-4 mr-2" /> Create Binding Proposal
+          <Plus className="w-4 h-4 mr-2" /> Create formal proposal
         </Button>
       </div>
 
@@ -327,10 +327,10 @@ export default function BindingProposalsPage() {
       ) : proposals.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <Gavel className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No Binding Proposals Yet</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Formal response proposals Yet</h3>
           <p className="text-cosmic-muted text-sm mb-4">Create a binding proposal and rally citizens to force government action.</p>
           <Button className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90" onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Create Binding Proposal
+            <Plus className="w-4 h-4 mr-2" /> Create formal proposal
           </Button>
         </div>
       ) : (
@@ -369,7 +369,7 @@ export default function BindingProposalsPage() {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* LARGE Signature Progress Bar */}
+                  {/* LARGE Reviewed signature progress Bar */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-cosmic-muted flex items-center gap-1">
@@ -545,10 +545,10 @@ export default function BindingProposalsPage() {
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2">
               <Gavel className="w-5 h-5 text-cosmic-rose" />
-              Create Binding Proposal
+              Create formal proposal
             </DialogTitle>
             <DialogDescription className="text-cosmic-muted">
-              Create a proposal that legally requires government response at threshold
+              Create a proposal and state the response process you are requesting.
             </DialogDescription>
           </DialogHeader>
 
@@ -670,7 +670,7 @@ export default function BindingProposalsPage() {
               disabled={creating || !createForm.title || !createForm.description}
             >
               {creating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Gavel className="w-4 h-4 mr-2" />}
-              Create Binding Proposal
+              Create formal proposal
             </Button>
           </DialogFooter>
         </DialogContent>

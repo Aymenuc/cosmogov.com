@@ -11,6 +11,7 @@ export interface CivicProposal {
   creator?: { name: string | null };
   organization?: { name: string; slug: string } | null;
   _count?: { votes: number; comments: number };
+  voteTotals?: { option: string; count: number }[];
   votes?: { voterId: string; option: string }[];
 }
 export function isOpen(proposal: CivicProposal) {

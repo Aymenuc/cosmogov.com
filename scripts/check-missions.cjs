@@ -198,6 +198,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     assert.equal((await api(`/${missionId}/contributions`, { method: 'POST', cookie: memberCookie, body: { kind: 'perspective', title: 'Former member', content: 'Cannot add this.' } })).status, 404);
     await db.membership.create({ data: { userId: member.id, organizationId: org.id } });
   });
+  await require("./check-integrity.cjs")({ check, db, base, owner, member, org, ownerCookie, memberCookie, login, passwordHash });
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
   const cookieValue = ownerCookie.slice(ownerCookie.indexOf('=') + 1); await context.addCookies([{ name: 'cosmogov_session', value: cookieValue, url: base }]);
