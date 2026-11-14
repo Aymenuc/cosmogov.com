@@ -61,4 +61,3 @@ ALTER TABLE "MissionTemplate" ADD CONSTRAINT "MissionTemplate_organizationId_fke
 
 -- AddForeignKey
 ALTER TABLE "MissionTemplate" ADD CONSTRAINT "MissionTemplate_sourceMissionId_fkey" FOREIGN KEY ("sourceMissionId") REFERENCES "Mission"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
