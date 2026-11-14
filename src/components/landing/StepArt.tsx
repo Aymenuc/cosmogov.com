@@ -278,6 +278,61 @@ function Decide() {
   );
 }
 
+/** A four-point sparkle centred on (cx, cy). */
+const sparkle = (cx: number, cy: number, r: number) => {
+  const k = r * 0.3;
+  return `M${cx} ${cy - r}L${cx + k} ${cy - k}L${cx + r} ${cy}L${cx + k} ${cy + k}L${cx} ${cy + r}L${cx - k} ${cy + k}L${cx - r} ${cy}L${cx - k} ${cy - k}Z`;
+};
+
+/** Small marks that spill past the edge of each tile, like ink on a sticker. */
+const accents: Record<StepArtName, React.JSX.Element> = {
+  goal: (
+    <>
+      <path d={sparkle(-4, 28, 7)} fill={CORAL} />
+      <path d={sparkle(100, 30, 6)} fill={VIOLET} />
+      <circle cx="92" cy="8" r="3" fill={SUN} />
+    </>
+  ),
+  scout: (
+    <path
+      d="M80 30l7-8m-1 18 9-4m-23-12 2-10"
+      stroke={INK}
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+  ),
+  bridge: (
+    <>
+      <circle cx="80" cy="18" r="4.5" fill={SUN} />
+      <path d={sparkle(92, 32, 5.5)} fill={VIOLET} />
+      <circle cx="8" cy="80" r="3.5" fill={CORAL} />
+    </>
+  ),
+  maker: (
+    <path
+      d="M86 10l6-8m2 18 9-4M75 6V-3"
+      stroke={INK}
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+  ),
+  studio: (
+    <>
+      <circle cx="2" cy="52" r="3.5" fill={VIOLET} />
+      <path d={sparkle(4, 24, 6)} fill={INK} />
+      <circle cx="90" cy="66" r="3" fill={CORAL} />
+    </>
+  ),
+  decide: (
+    <path
+      d="M33 57l-8-4m11 13-6 8m0-12-9 1"
+      stroke={INK}
+      strokeWidth="3"
+      strokeLinecap="round"
+    />
+  ),
+};
+
 const art: Record<StepArtName, () => React.JSX.Element> = {
   goal: Goal,
   scout: Scout,
@@ -298,6 +353,7 @@ export default function StepArt({ name }: { name: StepArtName }) {
       focusable="false"
     >
       <Art />
+      <g className="step-art-accent">{accents[name]}</g>
     </svg>
   );
 }

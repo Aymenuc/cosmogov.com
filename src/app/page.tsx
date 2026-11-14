@@ -34,6 +34,7 @@ import { BrandMark } from "@/components/Brand";
 import CommonsArt from "@/components/CommonsArt";
 import MissionBoard, { MissionChooser } from "@/components/landing/MissionBoard";
 import MissionPath from "@/components/landing/MissionPath";
+import CommonsStreet from "@/components/landing/CommonsStreet";
 import { boardMissions } from "@/components/landing/missions";
 // Ideas only. Each one is a kind of mission a community might start.
 const missionIdeas = [
@@ -201,6 +202,8 @@ export default function HomePage() {
                 <strong>It’s an example. Nothing breaks.</strong>
               </span>
             </div>
+            <span className="board-tape board-tape-left" aria-hidden="true" />
+            <span className="board-tape board-tape-right" aria-hidden="true" />
             <MissionBoard missionId={missionId} />
           </div>
         </section>
@@ -593,6 +596,7 @@ export default function HomePage() {
             </div>
             <BrandMark className="cta-mark" />
           </div>
+          <CommonsStreet />
         </section>
       </main>
       <Footer />

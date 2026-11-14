@@ -36,6 +36,21 @@ export function MissionChooser({
           </button>
         ))}
       </div>
+      <svg
+        className="chooser-arrow"
+        viewBox="0 0 120 64"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M4 50C26 14 68 4 108 24m0 0-17-3m17 3-8 15"
+          stroke="currentColor"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
     </div>
   );
 }

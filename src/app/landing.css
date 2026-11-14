@@ -159,7 +159,17 @@
   color: #29223d;
 }
 .mission-chooser {
+  position: relative;
   margin-top: 34px;
+}
+/* A hand-drawn nudge from the goals to the board they drive. */
+.chooser-arrow {
+  position: absolute;
+  top: -40px;
+  left: 232px;
+  width: 104px;
+  color: var(--ink);
+  transform: rotate(-6deg);
 }
 .mission-chooser > span {
   display: block;
@@ -225,6 +235,39 @@
   left: 20px;
   font-size: 13px;
   color: #29223d;
+}
+
+/* Two strips of paper tape hold the board to the page. */
+.board-tape {
+  position: absolute;
+  z-index: 2;
+  width: 78px;
+  height: 24px;
+  background: #ff785f;
+  clip-path: polygon(
+    0 0,
+    4% 25%,
+    0 50%,
+    4% 75%,
+    0 100%,
+    100% 100%,
+    96% 75%,
+    100% 50%,
+    96% 25%,
+    100% 0
+  );
+  opacity: 0.9;
+}
+.board-tape-left {
+  left: -16px;
+  bottom: 44px;
+  transform: rotate(38deg);
+}
+.board-tape-right {
+  top: 50px;
+  right: -18px;
+  background: #28745b;
+  transform: rotate(36deg);
 }
 
 /* The mission board: a working miniature of the product. It sits straight,
@@ -688,7 +731,28 @@
 
 /* ── How a mission moves ──────────────────────────────────────────────── */
 .path-section {
+  position: relative;
   background: #fff0c3;
+}
+/* Scalloped edges: the band above hangs into this one, and this one lifts
+   out of the page below. */
+.path-section::before,
+.path-section::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 26px;
+  background-size: 64px 26px;
+  background-repeat: repeat-x;
+}
+.path-section::before {
+  top: -1px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='26' viewBox='0 0 64 26'%3E%3Cpath d='M0 0h64v8a32 18 0 0 1-64 0Z' fill='%23eee6ff'/%3E%3C/svg%3E");
+}
+.path-section::after {
+  bottom: -1px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='26' viewBox='0 0 64 26'%3E%3Cpath d='M0 26h64v-8a32 18 0 0 0-64 0Z' fill='%23fffdf7'/%3E%3C/svg%3E");
 }
 .path-heading {
   max-width: 760px;
@@ -749,7 +813,15 @@
   place-items: center;
   width: 136px;
   height: 136px;
-  background: var(--tint-bg);
+  /* A fine dot screen, like a printed sticker. */
+  background:
+    radial-gradient(
+        circle,
+        color-mix(in srgb, var(--tint-ink) 26%, transparent) 1.2px,
+        transparent 1.8px
+      )
+      0 0 / 13px 13px,
+    var(--tint-bg);
   border: 2px solid var(--ink);
   border-radius: 36px;
   box-shadow: 5px 6px 0 var(--ink);
@@ -927,6 +999,26 @@
   color: var(--violet);
 }
 
+/* ── The closing band: a street on repair-café day ──────────────────── */
+.landing-page .final-cta {
+  position: relative;
+  padding-bottom: max(150px, 19vw);
+}
+.landing-page .final-cta > .site-container {
+  z-index: 1;
+}
+.landing-page .cta-mark {
+  display: none;
+}
+.commons-street {
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: max(820px, 100%);
+  height: auto;
+  transform: translateX(-50%);
+}
+
 /* ── Motion: once, and only when the visitor has not asked for less ───── */
 @keyframes board-rise {
   from {
@@ -1021,6 +1113,9 @@
   }
 }
 @media (max-width: 1000px) {
+  .chooser-arrow {
+    display: none;
+  }
   .landing-page .landing-hero {
     grid-template-columns: 1fr;
     gap: 44px;
@@ -1041,6 +1136,9 @@
   }
 }
 @media (max-width: 760px) {
+  .board-tape {
+    display: none;
+  }
   .landing-page .landing-hero {
     padding-block: 36px 70px;
   }
