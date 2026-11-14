@@ -118,7 +118,7 @@ async function fixtures(context) {
   await context.addCookies([
     {
       name: "cosmogov_session",
-      value: Buffer.from("ui-test-user:1:fixture").toString("base64"),
+      value: "v1.ui-test-user.fixture",
       url: base,
     },
   ]);

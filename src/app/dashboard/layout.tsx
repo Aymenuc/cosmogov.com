@@ -62,6 +62,7 @@ interface Notification {
   link?: string;
 }
 const mainLinks = [
+  { label: "Mission studio", href: "/dashboard/missions", icon: Sparkles },
   { label: "My civic desk", href: "/dashboard", icon: LayoutDashboard },
   {
     label: "Explore participation",
@@ -205,11 +206,11 @@ export default function DashboardLayout({
         </div>
       </div>
       <Link
-        href="/dashboard/proposals/new"
+        href="/dashboard/missions"
         className="civic-button sidebar-create"
       >
         <Plus size={16} />
-        Start a proposal
+        Start a mission
       </Link>
       <nav aria-label="Workspace navigation" className="workspace-nav">
         <div className="nav-group-label">YOUR COMMUNITY</div>

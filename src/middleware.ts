@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * - /dashboard/* requires authentication
  * - /dashboard/admin/* requires admin or super_admin role
  * - /dashboard/gov-portal/* requires gov_official, admin, or super_admin role
- * - /auth/* redirects to dashboard if already authenticated
+ * - /auth/* remains accessible when a cookie is expired or invalid
  */
 
 const PUBLIC_PATHS = new Set([
@@ -32,19 +32,9 @@ function isPublicStaticPath(pathname: string): boolean {
   return false;
 }
 
-function parseSession(cookie: string | undefined): { userId: string; role: string } | null {
-  if (!cookie) return null;
-  try {
-    const decoded = Buffer.from(cookie, 'base64').toString();
-    // Format: userId:timestamp:random
-    const userId = decoded.split(':')[0];
-    if (!userId) return null;
-    // Note: We can't get the role from the cookie alone without a DB lookup.
-    // For middleware, we do a lightweight check and let the page/API do the full auth.
-    return { userId, role: '' };
-  } catch {
-    return null;
-  }
+// This is only a navigation hint. API routes verify the signature and user.
+function looksLikeSession(cookie: string | undefined): boolean {
+  return Boolean(cookie && /^v1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(cookie));
 }
 
 export function middleware(request: NextRequest) {
@@ -66,17 +56,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Auth pages — redirect to dashboard if already logged in
-  if (pathname.startsWith('/auth/')) {
-    if (sessionCookie && parseSession(sessionCookie)) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
-    return NextResponse.next();
-  }
+  // Always allow sign-in: an expired or forged cookie must not create a redirect loop.
+  if (pathname.startsWith('/auth/')) return NextResponse.next();
 
   // Dashboard routes — require authentication
   if (pathname.startsWith('/dashboard')) {
-    if (!sessionCookie || !parseSession(sessionCookie)) {
+    if (!sessionCookie || !looksLikeSession(sessionCookie)) {
       const loginUrl = new URL('/auth/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);

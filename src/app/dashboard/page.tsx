@@ -109,9 +109,9 @@ export default function OverviewPage() {
             Fresh ideas, familiar faces, and a few things only you can bring.
           </p>
         </div>
-        <Link href="/dashboard/proposals/new" className="civic-button">
+        <Link href="/dashboard/missions" className="civic-button">
           <Plus size={15} />
-          Start an idea
+          Start a mission
         </Link>
       </div>
       <section className="desk-welcome">

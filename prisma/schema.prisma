@@ -81,6 +81,11 @@ model User {
   bindingProposalSignatures BindingProposalSignature[]
   surveyResponses  SurveyResponse[]
   pushSubscriptions PushSubscription[]
+  missions Mission[] @relation("MissionCreator")
+  missionContributions MissionContribution[]
+  missionRuns MissionRun[] @relation("MissionRequester")
+  missionTasks MissionTask[] @relation("MissionAssignee")
+  missionToolResponses MissionToolResponse[]
 }
 
 model Organization {
@@ -110,6 +115,7 @@ model Organization {
   proposals   Proposal[]
   invitations Invitation[]
   participatoryProcesses ParticipatoryProcess[]
+  missions Mission[]
 }
 
 model Membership {
@@ -1052,4 +1058,107 @@ model PushSubscription {
   createdAt   DateTime @default(now())
 
   user        User @relation(fields: [userId], references: [id])
+}
+
+// Shared mission work. Private missions belong to their creator; organization
+// missions are visible only to current members of that organization.
+model Mission {
+  toolResponses MissionToolResponse[]
+  id             String    @id @default(cuid())
+  title          String
+  goal           String
+  location       String?
+  organizationId String?
+  createdBy      String
+  revision       Int       @default(0)
+  runLeaseUntil  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  creator       User                  @relation("MissionCreator", fields: [createdBy], references: [id])
+  organization  Organization?         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contributions MissionContribution[]
+  runs          MissionRun[]
+  tasks         MissionTask[]
+
+  @@index([organizationId, updatedAt])
+  @@index([createdBy, updatedAt])
+}
+
+model MissionContribution {
+  id        String   @id @default(cuid())
+  missionId String
+  authorId  String
+  kind      String // perspective, constraint, source
+  title     String
+  content   String
+  url       String?
+  createdAt DateTime @default(now())
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id])
+
+  @@index([missionId, createdAt])
+}
+
+model MissionRun {
+  toolResponses MissionToolResponse[]
+  id            String    @id @default(cuid())
+  missionId     String
+  requestedBy   String
+  stage         String // research, perspectives, plan
+  status        String    @default("running") // running, completed, failed
+  inputRevision Int
+  sources       Json      @default("[]")
+  output        Json?
+  error         String?
+  searchStatus  String    @default("not_requested")
+  reviewedBy    String?
+  acceptedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  mission   Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  requester User          @relation("MissionRequester", fields: [requestedBy], references: [id])
+  tasks     MissionTask[]
+
+  @@index([missionId, createdAt])
+  @@index([requestedBy, createdAt])
+}
+
+model MissionTask {
+  id           String   @id @default(cuid())
+  missionId    String
+  runId        String
+  position     Int
+  title        String
+  detail       String
+  minutes      Int
+  status       String   @default("open") // open, claimed, done
+  assignedToId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  mission  Mission    @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  run      MissionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  assignee User?      @relation("MissionAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@unique([runId, position])
+  @@index([missionId, createdAt])
+}
+
+model MissionToolResponse {
+  id        String   @id @default(cuid())
+  missionId String
+  runId     String
+  authorId  String
+  values    Json
+  updatedAt DateTime @updatedAt
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  run     MissionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  author  User @relation(fields: [authorId], references: [id])
+
+  @@unique([runId, authorId])
+  @@index([missionId])
 }

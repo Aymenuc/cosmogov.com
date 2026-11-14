@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       email: user.email,
       name: user.name,
       plan: user.plan,
+      role: user.role,
       totalXp: user.totalXp,
       level: user.level,
     });
