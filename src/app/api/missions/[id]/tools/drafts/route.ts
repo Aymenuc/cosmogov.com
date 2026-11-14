@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { formReviewError } from "@/lib/missions/forms";
 import { db } from "@/lib/db";
 import { formDraftSchema, outputSchema } from "@/lib/missions/validation";
 import {
@@ -20,9 +21,10 @@ export async function POST(
     const { id } = await params;
     const { canManage } = await accessMission(id, user.id);
     requireManager(canManage);
-    const { tool, sourceRunId, inputRevision } = formDraftSchema.parse(
-      await req.json(),
-    );
+    const { tool, sourceRunId, inputRevision, settings } =
+      formDraftSchema.parse(await req.json());
+    const reviewError = formReviewError(tool, settings);
+    if (reviewError) throw new MissionError(400, reviewError);
     const draft = await db.$transaction(
       async (tx) => {
         const mission = await tx.mission.findUniqueOrThrow({ where: { id } });
@@ -76,6 +78,10 @@ export async function POST(
             stage: "tool",
             status: "completed",
             inputRevision,
+            ...settings,
+            model: source?.model,
+            provider: source?.provider,
+            promptVersion: source?.promptVersion,
             origin: source && source.origin !== "manual" ? "edited" : "manual",
             derivedFromId: source?.id,
             sources: (source?.sources || []) as Prisma.InputJsonValue,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
+import { formReviewError } from "@/lib/missions/forms";
 import { outputSchema } from "@/lib/missions/validation";
 import {
   accessMission,
@@ -43,9 +44,17 @@ export async function POST(
           throw new MissionError(409, "This plan has no tasks to adopt.");
         if (run.stage === "tool" && !output.tool)
           throw new MissionError(409, "This output has no form to publish.");
+        if (output.tool) {
+          const reviewError = formReviewError(output.tool, run);
+          if (reviewError) throw new MissionError(400, reviewError);
+        }
         await tx.missionRun.update({
           where: { id: runId },
-          data: { acceptedAt: new Date(), reviewedBy: user.id },
+          data: {
+            acceptedAt: new Date(),
+            reviewedBy: user.id,
+            ...(run.stage === "tool" ? { formState: "published" } : {}),
+          },
         });
         if (run.stage === "plan")
           await tx.missionTask.createMany({
@@ -56,6 +65,14 @@ export async function POST(
               runId,
             })),
           });
+        await tx.missionEvent.create({
+          data: {
+            missionId: id,
+            runId,
+            actorId: user.id,
+            action: run.stage === "tool" ? "form_published" : "plan_adopted",
+          },
+        });
         await tx.mission.update({
           where: { id },
           data: { updatedAt: new Date() },

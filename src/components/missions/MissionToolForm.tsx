@@ -1,38 +1,52 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Check, Users } from "lucide-react";
+import { answerNotice } from "@/lib/missions/forms";
 import type { MissionTool } from "@/lib/missions/types";
 export default function MissionToolForm({
   tool,
   preview = false,
+  closed = false,
+  responseVisibility = "members",
+  retentionDays = null,
+  initialOfferToHelp = false,
   initialValues,
   busy = false,
   onSubmit,
 }: {
   tool: MissionTool;
   preview?: boolean;
+  closed?: boolean;
+  responseVisibility?: "organizers" | "members";
+  retentionDays?: number | null;
+  initialOfferToHelp?: boolean;
   initialValues?: Record<string, string>;
   busy?: boolean;
-  onSubmit?: (values: Record<string, string>) => Promise<void>;
+  onSubmit?: (
+    values: Record<string, string>,
+    offerToHelp: boolean,
+  ) => Promise<void>;
 }) {
   const [values, setValues] = useState<Record<string, string>>(
     initialValues || {},
   );
+  const [offerToHelp, setOfferToHelp] = useState(initialOfferToHelp);
   const [saved, setSaved] = useState(false);
   const savedValues = JSON.stringify(initialValues || {});
   useEffect(() => {
     setValues(JSON.parse(savedValues));
     setSaved(false);
   }, [savedValues]);
+  useEffect(() => setOfferToHelp(initialOfferToHelp), [initialOfferToHelp]);
   return (
     <form
       className="mission-generated-form"
       onSubmit={async (e) => {
         e.preventDefault();
-        if (!preview && onSubmit) {
+        if (!preview && !closed && onSubmit) {
           setSaved(false);
           try {
-            await onSubmit(values);
+            await onSubmit(values, offerToHelp);
             setSaved(true);
           } catch {
             /* Parent displays the request error; preserve form values. */
@@ -54,7 +68,7 @@ export default function MissionToolForm({
           {field.kind === "choice" ? (
             <select
               required={field.required}
-              disabled={preview || busy}
+              disabled={preview || busy || closed}
               value={values[field.id] || ""}
               onChange={(e) => {
                 setSaved(false);
@@ -71,7 +85,7 @@ export default function MissionToolForm({
               rows={2}
               maxLength={500}
               required={field.required}
-              disabled={preview || busy}
+              disabled={preview || busy || closed}
               value={values[field.id] || ""}
               onChange={(e) => {
                 setSaved(false);
@@ -86,12 +100,34 @@ export default function MissionToolForm({
           <div className="mission-response-notice">
             <Users size={18} aria-hidden="true" />
             <p>
-              <strong>Shared with your mission.</strong> People with access to
-              this mission can see your name and answers. You can update or
-              remove your response here.
+              <strong>
+                {responseVisibility === "members"
+                  ? "Shared with your mission."
+                  : "Visible to organizers and you."}
+              </strong>{" "}
+              {answerNotice(responseVisibility, retentionDays).text}
             </p>
           </div>
-          <button className="civic-button" disabled={busy}>
+          {closed ? (
+            <p className="mission-small" role="status">
+              This form is closed to answers. Your saved response can still be
+              removed.
+            </p>
+          ) : (
+            <label className="mission-offer-optin">
+              <input
+                type="checkbox"
+                checked={offerToHelp}
+                onChange={(event) => setOfferToHelp(event.target.checked)}
+                disabled={busy}
+              />
+              <span>
+                Suggest tasks I could help with from this answer. Organizers and
+                I can see suggestions; I choose whether to accept.
+              </span>
+            </label>
+          )}
+          <button className="civic-button" disabled={busy || closed}>
             {busy
               ? "Saving…"
               : initialValues

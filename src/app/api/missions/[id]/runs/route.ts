@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { aiModelMetadata } from "@/lib/ai-completions";
+import { MISSION_PROMPT_VERSION } from "@/lib/missions/ai";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { runSchema } from "@/lib/missions/validation";
@@ -98,6 +100,10 @@ export async function POST(
         });
         const run = await tx.missionRun.create({
           data: {
+            ...aiModelMetadata(),
+            promptVersion: MISSION_PROMPT_VERSION,
+            responseVisibility: "organizers",
+            retentionDays: 90,
             missionId: id,
             requestedBy: user.id,
             stage,
@@ -117,6 +123,7 @@ export async function POST(
       kind: item.kind as Evidence["kind"],
       ...(item.url ? { url: item.url } : {}),
       author: item.author.name || "Community member",
+      authorId: item.authorId,
     }));
     const seenStages = new Set<string>();
     const stages = ["research", "perspectives", "plan", "tool"];
@@ -158,7 +165,7 @@ export async function POST(
         searchStatus,
       },
     });
-    const output = await bounded(
+    const generated = await bounded(
       generateMissionOutput({
         stage,
         title: mission.title,
@@ -175,7 +182,12 @@ export async function POST(
     await db.$transaction([
       db.missionRun.update({
         where: { id: runId },
-        data: { output, status: "completed", completedAt: new Date() },
+        data: {
+          output: generated.output,
+          ...(generated.model ? { model: generated.model } : {}),
+          status: "completed",
+          completedAt: new Date(),
+        },
       }),
       db.mission.updateMany({
         where: { id, runLeaseUntil: lease },

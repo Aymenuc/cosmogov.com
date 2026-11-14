@@ -225,3 +225,12 @@ Task: Civic integrity recommendations (14 Nov 2026)
 - Budget allowance and signature counts use serializable transactions. Reviewed signatures, not unverified submissions, determine formal-response thresholds. Removed unsupported legal-binding claims.
 - Added admin invitation/review UI and “Sign out everywhere,” preserving the shared redesign. Enabled React strict mode.
 - Verification: 35 disposable-database/API/browser checks passed, including nine new integrity checks covering every exported admin and government handler; nine vote rule tests and four session tests passed. Final combined build and browser regression checks will follow the mission-controls work.
+
+---
+Task: Mission lifecycle, privacy and traceability (14 Nov 2026)
+
+- Added form close/unpublish/reopen, organizer CSV exports, exact-title mission deletion, per-version response visibility/expiry and stored submission notices. Existing forms retain their prior sharing terms.
+- Added server-enforced sensitive-question review, private answer settings, response/contribution throttles, expiry filtering and an authenticated scheduled cleanup job.
+- AI runs record provider/model/prompt version. Contributor metadata is pseudonymized before sending to the provider; source text can still contain names and the input dialog makes that explicit.
+- Task changes have transactional actor history. Completion requires a note with optional evidence; the UI displays member-provided evidence without claiming independent verification.
+- Verification so far: 42 disposable-database/API/browser checks and four form-rule tests passed. Additional close/export/archive browser checks are included for the combined final verification. Live staging remains pending a staging URL and configured provider.

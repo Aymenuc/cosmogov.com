@@ -87,6 +87,7 @@ model User {
   missionRuns MissionRun[] @relation("MissionRequester")
   missionTasks MissionTask[] @relation("MissionAssignee")
   missionToolResponses MissionToolResponse[]
+  missionEvents MissionEvent[]
 }
 
 model Organization {
@@ -1066,6 +1067,7 @@ model PushSubscription {
 // missions are visible only to current members of that organization.
 model Mission {
   toolResponses MissionToolResponse[]
+  events MissionEvent[]
   id             String    @id @default(cuid())
   title          String
   goal           String
@@ -1105,6 +1107,16 @@ model MissionContribution {
 
 model MissionRun {
   toolResponses MissionToolResponse[]
+  events MissionEvent[]
+  formState String @default("draft")
+  responseVisibility String @default("members")
+  retentionDays Int?
+  sensitiveReason String?
+  model String?
+  provider String?
+  promptVersion String?
+  closedAt DateTime?
+  stateChangedBy String?
   id            String    @id @default(cuid())
   missionId     String
   requestedBy   String
@@ -1134,6 +1146,8 @@ model MissionRun {
 }
 
 model MissionTask {
+  evidence Json @default("[]")
+  events MissionEvent[]
   id           String   @id @default(cuid())
   missionId    String
   runId        String
@@ -1159,6 +1173,10 @@ model MissionToolResponse {
   missionId String
   runId     String
   authorId  String
+  expiresAt DateTime?
+  noticeVersion String @default("legacy-notice")
+  notice Json @default("{}")
+  offerToHelp Boolean @default(false)
   values    Json
   updatedAt DateTime @updatedAt
 
@@ -1192,4 +1210,20 @@ model RateLimitBucket {
   count Int @default(1)
   expiresAt DateTime
   @@index([expiresAt])
+}
+
+model MissionEvent {
+  id String @id @default(cuid())
+  missionId String
+  taskId String?
+  runId String?
+  actorId String?
+  action String
+  detail Json @default("{}")
+  createdAt DateTime @default(now())
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  task MissionTask? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  run MissionRun? @relation(fields: [runId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  @@index([missionId, createdAt])
 }

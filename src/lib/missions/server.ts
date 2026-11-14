@@ -1,3 +1,4 @@
+import { ApiError, apiFailure } from "@/lib/api-server";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { getSession } from "@/lib/auth";
@@ -47,6 +48,7 @@ export function requireManager(canManage: boolean) {
     );
 }
 export function missionFailure(error: unknown) {
+  if (error instanceof ApiError) return apiFailure(error);
   if (error instanceof MissionError)
     return NextResponse.json(
       { error: error.message },
@@ -90,7 +92,14 @@ export const missionInclude = {
     orderBy: { updatedAt: "desc" as const },
   },
   tasks: {
-    include: { assignee: { select: { name: true } } },
+    include: {
+      assignee: { select: { name: true } },
+      events: {
+        include: { actor: { select: { name: true } } },
+        orderBy: { createdAt: "desc" as const },
+        take: 25,
+      },
+    },
     orderBy: [{ createdAt: "asc" as const }, { position: "asc" as const }],
   },
 } satisfies Prisma.MissionInclude;

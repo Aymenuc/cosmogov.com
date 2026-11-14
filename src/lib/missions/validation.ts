@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formSettingsSchema } from "./forms";
 import type { Evidence } from "./types";
 const text = (max: number) => z.string().trim().min(1).max(max);
 export const createMissionSchema = z.object({
@@ -67,6 +68,11 @@ export const toolSchema = z
   );
 export const formDraftSchema = z.object({
   tool: toolSchema,
+  settings: formSettingsSchema.default({
+    responseVisibility: "organizers",
+    retentionDays: 90,
+    sensitiveReason: "",
+  }),
   sourceRunId: z.string().min(1).max(100).nullable().default(null),
   inputRevision: z.number().int().min(0),
 });

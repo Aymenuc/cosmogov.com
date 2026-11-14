@@ -53,6 +53,9 @@ import {
 import MissionToolForm from "./MissionToolForm";
 import MissionTogether from "./MissionTogether";
 import MissionFormEditor from "./MissionFormEditor";
+import MissionControls from "./MissionControls";
+import FormManagement from "./FormManagement";
+import { formSettingsFrom, type FormSettings } from "@/lib/missions/forms";
 const icons = {
   research: Search,
   perspectives: Users,
@@ -92,6 +95,11 @@ export default function MissionRoom({
     url: "",
   });
   const [webSearch, setWebSearch] = useState(false);
+  const [completionTaskId, setCompletionTaskId] = useState("");
+  const [completionEvidence, setCompletionEvidence] = useState({
+    note: "",
+    url: "",
+  });
   const [removeId, setRemoveId] = useState("");
   const alive = useRef(true);
   const refresh = useCallback(async () => {
@@ -135,12 +143,14 @@ export default function MissionRoom({
     setNotice("");
     try {
       await fn();
+      return true;
     } catch (e) {
       setError(
         e instanceof Error
           ? e.message
           : "Something went wrong. Please try again.",
       );
+      return false;
     } finally {
       if (alive.current) setPending("");
     }
@@ -177,7 +187,11 @@ export default function MissionRoom({
   const output = run?.output;
   const stale = Boolean(run && run.inputRevision !== mission.revision);
   const published = mission.runs.filter(
-    (item) => item.stage === "tool" && item.acceptedAt && item.output?.tool,
+    (item) =>
+      item.stage === "tool" &&
+      item.acceptedAt &&
+      item.output?.tool &&
+      (!item.formState || ["published", "closed"].includes(item.formState)),
   );
   const doneCount = mission.tasks.filter(
     (task) => task.status === "done",
@@ -188,7 +202,7 @@ export default function MissionRoom({
       source,
       revision: mission.revision,
     });
-  const saveFormDraft = async (tool: MissionTool) => {
+  const saveFormDraft = async (tool: MissionTool, settings: FormSettings) => {
     if (!editor) return;
     if (editor.revision !== mission.revision)
       throw new Error(
@@ -202,6 +216,8 @@ export default function MissionRoom({
       const draft: MissionRun = {
         id,
         stage: "tool",
+        ...settings,
+        formState: "draft",
         origin: source && source.origin !== "manual" ? "edited" : "manual",
         derivedFromId: source?.id || null,
         status: "completed",
@@ -225,6 +241,7 @@ export default function MissionRoom({
     } else {
       const result = await request("/tools/drafts", {
         tool,
+        settings,
         sourceRunId: editor.source?.id || null,
         inputRevision: editor.revision,
       });
@@ -295,6 +312,9 @@ export default function MissionRoom({
                   ? {
                       ...r,
                       acceptedAt: new Date().toISOString(),
+                      ...(stage === "tool"
+                        ? { formState: "published" as const }
+                        : {}),
                       reviewerName: "You",
                     }
                   : r,
@@ -350,7 +370,11 @@ export default function MissionRoom({
         "Your input is part of the mission. Earlier AI drafts are marked for a fresh review.",
       );
     });
-  const taskAction = (taskId: string, next: string) =>
+  const taskAction = (
+    taskId: string,
+    next: string,
+    evidence?: { note: string; url: string },
+  ) =>
     action(taskId, async () => {
       if (demo)
         setMission(
@@ -361,6 +385,27 @@ export default function MissionRoom({
                 task.id === taskId
                   ? {
                       ...task,
+                      ...(evidence
+                        ? {
+                            evidence: [
+                              ...(task.evidence || []),
+                              {
+                                ...evidence,
+                                actor: "You",
+                                at: new Date().toISOString(),
+                              },
+                            ],
+                          }
+                        : {}),
+                      events: [
+                        {
+                          id: crypto.randomUUID(),
+                          action: `task_${next}`,
+                          createdAt: new Date().toISOString(),
+                          actor: { name: "You" },
+                        },
+                        ...(task.events || []),
+                      ],
                       status:
                         next === "claim"
                           ? "claimed"
@@ -380,7 +425,46 @@ export default function MissionRoom({
               ),
             },
         );
-      else await request(`/tasks/${taskId}`, { action: next }, "PATCH");
+      else
+        await request(`/tasks/${taskId}`, { action: next, evidence }, "PATCH");
+    });
+  const changeFormState = (
+    toolRun: MissionRun,
+    next: "close" | "unpublish" | "reopen",
+  ) =>
+    action("form-state", async () => {
+      if (demo) {
+        if (next === "reopen" && toolRun.inputRevision !== mission.revision)
+          throw new Error(
+            "Mission context changed. Create and review a new version before reopening.",
+          );
+        setMission(
+          (m) =>
+            m && {
+              ...m,
+              runs: m.runs.map((run) =>
+                run.id === toolRun.id
+                  ? {
+                      ...run,
+                      formState:
+                        next === "close"
+                          ? "closed"
+                          : next === "unpublish"
+                            ? "unpublished"
+                            : "published",
+                    }
+                  : run,
+              ),
+            },
+        );
+      } else await request(`/tools/${toolRun.id}`, { action: next }, "PATCH");
+      setNotice(
+        next === "close"
+          ? "The form is closed to answers."
+          : next === "unpublish"
+            ? "The form is unpublished. Saved responses are preserved."
+            : "The form is open for answers again.",
+      );
     });
   return (
     <div className="mission-room">
@@ -443,6 +527,9 @@ export default function MissionRoom({
           <strong>what’s possible.</strong>
         </div>
       </header>
+      {mission.canManage && (
+        <MissionControls id={mission.id} title={mission.title} demo={demo} />
+      )}
       <MissionTogether mission={mission} onNavigate={setTab} />
       {error && (
         <div className="mission-alert" role="alert">
@@ -726,6 +813,15 @@ export default function MissionRoom({
                     </span>
                   )}
                 </div>
+                {run.model && (
+                  <p className="mission-small">
+                    {run.origin === "edited"
+                      ? "Original AI draft"
+                      : "AI record"}
+                    : {run.provider} · {run.model} · prompt{" "}
+                    {run.promptVersion || "not recorded"}
+                  </p>
+                )}
                 <h2>{output.headline}</h2>
                 <p className="mission-output-summary">{output.summary}</p>
                 {run.searchStatus === "unavailable" && (
@@ -1061,6 +1157,47 @@ export default function MissionRoom({
                           {task.assignee.name || "Community member"}
                         </div>
                       )}
+                      {task.evidence?.length ? (
+                        <details className="mission-task-evidence">
+                          <summary>
+                            Completion evidence · {task.evidence.length}
+                          </summary>
+                          {task.evidence.map((item, index) => (
+                            <div key={index}>
+                              <p>{item.note}</p>
+                              {item.url && safeSourceUrl(item.url) && (
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Open evidence <ExternalLink size={13} />
+                                </a>
+                              )}
+                              <small>
+                                {item.actor} ·{" "}
+                                {new Date(item.at).toLocaleDateString()}
+                              </small>
+                            </div>
+                          ))}
+                        </details>
+                      ) : task.status === "done" ? (
+                        <p className="mission-small">
+                          Marked done before evidence was required.
+                        </p>
+                      ) : null}
+                      {Boolean(task.events?.length) && (
+                        <details className="mission-task-history">
+                          <summary>Recent changes</summary>
+                          {task.events!.map((event) => (
+                            <p key={event.id}>
+                              {event.actor?.name || "A member"} ·{" "}
+                              {event.action.replace("task_", "")} ·{" "}
+                              {new Date(event.createdAt).toLocaleString()}
+                            </p>
+                          ))}
+                        </details>
+                      )}
                       <div className="mission-task-actions">
                         {status === "open" ? (
                           <button
@@ -1077,9 +1214,7 @@ export default function MissionRoom({
                                 <>
                                   <button
                                     disabled={Boolean(pending)}
-                                    onClick={() =>
-                                      taskAction(task.id, "complete")
-                                    }
+                                    onClick={() => setCompletionTaskId(task.id)}
                                   >
                                     <Check size={14} />
                                     Mark done
@@ -1176,8 +1311,14 @@ export default function MissionRoom({
                       key={toolRun.id}
                       tool={tool}
                       initialValues={mine?.values}
+                      initialOfferToHelp={mine?.offerToHelp}
+                      closed={toolRun.formState === "closed"}
+                      responseVisibility={
+                        toolRun.responseVisibility || "members"
+                      }
+                      retentionDays={toolRun.retentionDays || null}
                       busy={Boolean(pending)}
-                      onSubmit={async (values) => {
+                      onSubmit={async (values, offerToHelp) => {
                         setPending("response");
                         setError("");
                         try {
@@ -1200,6 +1341,7 @@ export default function MissionRoom({
                                       authorId: "demo-you",
                                       author: { name: "You" },
                                       values,
+                                      offerToHelp,
                                       updatedAt: new Date().toISOString(),
                                     },
                                   ],
@@ -1208,6 +1350,7 @@ export default function MissionRoom({
                           else
                             await request(`/tools/${toolRun.id}/responses`, {
                               values,
+                              offerToHelp,
                             });
                         } catch (e) {
                           setError(
@@ -1221,6 +1364,17 @@ export default function MissionRoom({
                         }
                       }}
                     />
+                    {mission.canManage && (
+                      <FormManagement
+                        id={mission.id}
+                        runId={toolRun.id}
+                        state={toolRun.formState || "published"}
+                        busy={Boolean(pending)}
+                        demo={demo}
+                        onChange={(next) => changeFormState(toolRun, next)}
+                        onError={setError}
+                      />
+                    )}
                     {mission.canManage && (
                       <button
                         className="mission-build-manual"
@@ -1266,7 +1420,8 @@ export default function MissionRoom({
                   </div>
                   <aside>
                     <h3>
-                      What people are bringing <span>{responses.length}</span>
+                      Responses{" "}
+                      <span>{toolRun.responseCount ?? responses.length}</span>
                     </h3>
                     {toolRun.inputRevision !== mission.revision && (
                       <p className="mission-small">
@@ -1288,7 +1443,14 @@ export default function MissionRoom({
                           ))}
                       </article>
                     ))}
-                    {!responses.length && (
+                    {toolRun.responseVisibility === "organizers" &&
+                      !mission.canManage && (
+                        <p className="mission-small">
+                          Only organizers can see other people’s answers. You
+                          can see and remove your own.
+                        </p>
+                      )}
+                    {!responses.length && !toolRun.responseCount && (
                       <p className="mission-small">
                         The first response could open a new possibility.
                       </p>
@@ -1315,10 +1477,148 @@ export default function MissionRoom({
           )}
         </section>
       )}
+      {tab === "tools" &&
+        mission.runs.some((run) => run.formState === "unpublished") && (
+          <section className="mission-panel">
+            <h2>Unpublished forms</h2>
+            <p className="mission-small">
+              These forms are no longer open to participants. Organizers and
+              respondents retain access to their permitted saved answers.
+            </p>
+            {mission.runs
+              .filter((run) => run.formState === "unpublished")
+              .map((toolRun) => (
+                <article className="mission-archived-form" key={toolRun.id}>
+                  <h3>{toolRun.output?.tool?.title}</h3>
+                  {mission.canManage && (
+                    <FormManagement
+                      id={mission.id}
+                      runId={toolRun.id}
+                      state="unpublished"
+                      busy={Boolean(pending)}
+                      demo={demo}
+                      onChange={(next) => changeFormState(toolRun, next)}
+                      onError={setError}
+                    />
+                  )}
+                  {mission.toolResponses
+                    .filter((response) => response.runId === toolRun.id)
+                    .map((response) => (
+                      <div key={response.id}>
+                        <strong>
+                          {response.author.name || "Community member"}
+                        </strong>
+                        {toolRun.output?.tool?.fields.map((field) => (
+                          <p key={field.id}>
+                            {field.label}: {response.values[field.id] || "—"}
+                          </p>
+                        ))}
+                        {response.authorId === userId && (
+                          <button
+                            className="mission-delete-response"
+                            disabled={Boolean(pending)}
+                            onClick={() =>
+                              action("remove-answer", async () => {
+                                if (demo)
+                                  setMission(
+                                    (m) =>
+                                      m && {
+                                        ...m,
+                                        toolResponses: m.toolResponses.filter(
+                                          (item) => item.id !== response.id,
+                                        ),
+                                      },
+                                  );
+                                else
+                                  await request(
+                                    `/tools/${toolRun.id}/responses`,
+                                    undefined,
+                                    "DELETE",
+                                  );
+                              })
+                            }
+                          >
+                            Remove my response
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                </article>
+              ))}
+          </section>
+        )}
+      <Dialog
+        open={Boolean(completionTaskId)}
+        onOpenChange={(value) => {
+          if (!pending && !value) setCompletionTaskId("");
+        }}
+      >
+        <DialogContent className="mission-dialog">
+          <DialogTitle>Show what got done.</DialogTitle>
+          <DialogDescription>
+            Add a concrete completion note and, if available, a source. This is
+            shared with people in the mission as member-provided evidence.
+          </DialogDescription>
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              if (
+                await taskAction(
+                  completionTaskId,
+                  "complete",
+                  completionEvidence,
+                )
+              ) {
+                setCompletionTaskId("");
+                setCompletionEvidence({ note: "", url: "" });
+              }
+            }}
+          >
+            <label className="mission-field">
+              <span>What was completed?</span>
+              <textarea
+                required
+                minLength={20}
+                maxLength={2000}
+                value={completionEvidence.note}
+                onChange={(event) =>
+                  setCompletionEvidence((value) => ({
+                    ...value,
+                    note: event.target.value,
+                  }))
+                }
+              />
+            </label>
+            <label className="mission-field">
+              <span>Evidence link (optional)</span>
+              <input
+                type="url"
+                maxLength={2000}
+                value={completionEvidence.url}
+                onChange={(event) =>
+                  setCompletionEvidence((value) => ({
+                    ...value,
+                    url: event.target.value,
+                  }))
+                }
+              />
+            </label>
+            {error && (
+              <p role="alert" className="form-error">
+                {error}
+              </p>
+            )}
+            <button className="civic-button" disabled={Boolean(pending)}>
+              Save evidence and mark done
+            </button>
+          </form>
+        </DialogContent>
+      </Dialog>
       {editor && (
         <MissionFormEditor
           key={editor.source?.id || "manual"}
           initialTool={editor.tool}
+          initialSettings={formSettingsFrom(editor.source)}
           basedOnAI={Boolean(
             editor.source && editor.source.origin !== "manual",
           )}
@@ -1337,7 +1637,9 @@ export default function MissionRoom({
           <DialogTitle>Add to the shared context</DialogTitle>
           <DialogDescription>
             Visible to people with access to this mission. Input is sent to the
-            AI provider when a mission manager runs a step.
+            AI provider when a mission manager runs a step. Author names are
+            replaced with contributor labels, but names written in the content
+            may still be sent. Avoid unnecessary personal information.
           </DialogDescription>
           <form
             onSubmit={(e) => {
@@ -1434,7 +1736,7 @@ export default function MissionRoom({
           </DialogTitle>
           <DialogDescription>
             {stage === "tool"
-              ? "People with access to this mission will be able to respond. Their names and responses will be visible within the mission."
+              ? `People with access can respond. ${run?.responseVisibility === "organizers" ? "Only organizers and each respondent" : "All mission members"} can see names and answers. ${run?.retentionDays ? `Answers expire ${run.retentionDays} days after their last save.` : "Answers stay until removed."}`
               : `This adds ${output?.tasks.length || 0} tasks to your shared board. People choose what to take on. Spending and official decisions still follow your community’s process.`}
           </DialogDescription>
           {error && (

@@ -1,4 +1,4 @@
-import { createZAI } from '@/lib/z-ai-client';
+import { createZAI } from "@/lib/z-ai-client";
 
 const NVIDIA_URL_HINTS = /nvidia\.com|integrate\.api\.nvidia/i;
 
@@ -8,14 +8,15 @@ const NVIDIA_URL_HINTS = /nvidia\.com|integrate\.api\.nvidia/i;
  * request fields some vendors do not accept.
  */
 export function useNvidiaOpenAICompat(): boolean {
-  if (process.env.Z_AI_USE_OPENAI_COMPAT === '1') return true;
-  const base = process.env.Z_AI_BASE_URL?.trim() ?? '';
+  if (process.env.Z_AI_USE_OPENAI_COMPAT === "1") return true;
+  const base = process.env.Z_AI_BASE_URL?.trim() ?? "";
   return NVIDIA_URL_HINTS.test(base);
 }
 
-type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string };
+type ChatMsg = { role: "system" | "user" | "assistant"; content: string };
 
 type CompletionResponse = {
+  model?: string;
   choices: Array<{
     message: { content: string | null };
   }>;
@@ -32,13 +33,15 @@ export async function chatCompletionsCreate(options: {
   max_tokens?: number;
 }): Promise<CompletionResponse> {
   const { messages, temperature, max_tokens } = options;
-  const model = process.env.Z_AI_MODEL?.trim() || 'deepseek-ai/deepseek-v4-pro';
+  const model = process.env.Z_AI_MODEL?.trim() || "deepseek-ai/deepseek-v4-pro";
 
   if (useNvidiaOpenAICompat()) {
-    const baseUrl = (process.env.Z_AI_BASE_URL ?? '').replace(/\/$/, '');
+    const baseUrl = (process.env.Z_AI_BASE_URL ?? "").replace(/\/$/, "");
     const apiKey = process.env.Z_AI_API_KEY?.trim();
     if (!baseUrl || !apiKey) {
-      throw new Error('NVIDIA / OpenAI-compat mode requires Z_AI_BASE_URL and Z_AI_API_KEY in the environment');
+      throw new Error(
+        "NVIDIA / OpenAI-compat mode requires Z_AI_BASE_URL and Z_AI_API_KEY in the environment",
+      );
     }
     const body: Record<string, unknown> = {
       model,
@@ -48,13 +51,13 @@ export async function chatCompletionsCreate(options: {
       max_tokens: max_tokens ?? 4096,
       stream: false,
     };
-    if (process.env.Z_AI_SKIP_CHAT_TEMPLATE_KWARGS !== '1') {
+    if (process.env.Z_AI_SKIP_CHAT_TEMPLATE_KWARGS !== "1") {
       body.chat_template_kwargs = { thinking: false };
     }
     const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(body),
@@ -67,9 +70,25 @@ export async function chatCompletionsCreate(options: {
   }
 
   const zai = await createZAI();
-  const payload: Record<string, unknown> = { messages, temperature, max_tokens };
+  const payload: Record<string, unknown> = {
+    messages,
+    temperature,
+    max_tokens,
+  };
   if (process.env.Z_AI_MODEL?.trim()) {
     payload.model = process.env.Z_AI_MODEL.trim();
   }
-  return (await zai.chat.completions.create(payload as never)) as CompletionResponse;
+  return (await zai.chat.completions.create(
+    payload as never,
+  )) as CompletionResponse;
+}
+
+export function aiModelMetadata() {
+  const compatible = useNvidiaOpenAICompat();
+  return {
+    provider: compatible ? "openai-compatible" : "z-ai",
+    model:
+      process.env.Z_AI_MODEL?.trim() ||
+      (compatible ? "deepseek-ai/deepseek-v4-pro" : "provider-default"),
+  };
 }

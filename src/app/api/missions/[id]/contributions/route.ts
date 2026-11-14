@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
+import { rateLimit } from "@/lib/api-server";
 import { contributionSchema } from "@/lib/missions/validation";
 import {
   accessMission,
@@ -14,6 +15,7 @@ export async function POST(
 ) {
   try {
     const user = await missionUser();
+    await rateLimit("mission-contribution", user.id, 60, 3600);
     const { id } = await params;
     await accessMission(id, user.id);
     const data = contributionSchema.parse(await req.json());

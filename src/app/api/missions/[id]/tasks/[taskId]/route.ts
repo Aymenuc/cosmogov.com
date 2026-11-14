@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { db } from "@/lib/db";
+import { evidenceSchema } from "@/lib/missions/forms";
 import {
   accessMission,
   missionUser,
@@ -15,48 +17,90 @@ export async function PATCH(
     const user = await missionUser();
     const { id, taskId } = await params;
     const { canManage } = await accessMission(id, user.id);
-    const { action } = z
-      .object({ action: z.enum(["claim", "release", "complete", "reopen"]) })
+    const { action, evidence } = z
+      .object({
+        action: z.enum(["claim", "release", "complete", "reopen"]),
+        evidence: evidenceSchema.optional(),
+      })
       .parse(await req.json());
-    const task = await db.missionTask.findFirst({
-      where: { id: taskId, missionId: id },
-    });
-    if (!task) throw new MissionError(404, "Task not found.");
-    if (action !== "claim" && task.assignedToId !== user.id && !canManage)
+    if (action === "complete" && !evidence)
       throw new MissionError(
-        403,
-        "Only the person responsible or a mission manager can change this task.",
+        400,
+        "Add a completion note or source before marking this task done.",
       );
-    if (action === "claim" && task.status !== "open")
-      throw new MissionError(409, "This task has already been picked up.");
-    if (action === "complete" && task.status !== "claimed")
-      throw new MissionError(409, "Pick up this task before marking it done.");
-    if (action === "release" && task.status !== "claimed")
-      throw new MissionError(409, "Only a claimed task can be released.");
-    if (action === "reopen" && task.status !== "done")
-      throw new MissionError(409, "Only a completed task can be reopened.");
-    const status =
-      action === "claim" ? "claimed" : action === "complete" ? "done" : "open";
-    const assignedToId =
-      action === "claim"
-        ? user.id
-        : action === "complete"
-          ? task.assignedToId
-          : null;
-    const changed = await db.missionTask.updateMany({
-      where: {
-        id: taskId,
-        missionId: id,
-        status: task.status,
-        assignedToId: task.assignedToId,
+    await db.$transaction(
+      async (tx) => {
+        const task = await tx.missionTask.findFirst({
+          where: { id: taskId, missionId: id },
+        });
+        if (!task) throw new MissionError(404, "Task not found.");
+        if (action !== "claim" && task.assignedToId !== user.id && !canManage)
+          throw new MissionError(
+            403,
+            "Only the person responsible or a mission manager can change this task.",
+          );
+        const expected = {
+          claim: "open",
+          release: "claimed",
+          complete: "claimed",
+          reopen: "done",
+        }[action];
+        if (task.status !== expected)
+          throw new MissionError(
+            409,
+            "This task changed. Refresh before updating it.",
+          );
+        const changed = await tx.missionTask.updateMany({
+          where: {
+            id: taskId,
+            missionId: id,
+            status: expected,
+            assignedToId: task.assignedToId,
+          },
+          data: {
+            status:
+              action === "claim"
+                ? "claimed"
+                : action === "complete"
+                  ? "done"
+                  : "open",
+            assignedToId:
+              action === "claim"
+                ? user.id
+                : action === "complete"
+                  ? task.assignedToId
+                  : null,
+            ...(evidence
+              ? {
+                  evidence: [
+                    ...(Array.isArray(task.evidence) ? task.evidence : []),
+                    {
+                      ...evidence,
+                      actor: user.name || "Community member",
+                      at: new Date().toISOString(),
+                    },
+                  ],
+                }
+              : {}),
+          },
+        });
+        if (!changed.count)
+          throw new MissionError(
+            409,
+            "Someone just changed this task. Refresh and try again.",
+          );
+        await tx.missionEvent.create({
+          data: {
+            missionId: id,
+            taskId,
+            actorId: user.id,
+            action: `task_${action}`,
+            detail: { evidenceAdded: Boolean(evidence) },
+          },
+        });
       },
-      data: { status, assignedToId },
-    });
-    if (!changed.count)
-      throw new MissionError(
-        409,
-        "Someone just changed this task. Refresh and try again.",
-      );
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
     return NextResponse.json({ ok: true });
   } catch (error) {
     return missionFailure(error);
