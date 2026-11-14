@@ -26,3 +26,7 @@ Existing routes, backend integrations, and PostgreSQL schema are retained. The l
 Run `npm ci` and `npm run build:next`. If Turbopack is restricted by the host, `npx next build --webpack` uses the same application source. `node scripts/check-redesign.cjs` runs browser integration checks against an existing local server; it requires Playwright and an installed Chromium (or `CHROMIUM_PATH`). `COSMOGOV_TEST_URL` and `COSMOGOV_TEST_ARTIFACTS` override their defaults. Tests cover navigation, feature tabs, pricing, signup fields, following persistence, proposal filters, vote/comment errors and success, global search, process creation, and desktop/tablet/mobile layouts.
 
 A live PostgreSQL connection is not included in this workspace. Browser tests intercept API requests with fixtures; production data writes and external services therefore need verification against the deployment's configured environment.
+
+### Recorded validation
+
+The Webpack production build passes and generates all 104 static pages. The browser suite passes 11 interaction/layout checks, and the voting route passes 8 isolated tests. A clean checkout produced 22 TypeScript diagnostic entries; the redesign leaves 16 pre-existing entries, with no new diagnostic file/code pairs. The normal build retains the repository’s existing `ignoreBuildErrors` setting, so passing the production build does not imply a clean repository-wide typecheck.

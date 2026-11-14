@@ -407,6 +407,13 @@ async function fixtures(context) {
         .inputValue(),
       "garden",
     );
+    await app.keyboard.press("Control+k");
+    await app.getByLabel("Search tools").fill("safer");
+    await app.getByRole("button", { name: "Search for “safer”" }).click();
+    await app.waitForURL("**/dashboard/search?q=safer");
+    await app.waitForFunction(
+      () => document.querySelector('input[placeholder="Search proposals and your communities..."]')?.value === "safer",
+    );
   });
   await check(
     "Participation process creation is wired to the API",
