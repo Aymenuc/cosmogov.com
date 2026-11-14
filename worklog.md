@@ -194,4 +194,4 @@ Verification:
 - `node scripts/check-redesign.cjs`: 12 of 12 pass (one run failed once on first page compile and passed on re-run).
 - No horizontal overflow on the desk, sticker book and mission studio at 390, 768 and 1440px.
 - Not verified: `GET /api/stickers` against a real database (no database in this workspace; the browser checks use fixtures), and `scripts/check-missions.cjs`.
-
+- Follow-up: moved the sticker book into the main sidebar list, and rebuilt the Explore participation page around nine plain-language intent cards; fixed category chip contrast and wired the empty-state button to the process dialog.

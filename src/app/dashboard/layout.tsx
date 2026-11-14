@@ -66,6 +66,7 @@ interface Notification {
 const mainLinks = [
   { label: "Mission studio", href: "/dashboard/missions", icon: Sparkles },
   { label: "My civic desk", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Sticker book", href: "/dashboard/stickers", icon: Sticker },
   {
     label: "Explore participation",
     href: "/dashboard/participation",
@@ -117,7 +118,6 @@ const toolGroups: { label: string; items: [string, string, LucideIcon][] }[] = [
     label: "Learn & grow",
     items: [
       ["AI agents", "/dashboard/ai-agents", Sparkles],
-      ["Sticker book", "/dashboard/stickers", Sticker],
       ["Civic games", "/dashboard/games", Gamepad2],
       ["Leaderboards", "/dashboard/leaderboards", Trophy],
       ["My reputation", "/dashboard/reputation", Star],

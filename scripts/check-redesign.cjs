@@ -455,7 +455,8 @@ async function fixtures(context) {
         waitUntil: "networkidle",
         timeout: 120000,
       });
-      await app.getByRole("link", { name: /Create Process/ }).click();
+      assert.equal(await app.locator(".intent-grid .intent-card").count(), 9);
+      await app.getByRole("button", { name: "Start a process" }).click();
       await app.getByRole("dialog").waitFor();
       await app
         .getByLabel("What will your community shape?")

@@ -348,7 +348,86 @@ a.sticker-state:hover {
   box-shadow: 0 8px 18px #39225e12;
 }
 
+/* ── Explore participation: start from what you want to do ───────────── */
+.intent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.intent-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 22px 22px 20px;
+  background: var(--tint-bg);
+  color: #29223d;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.intent-card:hover,
+.intent-card:focus-visible {
+  border-color: #29223d;
+  box-shadow: 5px 6px 0 #29223d;
+  transform: translate(-2px, -2px);
+}
+.intent-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+  background: #fffdf7;
+  color: var(--tint-ink);
+  border-radius: 14px;
+}
+.intent-card strong {
+  font-family: Manrope, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+}
+.intent-card > span:not(.intent-icon) {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.intent-card small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  color: var(--tint-ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.intent-divider {
+  margin-top: 12px;
+  padding-top: 26px;
+  border-top: 1px solid var(--civic-line);
+}
+.intent-divider h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.intent-divider p {
+  margin-top: 6px;
+  font-size: 15px;
+  color: #29223d;
+}
+
 @media (max-width: 1000px) {
+  .intent-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .desk-rewards {
     grid-template-columns: 1fr;
   }
@@ -384,6 +463,9 @@ a.sticker-state:hover {
     width: calc((100% - 16px) / 3);
   }
   .sticker-rules ul {
+    grid-template-columns: 1fr;
+  }
+  .intent-grid {
     grid-template-columns: 1fr;
   }
   .workspace-shell .mission-starters > div:last-child {
