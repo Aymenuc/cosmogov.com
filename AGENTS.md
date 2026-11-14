@@ -8,15 +8,38 @@ Everything here was checked against the code on `redesign/civic-experience` at
 commit `cbb9b8f` (14 Nov 2026) by reading it. Nothing was run against a live
 database. Where a claim was not verified, it says so.
 
-**Not covered: missions and AI-drafted community forms.** The owner reports later
-work in which AI turns a mission into a working community form (for example
-collecting repair skills or equipment offers), with responses saved beside the
-mission's plan and tasks, and AI drafts that show their references and
-unanswered questions. None of that code was on GitHub when this file was written,
-so nothing below describes it. Once it is pushed, read it first, then update the
-repository map (section 3), the defect list (section 6) and the roadmap (section 7)
-before following them. The product rules in section 1 and the design system in
-section 5 still apply to it.
+## 0. Start here: the missions commit
+
+The newest work is **not described from code in this file**. The owner reports
+that Codex committed it as `cf56cb8` on `redesign/civic-experience`, one commit
+after `cbb9b8f`. When this file was last updated, GitHub still ended at `cbb9b8f`
+and had no object `cf56cb8`, so the commit existed only in Codex's workspace.
+
+What the owner says it contains (reported, not verified):
+
+- A **mission** has a plan and tasks.
+- **AI can turn a mission into a working community form**, for example
+  collecting repair skills or equipment offers. Responses are saved alongside the
+  mission's plan and tasks.
+- **AI drafts show their references and their unanswered questions.**
+- **People choose** which plans and tools become part of the mission.
+- The visual direction stays warm and colourful (section 5 applies unchanged).
+
+Do this before anything else:
+
+1. Run `git fetch origin redesign/civic-experience` and `git cat-file -t cf56cb8`.
+   - If you are the agent that holds `cf56cb8` locally and it is not on GitHub,
+     push it: `git push origin redesign/civic-experience`. Nothing else can be
+     reviewed, deployed or handed over until it is.
+   - If the commit is on neither side, stop and ask the owner where it is.
+2. Read the whole diff: `git show --stat cf56cb8`, then the files.
+3. Review it against the checklist in section 7.0 and record what you find.
+4. Update this file from what you read: the repository map (section 3), the
+   defect list (section 6), section 7.0 and the status table (section 10). Replace
+   every "reported, not verified" statement about missions with what the code does.
+
+Until step 4 is done, treat every statement about missions in this file as the
+owner's description of intent, not as a description of the code.
 
 Related files: `DESIGN.md` (what the redesign changed and how it was verified),
 `worklog.md` (history of earlier agents), `agent-ctx/` (notes per feature).
@@ -40,11 +63,20 @@ Three rules follow from that and override any feature idea:
 3. **Never present more than is true.** A threshold reached is not approval. A
    closed vote is not implementation. Demonstration content is labelled as such.
 
-The goal of the next phase is not more modules. The platform already has
-proposals, participatory processes, budgets, initiatives, binding proposals,
-legislation with amendments, surveys, assemblies, meetings, sortition, an
-accountability tracker, a map, chat, AI debate agents and civic games. What it
-lacks is **provable integrity**. That is what the roadmap in section 7 builds.
+The product now has two threads, and both matter:
+
+- **Missions** are the current thread (section 0 and 7.0). A community names
+  something it wants done, AI drafts a plan, tasks and a form to gather what is
+  needed, and people choose what to keep. This is where the three rules are
+  tested most directly: the AI drafts, shows its references and what it does not
+  know, and a person decides.
+- **Provable integrity** is the thread underneath. The platform already has
+  proposals, participatory processes, budgets, initiatives, binding proposals,
+  legislation with amendments, surveys, assemblies, meetings, sortition, an
+  accountability tracker, a map, chat, AI debate agents and civic games. What
+  those lack is results a sceptic can check. Sections 6 and 7.1 onward build that.
+
+Do not add further modules beyond missions until the defects in section 6 are fixed.
 
 ---
 
@@ -132,8 +164,13 @@ Workspace navigation (defined in `src/app/dashboard/layout.tsx`):
 
 ## 4. Working rules
 
-- **Branch.** Work on a new branch cut from `redesign/civic-experience`. Open a
-  draft pull request back into it. Do not push to `main` or to the redesign branch directly.
+- **Branch.** `redesign/civic-experience` is the integration branch, and Codex
+  has been committing to it directly. Always fetch it before starting, and never
+  rewrite its history. For new work, cut a branch from its latest commit and open
+  a draft pull request back into it. Do not push to `main`.
+- **Push what you commit.** A commit that exists only in one agent's workspace
+  cannot be reviewed or continued by anyone else. End every working session with
+  the branch pushed and its commit id checked on GitHub.
 - **One concern per pull request.** A security fix does not travel with a restyle.
 - **Schema changes are migrations.** `npm run build` runs `prisma migrate deploy`,
   so use `npx prisma migrate dev --name <what>` and commit the SQL. Do not use
@@ -357,6 +394,33 @@ Target WCAG 2.2 AA. For every interface change:
   until there is a redirect plan.
 - **`DESIGN.md` mentions `artifacts/colorful` screenshots** that are not in the repository.
 
+### 5.12 AI drafts, mission plans and community forms
+
+These rules apply the system above to the missions work. Check the existing
+mission screens against them and bring them into line.
+
+- **An AI draft always looks like a draft.** Use the AI callout pair: fill
+  `#fff0c3`, border `#f2dd9d`, text `#745214`, with a visible "AI draft" label
+  and a spark icon. Once a person accepts it, it becomes a normal white card and
+  the label changes to who accepted it and when.
+- **References and unanswered questions sit with the draft**, not behind a
+  toggle. References are a short numbered list in the body font, each linking to
+  its source. Unanswered questions use the peach pair (`#ffe7df` / `#a44231`) so
+  they read as "needs a person", never as an error.
+- **Choosing is an equal choice.** "Add to mission" and "Leave out" have the
+  same size and weight; nothing is pre-selected, and declining a draft is one tap.
+- **Forms are reading surfaces.** White card, 18px radius, inputs at 12px radius
+  with a visible label above each field (never placeholder-only), help text in
+  muted ink at 14px or larger, errors in `#bf4054` with an icon and a sentence
+  that says how to fix it.
+- **Say who will see the answers** directly above the submit button, in plain
+  words, using the sky pair (`#e1f3ff` / `#226784`).
+- **Task and plan status use the tint pairs**: to do lilac, in progress sun,
+  done mint, blocked peach. Status is always text plus colour, never colour alone.
+- Submit is the primary violet pill. One primary button per form.
+- Forms must work at 390px with touch targets of at least 44px, and be fully
+  usable by keyboard and screen reader.
+
 ---
 
 ## 6. Fix before anything else
@@ -447,7 +511,98 @@ only what it does.
 Each item lists what to build, the data it needs, and when it is done. Keep the
 order: later items depend on the trust established by earlier ones.
 
-### 7.1 Verifiable sortition (first, smallest, strongest demo)
+### 7.0 Missions and AI-drafted community forms (current work — verify, then harden)
+
+This is the work in `cf56cb8` (section 0). The description below is the owner's;
+the checklist is what the code must satisfy. Go through it against the real
+diff, mark each line pass or fail in the pull request, and fix the failures
+before building anything new on top.
+
+**The form definition**
+
+- [ ] The AI returns a form as data, and the server validates it with `zod`
+      against a fixed list of field types (short text, long text, single choice,
+      multiple choice, number, date, yes/no, contact). Anything else is rejected,
+      not rendered.
+- [ ] Limits are enforced in code: number of fields, label and option length,
+      number of options.
+- [ ] No AI-drafted form, plan or task is visible to the community until a
+      person with rights on the mission accepts it. The acceptance is stored:
+      who, when, and which draft version.
+- [ ] An accepted form is versioned. Editing it after responses exist creates a
+      new version; old responses stay tied to the version they answered.
+- [ ] The AI does not add fields asking for health, religion, ethnicity,
+      political opinion, identity documents or financial details. If a person
+      adds one, the form shows a warning and requires a stated reason.
+
+**The AI draft**
+
+- [ ] All model calls go through `chatCompletionsCreate` in
+      `src/lib/ai-completions.ts`.
+- [ ] Mission text and form answers are treated as untrusted input: they are
+      passed as content to analyse, never as instructions, and model output is
+      never executed, never used as HTML, and never decides permissions.
+- [ ] Every reference shown on a draft resolves to something real (a record in
+      the database or a URL that was actually supplied). References that cannot
+      be resolved are dropped by code before display, not left to the model.
+- [ ] Unanswered questions are stored with the draft and shown, and a draft with
+      open questions can still be declined or edited.
+- [ ] A failed or empty model response produces a clear message and a way to
+      build the form by hand. The feature works without AI.
+- [ ] The draft records which model and prompt version produced it.
+
+**Responses**
+
+- [ ] The submit route checks the session and the mission's eligibility rule in
+      the handler, validates the answers against the stored form version, and is
+      rate limited.
+- [ ] Reading responses is restricted in the handler to the mission's organisers.
+      A participant can read, edit and delete their own response.
+- [ ] The form states who will see the answers and how long they are kept
+      before the person submits (section 5.12), and the stored response records
+      that notice version.
+- [ ] One response per person per form unless the form allows several, enforced
+      by a database constraint and not only in the interface.
+- [ ] Responses can be exported by organisers and deleted with the mission.
+      Responses are never sent to the model unless the organiser asks for a
+      summary, and then without names or contact details.
+- [ ] No points, levels or reputation are awarded for responding.
+
+**Plans and tasks**
+
+- [ ] A task has an owner, a status and a history of who changed it.
+- [ ] AI-suggested tasks are drafts until accepted, like forms.
+- [ ] A mission page shows the plan, the tasks, the form and a count of
+      responses, with each AI-drafted part labelled until accepted.
+
+**Engineering**
+
+- [ ] The schema change ships as a Prisma migration (section 4), not `db push`.
+- [ ] New logic has tests: form validation, reference filtering, the response
+      permission checks.
+- [ ] Missions are reachable from the workspace navigation and the command menu.
+- [ ] `DESIGN.md` and `worklog.md` describe the feature.
+
+Why section 6 matters more now: form responses are personal data (names, skills,
+what people own, how to reach them). With the forgeable session cookie (6.1),
+anyone could submit as someone else or read an organiser's view. Fix 6.1 before
+any real community uses a mission form.
+
+Next steps once the checklist passes:
+
+1. **Matching.** Turn responses into offers and needs, and suggest which offers
+   fit which tasks. The suggestion is a rule over form fields first; a model may
+   only help word the suggestion. A person confirms every match.
+2. **Follow-through.** Link mission tasks to the accountability tracker (7.5) so
+   a finished mission shows what was done with what people offered.
+3. **Templates.** Let a community save an accepted form and plan as a template
+   others can start from, with the original credited.
+4. **Languages.** Mission forms are the first content to translate (7.6).
+
+Done when: every checklist line is marked pass in a merged pull request, and
+section 0 of this file has been rewritten from the code.
+
+### 7.1 Verifiable sortition (smallest build, strongest demo)
 
 Today `src/app/api/sortition/[id]/select/route.ts` shuffles with `Math.random()`,
 records no seed, and with more than one demographic dimension can select more
@@ -637,6 +792,10 @@ Commit messages: `type(scope): description`, for example
   unless the code enforces exactly that.
 - Reintroduce the dark space theme, gradients on text, glow effects or glass cards.
 - Add an HTTP route that seeds, resets or migrates data.
+- Show an AI-drafted form, plan or task to the community before a person accepts it.
+- Collect a response without first telling the person who will see it.
+- Render a form field type that is not on the validated list.
+- Leave a commit unpushed at the end of a session.
 
 ## 10. Roadmap status
 
@@ -649,6 +808,8 @@ Update this table in the same pull request as the work.
 | 6.3 Vote and email exposure | Not started |
 | 6.4 Tally integrity | Not started |
 | 6.5 Hardening | Not started |
+| 0 Missions commit `cf56cb8` on GitHub | Not pushed when last checked |
+| 7.0 Missions and community forms | Built by Codex (reported); not reviewed against the checklist |
 | 7.1 Verifiable sortition | Not started |
 | 7.2 Consensus mapping | Not started |
 | 7.3 Verified identity | Not started |
@@ -670,3 +831,6 @@ Ask before building the part they affect; do not guess.
    voting (6.4)?
 4. Which AI provider and region should production use? It affects data
    residency for any public-sector customer.
+5. For mission forms: who may see responses (organisers only, or all mission
+   members), and how long are they kept? The form must say so before submit (7.0).
+6. Who may accept an AI draft into a mission: its creator only, or any organiser?
