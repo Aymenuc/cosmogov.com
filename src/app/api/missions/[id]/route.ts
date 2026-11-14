@@ -30,6 +30,17 @@ export async function GET(
         (run) => !mission!.runs.some((recent) => recent.id === run.id),
       ),
     ];
+    const reviewerIds = [
+      ...new Set(
+        history.flatMap((run) => (run.reviewedBy ? [run.reviewedBy] : [])),
+      ),
+    ];
+    const reviewers = reviewerIds.length
+      ? await db.user.findMany({
+          where: { id: { in: reviewerIds } },
+          select: { id: true, name: true },
+        })
+      : [];
     const runs = history.map((run) =>
       run.status === "running" &&
       (!mission!.runLeaseUntil || mission!.runLeaseUntil < new Date())
@@ -38,7 +49,12 @@ export async function GET(
             status: "failed",
             error: "This run timed out. You can try again.",
           }
-        : run,
+        : {
+            ...run,
+            reviewerName:
+              reviewers.find((person) => person.id === run.reviewedBy)?.name ||
+              null,
+          },
     );
     return NextResponse.json({
       ...mission,

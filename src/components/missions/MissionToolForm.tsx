@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight, Check, Users } from "lucide-react";
 import type { MissionTool } from "@/lib/missions/types";
 export default function MissionToolForm({
   tool,
@@ -83,10 +83,14 @@ export default function MissionToolForm({
       ))}
       {!preview && (
         <>
-          <p className="mission-small">
-            Your name and response are visible to people with access to this
-            mission.
-          </p>
+          <div className="mission-response-notice">
+            <Users size={18} aria-hidden="true" />
+            <p>
+              <strong>Shared with your mission.</strong> People with access to
+              this mission can see your name and answers. You can update or
+              remove your response here.
+            </p>
+          </div>
           <button className="civic-button" disabled={busy}>
             {busy
               ? "Saving…"

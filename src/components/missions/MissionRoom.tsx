@@ -49,6 +49,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import MissionToolForm from "./MissionToolForm";
+import MissionTogether from "./MissionTogether";
 const icons = {
   research: Search,
   perspectives: Users,
@@ -227,7 +228,11 @@ export default function MissionRoom({
               ...m,
               runs: m.runs.map((r) =>
                 r.id === run.id
-                  ? { ...r, acceptedAt: new Date().toISOString() }
+                  ? {
+                      ...r,
+                      acceptedAt: new Date().toISOString(),
+                      reviewerName: "You",
+                    }
                   : r,
               ),
               tasks: [
@@ -374,6 +379,7 @@ export default function MissionRoom({
           <strong>what’s possible.</strong>
         </div>
       </header>
+      <MissionTogether mission={mission} onNavigate={setTab} />
       {error && (
         <div className="mission-alert" role="alert">
           <CircleHelp size={18} />
@@ -567,8 +573,9 @@ export default function MissionRoom({
               <div className="mission-stale">
                 <RefreshCw size={16} />
                 <span>
-                  Community input has changed since this draft. Run this step
-                  again before adopting it.
+                  {run?.acceptedAt
+                    ? "Community input has changed since this was adopted. This is a snapshot of the earlier context."
+                    : "Community input has changed since this draft. Run this step again before adopting it."}
                 </span>
               </div>
             )}
@@ -587,18 +594,31 @@ export default function MissionRoom({
               </div>
             )}
             {output && run?.status === "completed" ? (
-              <article className="mission-output">
+              <article
+                className={`mission-output ${run.acceptedAt ? "is-adopted" : "is-draft"}`}
+              >
                 <div className="mission-output-label">
                   <span>
                     <Sparkles size={13} />
-                    {demo
-                      ? "ILLUSTRATIVE AI DRAFT"
-                      : "AI DRAFT · REVIEW WITH YOUR COMMUNITY"}
+                    {demo ? "Illustrative AI output" : "AI-assisted work"}
+                    {!run.acceptedAt && (
+                      <span className="mission-draft-badge">
+                        Draft · needs review
+                      </span>
+                    )}
                   </span>
                   {run.acceptedAt && (
                     <span className="mission-adopted">
                       <Check size={13} />
-                      Adopted
+                      {stage === "tool" ? "Published" : "Adopted"} by{" "}
+                      {run.reviewerName || "a mission organizer"}
+                      <span aria-hidden="true">·</span>
+                      <time dateTime={run.acceptedAt}>
+                        {new Date(run.acceptedAt).toLocaleDateString(
+                          undefined,
+                          { month: "short", day: "numeric", year: "numeric" },
+                        )}
+                      </time>
                     </span>
                   )}
                 </div>
@@ -647,6 +667,7 @@ export default function MissionRoom({
                                       ?.closest("details");
                                     if (details) details.open = true;
                                   }}
+                                  title={run.sources[index]?.title}
                                   aria-label={`Read reference ${index + 1}`}
                                 >
                                   [{index + 1}]
@@ -674,7 +695,11 @@ export default function MissionRoom({
                 )}
                 {output.tasks.length > 0 && (
                   <div className="mission-plan-preview">
-                    <h3>A draft action plan</h3>
+                    <h3>
+                      {run.acceptedAt
+                        ? "The adopted action plan"
+                        : "A draft action plan"}
+                    </h3>
                     {output.tasks.map((task, i) => (
                       <div key={i}>
                         <span>{i + 1}</span>
@@ -718,11 +743,10 @@ export default function MissionRoom({
                   </div>
                 )}
                 {run.sources.length > 0 && (
-                  <details className="mission-sources">
+                  <details className="mission-sources" open>
                     <summary>
                       <BookOpen size={16} />
-                      References behind this draft{" "}
-                      <span>{run.sources.length}</span>
+                      Sources for this work <span>{run.sources.length}</span>
                     </summary>
                     <p className="mission-small">
                       References identify the supplied context. Their accuracy
@@ -1023,6 +1047,16 @@ export default function MissionRoom({
               return (
                 <div className="mission-published-tool" key={toolRun.id}>
                   <div>
+                    <p className="mission-tool-review">
+                      <Check size={16} /> Published by{" "}
+                      {toolRun.reviewerName || "a mission organizer"} ·{" "}
+                      <time dateTime={toolRun.acceptedAt!}>
+                        {new Date(toolRun.acceptedAt!).toLocaleDateString(
+                          undefined,
+                          { month: "short", day: "numeric", year: "numeric" },
+                        )}
+                      </time>
+                    </p>
                     <MissionToolForm
                       key={toolRun.id}
                       tool={tool}

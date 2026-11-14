@@ -80,6 +80,7 @@ export type MissionRun = {
   error: string | null;
   searchStatus: string;
   acceptedAt: string | null;
+  reviewerName?: string | null;
   createdAt: string;
   completedAt: string | null;
 };

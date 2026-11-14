@@ -186,16 +186,29 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   const publicPage = await browser.newPage({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); publicPage.on('pageerror', e => pageErrors.push(e.message));
   await check('Public example is labeled and supports plan adoption and a working shared form', async () => {
     await publicPage.goto(base + '/missions/demo', { waitUntil: 'networkidle', timeout: 120000 });
-    await publicPage.getByText('Interactive example.', { exact: true }).waitFor(); await screenshot(publicPage, 'mission-workbench-desktop.png');
+    await publicPage.getByText('Interactive example.', { exact: true }).waitFor();
+    await publicPage.getByRole('heading', { name: 'This is how an idea grows.' }).waitFor();
+    assert.equal(await publicPage.locator('.mission-sources[open]').count(), 1);
+    await publicPage.getByText('Draft · needs review', { exact: true }).waitFor();
+    await screenshot(publicPage, 'mission-workbench-desktop.png');
     await publicPage.getByRole('link', { name: 'Read reference 1', exact: true }).first().click(); assert.equal(await publicPage.locator('.mission-sources[open]').count(), 1);
     await publicPage.getByRole('button', { name: /Maker.*A plan you can use/ }).click(); await publicPage.getByRole('button', { name: 'Adopt this plan' }).click(); await publicPage.getByRole('button', { name: 'Add tasks to the board' }).click();
     await publicPage.getByRole('button', { name: 'I can do this' }).first().click(); await publicPage.getByRole('button', { name: 'Mark done' }).click();
+    await publicPage.getByText('1 small win, together', { exact: true }).waitFor();
+    await screenshot(publicPage, 'mission-progress-desktop.png');
+    await publicPage.getByRole('button', { name: /AI workbench/ }).click();
+    await publicPage.getByText('Adopted by You', { exact: false }).waitFor();
+    assert.equal(await publicPage.getByText('Draft · needs review', { exact: true }).count(), 0);
+    await screenshot(publicPage, 'mission-adopted-plan-desktop.png');
     await publicPage.getByRole('button', { name: /AI workbench/ }).click(); await publicPage.getByRole('button', { name: /Studio.*Build a shared tool/ }).click(); await publicPage.getByRole('button', { name: 'Publish this tool' }).click(); await publicPage.getByRole('button', { name: 'Publish for this mission' }).click();
+    await publicPage.getByText('Shared with your mission.', { exact: true }).waitFor();
     await publicPage.getByLabel('How would you like to help?').selectOption('Clothes & textiles'); await publicPage.getByRole('button', { name: 'Add my response' }).click(); await publicPage.getByRole('button', { name: 'Update my response' }).waitFor();
   });
-  await check('Responsive mission screens at 375, 768 and 1440 pixels', async () => {
-    for (const width of [375, 768, 1440]) {
+  await check('Responsive mission screens at 375, 768, 1024 and 1440 pixels', async () => {
+    for (const width of [375, 768, 1024, 1440]) {
       await publicPage.setViewportSize({ width, height: 900 }); await publicPage.goto(base + '/missions/demo', { waitUntil: 'networkidle' }); await noOverflow(publicPage);
+      const reading = await publicPage.locator('.mission-findings p').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+      assert.ok(reading >= 14, `Reading text too small at ${width}px: ${reading}`);
       for (const label of [/Community input/, /Action board/, /Shared tools/]) { await publicPage.getByRole('button', { name: label }).click(); await noOverflow(publicPage); }
       if (width === 375) { await publicPage.getByRole('button', { name: /AI workbench/ }).click(); await screenshot(publicPage, 'mission-workbench-mobile.png'); }
       await page.setViewportSize({ width, height: 900 }); await page.goto(base + '/dashboard/missions', { waitUntil: 'networkidle' }); await noOverflow(page);
@@ -214,6 +227,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     await db.missionRun.createMany({ data: Array.from({ length: 21 }, () => ({ missionId, requestedBy: owner.id, stage: 'research', status: 'failed', inputRevision: 0 })) });
     const mission = await api('/' + missionId);
     assert.equal(mission.status, 200);
+    assert.equal(mission.data.runs.find(run => run.id === toolId).reviewerName, 'Alex');
     assert.ok(mission.data.runs.some(run => run.id === toolId && run.acceptedAt));
   });
   fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify({ checks, failures, pageErrors }, null, 2));

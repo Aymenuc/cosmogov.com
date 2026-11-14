@@ -158,3 +158,13 @@ Stage Summary:
 - Signup page supports government official registration with verification codes
 - Push notification toggle in settings page
 - All features compile and build successfully
+
+---
+Task: Mission design clarity and visible community contribution (14 Nov 2026)
+
+- Added a mission contribution strip using actual input authors, task assignees, responses and completion states.
+- Separated draft and accepted presentation; adopted plans and published forms identify the reviewer and date.
+- Made references open by default and highlighted cited sources; moved open questions to peach and answer visibility into a sky notice.
+- Increased mission labels and reading text and enlarged key touch targets.
+- Extended existing integration checks for acceptance attribution, dynamic progress, draft states, source visibility and 1024px layouts.
+- Verification: Webpack production build passed (107 static pages); 21 disposable-PostgreSQL/API/browser mission checks, 11 production-build UI regression checks, 4 session checks and 8 voting checks passed. Targeted lint passed for the contribution component, mission types and detail route. Repository-wide typecheck retains the same 16 existing errors. Live external AI and deployment services were not exercised.

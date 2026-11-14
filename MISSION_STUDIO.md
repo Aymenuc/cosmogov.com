@@ -10,6 +10,7 @@ The useful unit is a shared artifact: a research brief, a plan people can claim 
 - Structured AI outputs validated against known reference IDs. References identify contributed excerpts or web snippets; their presence does not prove a claim is true.
 - Optional web search through the existing Z AI SDK. Chat-only providers work with member-supplied context and clearly report unavailable search.
 - Revision checks prevent adopting a draft after its source context changes. Published forms remain available beyond the recent 20-run history.
+- Visible acceptance names/dates, open references, response visibility notices, and a contribution strip derived from actual mission records.
 - Exactly-once task adoption, atomic task claims, member-owned responses, a per-user 12-run hourly quota, and a per-mission run lease with timeout recovery.
 - AI-generated forms use validated text and choice fields. No generated JavaScript runs in the browser or server.
 - Public interactive example at `/missions/demo`. All example people, sources, and outputs are labeled illustrative. Its changes last only until reload; loading an example does not invoke AI or analyze edited inputs.

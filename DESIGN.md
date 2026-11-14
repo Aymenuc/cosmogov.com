@@ -32,3 +32,13 @@ The broader redesign browser tests use fixtures. Mission Studio additionally has
 ### Recorded validation
 
 The Webpack production build passes and generates the application routes. The browser suite passes 11 interaction/layout checks, and the voting route passes 8 isolated tests. A clean checkout produced 22 TypeScript diagnostic entries; the redesign leaves 16 pre-existing entries, with no new diagnostic file/code pairs. The normal build retains the repository’s existing `ignoreBuildErrors` setting, so passing the production build does not imply a clean repository-wide typecheck.
+
+## Mission workspace clarity
+
+Mission pages now put people alongside AI work: a contribution strip shows the actual supplied context, tasks currently claimed, and tasks members marked done. Contributor initials and counts derive from mission inputs, task ownership and form responses; they do not imply a count of community members or verified outcomes. Each card opens the relevant mission section.
+
+AI authorship remains visible after adoption. Drafts carry a compact review badge; accepted plans and published forms show the accepting person's current name and acceptance date. Accepted plans use a quiet mint border. A changed-context message distinguishes an earlier adopted snapshot from a draft that needs regeneration. Source references are open by default, cited from findings, and highlighted when followed. Questions use peach; answer visibility uses a sky notice beside submission.
+
+Mission labels have a 12px minimum and primary reading text is at least 14px across mobile and desktop layouts. Key navigation and task controls have 44px minimum touch targets. The small illustrative homepage preview retains its display scale.
+
+This pass was verified with the Webpack production build, 21 mission integration checks against disposable PostgreSQL and an isolated model provider, 11 broader UI checks against the production build, and 12 session/voting checks. Mission layouts were checked at 375, 768, 1024 and 1440px. Screenshots are local, ignored verification artifacts under `artifacts/missions`; they are not included in the repository.
