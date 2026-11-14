@@ -10,6 +10,8 @@ All four HTTP seed routes were removed. Dynamic route fallbacks may return 405 r
 
 Signed sessions check a user revocation version. Logout revokes its individual token, and “Sign out everywhere” revokes all current sessions. Production still requires a shared random SESSION_SECRET. Login, signup, invitations, proposal creation/voting/comments, allocation and signing have persistent database rate limits. Only Vercel’s own forwarding header is trusted for client throttling on Vercel; direct/local deployments share the client bucket and retain account-based login limits. A different reverse proxy needs a deliberately configured trusted-client policy.
 
+Signature encoding must be canonical base64url. Alternate spellings that decode to the same HMAC bytes are rejected, so a revoked token cannot bypass its stored hash by changing ignored encoding bits or adding padding. Unit tests cover every final signature character; API checks cover the equivalent-byte alias before access and after logout.
+
 Migration: `20261114200000_civic_integrity`. Apply through `npm run db:migrate:deploy`. Cleanup of expired rate buckets and revoked tokens is part of the maintenance job added with mission retention controls.
 
 Run `scripts/check-missions.cjs` with the disposable PostgreSQL harness to include `scripts/check-integrity.cjs`. It checks seed rejection, invitation properties, ballot privacy, unauthorized edits, no voting XP, unsupported methods, concurrent allowance enforcement, signature review thresholds, every exported admin/government handler, token revocation and login throttling. Tests use fixture accounts and stub email; no real invitations or messages are sent.

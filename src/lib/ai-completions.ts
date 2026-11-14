@@ -7,7 +7,7 @@ const NVIDIA_URL_HINTS = /nvidia\.com|integrate\.api\.nvidia/i;
  * Use for NVIDIA NIM (e.g. `https://integrate.api.nvidia.com/v1`); the z-ai SDK adds
  * request fields some vendors do not accept.
  */
-export function useNvidiaOpenAICompat(): boolean {
+export function isOpenAICompatible(): boolean {
   if (process.env.Z_AI_USE_OPENAI_COMPAT === "1") return true;
   const base = process.env.Z_AI_BASE_URL?.trim() ?? "";
   return NVIDIA_URL_HINTS.test(base);
@@ -35,7 +35,7 @@ export async function chatCompletionsCreate(options: {
   const { messages, temperature, max_tokens } = options;
   const model = process.env.Z_AI_MODEL?.trim() || "deepseek-ai/deepseek-v4-pro";
 
-  if (useNvidiaOpenAICompat()) {
+  if (isOpenAICompatible()) {
     const baseUrl = (process.env.Z_AI_BASE_URL ?? "").replace(/\/$/, "");
     const apiKey = process.env.Z_AI_API_KEY?.trim();
     if (!baseUrl || !apiKey) {
@@ -84,7 +84,7 @@ export async function chatCompletionsCreate(options: {
 }
 
 export function aiModelMetadata() {
-  const compatible = useNvidiaOpenAICompat();
+  const compatible = isOpenAICompatible();
   return {
     provider: compatible ? "openai-compatible" : "z-ai",
     model:

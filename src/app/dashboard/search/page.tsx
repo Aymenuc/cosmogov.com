@@ -16,21 +16,23 @@ interface SearchResult {
 
 function SearchContent() {
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
+  const initialQuery = searchParams.get("q") || "";
+  return <SearchResults key={initialQuery} initialQuery={initialQuery} />;
+}
+
+function SearchResults({ initialQuery }: { initialQuery: string }) {
+  const [query, setQuery] = useState(initialQuery);
+  const [response, setResponse] = useState<{
+    query: string;
+    results: SearchResult[];
+  }>({ query: "", results: [] });
+  const loading = Boolean(query.trim() && response.query !== query);
+  const results =
+    response.query === query && query.trim() ? response.results : [];
 
   useEffect(() => {
-    setQuery(searchParams.get("q") || "");
-  }, [searchParams]);
-  useEffect(() => {
     let cancelled = false;
-    if (!query.trim()) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
+    if (!query.trim()) return;
     const timer = setTimeout(() => {
       Promise.all([
         fetch("/api/proposals?search=" + encodeURIComponent(query)).then((r) =>
@@ -64,13 +66,10 @@ function SearchContent() {
                 href: `/dashboard/organizations/${o.slug}`,
               }),
             );
-          setResults(matches);
+          setResponse({ query, results: matches });
         })
         .catch(() => {
-          if (!cancelled) setResults([]);
-        })
-        .finally(() => {
-          if (!cancelled) setLoading(false);
+          if (!cancelled) setResponse({ query, results: [] });
         });
     }, 200);
     return () => {

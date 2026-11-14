@@ -143,6 +143,11 @@ export default function DashboardLayout({
   const router = useRouter();
   const [user, setUser] = useState<WorkspaceUser | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setMobileOpen(false);
+  }
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const [error, setError] = useState("");
@@ -175,9 +180,6 @@ export default function DashboardLayout({
       )
       .catch(() => {});
   }, [user]);
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
   const logout = async () => {
     const res = await fetch("/api/auth/logout", { method: "POST" });
     if (res.ok) router.push("/");
@@ -208,10 +210,7 @@ export default function DashboardLayout({
           <span>A place to make a difference</span>
         </div>
       </div>
-      <Link
-        href="/dashboard/missions"
-        className="civic-button sidebar-create"
-      >
+      <Link href="/dashboard/missions" className="civic-button sidebar-create">
         <Plus size={16} />
         Start a mission
       </Link>

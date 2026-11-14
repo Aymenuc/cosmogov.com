@@ -14,6 +14,7 @@ import {
 
 interface GameResult {
   gameSlug: string;
+  gameType?: string;
   score: number;
   xpEarned: number;
   accuracy: number;

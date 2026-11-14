@@ -1170,7 +1170,7 @@ export default function GovPortalPage() {
               {legislation.map((leg) => {
                 const comments = leg._count?.comments ?? leg.commentCount ?? 0;
                 const amendments = leg._count?.amendments ?? leg.amendmentCount ?? 0;
-                const votes = leg._count?.votes ?? (leg.supportCount + leg.opposeCount) ?? 0;
+                const votes = leg._count?.votes ?? ((leg.supportCount || 0) + (leg.opposeCount || 0));
 
                 return (
                   <div

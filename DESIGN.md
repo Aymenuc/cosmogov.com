@@ -41,7 +41,7 @@ The broader redesign browser tests use fixtures. Mission Studio additionally has
 
 ### Recorded validation
 
-The Webpack production build passes and generates the application routes. The browser suite passes 11 interaction/layout checks, and the voting route passes 8 isolated tests. A clean checkout produced 22 TypeScript diagnostic entries; the redesign leaves 16 pre-existing entries, with no new diagnostic file/code pairs. The normal build retains the repository’s existing `ignoreBuildErrors` setting, so passing the production build does not imply a clean repository-wide typecheck.
+Earlier redesign validation passed 11 browser checks and 8 vote rule checks while retaining 16 pre-existing TypeScript diagnostics. The follow-up work fixes the application diagnostics and removes `ignoreBuildErrors`; production builds now enforce type checking. The standalone WebSocket example is outside the application typecheck because it has its own server dependencies. Current combined verification is recorded in `worklog.md`.
 
 ## Mission workspace clarity
 
@@ -59,10 +59,17 @@ The form editor continues Claude’s landing and portal redesign: a lilac invita
 
 Managers can build a form by hand or revise an AI draft, including title, introduction, text/choice questions, options, required answers and order. Saving creates a new draft; publishing is a separate review step. Authorship labels distinguish community-written forms from AI-assisted and community-edited AI forms. Revising a published form leaves its original version and answers intact.
 
-Verification for the combined redesign and form editor: Webpack production build passed; 26 real-API/disposable-database/browser mission checks, 13 browser regression checks against the standalone production build, and 19 sticker/session/voting rule checks passed. The illustrated homepage path is visited before full-page screenshots so its scroll-triggered artwork is captured in its visible state. Local screenshots are under `artifacts/missions` and `artifacts/editor-regression` and remain ignored by Git. The repository-wide typecheck still reports 16 pre-existing diagnostics.
+Verification for the combined redesign and form editor: Webpack production build passed; 26 real-API/disposable-database/browser mission checks, 13 browser regression checks against the standalone production build, and 19 sticker/session/voting rule checks passed. The illustrated homepage path is visited before full-page screenshots so its scroll-triggered artwork is captured in its visible state. Local screenshots are under `artifacts/missions` and `artifacts/editor-regression` and remain ignored by Git. At that point the typecheck still reported 16 pre-existing diagnostics; the later verification cleanup resolves them for the application.
 
 ## Mission controls and evidence
 
 Forms show visibility and availability terms before submission. Organizers choose those terms in the editor; new forms start with organizer-only answers and 90 days. A review panel flags possible sensitive questions, requests a stated need, and restricts flagged forms to organizer-only answers. Close, unpublish, reopen and export controls sit beside the reviewed form. Archived answers remain available only to the respondent and permitted organizers.
 
 Task completion opens a small evidence dialog rather than immediately marking work done. Completion notes, optional source links and recent actor history sit with each task. The mission settings dialog requires the exact mission title before permanent deletion. These surfaces use the existing calm cards, violet controls, peach review panels and sky privacy notices.
+
+
+## Community coordination
+
+Task invitations use the existing lilac reading surface, quiet white cards and a clear consent sentence. The task board stays human-directed: a shared-word suggestion becomes an invitation, then a task claim only after the participant accepts. Members see their own suggestions and invitations, while organizers can coordinate opted-in offers. Empty states explain how an offer becomes useful work.
+
+The Mission Studio template gallery credits the people who shared the starting point. Saving a template uses an explicit content-selection and preview dialog; reuse opens the existing mission creation flow and creates drafts that still need review. Completion notes appear on the existing Accountability page with a direct path to the mission and original evidence. These additions keep Claude's palette, typography, illustrations, stickers and garden.

@@ -34,7 +34,7 @@ export async function createZAI() {
   const { default: ZAI } = await import('z-ai-web-dev-sdk');
   if (fromEnv) {
     // SDK types mark constructor private; at runtime the class accepts config like `ZAI.create()`.
-    return new (ZAI as unknown as new (c: ZAIBaseConfig) => InstanceType<typeof ZAI>)(fromEnv);
+    return new (ZAI as unknown as new (c: ZAIBaseConfig) => Awaited<ReturnType<typeof ZAI.create>>)(fromEnv);
   }
   return ZAI.create();
 }

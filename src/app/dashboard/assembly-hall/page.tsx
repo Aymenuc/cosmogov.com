@@ -690,7 +690,7 @@ function CosmicDebateCanvas({
   speechBubbles: SpeechBubble[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>();
+  const animFrameRef = useRef<number | undefined>(undefined);
   const starsRef = useRef<Star[]>([]);
   const initializedRef = useRef(false);
 
