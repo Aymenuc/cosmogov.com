@@ -4,26 +4,52 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
+  Bike,
+  BookOpen,
   Check,
-  CheckCheck,
   CircleCheck,
-  Fingerprint,
+  Flower2,
+  Footprints,
   Globe2,
+  Hammer,
   Landmark,
   Leaf,
-  MessageCircle,
+  Megaphone,
   Plus,
+  Recycle,
+  Refrigerator,
   ShieldCheck,
   Sparkles,
+  TrafficCone,
+  Trees,
   Users,
   Vote,
   Wallet,
+  Wrench,
 } from "lucide-react";
+import "./landing.css";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { BrandMark } from "@/components/Brand";
 import CommonsArt from "@/components/CommonsArt";
-import MissionPreview from "@/components/missions/MissionPreview";
+import MissionBoard, { MissionChooser } from "@/components/landing/MissionBoard";
+import MissionPath from "@/components/landing/MissionPath";
+import CommonsStreet from "@/components/landing/CommonsStreet";
+import { boardMissions } from "@/components/landing/missions";
+// Ideas only. Each one is a kind of mission a community might start.
+const missionIdeas = [
+  { label: "Repair café", icon: Wrench, tint: "lilac" },
+  { label: "Tool library", icon: Hammer, tint: "sun" },
+  { label: "Walking school bus", icon: Footprints, tint: "mint" },
+  { label: "Community fridge", icon: Refrigerator, tint: "sky" },
+  { label: "Street tree count", icon: Trees, tint: "mint" },
+  { label: "Pocket park", icon: Flower2, tint: "paper" },
+  { label: "Youth council", icon: Megaphone, tint: "sun" },
+  { label: "Safer crossing", icon: TrafficCone, tint: "lilac" },
+  { label: "Book swap shelf", icon: BookOpen, tint: "paper" },
+  { label: "Bike train to work", icon: Bike, tint: "sky" },
+  { label: "Clean-up Saturday", icon: Recycle, tint: "mint" },
+];
 const tools = [
   {
     label: "Propose & vote",
@@ -129,6 +155,7 @@ function CommunityPreview({ selected = 0 }: { selected?: number }) {
 export default function HomePage() {
   const [selected, setSelected] = useState(0);
   const [annual, setAnnual] = useState(true);
+  const [missionId, setMissionId] = useState(boardMissions[0].id);
   return (
     <>
       <SiteHeader />
@@ -153,15 +180,16 @@ export default function HomePage() {
                 Start a mission <ArrowUpRight size={18} />
               </Link>
               <Link href="/missions/demo" className="text-link">
-                Try it for yourself <ArrowRight size={17} />
+                Step inside a full example <ArrowRight size={17} />
               </Link>
             </div>
+            <MissionChooser selected={missionId} onSelect={setMissionId} />
             <div className="hero-reassurance">
               <span>
-                <Check size={14} /> Free to get started
+                <Check size={15} /> Free to get started
               </span>
               <span>
-                <Check size={14} /> Built for every voice
+                <Check size={15} /> AI drafts, people decide
               </span>
             </div>
           </div>
@@ -169,28 +197,14 @@ export default function HomePage() {
             <div className="orbit-label">
               <BrandMark />
               <span>
-                A good idea is
+                Go on, press things.
                 <br />
-                <strong>just the beginning.</strong>
+                <strong>It’s an example. Nothing breaks.</strong>
               </span>
             </div>
-            <MissionPreview />
-            <div className="floating-outcome">
-              <div>
-                <CheckCheck size={20} />
-              </div>
-              <span>
-                Your people. Your place.
-                <br />
-                <strong>Your next big “what if”.</strong>
-              </span>
-              <span className="tiny-star">
-                <Sparkles size={28} />
-              </span>
-            </div>
-            <span className="visual-coordinate">
-              A LITTLE SPARK GOES A LONG WAY
-            </span>
+            <span className="board-tape board-tape-left" aria-hidden="true" />
+            <span className="board-tape board-tape-right" aria-hidden="true" />
+            <MissionBoard missionId={missionId} />
           </div>
         </section>
         <div className="platform-ribbon">
@@ -212,13 +226,39 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+        <section id="how-it-works" className="path-section">
+          <div className="site-container section-space">
+            <div className="path-heading">
+              <div className="eyebrow">HOW A MISSION MOVES</div>
+              <h2>
+                One goal. Four helping hands.
+                <br />
+                <em>Your call.</em>
+              </h2>
+              <p>
+                Scout, Bridge, Maker and Studio are four AI steps you ask for,
+                one at a time. They draft. They show their references. They
+                say what they don’t know. Then they wait for you.
+              </p>
+            </div>
+            <MissionPath />
+            <div className="path-end">
+              <Link href="/dashboard/missions" className="civic-button">
+                Start a mission <ArrowUpRight size={18} />
+              </Link>
+              <Link href="/missions/demo" className="text-link">
+                Or explore a full example <ArrowRight size={17} />
+              </Link>
+            </div>
+          </div>
+        </section>
         <section
           id="platform"
           className="platform-section site-container section-space"
         >
           <div className="section-heading">
             <div>
-              <div className="eyebrow">PARTICIPATION, WITH PURPOSE</div>
+              <div className="eyebrow">AND WHEN IT’S TIME TO DECIDE TOGETHER</div>
               <h2>
                 Good things happen
                 <br />
@@ -320,70 +360,8 @@ export default function HomePage() {
             </Link>
           </div>
         </section>
-        <section id="how-it-works" className="how-section">
-          <div className="site-container section-space">
-            <div className="section-heading">
-              <div>
-                <div className="eyebrow">A SIMPLE WAY FORWARD</div>
-                <h2>
-                  Start a conversation.
-                  <br />
-                  Create a ripple.
-                </h2>
-              </div>
-              <Link href="/auth/signup" className="civic-button outline">
-                Let’s get started <ArrowUpRight size={17} />
-              </Link>
-            </div>
-            <div className="steps-grid">
-              {[
-                {
-                  n: "01",
-                  title: "Make a place for your people.",
-                  copy: "Create your community and invite the people who care about its future.",
-                  icon: Users,
-                },
-                {
-                  n: "02",
-                  title: "Put ideas into motion.",
-                  copy: "Open a proposal, launch a survey, or bring people together in an assembly.",
-                  icon: MessageCircle,
-                },
-                {
-                  n: "03",
-                  title: "Move forward, together.",
-                  copy: "Make a decision, share the outcome, and keep the community in the loop.",
-                  icon: Vote,
-                },
-              ].map((step) => (
-                <div key={step.n}>
-                  <div className="step-top">
-                    <span>{step.n}</span>
-                    <step.icon size={27} strokeWidth={1.3} />
-                  </div>
-                  <h3>{step.title}</h3>
-                  <p>{step.copy}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        <section className="mission-section site-container section-space">
-          <div className="mission-image">
-            <img
-              src="/images/city.jpg"
-              alt="A city street, home to many different communities"
-            />
-            <div>
-              <Globe2 size={20} />
-              <span>
-                Many perspectives.
-                <br />
-                <strong>One shared future.</strong>
-              </span>
-            </div>
-          </div>
-          <div className="mission-copy">
+        <section className="ideas-section site-container section-space">
+          <div className="ideas-copy">
             <div className="eyebrow">BUILT AROUND PEOPLE</div>
             <h2>
               Democracy is
@@ -392,26 +370,41 @@ export default function HomePage() {
             </h2>
             <p>
               It’s the park down the street. The priorities in a public budget.
-              The ideas that deserve to be heard.
+              The broken toaster somebody on your block knows how to fix.
             </p>
             <p>
               Cosmogov brings those conversations closer to the people they
-              affect—with tools for communities to participate, deliberate, and
-              act.
+              affect, with tools for communities to participate, deliberate,
+              and act.
             </p>
             <Link href="/about" className="text-link">
               The idea behind Cosmogov <ArrowUpRight size={17} />
             </Link>
-            <div className="mission-values">
-              <span>
-                <Fingerprint size={19} />
-                Every voice matters
-              </span>
-              <span>
-                <Globe2 size={19} />
-                Every community belongs
-              </span>
-            </div>
+          </div>
+          <div className="ideas-wall">
+            <p id="ideas-wall-label">What could yours be?</p>
+            <ul aria-labelledby="ideas-wall-label">
+              {missionIdeas.map((idea) => (
+                <li key={idea.label}>
+                  <Link
+                    href="/dashboard/missions"
+                    className={`idea-sticker tint-${idea.tint}`}
+                  >
+                    <idea.icon size={18} aria-hidden="true" />
+                    {idea.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/dashboard/missions"
+                  className="idea-sticker idea-yours"
+                >
+                  <Plus size={18} aria-hidden="true" />
+                  Yours goes here
+                </Link>
+              </li>
+            </ul>
           </div>
         </section>
         <section id="pricing" className="pricing-section section-space">
@@ -563,6 +556,14 @@ export default function HomePage() {
                 a: "Officials can use a dedicated government portal to review initiatives, respond to citizen proposals, and update legislation. Government accounts use a verification code supplied by an administrator.",
               },
               {
+                q: "Is the AI team a set of independent agents?",
+                a: "No. Scout, Bridge, Maker and Studio are four steps you ask for, one at a time, on one AI model. They draft from what your community added. They don’t act on their own, send messages, spend money, or remember people between missions.",
+              },
+              {
+                q: "Can an AI draft be wrong?",
+                a: "Yes. A reference shows where a point came from, not that the point is true. That is why every draft lists what still needs checking, and why a plan or a form only joins a mission when a person adopts it.",
+              },
+              {
                 q: "Does AI make decisions for the community?",
                 a: "No. AI tools can help explore and develop ideas. Community members and their established governance processes make the decisions.",
               },
@@ -595,6 +596,7 @@ export default function HomePage() {
             </div>
             <BrandMark className="cta-mark" />
           </div>
+          <CommonsStreet />
         </section>
       </main>
       <Footer />

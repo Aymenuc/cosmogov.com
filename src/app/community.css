@@ -71,7 +71,7 @@
   background: var(--community-peach);
   color: #8b382b;
   border-radius: 100px;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 .hero-copy h1 {
@@ -151,7 +151,7 @@ h2 em,
   left: 17px;
   transform: rotate(-5deg);
   color: #514460;
-  font-size: 11px;
+  font-size: 12px;
 }
 .orbit-label svg {
   color: var(--civic-accent);
@@ -214,28 +214,6 @@ h2 em,
 }
 .preview-avatars span:nth-child(3) {
   background: #caecea;
-}
-.floating-outcome {
-  background: #fffdf7;
-  border: 2px solid #29223d;
-  border-radius: 16px;
-  transform: rotate(4deg);
-  box-shadow: 4px 5px 0 #29223d;
-  bottom: 19px;
-  left: -27px;
-}
-.floating-outcome > div {
-  background: var(--community-mint);
-  color: #28745b;
-}
-.floating-outcome .tiny-star {
-  color: #c44831;
-  font-size: 34px;
-}
-.visual-coordinate {
-  color: #6c6176;
-  right: 0;
-  font-size: 9px;
 }
 .platform-ribbon {
   background: var(--community-lilac);
@@ -310,50 +288,6 @@ h2 em,
 }
 .supporting-features > a:last-child > svg:first-child {
   color: var(--civic-accent);
-}
-.how-section {
-  background: #fff0c3;
-  border: 0;
-}
-.steps-grid {
-  gap: 23px;
-  margin-top: 40px;
-}
-.steps-grid > div {
-  background: #fffdf7;
-  border-radius: 22px;
-  padding: 27px;
-}
-.step-top {
-  border: 0;
-  margin-bottom: 15px;
-  padding-bottom: 8px;
-}
-.step-top span {
-  font-family: Manrope, sans-serif;
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--civic-accent);
-}
-.step-top svg {
-  color: #a94c34;
-  width: 30px;
-  height: 30px;
-}
-.steps-grid h3 {
-  font-weight: 750;
-}
-.steps-grid p {
-  color: #706779;
-}
-.mission-image {
-  border-radius: 120px 120px 24px 24px;
-}
-.mission-image::after {
-  background: linear-gradient(transparent 30%, #29223db0);
-}
-.mission-copy .eyebrow {
-  color: #a44231;
 }
 .pricing-section {
   background: #f2edfb;
@@ -444,7 +378,7 @@ h2 em,
 }
 .desk-welcome .eyebrow {
   color: #7044a1;
-  font-size: 9px;
+  font-size: 12px;
 }
 .desk-welcome h2 {
   font-weight: 800;
@@ -484,7 +418,7 @@ h2 em,
   background: #ffcf4d;
   border-radius: 100px;
   transform: rotate(-4deg);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   color: #3d2a42;
 }
@@ -538,7 +472,7 @@ h2 em,
   padding: 9px 12px;
   margin: 0;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .desk-tabs button.active {
   color: #5932c4;
@@ -764,7 +698,7 @@ h2 em,
     font-size: 15px;
   }
   .hero-copy > .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
   }
   .hero-actions {
     gap: 22px;
@@ -774,9 +708,6 @@ h2 em,
   }
   .preview-photo {
     height: 190px;
-  }
-  .floating-outcome {
-    left: -9px;
   }
   .ribbon-inner > div svg {
     width: 32px;
@@ -791,9 +722,6 @@ h2 em,
   }
   .feature-visual {
     padding: 0;
-  }
-  .steps-grid {
-    gap: 15px;
   }
   .supporting-features {
     gap: 15px;
@@ -834,7 +762,7 @@ h2 em,
   .desk-art-label {
     bottom: 9px;
     right: 17px;
-    font-size: 9px;
+    font-size: 12px;
   }
   .desk-stats {
     gap: 10px;
@@ -843,7 +771,7 @@ h2 em,
     padding: 16px;
   }
   .desk-stats > div > div {
-    font-size: 11px;
+    font-size: 12px;
   }
   .desk-stats strong {
     font-size: 30px;
@@ -877,4 +805,21 @@ h2 em,
 }
 .desk-ai p {
   color: #6e614b;
+}
+
+/* Shared header and footer: readable sizes on every public page. */
+.site-nav a,
+.header-login {
+  font-size: 15px;
+}
+.header-actions .civic-button.small {
+  font-size: 14px;
+}
+.footer-main > div:first-child > p,
+.footer-main > div > a:not(.brand) {
+  font-size: 14px;
+}
+.footer-main h3,
+.footer-bottom {
+  font-size: 13px;
 }

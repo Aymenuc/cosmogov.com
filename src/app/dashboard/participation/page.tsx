@@ -22,9 +22,15 @@ import {
   Clock,
   Plus,
   ArrowRight,
+  ArrowUpRight,
   Sparkles,
   Orbit,
-  HandMetal,
+  ClipboardList,
+  Dices,
+  Eye,
+  PenLine,
+  Scale,
+  Vote,
   Building2,
   Globe2,
   MapPin,
@@ -38,6 +44,82 @@ import {
   getCategory,
   resolveCategory,
 } from '@/lib/categories';
+
+// What people come here to do, in their words, and the tool made for it.
+const intents = [
+  {
+    want: 'Get something done',
+    tool: 'Mission studio',
+    copy: 'Bring a goal. Get help researching it, planning it and gathering what you need.',
+    href: '/dashboard/missions',
+    icon: Sparkles,
+    tint: 'sun',
+  },
+  {
+    want: 'Decide something together',
+    tool: 'Proposals & voting',
+    copy: 'Put a question to your group, discuss it, and vote with the rules in view.',
+    href: '/dashboard/proposals',
+    icon: Vote,
+    tint: 'lilac',
+  },
+  {
+    want: 'Share out a budget',
+    tool: 'Budgets',
+    copy: 'Let people propose projects and choose where the money goes.',
+    href: '/dashboard/participation/budget',
+    icon: Wallet,
+    tint: 'mint',
+  },
+  {
+    want: 'Ask what people think',
+    tool: 'Surveys & polls',
+    copy: 'A few quick questions when you need a sense of the room.',
+    href: '/dashboard/participation/surveys',
+    icon: ClipboardList,
+    tint: 'sky',
+  },
+  {
+    want: 'Gather support for an idea',
+    tool: 'Initiatives',
+    copy: 'Collect signatures to show an idea has backing.',
+    href: '/dashboard/participation/initiatives',
+    icon: PenLine,
+    tint: 'peach',
+  },
+  {
+    want: 'Talk it through',
+    tool: 'Assemblies',
+    copy: 'Bring people together to discuss before anything is decided.',
+    href: '/dashboard/participation/assemblies',
+    icon: Users,
+    tint: 'lilac',
+  },
+  {
+    want: 'Pick a panel by lottery',
+    tool: 'Sortition',
+    copy: 'Draw a small group at random to look closely at a question.',
+    href: '/dashboard/participation/sortition',
+    icon: Dices,
+    tint: 'sun',
+  },
+  {
+    want: 'Shape a rule or policy',
+    tool: 'Legislation',
+    copy: 'Read a draft text, comment on it, and suggest changes.',
+    href: '/dashboard/participation/legislation',
+    icon: Scale,
+    tint: 'sky',
+  },
+  {
+    want: 'See what happened next',
+    tool: 'Accountability',
+    copy: 'Follow what was promised and what has been done.',
+    href: '/dashboard/participation/accountability',
+    icon: Eye,
+    tint: 'mint',
+  },
+];
 
 interface Process {
   id: string;
@@ -173,7 +255,6 @@ function PhaseStepper({ currentPhase, phases: phasesJson }: { currentPhase: stri
 export default function ParticipationHub() {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<Stats>({ activeProcesses: 0, totalParticipants: 0, proposalsSubmitted: 0, budgetAllocated: 0 });
   const [filters, setFilters] = useState({ category: 'all', phase: 'all', scope: 'all', search: '' });
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -201,12 +282,6 @@ export default function ParticipationHub() {
           );
         }
         setProcesses(filtered);
-        setStats({
-          activeProcesses: data.total,
-          totalParticipants: filtered.reduce((s: number, p: Process) => s + p.participantCount, 0),
-          proposalsSubmitted: filtered.reduce((s: number, p: Process) => s + p.proposalCount, 0),
-          budgetAllocated: filtered.reduce((s: number, p: Process) => s + p.budgetAllocated, 0),
-        });
       }
     } catch (err) {
       console.error(err);
@@ -245,67 +320,42 @@ export default function ParticipationHub() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-teal p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Megaphone className="w-5 h-5 text-cosmic-teal" />
-            <span className="text-cosmic-teal text-sm font-semibold tracking-wider uppercase">Explore participation</span>
+      <div className="app-page-heading">
+        <div>
+          <div className="eyebrow">
+            <span className="status-dot" /> MORE THAN A VOTE
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            A shared future starts with{' '}
-            <span className="text-gradient">your perspective.</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            Shape the future of your community through participatory democracy. Propose ideas, deliberate with neighbors, vote on budgets, and hold leaders accountable.
-          </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            {[
-              { label: 'Active Processes', value: stats.activeProcesses, icon: Orbit, color: 'text-cosmic-teal' },
-              { label: 'Participants', value: stats.totalParticipants, icon: Users, color: 'text-cosmic-accent' },
-              { label: 'Proposals', value: stats.proposalsSubmitted, icon: FileText, color: 'text-cosmic-violet' },
-              { label: 'Budget Allocated', value: formatCurrency(stats.budgetAllocated), icon: Wallet, color: 'text-cosmic-amber' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
-                </p>
-              </div>
-            ))}
-          </div>
+          <h1>What do you want to do together?</h1>
+          <p>Pick what you’re trying to do. Each card opens the tool made for it.</p>
         </div>
+        <button className="civic-button" onClick={() => setShowCreateModal(true)}>
+          <Plus size={15} />
+          Start a process
+        </button>
       </div>
+
+      <ul className="intent-grid">
+        {intents.map((intent) => (
+          <li key={intent.want}>
+            <Link href={intent.href} className={`intent-card tint-${intent.tint}`}>
+              <span className="intent-icon">
+                <intent.icon size={22} aria-hidden="true" />
+              </span>
+              <strong>{intent.want}</strong>
+              <span>{intent.copy}</span>
+              <small>
+                {intent.tool} <ArrowUpRight size={14} aria-hidden="true" />
+              </small>
+            </Link>
+          </li>
+        ))}
+      </ul>
 
       <StartProcessDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-        {[
-          { label: 'Create Process', icon: Plus, href: '#', colorClass: 'bg-cosmic-teal/10', iconColor: 'text-cosmic-teal', desc: 'Start a new participatory process' },
-          { label: 'Budget Projects', icon: Wallet, href: '/dashboard/participation/budget', colorClass: 'bg-cosmic-amber/10', iconColor: 'text-cosmic-amber', desc: 'Allocate community funds' },
-          { label: 'Sign Initiatives', icon: HandMetal, href: '/dashboard/participation/initiatives', colorClass: 'bg-cosmic-violet/10', iconColor: 'text-cosmic-violet', desc: 'Support citizen petitions' },
-          { label: 'Join Assembly', icon: Users, href: '/dashboard/participation/assemblies', colorClass: 'bg-cosmic-accent/10', iconColor: 'text-cosmic-accent', desc: 'Participate in deliberation' },
-        ].map((action) => (
-          <Link
-            key={action.label}
-            href={action.href}
-            onClick={event => { if (action.label === 'Create Process') { event.preventDefault(); setShowCreateModal(true); } }}
-            className="glass-card p-3 sm:p-4 rounded-xl hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
-          >
-            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${action.colorClass} flex items-center justify-center mb-2 sm:mb-3 transition-all`}>
-              <action.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${action.iconColor}`} />
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1">{action.label}</h3>
-            <p className="text-[10px] sm:text-xs text-cosmic-muted">{action.desc}</p>
-          </Link>
-        ))}
+      <div className="intent-divider">
+        <h2>Or join a process that’s already under way</h2>
+        <p>A process is a longer piece of shared work with stages, from first ideas to a decision.</p>
       </div>
 
       {/* Browse by Aspect — Category Group Cards */}
@@ -349,13 +399,13 @@ export default function ParticipationHub() {
                           e.stopPropagation();
                           handleCategoryChipClick(catId);
                         }}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium transition-all cursor-pointer ${cat.bgColor} ${cat.color} ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-foreground transition-all cursor-pointer ${cat.bgColor} ${
                           isChipSelected
-                            ? `ring-1 ${cat.borderColor} ${cat.bgColor.replace('/10', '/25')}`
-                            : 'opacity-70 hover:opacity-100'
+                            ? `ring-2 ring-foreground ${cat.bgColor.replace('/10', '/25')}`
+                            : ''
                         }`}
                       >
-                        <CatIcon className="w-2.5 h-2.5" />
+                        <CatIcon className={`w-3 h-3 ${cat.color}`} />
                         {cat.label}
                       </span>
                     );
@@ -430,13 +480,14 @@ export default function ParticipationHub() {
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChipClick(cat.id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                aria-pressed={isSelected}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium text-foreground whitespace-nowrap transition-all shrink-0 ${
                   isSelected
-                    ? `${cat.bgColor.replace('/10', '/25')} ${cat.color} ring-1 ${cat.borderColor}`
-                    : `${cat.bgColor} ${cat.color} opacity-60 hover:opacity-100`
+                    ? `${cat.bgColor.replace('/10', '/25')} ring-2 ring-foreground`
+                    : `${cat.bgColor} hover:ring-1 hover:ring-foreground/40`
                 }`}
               >
-                <CatIcon className="w-3 h-3" />
+                <CatIcon className={`w-3.5 h-3.5 ${cat.color}`} />
                 {cat.label}
               </button>
             );
@@ -449,7 +500,7 @@ export default function ParticipationHub() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-heading text-xl font-bold text-foreground flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-cosmic-teal" />
-            Active Processes
+            Processes under way
           </h2>
           <span className="text-sm text-cosmic-muted">{processes.length} processes</span>
         </div>
@@ -461,11 +512,11 @@ export default function ParticipationHub() {
         ) : processes.length === 0 ? (
           <div className="glass-card p-12 rounded-2xl text-center">
             <Megaphone className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">No Active Processes</h3>
-            <p className="text-cosmic-muted text-sm mb-4">Be the first to start a participatory process in your community.</p>
-            <Button className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90">
-              <Plus className="w-4 h-4 mr-2" /> Create New Process
-            </Button>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Nothing under way yet</h3>
+            <p className="text-foreground text-sm mb-4">Start a process when a piece of shared work needs stages and time.</p>
+            <button className="civic-button outline" onClick={() => setShowCreateModal(true)}>
+              <Plus size={15} /> Start the first one
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">

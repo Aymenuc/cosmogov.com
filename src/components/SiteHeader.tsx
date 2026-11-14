@@ -13,11 +13,11 @@ export default function SiteHeader() {
           aria-label="Main navigation"
           className={open ? "site-nav is-open" : "site-nav"}
         >
-          <a href="/#platform" onClick={() => setOpen(false)}>
-            Platform
-          </a>
           <a href="/#how-it-works" onClick={() => setOpen(false)}>
             How it works
+          </a>
+          <a href="/#platform" onClick={() => setOpen(false)}>
+            Platform
           </a>
           <a href="/#pricing" onClick={() => setOpen(false)}>
             Pricing

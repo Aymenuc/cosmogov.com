@@ -6,7 +6,7 @@ Cosmogov connects a citizen's contribution with a visible decision process: disc
 
 The visual identity invites people into community life: an original spark mark, bold Manrope typography, warm cream, vivid violet, coral, sunshine yellow, mint, and sky blue. An original geometric illustration of neighbors appears on the homepage, civic desk, and account entry. Topic colors help people scan proposals; voting choices keep neutral, equally weighted presentation. Decorative entrance motion runs once and respects reduced-motion preferences. The shared theme covers existing app surfaces; primary pages have new layouts and interaction patterns.
 
-The homepage leads with “Big ideas. Meet your team.” and conversational language. The civic desk uses a friendly personal greeting, a colorful invitation to contribute, and distinct participation cards. Decision rooms retain quiet reading surfaces, visible rules, and clear labels.
+The homepage leads with “Big ideas. Meet your team.” and conversational language. Its hero is a working miniature of a mission: a visitor picks one of three example goals, steps through Scout, Bridge, Maker and Studio, sees each draft’s references and open question, and chooses whether a plan or a form joins the mission. The two choices are the same size, and nothing is preselected. Below it, “How a mission moves” is a six-stop path whose dotted trail is drawn by scroll position; each AI step is illustrated as a tool and carries its house rule, and people are illustrated as people. A wall of mission ideas replaces the former stock photograph. All landing text is 12px or larger. Landing styles live in `src/app/landing.css`, loaded by the page only. The civic desk uses a friendly personal greeting, a colorful invitation to contribute, and distinct participation cards. Decision rooms retain quiet reading surfaces, visible rules, and clear labels.
 
 ## New behavior
 
@@ -19,9 +19,19 @@ The homepage leads with “Big ideas. Meet your team.” and conversational lang
 - Workspace navigation: grouped toolsets, persistent access to every existing feature, mobile navigation, notifications, and a keyboard command menu (Ctrl/Cmd+K).
 - Account entry: shared accessible signup/login forms, citizen/official selection, password visibility, verification code input, safe dashboard redirects, and explicit submission errors.
 
+## The portal: stickers, the shared garden and starters
+
+- **Stickers** are a small thanks for helping: starting a mission, joining or starting a community, adding a source or a point of view, picking up or finishing a task, answering a form, adopting a plan or publishing a form, opening a proposal, commenting. Twelve fixed rules in `src/lib/stickers.ts` decide them from counts of a person’s own records, served by `GET /api/stickers`. There is deliberately no sticker for voting or signing, stickers are not ranked, and they unlock nothing. A person’s book is only shown to them. The existing XP, levels and leaderboards are unchanged and separate.
+- **The shared garden** shows one flower for each task finished across the missions a person can see, by everyone in them, up to a bed of twelve.
+- **The civic desk** shows a sticker strip (collected, next within reach) and the garden. The full book is at `/dashboard/stickers`, in the main sidebar list and the command menu.
+- **Explore participation** starts from what people want to do: nine cards in plain words ("Decide something together", "Share out a budget", "Ask what people think"), each opening the tool made for it. The former hero, zero-value statistics and jargon labels are gone, category chips use dark text, and the empty state's button now opens the process dialog.
+- **Mission starters** are grouped by kind of group: neighborhood, school, workplace, club or association, local business, city hall. A starter only prefills the new-mission form. The chosen kind is remembered in the browser.
+- **Sticker elevation** (ink edge and solid shadow) is now used in the portal for moments of welcome or thanks: the desk welcome panel, stickers, the selected group. Reading and deciding surfaces stay quiet.
+- **Text size**: every `font-size` below 12px in `civic.css`, `community.css` and `missions.css` was raised to 12px (218 declarations). Portal styles live in `src/app/portal.css`, loaded by the dashboard layout.
+
 ## Scope and data
 
-Existing participation routes and backend integrations are retained. Mission Studio adds PostgreSQL models and a migration, documented in [MISSION_STUDIO.md](./MISSION_STUDIO.md). The landing page's Riverside preview is explicitly illustrative. Screenshots under `artifacts/colorful` use isolated test fixtures, not customer records. The remaining city photograph is downloaded locally from Unsplash and depicts a street rather than a claimed customer location; the community artwork and spark mark are original SVGs in the source.
+Existing participation routes and backend integrations are retained. Mission Studio adds PostgreSQL models and a migration, documented in [MISSION_STUDIO.md](./MISSION_STUDIO.md). The landing page's example missions and Riverside preview are fixed, explicitly illustrative content; the landing page never calls a model. Screenshots under `artifacts/colorful` use isolated test fixtures, not customer records. The landing page no longer uses a photograph (`public/images/city.jpg` and `park.jpg` are now unreferenced); the community artwork, the six mission-path illustrations and the spark mark are original SVGs in the source.
 
 ## Verification
 

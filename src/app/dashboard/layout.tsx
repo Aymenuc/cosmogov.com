@@ -1,4 +1,5 @@
 "use client";
+import "../portal.css";
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -16,6 +17,7 @@ import {
   FileSignature,
   FileText,
   Gamepad2,
+  Sticker,
   Globe2,
   Landmark,
   LayoutDashboard,
@@ -64,6 +66,7 @@ interface Notification {
 const mainLinks = [
   { label: "Mission studio", href: "/dashboard/missions", icon: Sparkles },
   { label: "My civic desk", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Sticker book", href: "/dashboard/stickers", icon: Sticker },
   {
     label: "Explore participation",
     href: "/dashboard/participation",

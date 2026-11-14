@@ -20,6 +20,7 @@ import {
 import { useWorkspace } from "@/components/WorkspaceContext";
 import ProposalCard from "@/components/ProposalCard";
 import CommonsArt from "@/components/CommonsArt";
+import { StickerStrip } from "@/components/stickers/StickerBook";
 import { type CivicProposal, isOpen } from "@/lib/civic";
 interface Community {
   id: string;
@@ -188,6 +189,7 @@ export default function OverviewPage() {
           </div>
         ))}
       </section>
+      <StickerStrip />
       <div className="desk-columns">
         <section className="desk-agenda">
           <div className="app-section-heading">
