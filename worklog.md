@@ -205,3 +205,13 @@ Verification:
 - No horizontal overflow on the desk, sticker book and mission studio at 390, 768 and 1440px.
 - Not verified: `GET /api/stickers` against a real database (no database in this workspace; the browser checks use fixtures), and `scripts/check-missions.cjs`.
 - Follow-up: moved the sticker book into the main sidebar list, and rebuilt the Explore participation page around nine plain-language intent cards; fixed category chip contrast and wired the empty-state button to the process dialog.
+
+---
+Task: Editable mission forms within Claude’s redesign (14 Nov 2026)
+
+- Created `feat/editable-mission-forms` from the current integration branch, then merged Claude’s `claude/portal-stickers` work at `d35332c`. Kept the clearer mission review states and larger reading text when resolving CSS conflicts; retained both work logs.
+- Added a form editor with the existing scalloped sticker, lilac header, white question cards, live preview, mobile layout and explicit unsaved-change handling.
+- Managers can build without AI or revise generated/published forms. Saves create immutable versions, distinguish manual and AI-edited origins, preserve references, and leave published responses intact.
+- Added a migration for form origin and source-version lineage. Form save routes enforce manager access, shared validation, source membership, context revisions and a separate 60-draft hourly limit. Manual saves do not consume paid AI run quota.
+- Extended the real-database and browser suite for manual creation, invalid schemas, source-version access, revision preservation, publication and the editor layouts.
+- Verification: production Webpack build passed (109 static pages). All 26 disposable-PostgreSQL/API/browser mission checks passed, including the three migrations, manual authoring, version preservation, input/access validation, publish/respond flows and editor sizes at 390/768/1024/1440px. All 13 production browser checks passed, including Claude’s interactive landing board, illustrated scrolling path, stickers, garden and mission starters, plus editing and publishing an AI form in the public example. Seven sticker rules, four session rules and eight voting rules passed. Targeted editor/route/schema lint passed. The typecheck retains the same 16 existing errors. External AI/search providers and a deployed staging database were not exercised.

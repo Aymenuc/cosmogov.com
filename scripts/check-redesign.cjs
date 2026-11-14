@@ -98,6 +98,11 @@ async function check(name, fn) {
   }
 }
 async function capture(page, path) {
+  // Visit the illustrated path as a person would before taking a full-page image.
+  for (const stop of await page.locator(".mission-path .path-stop").all()) {
+    await stop.evaluate(el => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await page.waitForFunction(el => Number(getComputedStyle(el).opacity) >= 0.99, await stop.locator(".path-card").elementHandle());
+  }
   await page.evaluate(() => {
     document.activeElement?.blur();
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -541,6 +546,32 @@ async function fixtures(context) {
       }
     },
   );
+  await check("AI forms can be edited, validated and published in the public example", async () => {
+    const example = await browser.newPage({ viewport: { width: 1440, height: 1000 }, serviceWorkers: "block" });
+    example.on("pageerror", error => pageErrors.push(error.message));
+    await example.goto(`${base}/missions/demo`, { waitUntil: "networkidle" });
+    await example.getByRole("button", { name: /Studio.*Build a shared tool/ }).click();
+    await example.getByRole("button", { name: "Edit this form", exact: true }).click();
+    const editor = example.getByRole("dialog");
+    await editor.getByLabel("Form title", { exact: true }).fill("Our community repair offers");
+    await editor.getByLabel("Options for question 1").fill("Same\nSame");
+    await editor.getByRole("button", { name: "Save draft", exact: true }).click();
+    await editor.getByRole("alert").waitFor();
+    assert.equal(await editor.getByLabel("Form title", { exact: true }).inputValue(), "Our community repair offers");
+    await editor.getByLabel("Options for question 1").fill("Mending\nEquipment");
+    await editor.locator(".mission-editor-body").evaluate(el => { el.scrollTop = 0; });
+    await example.screenshot({ path: `${output}/ai-form-editor-desktop.png`, fullPage: false, animations: "disabled" });
+    await editor.getByRole("button", { name: "Save draft", exact: true }).click();
+    await example.getByText("Community-edited AI form", { exact: true }).waitFor();
+    assert.equal(await example.locator(".mission-sources[open]").count(), 1);
+    await example.getByRole("button", { name: "Publish this tool", exact: true }).click();
+    await example.getByRole("button", { name: "Publish for this mission", exact: true }).click();
+    await example.getByRole("heading", { name: "Our community repair offers", exact: true }).waitFor();
+    await example.getByLabel("How would you like to help?").selectOption("Mending");
+    await example.getByRole("button", { name: "Add my response", exact: true }).click();
+    await example.getByRole("button", { name: "Update my response", exact: true }).waitFor();
+    await example.close();
+  });
   await check("No uncaught browser errors", async () =>
     assert.deepEqual(pageErrors, []),
   );

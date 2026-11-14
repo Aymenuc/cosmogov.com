@@ -65,6 +65,11 @@ export const toolSchema = z
       ),
     "Invalid form fields.",
   );
+export const formDraftSchema = z.object({
+  tool: toolSchema,
+  sourceRunId: z.string().min(1).max(100).nullable().default(null),
+  inputRevision: z.number().int().min(0),
+});
 export const outputSchema = z.object({
   tool: toolSchema.nullable().default(null),
   headline: text(180),

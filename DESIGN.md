@@ -52,3 +52,11 @@ AI authorship remains visible after adoption. Drafts carry a compact review badg
 Mission labels have a 12px minimum and primary reading text is at least 14px across mobile and desktop layouts. Key navigation and task controls have 44px minimum touch targets. The small illustrative homepage preview retains its display scale.
 
 This pass was verified with the Webpack production build, 21 mission integration checks against disposable PostgreSQL and an isolated model provider, 11 broader UI checks against the production build, and 12 session/voting checks. Mission layouts were checked at 375, 768, 1024 and 1440px. Screenshots are local, ignored verification artifacts under `artifacts/missions`; they are not included in the repository.
+
+## Editable mission forms
+
+The form editor continues Claude’s landing and portal redesign: a lilac invitation with the shared scalloped form sticker, white question cards, familiar violet controls, and a quiet live layout preview. At desktop widths the questions and preview sit side by side; on mobile they stack inside one scrollable dialog with the save controls kept visible. Labels remain visible, all ordering/removal controls have accessible names and 44px targets, and changes can be discarded explicitly.
+
+Managers can build a form by hand or revise an AI draft, including title, introduction, text/choice questions, options, required answers and order. Saving creates a new draft; publishing is a separate review step. Authorship labels distinguish community-written forms from AI-assisted and community-edited AI forms. Revising a published form leaves its original version and answers intact.
+
+Verification for the combined redesign and form editor: Webpack production build passed; 26 real-API/disposable-database/browser mission checks, 13 browser regression checks against the standalone production build, and 19 sticker/session/voting rule checks passed. The illustrated homepage path is visited before full-page screenshots so its scroll-triggered artwork is captured in its visible state. Local screenshots are under `artifacts/missions` and `artifacts/editor-regression` and remain ignored by Git. The repository-wide typecheck still reports 16 pre-existing diagnostics.

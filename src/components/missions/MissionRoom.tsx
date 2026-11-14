@@ -20,6 +20,7 @@ import {
   MapPin,
   MessageCircle,
   Plus,
+  Pencil,
   RefreshCw,
   Search,
   Send,
@@ -35,6 +36,7 @@ import {
   type Mission,
   type MissionStage,
   type MissionRun,
+  type MissionTool,
 } from "@/lib/missions/types";
 import {
   createDemoMission,
@@ -50,6 +52,7 @@ import {
 } from "@/components/ui/dialog";
 import MissionToolForm from "./MissionToolForm";
 import MissionTogether from "./MissionTogether";
+import MissionFormEditor from "./MissionFormEditor";
 const icons = {
   research: Search,
   perspectives: Users,
@@ -77,6 +80,11 @@ export default function MissionRoom({
   const [notice, setNotice] = useState("");
   const [inputOpen, setInputOpen] = useState(false);
   const [acceptOpen, setAcceptOpen] = useState(false);
+  const [editor, setEditor] = useState<{
+    tool: MissionTool | null;
+    source: MissionRun | null;
+    revision: number;
+  } | null>(null);
   const [form, setForm] = useState({
     kind: "perspective",
     title: "",
@@ -174,6 +182,62 @@ export default function MissionRoom({
   const doneCount = mission.tasks.filter(
     (task) => task.status === "done",
   ).length;
+  const openFormEditor = (source: MissionRun | null = null) =>
+    setEditor({
+      tool: source?.output?.tool || null,
+      source,
+      revision: mission.revision,
+    });
+  const saveFormDraft = async (tool: MissionTool) => {
+    if (!editor) return;
+    if (editor.revision !== mission.revision)
+      throw new Error(
+        "The mission context changed. Reload it before saving your form.",
+      );
+    let id: string;
+    if (demo) {
+      id = `demo-form-${crypto.randomUUID()}`;
+      const stamp = new Date().toISOString();
+      const source = editor.source;
+      const draft: MissionRun = {
+        id,
+        stage: "tool",
+        origin: source && source.origin !== "manual" ? "edited" : "manual",
+        derivedFromId: source?.id || null,
+        status: "completed",
+        inputRevision: mission.revision,
+        sources: source?.sources || [],
+        output: {
+          headline: tool.title,
+          summary: tool.description,
+          findings: source?.output?.findings || [],
+          questions: source?.output?.questions || [],
+          tasks: [],
+          tool,
+        },
+        error: null,
+        searchStatus: "not_requested",
+        acceptedAt: null,
+        createdAt: stamp,
+        completedAt: stamp,
+      };
+      setMission((m) => m && { ...m, runs: [draft, ...m.runs] });
+    } else {
+      const result = await request("/tools/drafts", {
+        tool,
+        sourceRunId: editor.source?.id || null,
+        inputRevision: editor.revision,
+      });
+      id = result.id;
+    }
+    setStage("tool");
+    setSelectedRun(id);
+    setTab("workbench");
+    setEditor(null);
+    setNotice(
+      "Your form draft is saved. Review it, then publish when it’s ready.",
+    );
+  };
   const latest = (id: MissionStage) =>
     mission.runs.find((item) => item.stage === id);
   const changeStage = (id: MissionStage) => {
@@ -520,13 +584,37 @@ export default function MissionRoom({
                     {demo
                       ? "Load example"
                       : run
-                        ? `Run ${current.name} again`
+                        ? run.origin === "manual"
+                          ? `Ask ${current.name}`
+                          : `Run ${current.name} again`
                         : `Ask ${current.name}`}
                   </>
                 )}
               </button>
             </div>
             <p className="mission-stage-description">{current.description}</p>
+            {stage === "tool" && mission.canManage && (
+              <div className="mission-form-actions">
+                {output?.tool && (
+                  <button
+                    className="civic-button outline"
+                    disabled={Boolean(pending) || stale}
+                    onClick={() => openFormEditor(run)}
+                  >
+                    <Pencil size={16} />
+                    {run.acceptedAt ? "Create revised form" : "Edit this form"}
+                  </button>
+                )}
+                <button
+                  className="mission-build-manual"
+                  disabled={Boolean(pending)}
+                  onClick={() => openFormEditor()}
+                >
+                  <Plus size={16} />
+                  Build a form yourself
+                </button>
+              </div>
+            )}
             {!mission.canManage && (
               <p className="mission-small">
                 The mission creator and community moderators can run AI steps.
@@ -563,7 +651,11 @@ export default function MissionRoom({
                     <option key={item.id} value={item.id}>
                       {i === 0 ? "Latest · " : ""}
                       {new Date(item.createdAt).toLocaleString()} ·{" "}
-                      {item.status}
+                      {item.origin === "manual"
+                        ? "written by people"
+                        : item.origin === "edited"
+                          ? "edited by people"
+                          : item.status}
                     </option>
                   ))}
                 </select>
@@ -599,8 +691,20 @@ export default function MissionRoom({
               >
                 <div className="mission-output-label">
                   <span>
-                    <Sparkles size={13} />
-                    {demo ? "Illustrative AI output" : "AI-assisted work"}
+                    {run.origin === "manual" ? (
+                      <Users size={14} />
+                    ) : (
+                      <Sparkles size={13} />
+                    )}
+                    <span className="mission-origin-label">
+                      {run.origin === "manual"
+                        ? "Community-written form"
+                        : run.origin === "edited"
+                          ? "Community-edited AI form"
+                          : demo
+                            ? "Illustrative AI output"
+                            : "AI-assisted work"}
+                    </span>
                     {!run.acceptedAt && (
                       <span className="mission-draft-badge">
                         Draft · needs review
@@ -1028,12 +1132,23 @@ export default function MissionRoom({
                 ready to use.
               </p>
             </div>
-            <button
-              className="civic-button outline"
-              onClick={() => changeStage("tool")}
-            >
-              Build with Studio <Sparkles size={16} />
-            </button>
+            <div className="mission-form-actions">
+              {mission.canManage && (
+                <button
+                  className="civic-button"
+                  onClick={() => openFormEditor()}
+                >
+                  <Plus size={16} />
+                  Build a form yourself
+                </button>
+              )}
+              <button
+                className="civic-button outline"
+                onClick={() => changeStage("tool")}
+              >
+                Build with Studio <Sparkles size={16} />
+              </button>
+            </div>
           </div>
           {published.length ? (
             published.map((toolRun) => {
@@ -1106,6 +1221,19 @@ export default function MissionRoom({
                         }
                       }}
                     />
+                    {mission.canManage && (
+                      <button
+                        className="mission-build-manual"
+                        disabled={
+                          Boolean(pending) ||
+                          toolRun.inputRevision !== mission.revision
+                        }
+                        onClick={() => openFormEditor(toolRun)}
+                      >
+                        <Pencil size={16} />
+                        Create revised form
+                      </button>
+                    )}
                     {mine && (
                       <button
                         className="mission-delete-response"
@@ -1186,6 +1314,18 @@ export default function MissionRoom({
             </div>
           )}
         </section>
+      )}
+      {editor && (
+        <MissionFormEditor
+          key={editor.source?.id || "manual"}
+          initialTool={editor.tool}
+          basedOnAI={Boolean(
+            editor.source && editor.source.origin !== "manual",
+          )}
+          revisingPublished={Boolean(editor.source?.acceptedAt)}
+          onClose={() => setEditor(null)}
+          onSave={saveFormDraft}
+        />
       )}
       <Dialog
         open={inputOpen}
