@@ -1106,7 +1106,11 @@ model MissionRun {
   id            String    @id @default(cuid())
   missionId     String
   requestedBy   String
-  stage         String // research, perspectives, plan
+  origin        String    @default("ai") // ai, edited, manual
+  derivedFromId String?
+  derivedFrom   MissionRun? @relation("MissionFormVersions", fields: [derivedFromId], references: [id], onDelete: SetNull)
+  versions      MissionRun[] @relation("MissionFormVersions")
+  stage         String // research, perspectives, plan, tool
   status        String    @default("running") // running, completed, failed
   inputRevision Int
   sources       Json      @default("[]")
@@ -1124,6 +1128,7 @@ model MissionRun {
 
   @@index([missionId, createdAt])
   @@index([requestedBy, createdAt])
+  @@index([derivedFromId])
 }
 
 model MissionTask {

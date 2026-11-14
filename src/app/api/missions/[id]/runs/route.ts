@@ -53,6 +53,7 @@ export async function POST(
           (await tx.missionRun.count({
             where: {
               requestedBy: user.id,
+              origin: "ai",
               createdAt: { gt: new Date(now.getTime() - 3_600_000) },
             },
           })) >= 12

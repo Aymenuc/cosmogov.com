@@ -50,7 +50,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   const env = { ...process.env, DATABASE_URL: databaseUrl, DIRECT_URL: databaseUrl, SESSION_SECRET: crypto.randomBytes(32).toString('hex'), Z_AI_USE_OPENAI_COMPAT: '1', Z_AI_SKIP_CHAT_TEMPLATE_KWARGS: '1', Z_AI_BASE_URL: `http://127.0.0.1:${modelServer.address().port}/v1`, Z_AI_API_KEY: 'isolated-test-provider', MISSION_WEB_SEARCH: '0', NODE_ENV: 'development', NEXT_TELEMETRY_DISABLED: '1' };
   const migration = spawnSync(path.join(root, 'node_modules/.bin/prisma'), ['migrate', 'deploy'], { cwd: root, env, encoding: 'utf8' });
   fs.writeFileSync(path.join(output, 'migrations.log'), migration.stdout + migration.stderr);
-  assert.equal(migration.status, 0, 'Disposable database migration failed'); checks.push('Both migrations apply to an empty PostgreSQL database'); console.log('PASS Both migrations apply to an empty PostgreSQL database');
+  assert.equal(migration.status, 0, 'Disposable database migration failed'); checks.push('All migrations apply to an empty PostgreSQL database'); console.log('PASS All migrations apply to an empty PostgreSQL database');
   db = new PrismaClient({ datasources: { db: { url: databaseUrl } } });
   const password = 'OnlyForThisTest123!'; const passwordHash = await bcrypt.hash(password, 4);
   const owner = await db.user.create({ data: { email: 'owner@example.test', name: 'Alex', passwordHash } });
@@ -147,6 +147,51 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     assert.equal((await api(responsePath, { method: 'DELETE', cookie: memberCookie })).status, 200);
     assert.equal((await api('/' + missionId)).data.toolResponses.length, 0);
   });
+  const authoredTool = { title: 'Equipment offers', description: 'Tell us which practical equipment you could share.', fields: [{ id: 'f1', label: 'What can you offer?', kind: 'choice', options: ['Sewing machine', 'Hand tools'], required: true }, { id: 'f2', label: 'Anything else we should know?', kind: 'text', options: [], required: false }] };
+  let manualId;
+  await check('Managers can author forms without invoking AI; other members cannot', async () => {
+    const revision = (await api('/' + missionId)).data.revision;
+    const body = { tool: authoredTool, inputRevision: revision };
+    const requestsBefore = modelRequests.length;
+    assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body, cookie: '' })).status, 401);
+    assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body, cookie: memberCookie })).status, 403);
+    assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body, cookie: outsiderCookie })).status, 404);
+    const result = await api(`/${missionId}/tools/drafts`, { method: 'POST', body }); assert.equal(result.status, 201); manualId = result.data.id;
+    const record = await db.missionRun.findUniqueOrThrow({ where: { id: manualId } });
+    assert.equal(record.origin, 'manual'); assert.equal(record.acceptedAt, null); assert.equal(record.derivedFromId, null);
+    assert.equal(modelRequests.length, requestsBefore);
+    assert.equal((await api(`/${missionId}/tools/${manualId}/responses`, { method: 'POST', body: { values: { f1: 'Hand tools' } } })).status, 404);
+  });
+  await check('Form drafts reject unsupported fields, invalid choices, stale context and foreign source versions', async () => {
+    const revision = (await api('/' + missionId)).data.revision;
+    for (const tool of [
+      { ...authoredTool, fields: [{ ...authoredTool.fields[0], kind: 'html' }] },
+      { ...authoredTool, fields: [{ ...authoredTool.fields[0], options: ['Same', 'Same'] }] },
+      { ...authoredTool, fields: Array.from({ length: 7 }, (_, i) => ({ ...authoredTool.fields[1], id: 'f' + (i + 1) })) },
+      { ...authoredTool, fields: [authoredTool.fields[0], authoredTool.fields[0]] },
+    ]) assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body: { tool, inputRevision: revision } })).status, 400);
+    assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body: { tool: authoredTool, inputRevision: revision + 1 } })).status, 409);
+    assert.equal((await api(`/${privateId}/tools/drafts`, { method: 'POST', body: { tool: authoredTool, inputRevision: 0, sourceRunId: toolId } })).status, 404);
+    const result = await api(`/${privateId}/tools/drafts`, { method: 'POST', body: { tool: authoredTool, inputRevision: 0 } }); assert.equal(result.status, 201);
+    await api(`/${privateId}/contributions`, { method: 'POST', body: { kind: 'perspective', title: 'A new constraint', content: 'The venue requires confirmation.' } });
+    assert.equal((await api(`/${privateId}/tools/drafts`, { method: 'POST', body: { tool: authoredTool, inputRevision: 1, sourceRunId: result.data.id } })).status, 409);
+  });
+  await check('Editing an AI form preserves its published version, references and existing responses', async () => {
+    const original = await db.missionRun.findUniqueOrThrow({ where: { id: toolId } });
+    await api(`/${missionId}/tools/${toolId}/responses`, { method: 'POST', cookie: memberCookie, body: { values: { f1: 'Mending' } } });
+    const edited = { ...original.output.tool, title: 'Revised repair offers', fields: [{ ...original.output.tool.fields[1] }, { ...original.output.tool.fields[0], label: 'Choose an offer', options: ['Fixing', 'Welcoming', 'Equipment'] }] };
+    const requestsBefore = modelRequests.length;
+    const result = await api(`/${missionId}/tools/drafts`, { method: 'POST', body: { tool: edited, sourceRunId: toolId, inputRevision: original.inputRevision } }); assert.equal(result.status, 201);
+    const draft = await db.missionRun.findUniqueOrThrow({ where: { id: result.data.id } });
+    assert.equal(draft.origin, 'edited'); assert.equal(draft.derivedFromId, toolId); assert.equal(draft.acceptedAt, null);
+    assert.deepEqual(draft.sources, original.sources); assert.deepEqual(draft.output.findings, original.output.findings);
+    assert.equal(modelRequests.length, requestsBefore);
+    assert.equal((await api(`/${missionId}/runs/${draft.id}/accept`, { method: 'POST' })).status, 200);
+    const originalAfter = await db.missionRun.findUniqueOrThrow({ where: { id: toolId } }); assert.deepEqual(originalAfter.output, original.output);
+    const response = await db.missionToolResponse.findUniqueOrThrow({ where: { runId_authorId: { runId: toolId, authorId: member.id } } }); assert.equal(response.values.f1, 'Mending');
+    assert.equal((await api(`/${missionId}/tools/${draft.id}/responses`, { method: 'POST', cookie: memberCookie, body: { values: { f1: 'Mending' } } })).status, 400);
+    assert.equal((await api(`/${missionId}/tools/${draft.id}/responses`, { method: 'POST', cookie: memberCookie, body: { values: { f1: 'Fixing' } } })).status, 200);
+  });
   await check('Removed community members lose read and write access', async () => {
     await db.membership.delete({ where: { userId_organizationId: { userId: member.id, organizationId: org.id } } });
     assert.equal((await api('/' + missionId, { cookie: memberCookie })).status, 404);
@@ -171,10 +216,11 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     await page.getByRole('button', { name: /Studio.*Build a shared tool/ }).click();
     await page.getByRole('heading', { name: 'A tiny tool', exact: false }).count();
     await page.getByRole('button', { name: /Shared tools/ }).click();
-    await page.getByLabel('How can you help?').selectOption('Welcoming');
-    await page.getByLabel('What could you bring?').fill('A welcome sign and a friendly face.');
-    await page.getByRole('button', { name: 'Add my response' }).click();
-    await page.getByRole('button', { name: 'Update my response' }).waitFor();
+    const originalForm = page.locator('.mission-published-tool').filter({ has: page.getByRole('heading', { name: 'Repair café offers', exact: true }) });
+    await originalForm.getByLabel('How can you help?').selectOption('Welcoming');
+    await originalForm.getByLabel('What could you bring?').fill('A welcome sign and a friendly face.');
+    await originalForm.getByRole('button', { name: 'Add my response' }).click();
+    await originalForm.getByRole('button', { name: 'Update my response' }).waitFor();
     await page.reload({ waitUntil: 'networkidle' }); await page.getByRole('button', { name: /Shared tools/ }).click();
     assert.equal(await page.getByLabel('How can you help?').inputValue(), 'Welcoming');
     await screenshot(page, 'mission-shared-tool-desktop.png');
@@ -182,6 +228,47 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     await page.getByRole('button', { name: /Community input/ }).click(); await page.getByRole('button', { name: 'Add your input' }).click();
     await page.getByLabel('A short title').fill('An accessible welcome'); await page.getByLabel('Tell us a little more').fill('Please keep the welcome area clear for wheelchair users.'); await page.getByRole('button', { name: 'Add to the mission', exact: true }).click();
     await page.getByRole('heading', { name: 'An accessible welcome' }).waitFor();
+  });
+  await check('People build, preview, save, publish and answer a form through the real UI', async () => {
+    await page.getByRole('button', { name: /Shared tools/ }).click();
+    await page.getByRole('button', { name: 'Build a form yourself', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Form title', { exact: true }).fill('Our Saturday welcome');
+    await dialog.getByLabel('A short invitation', { exact: true }).fill('Help make the first session welcoming.');
+    await dialog.getByLabel('Question 1 wording').fill('Which welcome role suits you?');
+    await dialog.getByLabel('Answer type for question 1').selectOption('choice');
+    await dialog.getByLabel('Options for question 1').fill('Welcome desk\nRoom setup\nTea and coffee');
+    await dialog.getByRole('button', { name: 'Add a question', exact: true }).click();
+    await dialog.getByLabel('Question 2 wording').fill('What would help you take part?');
+    await dialog.getByRole('button', { name: 'Move question 2 up' }).click();
+    assert.equal(await dialog.getByLabel('Question 1 wording').inputValue(), 'What would help you take part?');
+    await dialog.getByRole('button', { name: 'Move question 1 down' }).click();
+    assert.equal(await dialog.getByLabel('Question 1 wording').inputValue(), 'Which welcome role suits you?');
+    await dialog.getByRole('heading', { name: 'Our Saturday welcome', exact: true }).waitFor();
+    await page.locator('.mission-editor-body').evaluate(el => { el.scrollTop = 0; });
+    await page.screenshot({ path: path.join(output, 'form-editor-desktop.png'), fullPage: false, animations: 'disabled' });
+    for (const width of [390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const overflow = await dialog.evaluate(el => el.scrollWidth - el.clientWidth); assert.ok(overflow <= 1, `Editor overflow at ${width}px: ${overflow}`);
+      if (width === 390) { await page.locator('.mission-editor-body').evaluate(el => { el.scrollTop = 0; }); await page.screenshot({ path: path.join(output, 'form-editor-mobile.png'), fullPage: false, animations: 'disabled' }); }
+    }
+    await dialog.getByRole('button', { name: 'Save draft', exact: true }).click();
+    await page.getByText('Community-written form', { exact: true }).waitFor();
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: /Studio.*Build a shared tool/ }).click();
+    await page.getByRole('button', { name: 'Publish this tool', exact: true }).click();
+    await page.getByRole('button', { name: 'Publish for this mission', exact: true }).click();
+    const form = page.locator('.mission-published-tool').filter({ has: page.getByRole('heading', { name: 'Our Saturday welcome', exact: true }) });
+    await form.getByLabel('Which welcome role suits you?').selectOption('Room setup');
+    await form.getByRole('button', { name: 'Add my response', exact: true }).click();
+    await form.getByRole('button', { name: 'Update my response', exact: true }).waitFor();
+    await form.getByRole('button', { name: 'Create revised form', exact: true }).click();
+    await dialog.getByLabel('Form title', { exact: true }).fill('Our revised Saturday welcome');
+    await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Keep editing', exact: true }).click();
+    assert.equal(await dialog.getByLabel('Form title', { exact: true }).inputValue(), 'Our revised Saturday welcome');
+    await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Discard changes', exact: true }).click();
   });
   const publicPage = await browser.newPage({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); publicPage.on('pageerror', e => pageErrors.push(e.message));
   await check('Public example is labeled and supports plan adoption and a working shared form', async () => {
@@ -219,7 +306,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   });
   await check('No uncaught browser errors', async () => assert.deepEqual(pageErrors, []));
   await check('Run quota rejects excess paid-provider requests', async () => {
-    const count = await db.missionRun.count({ where: { requestedBy: owner.id } });
+    const count = await db.missionRun.count({ where: { requestedBy: owner.id, origin: 'ai' } });
     if (count < 12) await db.missionRun.createMany({ data: Array.from({ length: 12 - count }, () => ({ missionId, requestedBy: owner.id, stage: 'research', status: 'failed', inputRevision: 0 })) });
     const requestsBefore = modelRequests.length; assert.equal((await api(`/${missionId}/runs`, { method: 'POST', body: { stage: 'research' } })).status, 429); assert.equal(modelRequests.length, requestsBefore);
   });
@@ -229,6 +316,14 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     assert.equal(mission.status, 200);
     assert.equal(mission.data.runs.find(run => run.id === toolId).reviewerName, 'Alex');
     assert.ok(mission.data.runs.some(run => run.id === toolId && run.acceptedAt));
+  });
+  await check('Manual draft quota is separate from paid AI runs', async () => {
+    const requestsBefore = modelRequests.length;
+    const count = await db.missionRun.count({ where: { requestedBy: owner.id, origin: { in: ['manual', 'edited'] } } });
+    await db.missionRun.createMany({ data: Array.from({ length: Math.max(0, 60 - count) }, () => ({ missionId, requestedBy: owner.id, stage: 'tool', origin: 'manual', status: 'failed', inputRevision: 0 })) });
+    const revision = (await api('/' + missionId)).data.revision;
+    assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body: { tool: authoredTool, inputRevision: revision } })).status, 429);
+    assert.equal(modelRequests.length, requestsBefore);
   });
   fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify({ checks, failures, pageErrors }, null, 2));
   console.log(JSON.stringify({ passed: checks.length, failed: failures.length, artifacts: output }));

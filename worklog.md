@@ -168,3 +168,50 @@ Task: Mission design clarity and visible community contribution (14 Nov 2026)
 - Increased mission labels and reading text and enlarged key touch targets.
 - Extended existing integration checks for acceptance attribution, dynamic progress, draft states, source visibility and 1024px layouts.
 - Verification: Webpack production build passed (107 static pages); 21 disposable-PostgreSQL/API/browser mission checks, 11 production-build UI regression checks, 4 session checks and 8 voting checks passed. Targeted lint passed for the contribution component, mission types and detail route. Repository-wide typecheck retains the same 16 existing errors. Live external AI and deployment services were not exercised.
+
+---
+Task: Landing page redesign (14 Nov 2026)
+
+Work Log:
+- Replaced the static hero preview with an interactive mission board (`src/components/landing/MissionBoard.tsx`, data in `missions.ts`): three illustrative goals, four AI steps, references and open questions on each draft, and equal adopt / leave-out choices. No model is called.
+- Replaced the three-step "how it works" grid with a scroll-drawn mission path (`MissionPath.tsx`) and six original SVG illustrations (`StepArt.tsx`). Motion is skipped under reduced motion.
+- Replaced the stock-photo section with a wall of mission ideas.
+- Added `src/app/landing.css`, loaded only by the landing page. Raised all landing text to 12px or more, and header and footer text to 13px or more.
+- Removed the unused `MissionPreview` component and the style rules for removed sections (about 440 lines across `civic.css`, `community.css`, `missions.css`).
+- Header link order now matches the page: How it works, Platform, Pricing.
+- Added two FAQ entries: whether the AI steps are independent agents, and whether a draft can be wrong.
+- Extended `scripts/check-redesign.cjs` to cover the mission board.
+
+Verification:
+- `node scripts/check-redesign.cjs`: 11 of 11 pass. `node --test scripts/check-session.cjs scripts/check-voting.cjs`: 12 of 12 pass.
+- ESLint clean on changed files. `tsc --noEmit` still reports the 16 pre-existing diagnostics and no new ones.
+- No horizontal overflow at 390, 768, 1024 and 1440px. Reduced-motion screenshots were byte-identical before and after the style removal.
+- `npx next build` passes.
+- Not run: `scripts/check-missions.cjs` (needs a disposable PostgreSQL).
+
+---
+Task: Landing drawings and a friendlier portal (14 Nov 2026)
+
+Work Log:
+- Landing: added a street-on-repair-day illustration (`CommonsStreet.tsx`), dot-screen step tiles with ink accents, paper tape on the mission board, a hand-drawn arrow, and scalloped band edges.
+- Portal: added stickers (`src/lib/stickers.ts`, `GET /api/stickers`, `src/components/stickers/`), the sticker book page at `/dashboard/stickers`, and a sticker strip plus shared garden on the civic desk.
+- Portal: mission starters by kind of group (`src/lib/missions/starters.ts`) on the mission studio page.
+- Portal: added `src/app/portal.css`; raised 218 sub-12px `font-size` declarations in the shared stylesheets to 12px.
+- Tests: `scripts/check-stickers.cjs` (7 rule tests) and a new browser check for stickers, the garden and starters.
+
+Verification:
+- `node --test scripts/check-stickers.cjs scripts/check-session.cjs scripts/check-voting.cjs`: all pass.
+- `node scripts/check-redesign.cjs`: 12 of 12 pass (one run failed once on first page compile and passed on re-run).
+- No horizontal overflow on the desk, sticker book and mission studio at 390, 768 and 1440px.
+- Not verified: `GET /api/stickers` against a real database (no database in this workspace; the browser checks use fixtures), and `scripts/check-missions.cjs`.
+- Follow-up: moved the sticker book into the main sidebar list, and rebuilt the Explore participation page around nine plain-language intent cards; fixed category chip contrast and wired the empty-state button to the process dialog.
+
+---
+Task: Editable mission forms within Claude’s redesign (14 Nov 2026)
+
+- Created `feat/editable-mission-forms` from the current integration branch, then merged Claude’s `claude/portal-stickers` work at `d35332c`. Kept the clearer mission review states and larger reading text when resolving CSS conflicts; retained both work logs.
+- Added a form editor with the existing scalloped sticker, lilac header, white question cards, live preview, mobile layout and explicit unsaved-change handling.
+- Managers can build without AI or revise generated/published forms. Saves create immutable versions, distinguish manual and AI-edited origins, preserve references, and leave published responses intact.
+- Added a migration for form origin and source-version lineage. Form save routes enforce manager access, shared validation, source membership, context revisions and a separate 60-draft hourly limit. Manual saves do not consume paid AI run quota.
+- Extended the real-database and browser suite for manual creation, invalid schemas, source-version access, revision preservation, publication and the editor layouts.
+- Verification: production Webpack build passed (109 static pages). All 26 disposable-PostgreSQL/API/browser mission checks passed, including the three migrations, manual authoring, version preservation, input/access validation, publish/respond flows and editor sizes at 390/768/1024/1440px. All 13 production browser checks passed, including Claude’s interactive landing board, illustrated scrolling path, stickers, garden and mission starters, plus editing and publishing an AI form in the public example. Seven sticker rules, four session rules and eight voting rules passed. Targeted editor/route/schema lint passed. The typecheck retains the same 16 existing errors. External AI/search providers and a deployed staging database were not exercised.

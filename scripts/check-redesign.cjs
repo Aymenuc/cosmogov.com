@@ -98,6 +98,11 @@ async function check(name, fn) {
   }
 }
 async function capture(page, path) {
+  // Visit the illustrated path as a person would before taking a full-page image.
+  for (const stop of await page.locator(".mission-path .path-stop").all()) {
+    await stop.evaluate(el => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await page.waitForFunction(el => Number(getComputedStyle(el).opacity) >= 0.99, await stop.locator(".path-card").elementHandle());
+  }
   await page.evaluate(() => {
     document.activeElement?.blur();
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -130,6 +135,11 @@ async function fixtures(context) {
       status = 200;
     if (path === "/api/auth/me") data = user;
     else if (path === "/api/notifications") data = [];
+    else if (path === "/api/stickers")
+      data = {
+        counts: { missionsStarted: 1, communitiesJoined: 2, tasksDone: 3 },
+        garden: { tasksDone: 7, missions: 2 },
+      };
     else if (path === "/api/organizations") data = orgs;
     else if (path === "/api/proposals")
       data = proposals.filter(
@@ -225,6 +235,31 @@ async function fixtures(context) {
   await check("Homepage, feature tabs, pricing and FAQ", async () => {
     await page.goto(base, { waitUntil: "networkidle", timeout: 120000 });
     await page.getByRole("heading", { name: /Big ideas/ }).waitFor();
+    // The hero's mission board: drafts show references and an open question,
+    // and only a person's choice adds anything to the mission.
+    const board = page.locator(".mission-board");
+    await board.getByText("Illustrative mission", { exact: true }).waitFor();
+    await board.getByText("Still to check", { exact: true }).waitFor();
+    assert.equal(await board.locator(".board-references li").count(), 2);
+    assert.equal(await board.locator(".board-choices").count(), 0);
+    await board.getByRole("button", { name: /Next: Bridge/ }).click();
+    await board.getByRole("button", { name: /Next: Maker/ }).click();
+    const choices = board.locator(".board-choices button");
+    assert.equal(await choices.count(), 2);
+    const [adopt, leave] = await Promise.all([
+      choices.nth(0).boundingBox(),
+      choices.nth(1).boundingBox(),
+    ]);
+    assert.equal(adopt.height, leave.height);
+    await board.getByRole("button", { name: "Adopt it", exact: true }).click();
+    await board.getByText("Adopted by you", { exact: true }).waitFor();
+    await board.getByRole("button", { name: "Undo", exact: true }).click();
+    assert.equal(await board.getByText("Adopted by you").count(), 0);
+    await page.getByRole("button", { name: "Make a crossing safer" }).click();
+    await board
+      .getByRole("heading", { name: "A safer way across Elm Street." })
+      .waitFor();
+    assert.equal(await page.locator(".mission-path .path-stop").count(), 6);
     await page.getByRole("tab", { name: "Participatory budgets" }).click();
     await page
       .getByRole("heading", { name: "Decide where the budget goes." })
@@ -425,7 +460,8 @@ async function fixtures(context) {
         waitUntil: "networkidle",
         timeout: 120000,
       });
-      await app.getByRole("link", { name: /Create Process/ }).click();
+      assert.equal(await app.locator(".intent-grid .intent-card").count(), 9);
+      await app.getByRole("button", { name: "Start a process" }).click();
       await app.getByRole("dialog").waitFor();
       await app
         .getByLabel("What will your community shape?")
@@ -440,6 +476,42 @@ async function fixtures(context) {
       assert.equal(createdProcess.title, "A better park");
     },
   );
+  await check("Sticker book, shared garden and group starters", async () => {
+    await app.goto(`${base}/dashboard`, { waitUntil: "networkidle" });
+    const strip = app.locator(".sticker-strip");
+    await strip.getByText("3 of 12 collected.", { exact: false }).waitFor();
+    assert.match(await strip.innerText(), /never for voting/);
+    await strip.getByText("Next up: Handy", { exact: true }).waitFor();
+    assert.match(await strip.innerText(), /3 of 5 so far/);
+    assert.equal(await app.locator(".garden-art .garden-flower").count(), 7);
+    await strip.getByRole("link", { name: /Open the book/ }).click();
+    await app.getByRole("heading", { name: "Your sticker book." }).waitFor();
+    assert.equal(await app.locator(".sticker-grid li").count(), 12);
+    assert.equal(await app.locator(".sticker-grid li.earned").count(), 3);
+    await app
+      .getByText("There are none for voting or signing.", { exact: true })
+      .waitFor();
+    await noOverflow(app, "sticker book");
+    await app.goto(`${base}/dashboard/missions`, { waitUntil: "networkidle" });
+    await app.getByRole("radio", { name: "Workplace", exact: true }).click();
+    await app
+      .getByRole("button", { name: "Cut our office waste" })
+      .click();
+    const dialog = app.getByRole("dialog");
+    await dialog.waitFor();
+    assert.match(
+      await dialog.locator("textarea").first().inputValue(),
+      /waste our workplace produces/,
+    );
+    await app.keyboard.press("Escape");
+    await app.reload({ waitUntil: "networkidle" });
+    assert.equal(
+      await app
+        .getByRole("radio", { name: "Workplace", exact: true })
+        .getAttribute("aria-checked"),
+      "true",
+    );
+  });
   await check(
     "Responsive workspace and dialogs at 375, 768, 1440px",
     async () => {
@@ -474,6 +546,32 @@ async function fixtures(context) {
       }
     },
   );
+  await check("AI forms can be edited, validated and published in the public example", async () => {
+    const example = await browser.newPage({ viewport: { width: 1440, height: 1000 }, serviceWorkers: "block" });
+    example.on("pageerror", error => pageErrors.push(error.message));
+    await example.goto(`${base}/missions/demo`, { waitUntil: "networkidle" });
+    await example.getByRole("button", { name: /Studio.*Build a shared tool/ }).click();
+    await example.getByRole("button", { name: "Edit this form", exact: true }).click();
+    const editor = example.getByRole("dialog");
+    await editor.getByLabel("Form title", { exact: true }).fill("Our community repair offers");
+    await editor.getByLabel("Options for question 1").fill("Same\nSame");
+    await editor.getByRole("button", { name: "Save draft", exact: true }).click();
+    await editor.getByRole("alert").waitFor();
+    assert.equal(await editor.getByLabel("Form title", { exact: true }).inputValue(), "Our community repair offers");
+    await editor.getByLabel("Options for question 1").fill("Mending\nEquipment");
+    await editor.locator(".mission-editor-body").evaluate(el => { el.scrollTop = 0; });
+    await example.screenshot({ path: `${output}/ai-form-editor-desktop.png`, fullPage: false, animations: "disabled" });
+    await editor.getByRole("button", { name: "Save draft", exact: true }).click();
+    await example.getByText("Community-edited AI form", { exact: true }).waitFor();
+    assert.equal(await example.locator(".mission-sources[open]").count(), 1);
+    await example.getByRole("button", { name: "Publish this tool", exact: true }).click();
+    await example.getByRole("button", { name: "Publish for this mission", exact: true }).click();
+    await example.getByRole("heading", { name: "Our community repair offers", exact: true }).waitFor();
+    await example.getByLabel("How would you like to help?").selectOption("Mending");
+    await example.getByRole("button", { name: "Add my response", exact: true }).click();
+    await example.getByRole("button", { name: "Update my response", exact: true }).waitFor();
+    await example.close();
+  });
   await check("No uncaught browser errors", async () =>
     assert.deepEqual(pageErrors, []),
   );

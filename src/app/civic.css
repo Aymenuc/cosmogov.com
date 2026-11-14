@@ -167,7 +167,7 @@ button {
   color: var(--civic-accent);
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 1.65px;
   display: flex;
@@ -220,7 +220,7 @@ h2 em {
 .hero-reassurance {
   display: flex;
   gap: 22px;
-  font-size: 10px;
+  font-size: 12px;
   color: #70786e;
   margin-top: 22px;
 }
@@ -259,7 +259,7 @@ h2 em {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
   color: #68637b;
 }
@@ -285,7 +285,7 @@ h2 em {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 12px;
   gap: 8px;
 }
 .preview-toolbar > span:first-child {
@@ -295,7 +295,7 @@ h2 em {
   font-weight: 600;
 }
 .preview-example {
-  font-size: 8px;
+  font-size: 12px;
   color: #6f786f;
   border: 1px solid #e1deeb;
   padding: 3px 6px;
@@ -320,7 +320,7 @@ h2 em {
   gap: 6px;
   align-items: center;
   color: white;
-  font-size: 9px;
+  font-size: 12px;
   background: #262137a8;
   padding: 6px 9px;
   border-radius: 4px;
@@ -333,7 +333,7 @@ h2 em {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 8px;
+  font-size: 12px;
   color: #71786f;
   gap: 6px;
 }
@@ -345,7 +345,7 @@ h2 em {
   color: #524d61;
   padding: 5px 8px;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -358,7 +358,7 @@ h2 em {
   max-width: 300px;
 }
 .preview-content > p {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.75;
   color: #70786e;
   max-width: 330px;
@@ -369,7 +369,7 @@ h2 em {
 .preview-progress > div:first-child {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: 12px;
   color: #70786e;
   margin-bottom: 8px;
 }
@@ -411,7 +411,7 @@ h2 em {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 7px;
+  font-size: 12px;
   color: #5b566c;
 }
 .preview-avatars span:nth-child(2) {
@@ -424,59 +424,12 @@ h2 em {
   margin: 0;
 }
 .preview-bottom > a {
-  font-size: 9px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   gap: 7px;
   font-weight: 600;
   color: var(--civic-accent);
-}
-.floating-outcome {
-  position: absolute;
-  left: -19px;
-  bottom: 13px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 20px;
-  background: #fffefa;
-  border: 1px solid #d7d5de;
-  border-radius: 9px;
-  box-shadow: 0 9px 30px #29243c0b;
-  min-width: 255px;
-}
-.floating-outcome > div {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #e5e2ee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5c576c;
-}
-.floating-outcome > span {
-  font-size: 10px;
-  line-height: 1.6;
-  color: #6a657d;
-}
-.floating-outcome strong {
-  font-weight: 600;
-  color: var(--civic-ink);
-}
-.floating-outcome .tiny-star {
-  margin-left: 18px;
-  font-size: 27px;
-  color: #9f6a40;
-}
-.visual-coordinate {
-  position: absolute;
-  right: 22px;
-  bottom: -12px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 8px;
-  letter-spacing: 0.7px;
-  color: #69637c;
 }
 .platform-ribbon {
   border-block: 1px solid var(--civic-line);
@@ -567,7 +520,7 @@ h2 em {
   padding: 48px;
 }
 .feature-copy .eyebrow {
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 1.2px;
 }
 .feature-copy h3 {
@@ -595,7 +548,7 @@ h2 em {
   display: flex;
   gap: 9px;
   align-items: center;
-  font-size: 10px;
+  font-size: 12px;
   color: #5e596e;
 }
 .feature-copy li svg {
@@ -642,119 +595,10 @@ h2 em {
   margin-bottom: 6px;
 }
 .supporting-features p {
-  font-size: 11px;
+  font-size: 12px;
   color: #6b657e;
   line-height: 1.8;
   max-width: 360px;
-}
-.how-section {
-  background: #e3e0ed;
-  border-block: 1px solid #dad6e7;
-}
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 50px;
-  margin-top: 58px;
-}
-.step-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #c8c5d2;
-  padding-bottom: 23px;
-  margin-bottom: 23px;
-}
-.step-top span {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 12px;
-  color: #676179;
-}
-.step-top svg {
-  color: #69637c;
-}
-.steps-grid h3 {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -0.5px;
-  line-height: 1.4;
-  max-width: 240px;
-}
-.steps-grid p {
-  font-size: 12px;
-  line-height: 1.9;
-  color: #69637c;
-  margin-top: 13px;
-  max-width: 300px;
-}
-.mission-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 90px;
-  align-items: center;
-}
-.mission-image {
-  position: relative;
-  height: 430px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.mission-image > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.mission-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(transparent 40%, #221d329c);
-}
-.mission-image > div {
-  position: absolute;
-  bottom: 28px;
-  left: 28px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  color: #e5e2ee;
-  font-size: 12px;
-  line-height: 1.7;
-}
-.mission-image strong {
-  font-weight: 600;
-}
-.mission-copy h2 {
-  margin: 18px 0 25px;
-}
-.mission-copy > p {
-  font-size: 13px;
-  line-height: 1.9;
-  color: #6b657e;
-  margin: 13px 0;
-  max-width: 390px;
-}
-.mission-copy > .text-link {
-  margin-top: 14px;
-}
-.mission-values {
-  display: flex;
-  gap: 28px;
-  border-top: 1px solid var(--civic-line);
-  margin-top: 30px;
-  padding-top: 24px;
-}
-.mission-values span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 9px;
-  line-height: 1.5;
-}
-.mission-values svg {
-  color: #67617a;
-  flex: none;
 }
 .pricing-section {
   background: #eae8f1;
@@ -783,7 +627,7 @@ h2 em {
 }
 .billing-switch button {
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 12px;
   padding: 9px 15px;
   color: #6a647d;
 }
@@ -793,7 +637,7 @@ h2 em {
   color: var(--civic-ink);
 }
 .billing-switch span {
-  font-size: 8px;
+  font-size: 12px;
   color: #5b566c;
   margin-left: 7px;
 }
@@ -824,7 +668,7 @@ h2 em {
   font-weight: 600;
 }
 .plan-name > span {
-  font-size: 7px;
+  font-size: 12px;
   letter-spacing: 0.3px;
   background: #e5e2ee;
   color: #4f4b5e;
@@ -832,7 +676,7 @@ h2 em {
   padding: 5px 7px;
 }
 .pricing-card > p {
-  font-size: 11px;
+  font-size: 12px;
   color: #6a657d;
   margin: 10px 0 22px;
 }
@@ -844,7 +688,7 @@ h2 em {
 }
 .price > span {
   font-family: Inter, sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0;
   font-weight: 400;
   color: #69647c;
@@ -852,14 +696,14 @@ h2 em {
 }
 .billing-note {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #6a657d;
   margin: 6px 0 23px;
 }
 .pricing-card > .civic-button {
   width: 100%;
   min-height: 43px;
-  font-size: 11px;
+  font-size: 12px;
   justify-content: space-between;
   padding: 11px 15px;
 }
@@ -873,7 +717,7 @@ h2 em {
   display: flex;
   gap: 9px;
   align-items: center;
-  font-size: 10px;
+  font-size: 12px;
   color: #67617a;
   line-height: 1.5;
 }
@@ -881,7 +725,7 @@ h2 em {
   flex: none;
 }
 .pricing-note {
-  font-size: 10px;
+  font-size: 12px;
   color: #6a647d;
   text-align: center;
   margin-top: 27px;
@@ -902,7 +746,7 @@ h2 em {
   margin-top: 15px;
 }
 .faq-section > div > p {
-  font-size: 11px;
+  font-size: 12px;
   color: #69647c;
   margin-top: 25px;
 }
@@ -961,7 +805,7 @@ h2 em {
 }
 .final-cta .eyebrow {
   color: #b1adbf;
-  font-size: 9px;
+  font-size: 12px;
 }
 .final-cta h2 {
   font-size: 48px !important;
@@ -971,7 +815,7 @@ h2 em {
   color: #c9c6d3;
 }
 .final-cta p {
-  font-size: 10px;
+  font-size: 12px;
   color: #afaabe;
   margin-top: 13px;
 }
@@ -995,13 +839,13 @@ h2 em {
   padding-bottom: 55px;
 }
 .footer-main > div:first-child > p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   color: #6a647d;
   margin-top: 20px;
 }
 .footer-main h3 {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 22px;
 }
@@ -1010,7 +854,7 @@ h2 em {
   align-items: center;
   justify-content: space-between;
   max-width: 160px;
-  font-size: 10px;
+  font-size: 12px;
   color: #69637c;
   margin: 13px 0;
 }
@@ -1026,7 +870,7 @@ h2 em {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  font-size: 9px;
+  font-size: 12px;
   color: #6a657d;
 }
 .footer-bottom > div {
@@ -1066,7 +910,7 @@ h2 em {
 .beta-label {
   font-family: "IBM Plex Mono", monospace;
   letter-spacing: 0.6px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px 4px;
   border: 1px solid #cbc8d5;
   border-radius: 3px;
@@ -1099,7 +943,7 @@ h2 em {
 }
 .workspace-label div > span {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #69637c;
   margin-top: 4px;
 }
@@ -1118,7 +962,7 @@ h2 em {
   scrollbar-color: #c5c2d0 transparent;
 }
 .nav-group-label {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 1.2px;
   color: #6a647d;
   font-weight: 600;
@@ -1247,7 +1091,7 @@ h2 em {
 }
 .sidebar-user small {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #67627a;
   text-transform: capitalize;
   margin-top: 3px;
@@ -1261,7 +1105,7 @@ h2 em {
   gap: 7px;
   align-items: center;
   padding: 5px 2px 0;
-  font-size: 11px;
+  font-size: 12px;
   color: #67617a;
 }
 .workspace-body {
@@ -1359,7 +1203,7 @@ h2 em {
   justify-content: space-between;
   gap: 16px;
   padding: 20px 35px;
-  font-size: 11px;
+  font-size: 12px;
   color: #6a647d;
   border-top: 1px solid #e0ddeb;
 }
@@ -1425,7 +1269,7 @@ h2 em {
   line-height: 1.8;
 }
 .app-page-heading .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 1.5px;
 }
 .app-page-heading > .civic-button {
@@ -1448,7 +1292,7 @@ h2 em {
   padding: 30px 32px;
 }
 .desk-welcome .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1.3px;
   color: #645f76;
 }
@@ -1504,7 +1348,7 @@ h2 em {
   display: block;
   font-family: Inter, sans-serif;
   font-style: normal;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.8px;
   margin-top: -1px;
   color: #67617a;
@@ -1587,7 +1431,7 @@ h2 em {
   margin: 9px 0 4px;
 }
 .desk-stats small {
-  font-size: 10px;
+  font-size: 12px;
   color: #6a647d;
   line-height: 1.6;
 }
@@ -1648,7 +1492,7 @@ h2 em {
   font-weight: 600;
 }
 .desk-tabs button > span {
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 3px;
   padding: 2px 4px;
   background: #e2dfec;
@@ -1693,7 +1537,7 @@ h2 em {
   align-items: center;
   gap: 5px;
   color: #645e76;
-  font-size: 11px;
+  font-size: 12px;
 }
 .save-proposal {
   color: #6a647d;
@@ -1738,7 +1582,7 @@ h2 em {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11px;
+  font-size: 12px;
   color: #68637b;
 }
 .origin-initial {
@@ -1750,7 +1594,7 @@ h2 em {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 12px;
   color: #645f76;
 }
 .proposal-card-footer {
@@ -1760,7 +1604,7 @@ h2 em {
   flex-wrap: wrap;
   gap: 8px;
   padding: 12px 17px 14px;
-  font-size: 10px;
+  font-size: 12px;
   color: #68637b;
 }
 .proposal-card-footer > span {
@@ -1774,7 +1618,7 @@ h2 em {
   gap: 5px;
   background: #ebe9f2;
   color: #6a647d;
-  font-size: 10px;
+  font-size: 12px;
   padding: 4px 6px;
   border-radius: 3px;
 }
@@ -1808,12 +1652,12 @@ h2 em {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
   color: #666178;
 }
 .proposal-card-action > a {
   color: #5b566b;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .voted-label {
@@ -1827,7 +1671,7 @@ h2 em {
 }
 .feed-note {
   color: #6a647d;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.8;
   margin-top: 18px;
 }
@@ -1867,7 +1711,7 @@ h2 em {
 }
 .community-list > a small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #68627b;
   margin-top: 3px;
 }
@@ -1889,7 +1733,7 @@ h2 em {
   margin-top: 10px;
 }
 .community-empty .text-link {
-  font-size: 11px;
+  font-size: 12px;
   gap: 5px;
   color: #645f76;
   margin-top: 12px;
@@ -1898,7 +1742,7 @@ h2 em {
   padding: 25px 0 4px;
 }
 .ways-to-participate > .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
   color: #68637b;
   letter-spacing: 1.2px;
 }
@@ -1932,7 +1776,7 @@ h2 em {
 }
 .ways-to-participate small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #68637b;
   margin-top: 5px;
 }
@@ -1959,7 +1803,7 @@ h2 em {
   color: #7b7758;
 }
 .desk-ai p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   color: #797663;
   margin: 7px 0 10px;
@@ -1968,7 +1812,7 @@ h2 em {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: #7a7757;
 }
 .empty-state {
@@ -2032,7 +1876,7 @@ h2 em {
   font-weight: 500;
 }
 .proposal-intro-strip > span {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.7px;
   white-space: nowrap;
 }
@@ -2108,7 +1952,7 @@ h2 em {
   padding: 7px 10px;
   border: 1px solid #dcd9e8;
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 12px;
   color: #68627b;
   white-space: nowrap;
   flex: none;
@@ -2132,7 +1976,7 @@ h2 em {
   margin-bottom: 0;
 }
 .proposal-list-heading > span {
-  font-size: 11px;
+  font-size: 12px;
   color: #68627b;
   white-space: nowrap;
 }
@@ -2167,7 +2011,7 @@ h2 em {
   padding: 17px 13px;
 }
 .command-results .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   padding: 0 10px 12px;
   color: #68637b;
 }
@@ -2278,7 +2122,7 @@ h2 em {
 }
 .auth-story .eyebrow {
   color: #a9a5b9;
-  font-size: 11px;
+  font-size: 12px;
 }
 .auth-story h1 {
   font-size: 62px;
@@ -2389,7 +2233,7 @@ h2 em {
   padding: 60px 0;
 }
 .auth-form-wrap .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
 }
 .auth-form-wrap h2 {
   font-size: 31px !important;
@@ -2439,7 +2283,7 @@ h2 em {
 }
 .auth-roles button span {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.7;
   color: #68627b;
   margin-top: 5px;
@@ -2502,7 +2346,7 @@ h2 em {
 }
 .auth-field > small {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #68637b;
   line-height: 1.8;
   margin-top: 7px;
@@ -2533,7 +2377,7 @@ h2 em {
   margin-left: 5px;
 }
 .auth-form-wrap .auth-terms {
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
   margin-top: 15px;
   color: #69647c;
@@ -2551,13 +2395,13 @@ h2 em {
   margin-top: 27px;
   padding-top: 20px;
   color: #67617a;
-  font-size: 11px;
+  font-size: 12px;
 }
 .auth-footer {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  font-size: 11px;
+  font-size: 12px;
   color: #68637b;
 }
 .auth-footer a {
@@ -2601,7 +2445,7 @@ h2 em {
   max-width: 800px;
 }
 .decision-heading .eyebrow {
-  font-size: 11px;
+  font-size: 12px;
 }
 .decision-heading h1 {
   font-size: 35px;
@@ -2660,7 +2504,7 @@ h2 em {
 }
 .decision-steps small {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: #67617a;
   margin-top: 4px;
 }
@@ -2773,7 +2617,7 @@ h2 em {
   display: flex;
   justify-content: space-between;
   margin-top: 9px;
-  font-size: 11px;
+  font-size: 12px;
   color: #68627b;
 }
 .reasoning-label {
@@ -2853,7 +2697,7 @@ h2 em {
   font-weight: 500;
 }
 .decision-comments time {
-  font-size: 11px;
+  font-size: 12px;
   color: #68627b;
   white-space: nowrap;
 }
@@ -2873,7 +2717,7 @@ h2 em {
   margin-bottom: 22px;
 }
 .decision-sidebar .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
   color: #666178;
   letter-spacing: 0.8px;
 }
@@ -2889,7 +2733,7 @@ h2 em {
   padding: 12px 0;
 }
 .decision-sidebar dt {
-  font-size: 11px;
+  font-size: 12px;
   color: #67627a;
 }
 .decision-sidebar dd {
@@ -2909,7 +2753,7 @@ h2 em {
   margin-bottom: 9px;
 }
 .quorum-summary p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   color: #68627b;
   margin-top: 12px;
@@ -3002,18 +2846,12 @@ h2 em {
   .orbit-label {
     left: 15px;
   }
-  .floating-outcome {
-    left: -5px;
-  }
   .feature-panel {
     padding: 35px;
     gap: 35px;
   }
   .ribbon-inner > span {
     padding-right: 25px;
-  }
-  .mission-section {
-    gap: 55px;
   }
   .workspace-topbar {
     padding-inline: 25px;
@@ -3092,7 +2930,7 @@ h2 em {
     padding: 18px;
   }
   .preview-example {
-    font-size: 7px;
+    font-size: 12px;
   }
   .preview-meta > span:last-child {
     display: none;
@@ -3102,11 +2940,6 @@ h2 em {
   }
   .preview-photo {
     height: 140px;
-  }
-  .floating-outcome {
-    bottom: 15px;
-    min-width: 225px;
-    padding: 12px 16px;
   }
   .ribbon-inner {
     gap: 20px;
@@ -3128,16 +2961,6 @@ h2 em {
   }
   .feature-copy h3 {
     font-size: 28px;
-  }
-  .mission-section {
-    gap: 40px;
-  }
-  .mission-image {
-    height: 385px;
-  }
-  .mission-values {
-    gap: 14px;
-    flex-wrap: wrap;
   }
   .pricing-card {
     padding: 24px 20px;
@@ -3280,7 +3103,7 @@ h2 em {
     display: none;
   }
   .header-actions .civic-button {
-    font-size: 11px;
+    font-size: 12px;
     padding: 9px 13px;
     min-height: 36px;
   }
@@ -3335,7 +3158,7 @@ h2 em {
     font-size: 13px;
   }
   .hero-reassurance {
-    font-size: 10px;
+    font-size: 12px;
     gap: 20px;
   }
   .hero-visual {
@@ -3365,26 +3188,17 @@ h2 em {
     font-size: 12px;
   }
   .preview-toolbar {
-    font-size: 11px;
+    font-size: 12px;
     padding-inline: 20px;
   }
   .preview-example {
-    font-size: 8px;
+    font-size: 12px;
   }
   .preview-progress > div:first-child {
-    font-size: 10px;
+    font-size: 12px;
   }
   .preview-bottom > a {
-    font-size: 10px;
-  }
-  .floating-outcome {
-    left: -8px;
-    bottom: 12px;
-  }
-  .visual-coordinate {
-    font-size: 7px;
-    bottom: -9px;
-    right: 10px;
+    font-size: 12px;
   }
   .ribbon-inner {
     display: grid;
@@ -3393,12 +3207,12 @@ h2 em {
     padding-block: 27px;
   }
   .ribbon-inner > span {
-    font-size: 11px;
+    font-size: 12px;
     border: 0;
     padding: 0;
   }
   .ribbon-inner > div {
-    font-size: 11px;
+    font-size: 12px;
     gap: 9px;
     line-height: 1.6;
   }
@@ -3435,7 +3249,7 @@ h2 em {
     flex: none;
     min-width: fit-content;
     gap: 9px;
-    font-size: 11px;
+    font-size: 12px;
     padding: 16px 0;
   }
   .platform-tabs > button > svg:last-child {
@@ -3455,7 +3269,7 @@ h2 em {
     max-width: 100%;
   }
   .feature-copy li {
-    font-size: 11px;
+    font-size: 12px;
   }
   .feature-visual {
     padding: 0;
@@ -3474,38 +3288,6 @@ h2 em {
   .supporting-features p {
     font-size: 12px;
     max-width: 100%;
-  }
-  .steps-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    margin-top: 35px;
-  }
-  .step-top {
-    padding-bottom: 17px;
-    margin-bottom: 17px;
-  }
-  .steps-grid h3 {
-    max-width: 100%;
-    font-size: 19px;
-  }
-  .steps-grid p {
-    font-size: 13px;
-    max-width: 450px;
-  }
-  .mission-section {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
-  .mission-image {
-    height: 350px;
-  }
-  .mission-copy > p {
-    font-size: 13px;
-    max-width: 100%;
-  }
-  .mission-values {
-    font-size: 11px;
-    gap: 25px;
   }
   .pricing-grid {
     grid-template-columns: 1fr;
@@ -3530,10 +3312,10 @@ h2 em {
     font-size: 12px;
   }
   .billing-note {
-    font-size: 11px;
+    font-size: 12px;
   }
   .pricing-note {
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.9;
   }
   .faq-section {
@@ -3555,13 +3337,13 @@ h2 em {
     padding-block: 52px;
   }
   .final-cta .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
   }
   .final-cta > .site-container > div:nth-child(2) {
     margin-top: 30px;
   }
   .final-cta p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .cta-mark {
     right: -60px;
@@ -3588,7 +3370,7 @@ h2 em {
   }
   .footer-bottom {
     flex-direction: column;
-    font-size: 10px;
+    font-size: 12px;
     gap: 15px;
   }
   .workspace-sidebar {
@@ -3615,7 +3397,7 @@ h2 em {
     display: none;
   }
   .workspace-breadcrumb strong {
-    font-size: 11px;
+    font-size: 12px;
   }
   .workspace-top-actions {
     gap: 17px;
@@ -3625,7 +3407,7 @@ h2 em {
   }
   .workspace-footer {
     padding: 20px;
-    font-size: 9px;
+    font-size: 12px;
   }
   .app-page-heading {
     gap: 15px;
@@ -3637,13 +3419,13 @@ h2 em {
     max-width: 450px;
   }
   .app-page-heading .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
   }
   .app-page-heading > div > p {
     font-size: 12px;
   }
   .app-page-heading > .civic-button {
-    font-size: 11px;
+    font-size: 12px;
     min-height: 39px;
   }
   .desk-welcome {
@@ -3657,10 +3439,10 @@ h2 em {
     font-size: 23px;
   }
   .desk-welcome .eyebrow {
-    font-size: 7px;
+    font-size: 12px;
   }
   .desk-welcome p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .desk-welcome-art {
     transform: scale(0.8);
@@ -3668,17 +3450,17 @@ h2 em {
     justify-self: center;
   }
   .desk-welcome .text-link {
-    font-size: 11px;
+    font-size: 12px;
     gap: 7px;
   }
   .desk-stats > div {
     padding: 20px;
   }
   .desk-stats > div > div {
-    font-size: 10px;
+    font-size: 12px;
   }
   .desk-stats small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .desk-stats strong {
     font-size: 32px;
@@ -3687,16 +3469,16 @@ h2 em {
     font-size: 19px;
   }
   .app-section-heading p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .app-section-heading > .text-link {
-    font-size: 11px;
+    font-size: 12px;
   }
   .desk-tabs {
     gap: 19px;
   }
   .desk-tabs button {
-    font-size: 10px;
+    font-size: 12px;
   }
   .proposal-grid.full {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3711,24 +3493,24 @@ h2 em {
     font-size: 16px;
   }
   .proposal-card-main > p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .proposal-card-footer {
     padding-inline: 15px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .proposal-card-action {
     padding-inline: 15px;
   }
   .proposal-card-action > a,
   .proposal-card-action span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .proposal-card-action > div {
     gap: 7px;
   }
   .feed-note {
-    font-size: 9px;
+    font-size: 12px;
   }
   .proposal-intro-strip {
     padding: 17px;
@@ -3752,16 +3534,16 @@ h2 em {
   .following-filter,
   .sort-select,
   .sort-select select {
-    font-size: 11px;
+    font-size: 12px;
   }
   .sort-select {
     margin-left: auto;
   }
   .category-chips button {
-    font-size: 10px;
+    font-size: 12px;
   }
   .proposal-list-heading > span {
-    font-size: 10px;
+    font-size: 12px;
   }
   .proposal-list-heading .desk-tabs {
     gap: 15px;
@@ -3773,7 +3555,7 @@ h2 em {
     font-size: 28px;
   }
   .decision-byline {
-    font-size: 10px;
+    font-size: 12px;
     gap: 14px;
   }
   .decision-steps {
@@ -3790,7 +3572,7 @@ h2 em {
     font-size: 12px;
   }
   .decision-steps small {
-    font-size: 10px;
+    font-size: 12px;
   }
   .decision-steps > a > span {
     font-size: 12px;
@@ -3823,26 +3605,26 @@ h2 em {
     font-size: 13px;
   }
   .results-block > p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .confidence-label,
   .reasoning-label {
     font-size: 12px;
   }
   .confidence-endpoints {
-    font-size: 10px;
+    font-size: 12px;
   }
   .decision-comments strong {
     font-size: 12px;
   }
   .decision-comments time {
-    font-size: 10px;
+    font-size: 12px;
   }
   .decision-comments article p {
     font-size: 13px;
   }
   .decision-sidebar dt {
-    font-size: 10px;
+    font-size: 12px;
   }
   .decision-sidebar dd {
     font-size: 12px;
@@ -3873,16 +3655,16 @@ h2 em {
     font-size: 12px;
   }
   .auth-field input::placeholder {
-    font-size: 11px;
+    font-size: 12px;
   }
   .auth-roles legend {
     font-size: 12px;
   }
   .auth-roles button strong {
-    font-size: 11px;
+    font-size: 12px;
   }
   .auth-roles button span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .auth-form > .civic-button {
     font-size: 12px;
@@ -3891,13 +3673,13 @@ h2 em {
     font-size: 12px;
   }
   .auth-form-wrap .auth-terms {
-    font-size: 10px;
+    font-size: 12px;
   }
   .auth-form-note {
-    font-size: 10px;
+    font-size: 12px;
   }
   .auth-footer {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 @media (max-width: 480px) {
@@ -3906,7 +3688,7 @@ h2 em {
     letter-spacing: -2.2px;
   }
   .hero-copy .eyebrow {
-    font-size: 9px;
+    font-size: 12px;
   }
   .hero-actions {
     gap: 19px;
@@ -3917,11 +3699,11 @@ h2 em {
     font-size: 12px;
   }
   .hero-actions .text-link {
-    font-size: 11px;
+    font-size: 12px;
     gap: 6px;
   }
   .hero-reassurance {
-    font-size: 9px;
+    font-size: 12px;
     gap: 16px;
   }
   .hero-visual {
@@ -3943,10 +3725,10 @@ h2 em {
     font-size: 22px;
   }
   .preview-bottom > a {
-    font-size: 9px;
+    font-size: 12px;
   }
   .preview-example {
-    font-size: 7px;
+    font-size: 12px;
   }
   .landing-page h2 {
     font-size: 30px !important;
@@ -3988,10 +3770,10 @@ h2 em {
     padding: 18px 16px;
   }
   .desk-stats small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .desk-stats > div > div {
-    font-size: 10px;
+    font-size: 12px;
   }
   .desk-stats strong {
     font-size: 30px;
@@ -4017,24 +3799,24 @@ h2 em {
   }
   .proposal-card-origin {
     padding-inline: 19px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .proposal-category {
-    font-size: 10px;
+    font-size: 12px;
   }
   .proposal-card-footer {
     padding-inline: 19px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .proposal-status {
-    font-size: 9px;
+    font-size: 12px;
   }
   .proposal-card-action {
     padding: 15px 19px;
   }
   .proposal-card-action span,
   .proposal-card-action > a {
-    font-size: 11px;
+    font-size: 12px;
   }
   .proposal-card-action > div {
     gap: 14px;
@@ -4052,7 +3834,7 @@ h2 em {
     font-size: 13px;
   }
   .community-list > a small {
-    font-size: 10px;
+    font-size: 12px;
   }
   .ways-to-participate > h2 {
     font-size: 23px;
@@ -4064,16 +3846,16 @@ h2 em {
     font-size: 13px;
   }
   .ways-to-participate small {
-    font-size: 11px;
+    font-size: 12px;
   }
   .desk-ai h3 {
     font-size: 14px;
   }
   .desk-ai p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .desk-ai span {
-    font-size: 11px;
+    font-size: 12px;
   }
   .proposal-list-heading {
     display: block;
@@ -4102,7 +3884,7 @@ h2 em {
   }
   .decision-topline .following-filter {
     padding: 9px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .decision-steps {
     margin-top: 23px;
@@ -4111,7 +3893,7 @@ h2 em {
     font-size: 20px;
   }
   .quorum-summary p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .decision-nudge h3 {
     font-size: 17px;
@@ -4120,7 +3902,7 @@ h2 em {
     font-size: 12px;
   }
   .decision-nudge .text-link {
-    font-size: 11px;
+    font-size: 12px;
   }
   .recent-voters > div {
     font-size: 12px;
@@ -4141,7 +3923,7 @@ h2 em {
   font-weight: 500;
 }
 .start-process-dialog > .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 5px;
 }
 .start-process-dialog .auth-form {
@@ -4175,7 +3957,7 @@ h2 em {
   padding: 6px 8px;
   background: #e9e6f1;
   color: #726c87;
-  font-size: 9px;
+  font-size: 12px;
   border-radius: 4px;
 }
 .process-journey > span.current {
@@ -4188,7 +3970,7 @@ h2 em {
   gap: 15px;
 }
 .process-creation-note {
-  font-size: 11px;
+  font-size: 12px;
   color: #756f8a;
   line-height: 1.9;
   padding: 13px 16px;
@@ -4254,7 +4036,7 @@ h2 em {
   background: #fff9;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   text-transform: capitalize;
   color: #77708c;
 }
@@ -4290,7 +4072,7 @@ h2 em {
   gap: 15px;
   align-items: center;
   flex-wrap: wrap;
-  font-size: 10px;
+  font-size: 12px;
   color: #7f7994;
 }
 .community-card-copy > div > span {
@@ -4305,7 +4087,7 @@ h2 em {
   margin-top: 21px;
   padding-top: 18px;
   border-top: 1px solid #e2dfed;
-  font-size: 11px;
+  font-size: 12px;
   color: #6a657d;
 }
 @media (max-width: 1150px) {

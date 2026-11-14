@@ -22,26 +22,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { MissionSummary } from "@/lib/missions/types";
-const starters = [
-  {
-    icon: Users,
-    title: "Bring people together",
-    goal: "Organize a welcoming community event. Understand what people can contribute, what practical constraints matter, and how we can make it easy to join.",
-    color: "peach",
-  },
-  {
-    icon: MapPin,
-    title: "Make a shared space better",
-    goal: "Improve a shared space with the people who use it. Gather local knowledge, check the constraints, and prepare a practical plan for the community to review.",
-    color: "mint",
-  },
-  {
-    icon: WandSparkles,
-    title: "Build a useful community service",
-    goal: "Create a small service that helps people share skills or resources. Understand the need, gather offers of help, and build a tool the community can use.",
-    color: "lilac",
-  },
+import {
+  defaultGroupKind,
+  groupKinds,
+  isGroupKind,
+  startersByKind,
+  type GroupKind,
+} from "@/lib/missions/starters";
+const starterLooks = [
+  { icon: Users, color: "peach" },
+  { icon: MapPin, color: "mint" },
+  { icon: WandSparkles, color: "lilac" },
 ];
+const KIND_KEY = "cosmogov:group-kind";
 export default function MissionStudioPage() {
   const router = useRouter();
   const [missions, setMissions] = useState<MissionSummary[]>([]);
@@ -52,6 +45,20 @@ export default function MissionStudioPage() {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
+  const [kind, setKind] = useState<GroupKind>(defaultGroupKind);
+  // Remembering the kind of group is a convenience for this browser only.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(KIND_KEY);
+      if (isGroupKind(stored)) setKind(stored);
+    } catch {}
+  }, []);
+  const chooseKind = (value: GroupKind) => {
+    setKind(value);
+    try {
+      localStorage.setItem(KIND_KEY, value);
+    } catch {}
+  };
   const [form, setForm] = useState({
     title: "",
     goal: "",
@@ -165,19 +172,46 @@ export default function MissionStudioPage() {
         </div>
       </header>
       <section className="mission-starters">
-        <div className="mission-section-label">A SPARK TO GET YOU STARTED</div>
-        <div>
-          {starters.map((item) => (
+        <div className="mission-section-label" id="group-kind-label">
+          WHO ARE YOU DOING THIS WITH?
+        </div>
+        <div
+          className="group-kinds"
+          role="radiogroup"
+          aria-labelledby="group-kind-label"
+        >
+          {groupKinds.map((item) => (
             <button
-              className={item.color}
-              key={item.title}
-              onClick={() => start(item.title, item.goal)}
+              key={item.id}
+              type="button"
+              role="radio"
+              aria-checked={kind === item.id}
+              className={kind === item.id ? "selected" : ""}
+              onClick={() => chooseKind(item.id)}
             >
-              <item.icon size={21} />
-              <span>{item.title}</span>
-              <ArrowUpRight size={17} />
+              {item.label}
             </button>
           ))}
+        </div>
+        <p className="group-kind-blurb">
+          {groupKinds.find((item) => item.id === kind)?.blurb} Pick a starting
+          point, then make it yours.
+        </p>
+        <div>
+          {startersByKind[kind].map((item, index) => {
+            const look = starterLooks[index % starterLooks.length];
+            return (
+              <button
+                className={look.color}
+                key={item.title}
+                onClick={() => start(item.title, item.goal)}
+              >
+                <look.icon size={21} />
+                <span>{item.title}</span>
+                <ArrowUpRight size={17} />
+              </button>
+            );
+          })}
         </div>
       </section>
       <section className="mission-list">

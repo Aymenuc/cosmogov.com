@@ -73,6 +73,8 @@ export type Contribution = {
 export type MissionRun = {
   id: string;
   stage: MissionStage;
+  origin?: "ai" | "edited" | "manual";
+  derivedFromId?: string | null;
   status: string;
   inputRevision: number;
   sources: Evidence[];
