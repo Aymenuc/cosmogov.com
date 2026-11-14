@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./civic.css";
 import "./community.css";
+import "./missions.css";
 import { Toaster } from "@/components/ui/toaster";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
-  title: "Cosmogov — Big ideas. Local magic.",
+  title: "Cosmogov — Your community, with an AI team",
   description:
-    "A shared space for civic participation. Propose ideas, make community decisions, and follow progress with Cosmogov.",
+    "A shared workspace for people and AI. Research community goals, turn input into plans, build useful tools, and make decisions together.",
   keywords: [
     "governance",
     "voting",

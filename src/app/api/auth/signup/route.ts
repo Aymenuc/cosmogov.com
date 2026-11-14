@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, createSession } from '@/lib/auth';
+import { sessionSecret } from '@/lib/session-token';
 import { sendEmail, welcomeEmail } from '@/lib/email';
 
 // Government verification codes — in production, store these in the database
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
       // If no code provided, create as regular user (they can be upgraded later)
     }
 
+    sessionSecret(); // Validate session configuration before creating an account.
     const passwordHash = await hashPassword(password);
     const user = await db.user.create({
       data: {

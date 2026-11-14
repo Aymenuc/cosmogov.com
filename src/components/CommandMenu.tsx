@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 const destinations = [
+  ["Mission studio · people + AI", "/dashboard/missions"],
   ["My civic desk", "/dashboard"],
   ["Explore participation", "/dashboard/participation"],
   ["Proposals & voting", "/dashboard/proposals"],

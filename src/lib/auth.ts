@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { db } from './db';
+import { signSession, verifySession, sessionSecret } from './session-token';
 
 const SESSION_COOKIE = 'cosmogov_session';
 const SALT_ROUNDS = 10;
@@ -14,7 +15,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export async function createSession(userId: string) {
-  const token = Buffer.from(`${userId}:${Date.now()}:${Math.random().toString(36)}`).toString('base64');
+  const token = signSession(userId, sessionSecret());
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
@@ -32,8 +33,8 @@ export async function getSession(): Promise<{ id: string; email: string; name: s
     const token = cookieStore.get(SESSION_COOKIE)?.value;
     if (!token) return null;
     
-    const decoded = Buffer.from(token, 'base64').toString();
-    const userId = decoded.split(':')[0];
+    const userId = verifySession(token, sessionSecret());
+    if (!userId) return null;
     
     const user = await db.user.findUnique({
       where: { id: userId },

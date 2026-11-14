@@ -23,6 +23,7 @@ import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { BrandMark } from "@/components/Brand";
 import CommonsArt from "@/components/CommonsArt";
+import MissionPreview from "@/components/missions/MissionPreview";
 const tools = [
   {
     label: "Propose & vote",
@@ -140,20 +141,20 @@ export default function HomePage() {
             <h1>
               Big ideas.
               <br />
-              <em>Local magic.</em>
+              <em>Meet your team.</em>
             </h1>
             <p>
-              That “what if” you keep thinking about? Bring it here. Find your
-              people, put ideas in motion, and help your corner of the world
-              become a little more you.
+              Bring your people and a goal worth working on. Your AI team helps
+              research it, build a plan, and create useful tools—while your
+              community decides what happens next.
             </p>
             <div className="hero-actions">
-              <Link href="/auth/signup" className="civic-button">
-                Find your people <ArrowUpRight size={18} />
+              <Link href="/dashboard/missions" className="civic-button">
+                Start a mission <ArrowUpRight size={18} />
               </Link>
-              <a href="#platform" className="text-link">
-                Explore the platform <ArrowRight size={17} />
-              </a>
+              <Link href="/missions/demo" className="text-link">
+                Try it for yourself <ArrowRight size={17} />
+              </Link>
             </div>
             <div className="hero-reassurance">
               <span>
@@ -173,7 +174,7 @@ export default function HomePage() {
                 <strong>just the beginning.</strong>
               </span>
             </div>
-            <CommunityPreview />
+            <MissionPreview />
             <div className="floating-outcome">
               <div>
                 <CheckCheck size={20} />
