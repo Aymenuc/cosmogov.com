@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import StartProcessDialog from '@/components/StartProcessDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -88,7 +89,7 @@ const PHASE_COLORS: Record<string, string> = {
   voting: 'bg-cosmic-accent',
   implementation: 'bg-cosmic-amber',
   evaluation: 'bg-cosmic-success',
-  closed: 'bg-white/20',
+  closed: 'bg-foreground/20',
 };
 
 const SCOPE_CONFIG: Record<string, { label: string; icon: React.ElementType }> = {
@@ -145,22 +146,22 @@ function PhaseStepper({ currentPhase, phases: phasesJson }: { currentPhase: stri
                     ? `bg-cosmic-teal glow-teal scale-110`
                     : isCompleted
                     ? 'bg-cosmic-teal/60'
-                    : 'bg-white/10'
+                    : 'bg-foreground/10'
                 }`}
               >
                 {isCompleted && (
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
-                {isActive && <Orbit className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#0B1022]" />}
+                {isActive && <Orbit className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
               </div>
-              <span className={`text-[10px] sm:text-[9px] leading-tight text-center truncate max-w-[56px] sm:max-w-[48px] ${isActive ? 'text-cosmic-teal font-semibold' : isCompleted ? 'text-cosmic-muted' : 'text-white/30'}`}>
+              <span className={`text-[10px] sm:text-[9px] leading-tight text-center truncate max-w-[56px] sm:max-w-[48px] ${isActive ? 'text-cosmic-teal font-semibold' : isCompleted ? 'text-cosmic-muted' : 'text-foreground/30'}`}>
                 {phase.name}
               </span>
             </div>
             {idx < phases.filter((p) => p.id !== 'closed').length - 1 && (
-              <div className={`h-px flex-grow mx-0.5 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-white/10'}`} />
+              <div className={`h-px flex-grow mx-0.5 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-foreground/10'}`} />
             )}
           </div>
         );
@@ -250,11 +251,11 @@ export default function ParticipationHub() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Megaphone className="w-5 h-5 text-cosmic-teal" />
-            <span className="text-cosmic-teal text-sm font-semibold tracking-wider uppercase">e-Participation Hub</span>
+            <span className="text-cosmic-teal text-sm font-semibold tracking-wider uppercase">Explore participation</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-            Your Voice, Your Community,{' '}
-            <span className="text-gradient">Your Power</span>
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+            A shared future starts with{' '}
+            <span className="text-gradient">your perspective.</span>
           </h1>
           <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
             Shape the future of your community through participatory democracy. Propose ideas, deliberate with neighbors, vote on budgets, and hold leaders accountable.
@@ -282,23 +283,26 @@ export default function ParticipationHub() {
         </div>
       </div>
 
+      <StartProcessDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
+
       {/* Quick Actions */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {[
           { label: 'Create Process', icon: Plus, href: '#', colorClass: 'bg-cosmic-teal/10', iconColor: 'text-cosmic-teal', desc: 'Start a new participatory process' },
           { label: 'Budget Projects', icon: Wallet, href: '/dashboard/participation/budget', colorClass: 'bg-cosmic-amber/10', iconColor: 'text-cosmic-amber', desc: 'Allocate community funds' },
-          { label: 'Sign Initiatives', icon: HandMetal, href: '#', colorClass: 'bg-cosmic-violet/10', iconColor: 'text-cosmic-violet', desc: 'Support citizen petitions' },
-          { label: 'Join Assembly', icon: Users, href: '#', colorClass: 'bg-cosmic-accent/10', iconColor: 'text-cosmic-accent', desc: 'Participate in deliberation' },
+          { label: 'Sign Initiatives', icon: HandMetal, href: '/dashboard/participation/initiatives', colorClass: 'bg-cosmic-violet/10', iconColor: 'text-cosmic-violet', desc: 'Support citizen petitions' },
+          { label: 'Join Assembly', icon: Users, href: '/dashboard/participation/assemblies', colorClass: 'bg-cosmic-accent/10', iconColor: 'text-cosmic-accent', desc: 'Participate in deliberation' },
         ].map((action) => (
           <Link
             key={action.label}
             href={action.href}
+            onClick={event => { if (action.label === 'Create Process') { event.preventDefault(); setShowCreateModal(true); } }}
             className="glass-card p-3 sm:p-4 rounded-xl hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
           >
             <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${action.colorClass} flex items-center justify-center mb-2 sm:mb-3 transition-all`}>
               <action.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${action.iconColor}`} />
             </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-white mb-1">{action.label}</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1">{action.label}</h3>
             <p className="text-[10px] sm:text-xs text-cosmic-muted">{action.desc}</p>
           </Link>
         ))}
@@ -320,12 +324,12 @@ export default function ParticipationHub() {
                 className={`glass-card p-3 sm:p-4 rounded-xl cursor-pointer hover:scale-[1.02] transition-all ${
                   isActive
                     ? 'ring-1 ring-cosmic-accent/60 border-cosmic-accent/30'
-                    : 'border-white/5'
+                    : 'border-border'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <GroupIcon className="w-4 h-4 sm:w-5 sm:h-5 text-cosmic-accent" />
-                  <span className="font-medium text-xs sm:text-sm text-white">{group.label}</span>
+                  <span className="font-medium text-xs sm:text-sm text-foreground">{group.label}</span>
                   {isActive && (
                     <ChevronRight className="w-4 h-4 text-cosmic-accent ml-auto" />
                   )}
@@ -371,13 +375,13 @@ export default function ParticipationHub() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search processes..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             />
           </div>
           <Select value={filters.phase} onValueChange={(v) => setFilters((f) => ({ ...f, phase: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Phase" />
             </SelectTrigger>
             <SelectContent>
@@ -391,7 +395,7 @@ export default function ParticipationHub() {
             </SelectContent>
           </Select>
           <Select value={filters.scope} onValueChange={(v) => setFilters((f) => ({ ...f, scope: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Scope" />
             </SelectTrigger>
             <SelectContent>
@@ -411,8 +415,8 @@ export default function ParticipationHub() {
             onClick={() => setFilters((f) => ({ ...f, category: 'all' }))}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
               filters.category === 'all'
-                ? 'bg-white/15 text-white ring-1 ring-white/20'
-                : 'bg-white/5 text-cosmic-muted hover:bg-white/10'
+                ? 'bg-foreground/15 text-foreground ring-1 ring-foreground/20'
+                : 'bg-foreground/5 text-cosmic-muted hover:bg-foreground/10'
             }`}
           >
             <FileText className="w-3 h-3" />
@@ -443,7 +447,7 @@ export default function ParticipationHub() {
       {/* Active Processes Grid */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="font-heading text-xl font-bold text-foreground flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-cosmic-teal" />
             Active Processes
           </h2>
@@ -457,9 +461,9 @@ export default function ParticipationHub() {
         ) : processes.length === 0 ? (
           <div className="glass-card p-12 rounded-2xl text-center">
             <Megaphone className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">No Active Processes</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No Active Processes</h3>
             <p className="text-cosmic-muted text-sm mb-4">Be the first to start a participatory process in your community.</p>
-            <Button className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90">
+            <Button className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90">
               <Plus className="w-4 h-4 mr-2" /> Create New Process
             </Button>
           </div>
@@ -485,7 +489,7 @@ export default function ParticipationHub() {
                           {scopeConfig.label}
                         </div>
                       </div>
-                      <h3 className="text-base font-semibold text-white group-hover:text-cosmic-teal transition-colors line-clamp-2">
+                      <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-teal transition-colors line-clamp-2">
                         {process.title}
                       </h3>
                       {process.shortDescription && (
@@ -502,12 +506,12 @@ export default function ParticipationHub() {
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${PHASE_COLORS[process.currentPhase]} ${process.currentPhase !== 'closed' ? 'animate-pulse' : ''}`} />
                         <span className="text-xs text-cosmic-muted">
-                          Current: <span className="text-white font-medium">{PHASE_LABELS[process.currentPhase]}</span>
+                          Current: <span className="text-foreground font-medium">{PHASE_LABELS[process.currentPhase]}</span>
                         </span>
                       </div>
 
                       {/* Stats Row */}
-                      <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
                         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                           <div className="flex items-center gap-1 text-xs text-cosmic-muted">
                             <Users className="w-3.5 h-3.5" />

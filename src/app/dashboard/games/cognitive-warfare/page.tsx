@@ -25,7 +25,7 @@ export default function CognitiveWarfarePage() {
       <h1 className="text-3xl font-bold font-heading mb-2">Battle Complete</h1>
       <div className="text-5xl font-bold font-heading text-gradient mb-2">+{totalXp} XP</div>
       <p className="text-cosmic-muted mb-6">Biases defeated, evidence victorious</p>
-      <Link href="/dashboard/games"><Button className="bg-cosmic-accent text-white">Back to Games</Button></Link>
+      <Link href="/dashboard/games"><Button className="bg-cosmic-accent text-primary-foreground">Back to Games</Button></Link>
     </div>;
   }
 
@@ -33,7 +33,7 @@ export default function CognitiveWarfarePage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
+      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-cosmic-rose/10 flex items-center justify-center"><AlertTriangle className="w-5 h-5 text-cosmic-rose" /></div>
@@ -44,14 +44,14 @@ export default function CognitiveWarfarePage() {
       <Card className="glass-card-rose mb-6">
         <CardContent className="p-6">
           <p className="text-xs text-cosmic-muted mb-3">Encounter {idx + 1} of {BIASES.length}</p>
-          <div className="bg-[#04050b] rounded-lg p-4 mb-5 border-l-2 border-cosmic-rose">
+          <div className="bg-card rounded-lg p-4 mb-5 border-l-2 border-cosmic-rose">
             <p className="text-sm italic text-cosmic-muted leading-relaxed">&ldquo;{current.quote}&rdquo;</p>
           </div>
           <p className="text-xs text-cosmic-muted mb-3">Identify the cognitive bias:</p>
           <div className="space-y-2">
             {current.options.map(opt => (
               <button key={opt} onClick={() => !revealed && setSelected(opt)} disabled={revealed}
-                className={`w-full p-3 rounded-xl text-sm font-medium border transition-all text-left ${selected === opt ? 'border-cosmic-rose/30 bg-cosmic-rose/5 text-cosmic-rose' : 'border-white/5 bg-white/5 text-cosmic-muted hover:border-white/10'}`}>
+                className={`w-full p-3 rounded-xl text-sm font-medium border transition-all text-left ${selected === opt ? 'border-cosmic-rose/30 bg-cosmic-rose/5 text-cosmic-rose' : 'border-border bg-foreground/5 text-cosmic-muted hover:border-border'}`}>
                 {selected === opt && <Check className="w-3 h-3 inline mr-2" />}{opt}
               </button>
             ))}
@@ -66,9 +66,9 @@ export default function CognitiveWarfarePage() {
       </Card>
       <div className="flex justify-center">
         {!revealed ? (
-          <Button onClick={() => { if (selected) { setRevealed(true); const xp = selected === current.correct ? Math.floor(50 + Math.random() * 70) : 5; setTotalXp(prev => prev + xp); } }} disabled={!selected} className="bg-cosmic-rose text-white rounded-xl px-8">Attack</Button>
+          <Button onClick={() => { if (selected) { setRevealed(true); const xp = selected === current.correct ? Math.floor(50 + Math.random() * 70) : 5; setTotalXp(prev => prev + xp); } }} disabled={!selected} className="bg-cosmic-rose text-foreground rounded-xl px-8">Attack</Button>
         ) : (
-          <Button onClick={() => { setIdx(prev => prev + 1); setSelected(null); setRevealed(false); if (idx >= BIASES.length - 1) setFinished(true); }} className="bg-cosmic-accent text-white rounded-xl px-8">
+          <Button onClick={() => { setIdx(prev => prev + 1); setSelected(null); setRevealed(false); if (idx >= BIASES.length - 1) setFinished(true); }} className="bg-cosmic-accent text-primary-foreground rounded-xl px-8">
             {idx >= BIASES.length - 1 ? 'See Results' : 'Next Battle'}
           </Button>
         )}

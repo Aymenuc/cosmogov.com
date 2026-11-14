@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -133,22 +135,15 @@ export default function ApplicationPage() {
 
   if (!job) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#04050b]">
-        <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-              <Rocket className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-heading font-bold text-lg">CosmoGov</span>
-          </Link>
-        </nav>
-        <main className="flex-grow flex items-center justify-center px-6">
+      <div className="min-h-screen flex flex-col bg-card">
+        <SiteHeader />
+        <main id="main-content" className="flex-grow flex items-center justify-center px-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-white mb-4 font-heading">Position Not Found</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-4 font-heading">Position Not Found</h1>
             <p className="text-cosmic-muted mb-6">The position you are looking for does not exist or has been closed.</p>
             <Link
               href="/careers"
-              className="inline-flex items-center gap-2 text-sm font-medium bg-cosmic-accent text-white hover:bg-cosmic-accent/90 px-5 py-2.5 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-medium bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90 px-5 py-2.5 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Careers
             </Link>
@@ -169,33 +164,22 @@ export default function ApplicationPage() {
     color: confettiColors[i % confettiColors.length],
   }));
 
-  const inputClass = 'w-full bg-white/5 border border-white/10 text-white placeholder:text-cosmic-muted/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cosmic-teal focus:ring-1 focus:ring-cosmic-teal/20 transition-colors';
+  const inputClass = 'w-full bg-foreground/5 border border-border text-foreground placeholder:text-cosmic-muted/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cosmic-teal focus:ring-1 focus:ring-cosmic-teal/20 transition-colors';
   const labelClass = 'text-sm text-cosmic-muted mb-1 block';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
+    <div className="min-h-screen flex flex-col bg-card">
       <div className="fixed inset-0 starfield opacity-20 pointer-events-none" />
 
       {/* Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg">CosmoGov</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-          <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-        </div>
-      </nav>
+      <SiteHeader />
 
       {/* Main Content */}
       <main className="relative z-10 flex-grow max-w-2xl mx-auto px-6 py-12 w-full">
         {/* Back Link */}
         <Link
           href="/careers"
-          className="inline-flex items-center gap-2 text-sm text-cosmic-muted hover:text-white transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-sm text-cosmic-muted hover:text-foreground transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Careers
         </Link>
@@ -207,7 +191,7 @@ export default function ApplicationPage() {
               <Icon className={`w-6 h-6 ${colors.text}`} />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white font-heading mb-2">{job.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground font-heading mb-2">{job.title}</h1>
               <div className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted">
                   <Briefcase className="w-3.5 h-3.5" /> {job.department}
@@ -236,7 +220,7 @@ export default function ApplicationPage() {
               <div className="w-16 h-16 rounded-full bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-8 h-8 text-cosmic-teal" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2 font-heading">Application Submitted!</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-2 font-heading">Application Submitted!</h2>
               <p className="text-cosmic-muted mb-2">
                 Thank you for applying for the {job.title} position. We appreciate your interest in joining CosmoGov.
               </p>
@@ -252,7 +236,7 @@ export default function ApplicationPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
                   href="/careers"
-                  className="inline-flex items-center gap-2 text-sm font-medium bg-cosmic-accent text-white hover:bg-cosmic-accent/90 px-5 py-2.5 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90 px-5 py-2.5 rounded-lg transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back to Careers
                 </Link>
@@ -261,7 +245,7 @@ export default function ApplicationPage() {
                     setSubmitted(false);
                     setFormData({ fullName: '', email: '', phone: '', portfolio: '', coverLetter: '' });
                   }}
-                  className="text-sm text-cosmic-muted hover:text-white border border-white/10 px-5 py-2.5 rounded-lg transition-colors"
+                  className="text-sm text-cosmic-muted hover:text-foreground border border-border px-5 py-2.5 rounded-lg transition-colors"
                 >
                   Submit Another Application
                 </button>
@@ -269,7 +253,7 @@ export default function ApplicationPage() {
             </div>
           ) : (
             <>
-              <h2 className="text-xl font-bold text-white font-heading mb-1">Apply for {job.title}</h2>
+              <h2 className="text-xl font-bold text-foreground font-heading mb-1">Apply for {job.title}</h2>
               <p className="text-cosmic-muted text-sm mb-6">Fill out the form below to submit your application.</p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -362,7 +346,7 @@ export default function ApplicationPage() {
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold bg-cosmic-accent text-white hover:bg-cosmic-accent/90 px-6 py-3.5 rounded-xl transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90 px-6 py-3.5 rounded-xl transition-colors"
                 >
                   <Send className="w-4 h-4" /> Submit Application
                 </button>

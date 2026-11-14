@@ -81,7 +81,7 @@ export default function OfficialResponseBadge({
         )}
       </div>
       {responseText && (
-        <p className="text-xs text-white/90 line-clamp-3 whitespace-pre-wrap">{responseText}</p>
+        <p className="text-xs text-foreground/90 line-clamp-3 whitespace-pre-wrap">{responseText}</p>
       )}
     </div>
   );
@@ -110,7 +110,7 @@ export function OfficialResponseCard({
             <CheckCircle2 className="w-4 h-4 text-cosmic-teal" />
           </div>
           <div>
-            <h3 className="font-heading text-base font-semibold text-white">{title}</h3>
+            <h3 className="font-heading text-base font-semibold text-foreground">{title}</h3>
             <div className="flex items-center gap-2 text-xs text-cosmic-muted">
               {respondedBy && <span>Responded by {respondedBy}</span>}
               {responseDate && (
@@ -124,7 +124,7 @@ export function OfficialResponseCard({
       </div>
       <div className="p-4">
         <div className="glass-card p-4 rounded-xl bg-cosmic-teal/5 border border-cosmic-teal/10">
-          <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">{responseText}</p>
+          <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{responseText}</p>
         </div>
       </div>
     </div>

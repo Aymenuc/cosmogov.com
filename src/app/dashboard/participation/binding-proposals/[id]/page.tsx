@@ -159,9 +159,9 @@ export default function BindingProposalDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <Gavel className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-white mb-2">Proposal Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Proposal Not Found</h3>
         <Link href="/dashboard/participation/binding-proposals">
-          <Button className="bg-cosmic-rose text-white hover:bg-cosmic-rose/90">
+          <Button className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Proposals
           </Button>
         </Link>
@@ -178,7 +178,7 @@ export default function BindingProposalDetailPage() {
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       {/* Back navigation */}
-      <Link href="/dashboard/participation/binding-proposals" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-white transition-colors">
+      <Link href="/dashboard/participation/binding-proposals" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" />
         Back to Binding Proposals
       </Link>
@@ -193,7 +193,7 @@ export default function BindingProposalDetailPage() {
               {typeConfig.label}
             </Badge>
             {proposal.category && (
-              <Badge className="text-cosmic-muted bg-white/5 border-white/10 text-[10px] border capitalize">
+              <Badge className="text-cosmic-muted bg-foreground/5 border-border text-[10px] border capitalize">
                 {proposal.category}
               </Badge>
             )}
@@ -204,7 +204,7 @@ export default function BindingProposalDetailPage() {
               </Badge>
             )}
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-2">
             {proposal.title}
           </h1>
           <p className="text-cosmic-muted text-sm sm:text-base max-w-3xl">
@@ -222,12 +222,12 @@ export default function BindingProposalDetailPage() {
                 <Users className="w-4 h-4" />
                 Signature Progress
               </span>
-              <span className={`text-xl sm:text-2xl font-bold font-heading ${isThresholdReached ? 'text-cosmic-teal' : 'text-white'}`}>
+              <span className={`text-xl sm:text-2xl font-bold font-heading ${isThresholdReached ? 'text-cosmic-teal' : 'text-foreground'}`}>
                 {proposal.signatureCount.toLocaleString()} / {proposal.signatureGoal.toLocaleString()}
                 <span className="text-sm font-normal text-cosmic-muted ml-2">— {progress}%</span>
               </span>
             </div>
-            <div className="relative h-5 bg-white/5 rounded-full overflow-hidden">
+            <div className="relative h-5 bg-foreground/5 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ease-out ${
                   isThresholdReached
@@ -260,7 +260,7 @@ export default function BindingProposalDetailPage() {
       {/* Status Timeline */}
       <Card className="glass-card rounded-2xl">
         <CardHeader className="pb-2">
-          <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-cosmic-rose" />
             Status Timeline
           </h2>
@@ -277,14 +277,14 @@ export default function BindingProposalDetailPage() {
                       ? 'bg-cosmic-rose/20 text-cosmic-rose border-cosmic-rose/30'
                       : isCompleted
                       ? 'bg-cosmic-success/10 text-cosmic-success border-cosmic-success/20'
-                      : 'bg-white/5 text-cosmic-muted border-white/10'
+                      : 'bg-foreground/5 text-cosmic-muted border-border'
                   }`}>
-                    {isCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : isActive ? <Gavel className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5 rounded-full bg-white/10" />}
+                    {isCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : isActive ? <Gavel className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5 rounded-full bg-foreground/10" />}
                     <span className="hidden sm:inline">{step.label}</span>
                     <span className="sm:hidden">{step.label.split(' ')[0]}</span>
                   </div>
                   {idx < STATUS_STEPS.length - 1 && (
-                    <div className={`w-2 sm:w-6 h-0.5 mx-0.5 ${isCompleted ? 'bg-cosmic-success/30' : 'bg-white/10'}`} />
+                    <div className={`w-2 sm:w-6 h-0.5 mx-0.5 ${isCompleted ? 'bg-cosmic-success/30' : 'bg-foreground/10'}`} />
                   )}
                 </div>
               );
@@ -297,7 +297,7 @@ export default function BindingProposalDetailPage() {
       {(proposal.status === 'government_response' || proposal.status === 'scheduled_vote' || proposal.status === 'passed' || proposal.status === 'enacted') && proposal.governmentResponse && (
         <Card className="glass-card rounded-2xl border-cosmic-teal/20">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Building2 className="w-5 h-5 text-cosmic-teal" />
               Government Response
               {proposal.responseDate && (
@@ -309,7 +309,7 @@ export default function BindingProposalDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="glass-card p-4 rounded-xl bg-cosmic-teal/5 border border-cosmic-teal/10">
-              <p className="text-sm text-white whitespace-pre-wrap">{proposal.governmentResponse}</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap">{proposal.governmentResponse}</p>
             </div>
           </CardContent>
         </Card>
@@ -319,14 +319,14 @@ export default function BindingProposalDetailPage() {
       {proposal.legalReference && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-cosmic-amber" />
               Legal Reference
             </h2>
           </CardHeader>
           <CardContent>
             <div className="glass-card p-4 rounded-xl bg-cosmic-amber/5 border border-cosmic-amber/10">
-              <p className="text-sm text-white">{proposal.legalReference}</p>
+              <p className="text-sm text-foreground">{proposal.legalReference}</p>
             </div>
           </CardContent>
         </Card>
@@ -336,14 +336,14 @@ export default function BindingProposalDetailPage() {
       {proposal.impactAssessment && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-cosmic-violet" />
               Impact Assessment
             </h2>
           </CardHeader>
           <CardContent>
             <div className="glass-card p-4 rounded-xl bg-cosmic-violet/5 border border-cosmic-violet/10">
-              <p className="text-sm text-white whitespace-pre-wrap">{proposal.impactAssessment}</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap">{proposal.impactAssessment}</p>
             </div>
           </CardContent>
         </Card>
@@ -353,7 +353,7 @@ export default function BindingProposalDetailPage() {
       <div className="flex flex-col sm:flex-row gap-3">
         {proposal.status === 'collecting' && (
           <Button
-            className="flex-1 bg-cosmic-rose text-white hover:bg-cosmic-rose/90 h-12 text-base"
+            className="flex-1 bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90 h-12 text-base"
             onClick={() => {
               setSignComment('');
               setSigned(false);
@@ -379,7 +379,7 @@ export default function BindingProposalDetailPage() {
       {proposal.signatures && proposal.signatures.length > 0 && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Users className="w-5 h-5 text-cosmic-violet" />
               Recent Signers ({proposal._count?.signatures || proposal.signatureCount})
             </h2>
@@ -399,7 +399,7 @@ export default function BindingProposalDetailPage() {
                   </Avatar>
                   <div className="min-w-0 flex-grow">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white truncate">{sig.user.name || 'Anonymous'}</span>
+                      <span className="text-sm font-medium text-foreground truncate">{sig.user.name || 'Anonymous'}</span>
                       {sig.verified && (
                         <Badge className="text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20 text-[9px] border">
                           Verified
@@ -428,7 +428,7 @@ export default function BindingProposalDetailPage() {
               <AlertTriangle className="w-5 h-5 text-cosmic-amber" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Government Response Deadline</h3>
+              <h3 className="text-sm font-bold text-foreground">Government Response Deadline</h3>
               <p className="text-xs text-cosmic-muted mt-0.5">
                 The government must respond by {new Date(proposal.responseDeadline).toLocaleDateString()}.
                 {new Date(proposal.responseDeadline) > new Date()
@@ -449,7 +449,7 @@ export default function BindingProposalDetailPage() {
                 <Gavel className="w-5 h-5 text-cosmic-violet" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Scheduled Vote</h3>
+                <h3 className="text-sm font-bold text-foreground">Scheduled Vote</h3>
                 <p className="text-xs text-cosmic-muted mt-0.5">
                   This proposal will be put to vote on {new Date(proposal.voteDate).toLocaleDateString()}.
                 </p>
@@ -468,7 +468,7 @@ export default function BindingProposalDetailPage() {
                 <CheckCircle2 className="w-5 h-5 text-cosmic-success" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white">Enacted into Law/Policy</h3>
+                <h3 className="text-sm font-bold text-foreground">Enacted into Law/Policy</h3>
                 <p className="text-xs text-cosmic-muted mt-0.5">
                   This proposal was enacted on {new Date(proposal.enactmentDate).toLocaleDateString()}.
                 </p>
@@ -480,11 +480,11 @@ export default function BindingProposalDetailPage() {
 
       {/* Sign Dialog */}
       <Dialog open={signDialogOpen} onOpenChange={setSignDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg">
           {proposal && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-white flex items-center gap-2">
+                <DialogTitle className="text-foreground flex items-center gap-2">
                   <FileSignature className="w-5 h-5 text-cosmic-rose" />
                   Sign This Proposal
                 </DialogTitle>
@@ -496,11 +496,11 @@ export default function BindingProposalDetailPage() {
               {!signed ? (
                 <div className="space-y-4">
                   <div className="glass-card p-4 rounded-xl">
-                    <h3 className="text-white font-semibold mb-1">{proposal.title}</h3>
+                    <h3 className="text-foreground font-semibold mb-1">{proposal.title}</h3>
                     <p className="text-sm text-cosmic-muted line-clamp-3">{proposal.description}</p>
                     <div className="mt-3 flex items-center gap-3">
                       <div className="flex-grow">
-                        <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-2 bg-foreground/5 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-cosmic-rose to-cosmic-violet"
                             style={{ width: `${progress}%` }}
@@ -517,17 +517,17 @@ export default function BindingProposalDetailPage() {
                     <label className="text-sm text-cosmic-muted mb-1 block">Comment (optional)</label>
                     <Textarea
                       placeholder="Why are you signing this proposal?"
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                       value={signComment}
                       onChange={(e) => setSignComment(e.target.value)}
                     />
                   </div>
 
                   <DialogFooter>
-                    <Button variant="ghost" className="text-cosmic-muted hover:text-white" onClick={() => setSignDialogOpen(false)}>
+                    <Button variant="ghost" className="text-cosmic-muted hover:text-foreground" onClick={() => setSignDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button className="bg-cosmic-rose text-white hover:bg-cosmic-rose/90" onClick={handleSign} disabled={signing}>
+                    <Button className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90" onClick={handleSign} disabled={signing}>
                       {signing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileSignature className="w-4 h-4 mr-2" />}
                       Sign Proposal
                     </Button>
@@ -538,7 +538,7 @@ export default function BindingProposalDetailPage() {
                   <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${thresholdJustReached ? 'bg-cosmic-teal/20' : 'bg-cosmic-success/20'}`}>
                     <CheckCircle2 className={`w-8 h-8 ${thresholdJustReached ? 'text-cosmic-teal' : 'text-cosmic-success'}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">You&apos;ve Signed!</h3>
+                  <h3 className="text-lg font-semibold text-foreground">You&apos;ve Signed!</h3>
                   <p className="text-cosmic-muted text-sm">
                     {thresholdJustReached
                       ? 'Threshold Reached! The government must now respond!'

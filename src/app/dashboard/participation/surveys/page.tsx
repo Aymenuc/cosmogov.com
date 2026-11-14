@@ -72,7 +72,7 @@ interface Stats {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  draft: { label: 'Draft', color: 'text-cosmic-muted bg-white/5 border-white/10' },
+  draft: { label: 'Draft', color: 'text-cosmic-muted bg-foreground/5 border-border' },
   active: { label: 'Active', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20' },
   paused: { label: 'Paused', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20' },
   closed: { label: 'Closed', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20' },
@@ -271,7 +271,7 @@ export default function SurveysPage() {
             <ClipboardList className="w-5 h-5 text-cosmic-accent" />
             <span className="text-cosmic-accent text-sm font-semibold tracking-wider uppercase">Community Voice</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Surveys &{' '}
             <span className="text-gradient">Polls</span>
           </h1>
@@ -308,8 +308,8 @@ export default function SurveysPage() {
             onClick={() => setStatusFilter(sf.value)}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
               statusFilter === sf.value
-                ? 'bg-white/15 text-white border-white/30'
-                : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-foreground/15 text-foreground border-border'
+                : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
             }`}
           >
             {sf.label}
@@ -333,8 +333,8 @@ export default function SurveysPage() {
             onClick={() => setCategoryFilter('all')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
               categoryFilter === 'all'
-                ? 'bg-white/15 text-white border-white/30'
-                : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-foreground/15 text-foreground border-border'
+                : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -350,7 +350,7 @@ export default function SurveysPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
                   isSelected
                     ? `${cat.bgColor} ${cat.color} ${cat.borderColor} ring-1 ring-current/20`
-                    : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                    : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
                 }`}
               >
                 <CatIcon className="w-3.5 h-3.5" />
@@ -365,13 +365,13 @@ export default function SurveysPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search surveys..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Button
-            className="bg-cosmic-accent text-white hover:bg-cosmic-accent/90 shrink-0"
+            className="bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90 shrink-0"
             onClick={() => setCreateDialogOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" /> Create Survey
@@ -387,13 +387,13 @@ export default function SurveysPage() {
       ) : filteredSurveys.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <ClipboardList className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">No Surveys Found</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Surveys Found</h3>
           <p className="text-cosmic-muted text-sm mb-4">
             {categoryFilter !== 'all' || statusFilter !== 'all'
               ? 'Try adjusting your filters or search terms.'
               : 'Be the first to create a survey and gather community insights.'}
           </p>
-          <Button className="bg-cosmic-accent text-white hover:bg-cosmic-accent/90" onClick={() => setCreateDialogOpen(true)}>
+          <Button className="bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Create Survey
           </Button>
         </div>
@@ -417,7 +417,7 @@ export default function SurveysPage() {
                           {catConfig.label}
                         </Badge>
                         {survey.anonymous && (
-                          <Badge className="bg-white/5 text-cosmic-muted border-white/10 border text-[10px]">
+                          <Badge className="bg-foreground/5 text-cosmic-muted border-border border text-[10px]">
                             Anonymous
                           </Badge>
                         )}
@@ -427,7 +427,7 @@ export default function SurveysPage() {
                         {statusConfig.label}
                       </Badge>
                     </div>
-                    <h3 className="text-base font-semibold text-white group-hover:text-cosmic-teal transition-colors line-clamp-2">
+                    <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-teal transition-colors line-clamp-2">
                       {survey.title}
                     </h3>
                     <p className="text-xs text-cosmic-muted line-clamp-2 mt-1">
@@ -459,10 +459,10 @@ export default function SurveysPage() {
                     <Button
                       className={`w-full ${
                         isClosed
-                          ? 'bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10'
+                          ? 'bg-foreground/5 text-cosmic-muted border border-border hover:bg-foreground/10'
                           : isActive
                           ? 'bg-cosmic-teal/10 text-cosmic-teal border border-cosmic-teal/20 hover:bg-cosmic-teal/20'
-                          : 'bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10'
+                          : 'bg-foreground/5 text-cosmic-muted border border-border hover:bg-foreground/10'
                       }`}
                       variant="ghost"
                       asChild
@@ -496,9 +496,9 @@ export default function SurveysPage() {
 
       {/* Create Survey Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-cosmic-amber" />
               Create New Survey
             </DialogTitle>
@@ -514,7 +514,7 @@ export default function SurveysPage() {
                 <Label className="text-sm text-cosmic-muted mb-1 block">Title *</Label>
                 <Input
                   placeholder="What do you want to learn?"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                   value={createForm.title}
                   onChange={(e) => setCreateForm((f) => ({ ...f, title: e.target.value }))}
                 />
@@ -524,7 +524,7 @@ export default function SurveysPage() {
                 <Label className="text-sm text-cosmic-muted mb-1 block">Description *</Label>
                 <Textarea
                   placeholder="Explain the purpose and what the survey covers..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                   value={createForm.description}
                   onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
                 />
@@ -534,7 +534,7 @@ export default function SurveysPage() {
                 <div>
                   <Label className="text-sm text-cosmic-muted mb-1 block">Category</Label>
                   <Select value={createForm.category} onValueChange={(v) => setCreateForm((f) => ({ ...f, category: v }))}>
-                    <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                    <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -557,7 +557,7 @@ export default function SurveysPage() {
                   <Label className="text-sm text-cosmic-muted mb-1 block">Closing Date</Label>
                   <Input
                     type="datetime-local"
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-foreground/5 border-border text-foreground"
                     value={createForm.closesAt}
                     onChange={(e) => setCreateForm((f) => ({ ...f, closesAt: e.target.value }))}
                   />
@@ -585,7 +585,7 @@ export default function SurveysPage() {
             {/* Questions */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <ListChecks className="w-4 h-4 text-cosmic-teal" />
                   Questions ({questions.length})
                 </h3>
@@ -602,12 +602,12 @@ export default function SurveysPage() {
                       <div className="flex gap-3">
                         <Input
                           placeholder={`Question ${qIdx + 1}`}
-                          className="flex-grow bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                          className="flex-grow bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                           value={question.text}
                           onChange={(e) => updateQuestion(qIdx, 'text', e.target.value)}
                         />
                         <Select value={question.type} onValueChange={(v) => updateQuestion(qIdx, 'type', v)}>
-                          <SelectTrigger className="w-36 bg-white/5 border-white/10 text-white shrink-0">
+                          <SelectTrigger className="w-36 bg-foreground/5 border-border text-foreground shrink-0">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -631,13 +631,13 @@ export default function SurveysPage() {
                         <div className="space-y-2 pl-2">
                           {question.options.map((opt, oIdx) => (
                             <div key={opt.id} className="flex items-center gap-2">
-                              <div className="w-4 h-4 rounded border border-white/20 flex items-center justify-center shrink-0">
+                              <div className="w-4 h-4 rounded border border-border flex items-center justify-center shrink-0">
                                 <div className="w-2 h-2 rounded-sm bg-cosmic-accent/50" />
                               </div>
                               <Input
                                 value={opt.label}
                                 onChange={(e) => updateOption(qIdx, oIdx, e.target.value)}
-                                className="bg-white/5 border-white/10 text-white text-sm py-1 h-8"
+                                className="bg-foreground/5 border-border text-foreground text-sm py-1 h-8"
                                 placeholder={`Option ${oIdx + 1}`}
                               />
                               <Button
@@ -651,7 +651,7 @@ export default function SurveysPage() {
                               </Button>
                             </div>
                           ))}
-                          <Button size="sm" variant="ghost" className="text-cosmic-muted hover:text-white text-xs" onClick={() => addOption(qIdx)}>
+                          <Button size="sm" variant="ghost" className="text-cosmic-muted hover:text-foreground text-xs" onClick={() => addOption(qIdx)}>
                             <Plus className="w-3 h-3 mr-1" /> Add Option
                           </Button>
                           <div className="flex items-center gap-2 pt-1">
@@ -674,7 +674,7 @@ export default function SurveysPage() {
                             max={10}
                             value={question.minRating}
                             onChange={(e) => updateQuestion(qIdx, 'minRating', parseInt(e.target.value) || 1)}
-                            className="w-16 bg-white/5 border-white/10 text-white text-sm py-1 h-8"
+                            className="w-16 bg-foreground/5 border-border text-foreground text-sm py-1 h-8"
                           />
                           <Label className="text-xs text-cosmic-muted">Max</Label>
                           <Input
@@ -683,11 +683,11 @@ export default function SurveysPage() {
                             max={10}
                             value={question.maxRating}
                             onChange={(e) => updateQuestion(qIdx, 'maxRating', parseInt(e.target.value) || 5)}
-                            className="w-16 bg-white/5 border-white/10 text-white text-sm py-1 h-8"
+                            className="w-16 bg-foreground/5 border-border text-foreground text-sm py-1 h-8"
                           />
                           <div className="flex gap-1 ml-2">
                             {Array.from({ length: question.maxRating - question.minRating + 1 }, (_, i) => (
-                              <Star key={i} className={`w-4 h-4 ${i < Math.ceil((question.maxRating - question.minRating + 1) / 2) ? 'text-cosmic-amber' : 'text-white/10'}`} />
+                              <Star key={i} className={`w-4 h-4 ${i < Math.ceil((question.maxRating - question.minRating + 1) / 2) ? 'text-cosmic-amber' : 'text-foreground/10'}`} />
                             ))}
                           </div>
                         </div>
@@ -703,7 +703,7 @@ export default function SurveysPage() {
                             max={100}
                             value={question.minRating}
                             onChange={(e) => updateQuestion(qIdx, 'minRating', parseInt(e.target.value) || 0)}
-                            className="w-16 bg-white/5 border-white/10 text-white text-sm py-1 h-8"
+                            className="w-16 bg-foreground/5 border-border text-foreground text-sm py-1 h-8"
                           />
                           <Label className="text-xs text-cosmic-muted">Max</Label>
                           <Input
@@ -712,7 +712,7 @@ export default function SurveysPage() {
                             max={100}
                             value={question.maxRating}
                             onChange={(e) => updateQuestion(qIdx, 'maxRating', parseInt(e.target.value) || 10)}
-                            className="w-16 bg-white/5 border-white/10 text-white text-sm py-1 h-8"
+                            className="w-16 bg-foreground/5 border-border text-foreground text-sm py-1 h-8"
                           />
                         </div>
                       )}
@@ -728,7 +728,7 @@ export default function SurveysPage() {
                       {/* Text preview */}
                       {question.type === 'text' && (
                         <div className="pl-2">
-                          <div className="w-full h-16 rounded-lg bg-white/5 border border-white/10 border-dashed flex items-center justify-center text-xs text-cosmic-muted/40">
+                          <div className="w-full h-16 rounded-lg bg-foreground/5 border border-border border-dashed flex items-center justify-center text-xs text-cosmic-muted/40">
                             Free text response area
                           </div>
                         </div>
@@ -761,13 +761,13 @@ export default function SurveysPage() {
           <DialogFooter>
             <Button
               variant="ghost"
-              className="text-cosmic-muted hover:text-white"
+              className="text-cosmic-muted hover:text-foreground"
               onClick={() => setCreateDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-accent text-white hover:bg-cosmic-accent/90"
+              className="bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description || questions.some((q) => !q.text.trim())}
             >

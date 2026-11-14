@@ -24,11 +24,11 @@ export default function LeaderboardsPage() {
     <div>
       <div className="mb-6"><h1 className="text-2xl font-bold font-heading flex items-center gap-2"><Trophy className="w-6 h-6 text-cosmic-amber" /> Leaderboards</h1><p className="text-cosmic-muted text-sm">Top governance contributors</p></div>
       {/* Desktop Table */}
-      <Card className="bg-[#0B1022] border-white/5 hidden sm:block">
+      <Card className="bg-card border-border hidden sm:block">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead><tr className="border-b border-white/5">
+              <thead><tr className="border-b border-border">
                 <th className="text-left text-xs text-cosmic-muted font-medium p-4">Rank</th>
                 <th className="text-left text-xs text-cosmic-muted font-medium p-4">User</th>
                 <th className="text-right text-xs text-cosmic-muted font-medium p-4">Level</th>
@@ -39,7 +39,7 @@ export default function LeaderboardsPage() {
               </tr></thead>
               <tbody>
                 {leaders.map((l, i) => (
-                  <tr key={l.id} className={`border-b border-white/5 ${i === 0 ? 'bg-cosmic-amber/5' : ''}`}>
+                  <tr key={l.id} className={`border-b border-border ${i === 0 ? 'bg-cosmic-amber/5' : ''}`}>
                     <td className="p-4 text-lg">{medals[i] || `#${i + 1}`}</td>
                     <td className="p-4"><div className="flex items-center gap-2"><div className="w-7 h-7 rounded-full bg-cosmic-accent/20 flex items-center justify-center text-xs font-bold text-cosmic-accent">{(l.name || 'U')[0]}</div><span className="text-sm font-medium">{l.name}</span></div></td>
                     <td className="p-4 text-right text-sm"><span className="text-cosmic-teal">Lv.{l.level}</span></td>
@@ -58,7 +58,7 @@ export default function LeaderboardsPage() {
       {/* Mobile Cards */}
       <div className="sm:hidden space-y-3">
         {leaders.map((l, i) => (
-          <Card key={l.id} className={`bg-[#0B1022] border-white/5 ${i === 0 ? 'ring-1 ring-cosmic-amber/20' : ''}`}>
+          <Card key={l.id} className={`bg-card border-border ${i === 0 ? 'ring-1 ring-cosmic-amber/20' : ''}`}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-lg">{medals[i] || `#${i + 1}`}</span>

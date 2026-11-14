@@ -10,6 +10,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { option, confidence, reasoning } = await req.json();
   if (!option) return NextResponse.json({ error: 'Option is required' }, { status: 400 });
 
+  // A stale page must not submit a vote after the decision window closes.
+  const proposal = await db.proposal.findUnique({ where: { id } });
+  if (!proposal) return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
+  if (proposal.status !== 'active' || (proposal.closesAt && proposal.closesAt <= new Date())) {
+    return NextResponse.json({ error: 'Voting is no longer open for this proposal.' }, { status: 409 });
+  }
+  let options: string[];
+  try { options = JSON.parse(proposal.options || '["For","Against"]'); }
+  catch { return NextResponse.json({ error: 'This proposal’s voting options are unavailable.' }, { status: 409 }); }
+  if (!Array.isArray(options) || !options.includes(option)) {
+    return NextResponse.json({ error: 'Choose one of this proposal’s voting options.' }, { status: 400 });
+  }
+
   // Check if already voted
   const existing = await db.vote.findUnique({ where: { proposalId_voterId: { proposalId: id, voterId: session.id } } });
   if (existing) {

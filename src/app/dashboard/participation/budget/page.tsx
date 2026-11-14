@@ -17,7 +17,7 @@ import {
 import {
   Wallet, Users, ArrowLeft, Loader2, CheckCircle2, Clock,
   TreePine, Building2, GraduationCap, Heart, Zap, MapPin,
-  TrendingUp, Sparkles, Send, Map, Star, AlertCircle,
+  TrendingUp, Sparkles, Send, Map as MapIcon, Star, AlertCircle,
 } from 'lucide-react';
 
 interface BudgetProject {
@@ -55,7 +55,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ElementType; 
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  proposed: 'bg-white/10 text-cosmic-muted',
+  proposed: 'bg-foreground/10 text-cosmic-muted',
   shortlisted: 'bg-cosmic-accent/10 text-cosmic-accent',
   approved: 'bg-cosmic-success/10 text-cosmic-success',
   rejected: 'bg-cosmic-rose/10 text-cosmic-rose',
@@ -160,7 +160,7 @@ export default function BudgetPage() {
             <Wallet className="w-5 h-5 text-cosmic-amber" />
             <span className="text-cosmic-amber text-sm font-semibold tracking-wider uppercase">Participatory Budgeting</span>
           </div>
-          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">
             Allocate <span className="text-gradient-warm">Community Funds</span>
           </h1>
           <p className="text-cosmic-muted text-sm max-w-2xl mb-6">
@@ -182,7 +182,7 @@ export default function BudgetPage() {
             </div>
             <div className="glass-card p-4 rounded-xl">
               <span className="text-xs text-cosmic-muted">Remaining</span>
-              <p className="text-xl font-bold text-white font-heading">
+              <p className="text-xl font-bold text-foreground font-heading">
                 {budgetPool ? formatCurrency(budgetPool.remaining, budgetPool.currency) : '$0'}
               </p>
             </div>
@@ -199,7 +199,7 @@ export default function BudgetPage() {
                 <span>Budget Allocation Progress</span>
                 <span>{Math.round((budgetPool.allocated / budgetPool.total) * 100)}%</span>
               </div>
-              <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-3 bg-foreground/5 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-cosmic-amber to-cosmic-teal rounded-full transition-all duration-1000 tally-bar"
                   style={{ width: `${Math.min(100, (budgetPool.allocated / budgetPool.total) * 100)}%` }}
@@ -213,7 +213,7 @@ export default function BudgetPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-48 bg-white/5 border-white/10 text-white">
+          <SelectTrigger className="w-full sm:w-48 bg-foreground/5 border-border text-foreground">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -228,7 +228,7 @@ export default function BudgetPage() {
         </Select>
         {availableProcesses.length > 0 && (
           <Select value={selectedProcess} onValueChange={setSelectedProcess}>
-            <SelectTrigger className="w-full sm:w-64 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-64 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Process" />
             </SelectTrigger>
             <SelectContent>
@@ -251,7 +251,7 @@ export default function BudgetPage() {
           ) : projects.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <Wallet className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">No Budget Projects Yet</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No Budget Projects Yet</h3>
               <p className="text-cosmic-muted text-sm">Budget projects will appear here when they are proposed through participatory processes.</p>
             </div>
           ) : (
@@ -260,7 +260,7 @@ export default function BudgetPage() {
                 const catConfig = CATEGORY_CONFIG[project.category || ''] || {
                   label: project.category || 'General',
                   icon: Building2,
-                  color: 'text-cosmic-muted bg-white/5 border-white/10',
+                  color: 'text-cosmic-muted bg-foreground/5 border-border',
                 };
                 const CatIcon = catConfig.icon;
                 const fundingPct = project.budgetRequested > 0 ? Math.round((project.totalAllocated / project.budgetRequested) * 100) : 0;
@@ -275,12 +275,12 @@ export default function BudgetPage() {
                           <CatIcon className="w-3 h-3 mr-1" />
                           {catConfig.label}
                         </Badge>
-                        <Badge className={`${STATUS_COLORS[project.status] || 'bg-white/5 text-cosmic-muted'} text-[10px] capitalize`}>
+                        <Badge className={`${STATUS_COLORS[project.status] || 'bg-foreground/5 text-cosmic-muted'} text-[10px] capitalize`}>
                           {project.status}
                         </Badge>
                       </div>
 
-                      <h3 className="text-sm font-semibold text-white line-clamp-2">{project.title}</h3>
+                      <h3 className="text-sm font-semibold text-foreground line-clamp-2">{project.title}</h3>
                       <p className="text-xs text-cosmic-muted line-clamp-2">{project.description}</p>
 
                       {/* Budget info */}
@@ -303,13 +303,13 @@ export default function BudgetPage() {
 
                       {/* Allocate button */}
                       {project.status === 'proposed' || project.status === 'shortlisted' ? (
-                        <div className="flex gap-2 pt-2 border-t border-white/5">
+                        <div className="flex gap-2 pt-2 border-t border-border">
                           <div className="relative flex-grow">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-cosmic-muted">$</span>
                             <Input
                               type="number"
                               placeholder="0"
-                              className="pl-7 bg-white/5 border-white/10 text-white text-sm placeholder:text-cosmic-muted/50 h-9"
+                              className="pl-7 bg-foreground/5 border-border text-foreground text-sm placeholder:text-cosmic-muted/50 h-9"
                               value={allocationInputs[project.id] || ''}
                               onChange={(e) => setAllocationInputs(prev => ({ ...prev, [project.id]: e.target.value }))}
                               onKeyDown={(e) => { if (e.key === 'Enter') handleAllocate(project.id); }}
@@ -319,7 +319,7 @@ export default function BudgetPage() {
                             size="sm"
                             onClick={() => handleAllocate(project.id)}
                             disabled={submitting === project.id || !allocationInputs[project.id]}
-                            className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90 h-9"
+                            className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 h-9"
                           >
                             {submitting === project.id ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -329,7 +329,7 @@ export default function BudgetPage() {
                           </Button>
                         </div>
                       ) : (
-                        <div className="pt-2 border-t border-white/5">
+                        <div className="pt-2 border-t border-border">
                           {project.status === 'approved' || project.status === 'implementing' ? (
                             <div className="flex items-center gap-1.5 text-xs text-cosmic-success">
                               <CheckCircle2 className="w-3.5 h-3.5" /> Approved & In Progress
@@ -364,7 +364,7 @@ export default function BudgetPage() {
           {/* Your Allocation Panel */}
           <Card className="glass-card-amber rounded-2xl sticky top-20">
             <CardHeader className="pb-2">
-              <h3 className="font-heading font-semibold text-white flex items-center gap-2">
+              <h3 className="font-heading font-semibold text-foreground flex items-center gap-2">
                 <Wallet className="w-5 h-5 text-cosmic-amber" /> Your Allocation
               </h3>
             </CardHeader>
@@ -376,7 +376,7 @@ export default function BudgetPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-cosmic-muted">Available</span>
-                  <span className="text-white font-bold">{formatCurrency(Math.max(0, userBudgetRemaining))}</span>
+                  <span className="text-foreground font-bold">{formatCurrency(Math.max(0, userBudgetRemaining))}</span>
                 </div>
                 <Progress
                   value={budgetPool && budgetPool.total > 0 ? (totalUserAllocated / budgetPool.total) * 100 : 0}
@@ -390,8 +390,8 @@ export default function BudgetPage() {
                   {allocatedProjects.map(([projectId, amount]) => {
                     const project = projects.find((p) => p.id === projectId);
                     return (
-                      <div key={projectId} className="flex items-center justify-between bg-white/5 rounded-lg p-2">
-                        <span className="text-xs text-white truncate flex-grow mr-2">
+                      <div key={projectId} className="flex items-center justify-between bg-foreground/5 rounded-lg p-2">
+                        <span className="text-xs text-foreground truncate flex-grow mr-2">
                           {project?.title || 'Unknown Project'}
                         </span>
                         <span className="text-xs text-cosmic-amber font-medium flex-shrink-0">
@@ -408,7 +408,7 @@ export default function BudgetPage() {
               )}
 
               <Button
-                className="w-full bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90 font-semibold"
+                className="w-full bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 font-semibold"
                 disabled={allocatedProjects.length === 0}
                 onClick={() => {
                   setShowSubmitted(true);
@@ -427,8 +427,8 @@ export default function BudgetPage() {
           {/* Map Placeholder */}
           <Card className="glass-card rounded-2xl overflow-hidden">
             <CardContent className="p-0">
-              <div className="h-48 bg-gradient-to-br from-cosmic-teal/5 to-cosmic-violet/5 flex flex-col items-center justify-center gap-3 border border-white/5 rounded-2xl">
-                <Map className="w-8 h-8 text-cosmic-muted/30" />
+              <div className="h-48 bg-gradient-to-br from-cosmic-teal/5 to-cosmic-violet/5 flex flex-col items-center justify-center gap-3 border border-border rounded-2xl">
+                <MapIcon className="w-8 h-8 text-cosmic-muted/30" />
                 <span className="text-xs text-cosmic-muted font-medium">Interactive Map Coming Soon</span>
                 <span className="text-[10px] text-cosmic-muted/50">See project locations on a map</span>
               </div>
@@ -438,7 +438,7 @@ export default function BudgetPage() {
           {/* Results Section */}
           <Card className="glass-card rounded-2xl">
             <CardHeader className="pb-2">
-              <h3 className="font-heading font-semibold text-white flex items-center gap-2 text-sm">
+              <h3 className="font-heading font-semibold text-foreground flex items-center gap-2 text-sm">
                 <TrendingUp className="w-4 h-4 text-cosmic-success" /> Approved Projects
               </h3>
             </CardHeader>
@@ -448,9 +448,9 @@ export default function BudgetPage() {
               ) : (
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {projects.filter((p) => p.status === 'approved' || p.status === 'implementing' || p.status === 'completed').map((project) => (
-                    <div key={project.id} className="flex items-center justify-between bg-white/5 rounded-lg p-2">
+                    <div key={project.id} className="flex items-center justify-between bg-foreground/5 rounded-lg p-2">
                       <div className="min-w-0 flex-grow mr-2">
-                        <p className="text-xs text-white truncate">{project.title}</p>
+                        <p className="text-xs text-foreground truncate">{project.title}</p>
                         <div className="flex items-center gap-1 text-[10px] text-cosmic-muted">
                           <Clock className="w-2.5 h-2.5" />
                           {project.status === 'completed' ? 'Completed' : project.status === 'implementing' ? 'In Progress' : 'Approved'}

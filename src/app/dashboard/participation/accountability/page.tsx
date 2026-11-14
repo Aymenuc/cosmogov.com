@@ -58,11 +58,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 };
 
 const MILESTONE_STATUS: Record<string, { label: string; dot: string; color: string }> = {
-  pending: { label: 'Pending', dot: 'bg-white/20', color: 'text-cosmic-muted' },
+  pending: { label: 'Pending', dot: 'bg-foreground/20', color: 'text-cosmic-muted' },
   in_progress: { label: 'In Progress', dot: 'bg-cosmic-accent', color: 'text-cosmic-accent' },
   completed: { label: 'Completed', dot: 'bg-cosmic-success', color: 'text-cosmic-success' },
   delayed: { label: 'Delayed', dot: 'bg-cosmic-rose', color: 'text-cosmic-rose' },
-  cancelled: { label: 'Cancelled', dot: 'bg-white/10', color: 'text-white/30' },
+  cancelled: { label: 'Cancelled', dot: 'bg-foreground/10', color: 'text-foreground/30' },
 };
 
 function daysSince(dateStr: string) {
@@ -126,7 +126,7 @@ export default function AccountabilityPage() {
             <Eye className="w-5 h-5 text-cosmic-violet" />
             <span className="text-cosmic-violet text-sm font-semibold tracking-wider uppercase">Accountability Tracker</span>
           </div>
-          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">
             Promises Made, <span className="text-gradient-cool">Promises Kept</span>
           </h1>
           <p className="text-cosmic-muted text-sm max-w-2xl mb-6">
@@ -141,7 +141,7 @@ export default function AccountabilityPage() {
             </div>
             <div className="glass-card p-3 rounded-xl">
               <span className="text-[10px] text-cosmic-muted">Milestones</span>
-              <p className="text-lg font-bold text-white font-heading">{stats.totalMilestones}</p>
+              <p className="text-lg font-bold text-foreground font-heading">{stats.totalMilestones}</p>
             </div>
             <div className="glass-card p-3 rounded-xl">
               <span className="text-[10px] text-cosmic-muted">Completed</span>
@@ -172,7 +172,7 @@ export default function AccountabilityPage() {
                 <Shield className="w-5 h-5 text-cosmic-amber" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Transparency Score</h3>
+                <h3 className="text-sm font-semibold text-foreground">Transparency Score</h3>
                 <p className="text-[10px] text-cosmic-muted">% milestones with evidence</p>
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function AccountabilityPage() {
                 <Clock className="w-5 h-5 text-cosmic-teal" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">On-Time Completion</h3>
+                <h3 className="text-sm font-semibold text-foreground">On-Time Completion</h3>
                 <p className="text-[10px] text-cosmic-muted">Completed before deadline</p>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function AccountabilityPage() {
                 <BarChart3 className="w-5 h-5 text-cosmic-violet" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Overall Progress</h3>
+                <h3 className="text-sm font-semibold text-foreground">Overall Progress</h3>
                 <p className="text-[10px] text-cosmic-muted">Average milestone progress</p>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function AccountabilityPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48 bg-white/5 border-white/10 text-white">
+          <SelectTrigger className="w-full sm:w-48 bg-foreground/5 border-border text-foreground">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -250,7 +250,7 @@ export default function AccountabilityPage() {
       ) : filteredEntities.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <Eye className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">No Implementation Data</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Implementation Data</h3>
           <p className="text-cosmic-muted text-sm">Implementation tracking will appear once proposals are accepted and milestones are created.</p>
         </div>
       ) : (
@@ -279,7 +279,7 @@ export default function AccountabilityPage() {
                       {/* Header row */}
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div>
-                          <h3 className="text-sm font-semibold text-white">{entity.title}</h3>
+                          <h3 className="text-sm font-semibold text-foreground">{entity.title}</h3>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge className={`text-[9px] border ${statusCfg.bg} ${statusCfg.color}`}>
                               <StatusIcon className="w-3 h-3 mr-1" />
@@ -290,7 +290,7 @@ export default function AccountabilityPage() {
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <Progress value={entity.overallProgress} className="w-16 h-1.5" />
-                          <span className="text-sm font-bold text-white font-heading">{entity.overallProgress}%</span>
+                          <span className="text-sm font-bold text-foreground font-heading">{entity.overallProgress}%</span>
                         </div>
                       </div>
 
@@ -304,7 +304,7 @@ export default function AccountabilityPage() {
                                 <div className={`w-4 h-4 rounded-full ${ms.dot} cursor-pointer transition-all hover:scale-125`} />
                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                                   <div className="glass-card px-2 py-1 rounded-lg whitespace-nowrap">
-                                    <p className="text-[10px] text-white font-medium">{m.title}</p>
+                                    <p className="text-[10px] text-foreground font-medium">{m.title}</p>
                                     <p className={`text-[9px] ${ms.color}`}>{ms.label} · {m.progress}%</p>
                                   </div>
                                 </div>
@@ -330,17 +330,17 @@ export default function AccountabilityPage() {
 
                       {/* Expanded milestone detail */}
                       {isExpanded && (
-                        <div className="mt-3 pt-3 border-t border-white/5 space-y-2 max-h-72 overflow-y-auto">
+                        <div className="mt-3 pt-3 border-t border-border space-y-2 max-h-72 overflow-y-auto">
                           {entity.milestones.map((milestone) => {
                             const ms = MILESTONE_STATUS[milestone.status] || MILESTONE_STATUS.pending;
                             let evidenceItems: { type: string; url: string; description: string }[] = [];
                             try { evidenceItems = JSON.parse(milestone.evidence); } catch { /* empty */ }
 
                             return (
-                              <div key={milestone.id} className="bg-white/3 rounded-lg p-3">
+                              <div key={milestone.id} className="bg-foreground/3 rounded-lg p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                   <div className={`w-2.5 h-2.5 rounded-full ${ms.dot}`} />
-                                  <h4 className="text-xs font-medium text-white flex-grow">{milestone.title}</h4>
+                                  <h4 className="text-xs font-medium text-foreground flex-grow">{milestone.title}</h4>
                                   <span className={`text-[10px] ${ms.color}`}>{ms.label}</span>
                                 </div>
                                 {milestone.description && (

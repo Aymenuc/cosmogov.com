@@ -84,7 +84,7 @@ const TYPE_CONFIG: Record<string, { label: string; color: string; icon: React.El
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   scheduled: { label: 'Scheduled', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20' },
   live: { label: 'Live Now', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20' },
-  completed: { label: 'Completed', color: 'text-cosmic-muted bg-white/5 border-white/10' },
+  completed: { label: 'Completed', color: 'text-cosmic-muted bg-foreground/5 border-border' },
   cancelled: { label: 'Cancelled', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20' },
 };
 
@@ -262,7 +262,7 @@ export default function MeetingsPage() {
             <Calendar className="w-5 h-5 text-cosmic-amber" />
             <span className="text-cosmic-amber text-sm font-semibold tracking-wider uppercase">Meetings</span>
           </div>
-          <h1 className="font-heading text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h1 className="font-heading text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Gather, Discuss,{' '}
             <span className="text-gradient-warm">Decide</span>
           </h1>
@@ -296,10 +296,10 @@ export default function MeetingsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row gap-3 flex-grow">
           {/* Timeframe toggle */}
-          <div className="flex items-center bg-white/5 rounded-lg border border-white/10 p-0.5">
+          <div className="flex items-center bg-foreground/5 rounded-lg border border-border p-0.5">
             <button
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                timeframe === 'upcoming' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-white'
+                timeframe === 'upcoming' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-foreground'
               }`}
               onClick={() => setTimeframe('upcoming')}
             >
@@ -307,7 +307,7 @@ export default function MeetingsPage() {
             </button>
             <button
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                timeframe === 'past' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-white'
+                timeframe === 'past' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-foreground'
               }`}
               onClick={() => setTimeframe('past')}
             >
@@ -319,14 +319,14 @@ export default function MeetingsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search meetings..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             />
           </div>
 
           <Select value={filters.type} onValueChange={(v) => setFilters((f) => ({ ...f, type: v }))}>
-            <SelectTrigger className="w-full sm:w-36 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-36 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -338,10 +338,10 @@ export default function MeetingsPage() {
           </Select>
 
           {/* View toggle */}
-          <div className="flex items-center bg-white/5 rounded-lg border border-white/10 p-0.5">
+          <div className="flex items-center bg-foreground/5 rounded-lg border border-border p-0.5">
             <button
               className={`p-1.5 rounded-md transition-all ${
-                viewMode === 'list' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-white'
+                viewMode === 'list' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-foreground'
               }`}
               onClick={() => setViewMode('list')}
               title="List view"
@@ -350,7 +350,7 @@ export default function MeetingsPage() {
             </button>
             <button
               className={`p-1.5 rounded-md transition-all ${
-                viewMode === 'calendar' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-white'
+                viewMode === 'calendar' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'text-cosmic-muted hover:text-foreground'
               }`}
               onClick={() => setViewMode('calendar')}
               title="Calendar view"
@@ -361,7 +361,7 @@ export default function MeetingsPage() {
         </div>
 
         <Button
-          className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90 shrink-0"
+          className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 shrink-0"
           onClick={() => setCreateDialogOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" /> Create Meeting
@@ -376,14 +376,14 @@ export default function MeetingsPage() {
       ) : meetings.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <Calendar className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             {timeframe === 'upcoming' ? 'No Upcoming Meetings' : 'No Past Meetings'}
           </h3>
           <p className="text-cosmic-muted text-sm mb-4">
             {timeframe === 'upcoming' ? 'Schedule a meeting to bring your community together.' : 'Past meetings will appear here after they conclude.'}
           </p>
           {timeframe === 'upcoming' && (
-            <Button className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90" onClick={() => setCreateDialogOpen(true)}>
+            <Button className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90" onClick={() => setCreateDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" /> Create Meeting
             </Button>
           )}
@@ -407,20 +407,20 @@ export default function MeetingsPage() {
                         <div className="text-xs text-cosmic-muted uppercase">
                           {new Date(meeting.startsAt).toLocaleDateString('en-US', { month: 'short' })}
                         </div>
-                        <div className="text-2xl font-bold text-white font-heading">
+                        <div className="text-2xl font-bold text-foreground font-heading">
                           {new Date(meeting.startsAt).getDate()}
                         </div>
                         <div className="text-xs text-cosmic-muted">
                           {formatTime(meeting.startsAt)}
                         </div>
                       </div>
-                      <div className="w-px h-12 bg-white/10 hidden lg:block" />
+                      <div className="w-px h-12 bg-foreground/10 hidden lg:block" />
                     </div>
 
                     {/* Main Content */}
                     <div className="flex-grow min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="text-base font-semibold text-white group-hover:text-cosmic-amber transition-colors truncate">
+                        <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-amber transition-colors truncate">
                           {meeting.title}
                         </h3>
                         <div className="flex items-center gap-1.5 shrink-0">
@@ -485,7 +485,7 @@ export default function MeetingsPage() {
                             RSVP
                           </Button>
                           <Button
-                            className="bg-white/5 text-cosmic-muted hover:bg-white/10"
+                            className="bg-foreground/5 text-cosmic-muted hover:bg-foreground/10"
                             variant="ghost"
                             size="sm"
                             onClick={() => openDetail(meeting)}
@@ -497,7 +497,7 @@ export default function MeetingsPage() {
                         <div className="flex items-center gap-2">
                           {meeting.minutes && (
                             <Button
-                              className="bg-white/5 text-cosmic-muted hover:bg-white/10"
+                              className="bg-foreground/5 text-cosmic-muted hover:bg-foreground/10"
                               variant="ghost"
                               size="sm"
                             >
@@ -514,7 +514,7 @@ export default function MeetingsPage() {
                             </Button>
                           )}
                           <Button
-                            className="bg-white/5 text-cosmic-muted hover:bg-white/10"
+                            className="bg-foreground/5 text-cosmic-muted hover:bg-foreground/10"
                             variant="ghost"
                             size="sm"
                             onClick={() => openDetail(meeting)}
@@ -539,7 +539,7 @@ export default function MeetingsPage() {
                 <div className="w-10 h-10 rounded-lg bg-cosmic-amber/10 flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-cosmic-amber" />
                 </div>
-                <h3 className="font-heading text-lg font-semibold text-white">{date}</h3>
+                <h3 className="font-heading text-lg font-semibold text-foreground">{date}</h3>
                 <span className="text-xs text-cosmic-muted">{dateMeetings.length} meeting{dateMeetings.length !== 1 ? 's' : ''}</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 ml-0 lg:ml-13">
@@ -556,7 +556,7 @@ export default function MeetingsPage() {
                           </Badge>
                           <span className="text-xs text-cosmic-muted">{formatTime(meeting.startsAt)}</span>
                         </div>
-                        <h4 className="text-sm font-semibold text-white group-hover:text-cosmic-amber transition-colors">
+                        <h4 className="text-sm font-semibold text-foreground group-hover:text-cosmic-amber transition-colors">
                           {meeting.title}
                         </h4>
                         <div className="flex items-center gap-2 text-xs text-cosmic-muted">
@@ -585,11 +585,11 @@ export default function MeetingsPage() {
 
       {/* RSVP Dialog */}
       <Dialog open={rsvpDialogOpen} onOpenChange={setRsvpDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-card border-border text-foreground max-w-md">
           {selectedMeeting && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-white flex items-center gap-2">
+                <DialogTitle className="text-foreground flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-cosmic-amber" />
                   RSVP to Meeting
                 </DialogTitle>
@@ -601,7 +601,7 @@ export default function MeetingsPage() {
               {!rsvped ? (
                 <div className="space-y-4">
                   <div className="glass-card p-4 rounded-xl space-y-2">
-                    <h3 className="text-white font-semibold">{selectedMeeting.title}</h3>
+                    <h3 className="text-foreground font-semibold">{selectedMeeting.title}</h3>
                     <div className="flex flex-wrap gap-3 text-xs text-cosmic-muted">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -629,13 +629,13 @@ export default function MeetingsPage() {
                   <DialogFooter>
                     <Button
                       variant="ghost"
-                      className="text-cosmic-muted hover:text-white"
+                      className="text-cosmic-muted hover:text-foreground"
                       onClick={() => setRsvpDialogOpen(false)}
                     >
                       Cancel
                     </Button>
                     <Button
-                      className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90"
+                      className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90"
                       onClick={handleRsvp}
                       disabled={rsvping}
                     >
@@ -649,7 +649,7 @@ export default function MeetingsPage() {
                   <div className="w-16 h-16 mx-auto rounded-full bg-cosmic-amber/20 flex items-center justify-center glow-amber">
                     <CheckCircle2 className="w-8 h-8 text-cosmic-amber" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">You&apos;re In!</h3>
+                  <h3 className="text-lg font-semibold text-foreground">You&apos;re In!</h3>
                   <p className="text-cosmic-muted text-sm">See you at {selectedMeeting.title}!</p>
                   <Button
                     className="bg-cosmic-amber/10 text-cosmic-amber border border-cosmic-amber/20 hover:bg-cosmic-amber/20"
@@ -667,7 +667,7 @@ export default function MeetingsPage() {
 
       {/* Meeting Detail Dialog */}
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[80vh] overflow-y-auto">
           {detailLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-cosmic-amber animate-spin" />
@@ -675,7 +675,7 @@ export default function MeetingsPage() {
           ) : detailMeeting ? (
             <div className="space-y-6">
               <DialogHeader>
-                <DialogTitle className="text-white text-xl">{detailMeeting.title}</DialogTitle>
+                <DialogTitle className="text-foreground text-xl">{detailMeeting.title}</DialogTitle>
                 <DialogDescription className="text-cosmic-muted">{detailMeeting.description}</DialogDescription>
               </DialogHeader>
 
@@ -698,11 +698,11 @@ export default function MeetingsPage() {
               <div className="glass-card p-4 rounded-xl space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <Calendar className="w-4 h-4 text-cosmic-amber" />
-                  <span className="text-white">{formatDate(detailMeeting.startsAt)}</span>
+                  <span className="text-foreground">{formatDate(detailMeeting.startsAt)}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Clock className="w-4 h-4 text-cosmic-amber" />
-                  <span className="text-white">
+                  <span className="text-foreground">
                     {formatTime(detailMeeting.startsAt)}
                     {detailMeeting.endsAt && ` — ${formatTime(detailMeeting.endsAt)}`}
                   </span>
@@ -710,7 +710,7 @@ export default function MeetingsPage() {
                 {detailMeeting.address && (
                   <div className="flex items-center gap-3 text-sm">
                     <MapPin className="w-4 h-4 text-cosmic-amber" />
-                    <span className="text-white">{detailMeeting.address}</span>
+                    <span className="text-foreground">{detailMeeting.address}</span>
                   </div>
                 )}
                 {detailMeeting.videoUrl && (
@@ -738,7 +738,7 @@ export default function MeetingsPage() {
                 if (agenda.length === 0) return null;
                 return (
                   <div>
-                    <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                       <FileText className="w-4 h-4 text-cosmic-amber" />
                       Agenda
                     </h4>
@@ -749,7 +749,7 @@ export default function MeetingsPage() {
                             <span className="w-6 h-6 rounded-full bg-cosmic-amber/10 flex items-center justify-center text-[10px] font-bold text-cosmic-amber">
                               {idx + 1}
                             </span>
-                            <span className="text-sm text-white">{item.item}</span>
+                            <span className="text-sm text-foreground">{item.item}</span>
                           </div>
                           <span className="text-[10px] text-cosmic-muted">{item.duration}min</span>
                         </div>
@@ -762,20 +762,20 @@ export default function MeetingsPage() {
               {/* Attendees */}
               {detailMeeting.attendees && detailMeeting.attendees.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Users className="w-4 h-4 text-cosmic-teal" />
                     Attendees ({detailMeeting.attendeeCount})
                   </h4>
                   <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
                     {detailMeeting.attendees.map((attendee) => (
-                      <div key={attendee.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors">
+                      <div key={attendee.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-foreground/5 transition-colors">
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[10px] font-bold text-cosmic-violet">
                             {(attendee.user.name || 'U')[0].toUpperCase()}
                           </div>
-                          <span className="text-sm text-white">{attendee.user.name || 'Anonymous'}</span>
+                          <span className="text-sm text-foreground">{attendee.user.name || 'Anonymous'}</span>
                         </div>
-                        <Badge className="text-[9px] bg-white/5 border-white/10 text-cosmic-muted">
+                        <Badge className="text-[9px] bg-foreground/5 border-border text-cosmic-muted">
                           {attendee.role === 'organizer' ? '🎤 Organizer' : attendee.role === 'presenter' ? '📋 Presenter' : '👤 Attendee'}
                         </Badge>
                       </div>
@@ -787,7 +787,7 @@ export default function MeetingsPage() {
               {/* Minutes */}
               {detailMeeting.minutes && (
                 <div>
-                  <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-cosmic-amber" />
                     Meeting Minutes
                   </h4>
@@ -800,7 +800,7 @@ export default function MeetingsPage() {
               {/* RSVP Button */}
               {isUpcoming(detailMeeting.startsAt) && detailMeeting.status !== 'cancelled' && (
                 <Button
-                  className="w-full bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90"
+                  className="w-full bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90"
                   onClick={() => {
                     setDetailDialogOpen(false);
                     openRsvpDialog(detailMeeting);
@@ -816,9 +816,9 @@ export default function MeetingsPage() {
 
       {/* Create Meeting Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Calendar className="w-5 h-5 text-cosmic-amber" />
               Schedule New Meeting
             </DialogTitle>
@@ -832,7 +832,7 @@ export default function MeetingsPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Title *</label>
               <Input
                 placeholder="e.g., Community Budget Review"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={createForm.title}
                 onChange={(e) => setCreateForm((f) => ({ ...f, title: e.target.value }))}
               />
@@ -842,7 +842,7 @@ export default function MeetingsPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Description</label>
               <Textarea
                 placeholder="What will be discussed?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[60px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[60px]"
                 value={createForm.description}
                 onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
               />
@@ -852,7 +852,7 @@ export default function MeetingsPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Type</label>
                 <Select value={createForm.type} onValueChange={(v) => setCreateForm((f) => ({ ...f, type: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -867,7 +867,7 @@ export default function MeetingsPage() {
                 <Input
                   type="number"
                   placeholder="Unlimited"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                   value={createForm.maxAttendees}
                   onChange={(e) => setCreateForm((f) => ({ ...f, maxAttendees: e.target.value }))}
                 />
@@ -879,7 +879,7 @@ export default function MeetingsPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">Address</label>
                 <Input
                   placeholder="Meeting location"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                   value={createForm.address}
                   onChange={(e) => setCreateForm((f) => ({ ...f, address: e.target.value }))}
                 />
@@ -891,7 +891,7 @@ export default function MeetingsPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">Video URL</label>
                 <Input
                   placeholder="https://zoom.us/j/..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                   value={createForm.videoUrl}
                   onChange={(e) => setCreateForm((f) => ({ ...f, videoUrl: e.target.value }))}
                 />
@@ -903,7 +903,7 @@ export default function MeetingsPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">Start Date/Time *</label>
                 <Input
                   type="datetime-local"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-border text-foreground"
                   value={createForm.startsAt}
                   onChange={(e) => setCreateForm((f) => ({ ...f, startsAt: e.target.value }))}
                 />
@@ -912,7 +912,7 @@ export default function MeetingsPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">End Date/Time</label>
                 <Input
                   type="datetime-local"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-border text-foreground"
                   value={createForm.endsAt}
                   onChange={(e) => setCreateForm((f) => ({ ...f, endsAt: e.target.value }))}
                 />
@@ -930,7 +930,7 @@ export default function MeetingsPage() {
                     </span>
                     <Input
                       placeholder="Agenda item..."
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                       value={item}
                       onChange={(e) => {
                         const newItems = [...createForm.agendaItems];
@@ -970,13 +970,13 @@ export default function MeetingsPage() {
           <DialogFooter>
             <Button
               variant="ghost"
-              className="text-cosmic-muted hover:text-white"
+              className="text-cosmic-muted hover:text-foreground"
               onClick={() => setCreateDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90"
+              className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.startsAt}
             >

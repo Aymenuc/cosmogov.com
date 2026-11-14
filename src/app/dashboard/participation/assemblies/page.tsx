@@ -221,7 +221,7 @@ export default function AssembliesPage() {
             <Users className="w-5 h-5 text-cosmic-teal" />
             <span className="text-cosmic-teal text-sm font-semibold tracking-wider uppercase">Assemblies</span>
           </div>
-          <h1 className="font-heading text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h1 className="font-heading text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Deliberate Together,{' '}
             <span className="text-gradient">Decide Together</span>
           </h1>
@@ -258,13 +258,13 @@ export default function AssembliesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search assemblies..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             />
           </div>
           <Select value={filters.purpose} onValueChange={(v) => setFilters((f) => ({ ...f, purpose: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Purpose" />
             </SelectTrigger>
             <SelectContent>
@@ -276,7 +276,7 @@ export default function AssembliesPage() {
             </SelectContent>
           </Select>
           <Select value={filters.scope} onValueChange={(v) => setFilters((f) => ({ ...f, scope: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Scope" />
             </SelectTrigger>
             <SelectContent>
@@ -289,7 +289,7 @@ export default function AssembliesPage() {
           </Select>
         </div>
         <Button
-          className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90 shrink-0"
+          className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90 shrink-0"
           onClick={() => setCreateDialogOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" /> Create Assembly
@@ -304,9 +304,9 @@ export default function AssembliesPage() {
       ) : assemblies.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <Users className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">No Assemblies Yet</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Assemblies Yet</h3>
           <p className="text-cosmic-muted text-sm mb-4">Create the first assembly and start deliberating with your community.</p>
-          <Button className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90" onClick={() => setCreateDialogOpen(true)}>
+          <Button className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Create Assembly
           </Button>
         </div>
@@ -328,7 +328,7 @@ export default function AssembliesPage() {
                       {purposeConfig.label}
                     </Badge>
                     <div className="flex items-center gap-1.5">
-                      <Badge className="text-[10px] bg-white/5 border-white/10 text-cosmic-muted">
+                      <Badge className="text-[10px] bg-foreground/5 border-border text-cosmic-muted">
                         <ScopeIcon className="w-3 h-3 mr-1" />
                         {scopeConfig.label}
                       </Badge>
@@ -337,7 +337,7 @@ export default function AssembliesPage() {
                       )}
                     </div>
                   </div>
-                  <h3 className="text-base font-semibold text-white group-hover:text-cosmic-teal transition-colors">
+                  <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-teal transition-colors">
                     {assembly.name}
                   </h3>
                   <p className="text-xs text-cosmic-muted line-clamp-2 mt-1">
@@ -358,7 +358,7 @@ export default function AssembliesPage() {
                         <Clock className="w-3 h-3" />
                         Next Meeting
                       </div>
-                      <p className="text-xs text-white font-medium">{nextMeeting.title}</p>
+                      <p className="text-xs text-foreground font-medium">{nextMeeting.title}</p>
                       <p className="text-[10px] text-cosmic-muted mt-0.5">
                         {new Date(nextMeeting.startsAt).toLocaleDateString('en-US', {
                           weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -380,7 +380,7 @@ export default function AssembliesPage() {
                         </div>
                       ))}
                       {assembly._count.members > 5 && (
-                        <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[10px] text-cosmic-muted border-2 border-[#0B1022] -ml-1">
+                        <div className="w-7 h-7 rounded-full bg-foreground/10 flex items-center justify-center text-[10px] text-cosmic-muted border-2 border-[#0B1022] -ml-1">
                           +{assembly._count.members - 5}
                         </div>
                       )}
@@ -391,7 +391,7 @@ export default function AssembliesPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2 pt-2 border-t border-white/5">
+                  <div className="flex gap-2 pt-2 border-t border-border">
                     <Button
                       className="flex-1 bg-cosmic-teal/10 text-cosmic-teal border border-cosmic-teal/20 hover:bg-cosmic-teal/20"
                       variant="ghost"
@@ -400,7 +400,7 @@ export default function AssembliesPage() {
                       <UserPlus className="w-4 h-4 mr-1" /> Join
                     </Button>
                     <Button
-                      className="flex-1 bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10"
+                      className="flex-1 bg-foreground/5 text-cosmic-muted border border-border hover:bg-foreground/10"
                       variant="ghost"
                       onClick={() => openDetail(assembly)}
                     >
@@ -416,11 +416,11 @@ export default function AssembliesPage() {
 
       {/* Join Assembly Dialog */}
       <Dialog open={joinDialogOpen} onOpenChange={setJoinDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-card border-border text-foreground max-w-md">
           {selectedAssembly && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-white flex items-center gap-2">
+                <DialogTitle className="text-foreground flex items-center gap-2">
                   <UserPlus className="w-5 h-5 text-cosmic-teal" />
                   Join Assembly
                 </DialogTitle>
@@ -432,7 +432,7 @@ export default function AssembliesPage() {
               {!joined ? (
                 <div className="space-y-4">
                   <div className="glass-card p-4 rounded-xl">
-                    <h3 className="text-white font-semibold mb-1">{selectedAssembly.name}</h3>
+                    <h3 className="text-foreground font-semibold mb-1">{selectedAssembly.name}</h3>
                     <p className="text-sm text-cosmic-muted line-clamp-3">{selectedAssembly.description}</p>
                     <div className="mt-3 flex items-center gap-3 text-xs">
                       <Badge className={`${PURPOSE_CONFIG[selectedAssembly.purpose]?.color || ''} text-[10px] border`}>
@@ -447,13 +447,13 @@ export default function AssembliesPage() {
                   <DialogFooter>
                     <Button
                       variant="ghost"
-                      className="text-cosmic-muted hover:text-white"
+                      className="text-cosmic-muted hover:text-foreground"
                       onClick={() => setJoinDialogOpen(false)}
                     >
                       Cancel
                     </Button>
                     <Button
-                      className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90"
+                      className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90"
                       onClick={handleJoin}
                       disabled={joining}
                     >
@@ -467,7 +467,7 @@ export default function AssembliesPage() {
                   <div className="w-16 h-16 mx-auto rounded-full bg-cosmic-teal/20 flex items-center justify-center glow-teal">
                     <Users className="w-8 h-8 text-cosmic-teal" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">Welcome Aboard!</h3>
+                  <h3 className="text-lg font-semibold text-foreground">Welcome Aboard!</h3>
                   <p className="text-cosmic-muted text-sm">You&apos;re now a member of {selectedAssembly.name}.</p>
                   <Button
                     className="bg-cosmic-teal/10 text-cosmic-teal border border-cosmic-teal/20 hover:bg-cosmic-teal/20"
@@ -485,7 +485,7 @@ export default function AssembliesPage() {
 
       {/* Assembly Detail Dialog */}
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[80vh] overflow-y-auto">
           {detailLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-cosmic-teal animate-spin" />
@@ -493,7 +493,7 @@ export default function AssembliesPage() {
           ) : detailAssembly ? (
             <div className="space-y-6">
               <DialogHeader>
-                <DialogTitle className="text-white text-xl">{detailAssembly.name}</DialogTitle>
+                <DialogTitle className="text-foreground text-xl">{detailAssembly.name}</DialogTitle>
                 <DialogDescription className="text-cosmic-muted">{detailAssembly.description}</DialogDescription>
               </DialogHeader>
 
@@ -501,10 +501,10 @@ export default function AssembliesPage() {
                 <Badge className={`${PURPOSE_CONFIG[detailAssembly.purpose]?.color || ''} text-[10px] border`}>
                   {PURPOSE_CONFIG[detailAssembly.purpose]?.label}
                 </Badge>
-                <Badge className="text-[10px] bg-white/5 border-white/10 text-cosmic-muted">
+                <Badge className="text-[10px] bg-foreground/5 border-border text-cosmic-muted">
                   {SCOPE_CONFIG[detailAssembly.scope]?.label}
                 </Badge>
-                <Badge className="text-[10px] bg-white/5 border-white/10 text-cosmic-muted">
+                <Badge className="text-[10px] bg-foreground/5 border-border text-cosmic-muted">
                   <Calendar className="w-3 h-3 mr-1" />
                   {CADENCE_LABELS[detailAssembly.meetingCadence]}
                 </Badge>
@@ -517,7 +517,7 @@ export default function AssembliesPage() {
 
               {/* Members */}
               <div>
-                <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                   <Users className="w-4 h-4 text-cosmic-teal" />
                   Members ({detailAssembly._count?.members || detailAssembly.members?.length || 0})
                 </h4>
@@ -525,12 +525,12 @@ export default function AssembliesPage() {
                   {detailAssembly.members?.map((member: AssemblyMember) => {
                     const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.member;
                     return (
-                      <div key={member.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors">
+                      <div key={member.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-foreground/5 transition-colors">
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[10px] font-bold text-cosmic-violet">
                             {(member.user.name || 'U')[0].toUpperCase()}
                           </div>
-                          <span className="text-sm text-white">{member.user.name || 'Anonymous'}</span>
+                          <span className="text-sm text-foreground">{member.user.name || 'Anonymous'}</span>
                         </div>
                         <span className={`text-[10px] font-medium ${roleConfig.color}`}>{roleConfig.label}</span>
                       </div>
@@ -542,7 +542,7 @@ export default function AssembliesPage() {
               {/* Upcoming Meetings */}
               {detailAssembly.meetings && detailAssembly.meetings.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-cosmic-amber" />
                     Recent / Upcoming Meetings
                   </h4>
@@ -550,14 +550,14 @@ export default function AssembliesPage() {
                     {detailAssembly.meetings.slice(0, 5).map((meeting) => (
                       <div key={meeting.id} className="glass-card p-3 rounded-xl flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-white font-medium">{meeting.title}</p>
+                          <p className="text-sm text-foreground font-medium">{meeting.title}</p>
                           <p className="text-[10px] text-cosmic-muted">
                             {new Date(meeting.startsAt).toLocaleDateString('en-US', {
                               weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                             })}
                           </p>
                         </div>
-                        <Badge className="text-[9px] bg-white/5 border-white/10 text-cosmic-muted">
+                        <Badge className="text-[9px] bg-foreground/5 border-border text-cosmic-muted">
                           {meeting.type}
                         </Badge>
                       </div>
@@ -569,7 +569,7 @@ export default function AssembliesPage() {
               {/* Join button if not a member */}
               {!detailIsMember && (
                 <Button
-                  className="w-full bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90"
+                  className="w-full bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90"
                   onClick={() => {
                     setDetailDialogOpen(false);
                     openJoinDialog(detailAssembly);
@@ -585,9 +585,9 @@ export default function AssembliesPage() {
 
       {/* Create Assembly Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Users className="w-5 h-5 text-cosmic-teal" />
               Create New Assembly
             </DialogTitle>
@@ -601,7 +601,7 @@ export default function AssembliesPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Name *</label>
               <Input
                 placeholder="e.g., Neighborhood Advisory Council"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={createForm.name}
                 onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
               />
@@ -611,7 +611,7 @@ export default function AssembliesPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Description *</label>
               <Textarea
                 placeholder="What will this assembly discuss and decide?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                 value={createForm.description}
                 onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
               />
@@ -621,7 +621,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Purpose</label>
                 <Select value={createForm.purpose} onValueChange={(v) => setCreateForm((f) => ({ ...f, purpose: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -635,7 +635,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Scope</label>
                 <Select value={createForm.scope} onValueChange={(v) => setCreateForm((f) => ({ ...f, scope: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -652,7 +652,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Meeting Cadence</label>
                 <Select value={createForm.meetingCadence} onValueChange={(v) => setCreateForm((f) => ({ ...f, meetingCadence: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -667,7 +667,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Visibility</label>
                 <Select value={createForm.isPublic ? 'public' : 'private'} onValueChange={(v) => setCreateForm((f) => ({ ...f, isPublic: v === 'public' }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -682,13 +682,13 @@ export default function AssembliesPage() {
           <DialogFooter>
             <Button
               variant="ghost"
-              className="text-cosmic-muted hover:text-white"
+              className="text-cosmic-muted hover:text-foreground"
               onClick={() => setCreateDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90"
+              className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90"
               onClick={handleCreate}
               disabled={creating || !createForm.name || !createForm.description}
             >

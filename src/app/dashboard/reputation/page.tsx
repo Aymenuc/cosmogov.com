@@ -175,7 +175,7 @@ function ScoreRing({ score, tierColor, tier }: { score: number; tierColor: strin
       <div className="relative inline-flex items-center justify-center w-full">
         <canvas ref={canvasRef} />
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl sm:text-5xl font-bold font-heading text-white" style={{ textShadow: `0 0 40px ${tierColor}40` }}>
+          <span className="text-3xl sm:text-5xl font-bold font-heading text-foreground" style={{ textShadow: `0 0 40px ${tierColor}40` }}>
             {score}
           </span>
           <span className="text-xs text-cosmic-muted mt-1">/ 1000</span>
@@ -209,11 +209,11 @@ function ScoreBar({ label, score, icon: Icon, color }: { label: string; score: n
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Icon className="w-4 h-4" style={{ color }} />
-          <span className="text-sm text-white font-medium">{label}</span>
+          <span className="text-sm text-foreground font-medium">{label}</span>
         </div>
         <span className="text-sm font-bold font-heading" style={{ color }}>{Math.round(score)}%</span>
       </div>
-      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+      <div className="h-2 bg-foreground/5 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${width}%`, background: `linear-gradient(90deg, ${color}60, ${color})`, boxShadow: `0 0 10px ${color}30` }}
@@ -306,7 +306,7 @@ export default function ReputationPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-white">
+            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
             </Button>
           </Link>
@@ -323,7 +323,7 @@ export default function ReputationPage() {
       </div>
 
       {/* Score Hero */}
-      <Card className="bg-[#0B1022] border-white/5 mb-8 overflow-hidden">
+      <Card className="bg-card border-border mb-8 overflow-hidden">
         <CardContent className="p-4 sm:p-8 flex flex-col items-center">
           <div className="mb-6" style={{ animation: 'scaleIn 0.6s ease-out' }}>
             <ScoreRing score={data.score} tierColor={data.tierColor} tier={data.tier} />
@@ -332,7 +332,7 @@ export default function ReputationPage() {
             Your Cosmic Reputation is a weighted blend of participation, vote quality, consistency, influence, and game expertise.
           </p>
           <div className="flex items-center gap-3">
-            <Button onClick={handleShare} className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-white rounded-xl">
+            <Button onClick={handleShare} className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-primary-foreground rounded-xl">
               {copied ? <><CheckCircle className="w-4 h-4 mr-2" /> Copied!</> : <><Copy className="w-4 h-4 mr-2" /> Share Your Cosmic Score</>}
             </Button>
           </div>
@@ -341,7 +341,7 @@ export default function ReputationPage() {
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         {/* Score Breakdown */}
-        <Card className="bg-[#0B1022] border-white/5 lg:col-span-2">
+        <Card className="bg-card border-border lg:col-span-2">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold font-heading mb-6 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-cosmic-teal" /> Score Breakdown
@@ -355,7 +355,7 @@ export default function ReputationPage() {
         </Card>
 
         {/* Ranking */}
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold font-heading mb-4 flex items-center gap-2">
               <Trophy className="w-5 h-5 text-cosmic-amber" /> Your Ranking
@@ -367,10 +367,10 @@ export default function ReputationPage() {
               <p className="text-cosmic-muted text-sm mt-1">of governance participants</p>
             </div>
             <div className="space-y-2">
-              <div className="h-px bg-white/5 my-3" />
+              <div className="h-px bg-foreground/5 my-3" />
               <p className="text-xs text-cosmic-muted uppercase tracking-wider mb-2">Top 5 Leaders</p>
               {topLeaderboard.map((entry) => (
-                <div key={entry.rank} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
+                <div key={entry.rank} className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/[0.02] transition-colors">
                   <span className={`text-sm font-bold w-6 text-center ${entry.rank === 1 ? 'text-cosmic-amber' : entry.rank === 2 ? 'text-cosmic-muted' : entry.rank === 3 ? 'text-cosmic-amber/60' : 'text-cosmic-muted/50'}`}>
                     {entry.rank}
                   </span>
@@ -393,7 +393,7 @@ export default function ReputationPage() {
       </div>
 
       {/* Badges Section */}
-      <Card className="bg-[#0B1022] border-white/5">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold font-heading mb-6 flex items-center gap-2">
             <Shield className="w-5 h-5 text-cosmic-violet" /> Achievement Badges
@@ -407,18 +407,18 @@ export default function ReputationPage() {
                   className={`relative p-4 rounded-xl text-center transition-all duration-300 ${
                     badge.earned
                       ? 'bg-gradient-to-b from-cosmic-accent/10 to-transparent border border-cosmic-accent/20 hover:scale-105'
-                      : 'bg-white/[0.02] border border-white/5 opacity-40'
+                      : 'bg-foreground/[0.02] border border-border opacity-40'
                   }`}
                 >
                   {badge.earned && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cosmic-teal flex items-center justify-center">
-                      <CheckCircle className="w-3 h-3 text-white" />
+                      <CheckCircle className="w-3 h-3 text-foreground" />
                     </div>
                   )}
-                  <div className={`w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center ${badge.earned ? 'bg-cosmic-accent/20' : 'bg-white/5'}`}>
+                  <div className={`w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center ${badge.earned ? 'bg-cosmic-accent/20' : 'bg-foreground/5'}`}>
                     <BadgeIcon className={`w-5 h-5 ${badge.earned ? 'text-cosmic-accent' : 'text-cosmic-muted/30'}`} />
                   </div>
-                  <p className={`text-xs font-semibold ${badge.earned ? 'text-white' : 'text-cosmic-muted/40'}`}>{badge.name}</p>
+                  <p className={`text-xs font-semibold ${badge.earned ? 'text-foreground' : 'text-cosmic-muted/40'}`}>{badge.name}</p>
                   <p className={`text-[10px] mt-1 ${badge.earned ? 'text-cosmic-muted' : 'text-cosmic-muted/30'}`}>{badge.description}</p>
                 </div>
               );

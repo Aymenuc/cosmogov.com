@@ -188,7 +188,7 @@ export default function MapSidebar({
               value={searchQuery}
               onChange={e => { setSearchQuery(e.target.value); handleSearch(e.target.value); }}
               onFocus={() => { if (searchResults && (searchResults.countries.length || searchResults.cities.length)) setSearchOpen(true); }}
-              className="w-full bg-transparent pl-10 pr-10 py-2.5 text-white placeholder:text-cosmic-muted/60 text-sm outline-none"
+              className="w-full bg-transparent pl-10 pr-10 py-2.5 text-foreground placeholder:text-cosmic-muted/60 text-sm outline-none"
             />
             {searchLoading && (
               <Loader2 className="absolute right-3 w-4 h-4 text-cosmic-teal animate-spin" />
@@ -196,7 +196,7 @@ export default function MapSidebar({
             {searchQuery && !searchLoading && (
               <button
                 onClick={() => { setSearchQuery(''); setSearchResults(null); setSearchOpen(false); }}
-                className="absolute right-3 p-0.5 rounded hover:bg-white/10 transition-colors"
+                className="absolute right-3 p-0.5 rounded hover:bg-foreground/10 transition-colors"
               >
                 <X className="w-3.5 h-3.5 text-cosmic-muted" />
               </button>
@@ -216,7 +216,7 @@ export default function MapSidebar({
             >
               {searchResults.countries.length > 0 && (
                 <div>
-                  <div className="px-3 py-1.5 border-b border-white/5 bg-white/[0.02]">
+                  <div className="px-3 py-1.5 border-b border-border bg-foreground/[0.02]">
                     <span className="text-[10px] font-semibold text-cosmic-teal uppercase tracking-wider">Countries</span>
                   </div>
                   {searchResults.countries.map(c => (
@@ -226,10 +226,10 @@ export default function MapSidebar({
                         // Fly to country center — approximate from region
                         handleSelect(30, 0); // Will be refined by the API
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-foreground/5 transition-colors text-left"
                     >
                       <span className="text-lg">{c.emoji}</span>
-                      <span className="flex-1 text-sm text-white">{c.name}</span>
+                      <span className="flex-1 text-sm text-foreground">{c.name}</span>
                       <Badge variant="outline" className="text-[9px] border-cosmic-teal/20 text-cosmic-teal">{c.region}</Badge>
                     </button>
                   ))}
@@ -237,7 +237,7 @@ export default function MapSidebar({
               )}
               {searchResults.cities.length > 0 && (
                 <div>
-                  <div className="px-3 py-1.5 border-b border-white/5 bg-white/[0.02]">
+                  <div className="px-3 py-1.5 border-b border-border bg-foreground/[0.02]">
                     <span className="text-[10px] font-semibold text-cosmic-amber uppercase tracking-wider">Cities</span>
                   </div>
                   {searchResults.cities.slice(0, 15).map(c => (
@@ -250,11 +250,11 @@ export default function MapSidebar({
                           handleSelect(lat, lng);
                         }
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-foreground/5 transition-colors text-left"
                     >
                       <span className="text-lg">{c.countryEmoji}</span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm text-white">{c.name}</span>
+                        <span className="text-sm text-foreground">{c.name}</span>
                         <span className="text-xs text-cosmic-muted ml-1.5">{c.stateName}, {c.countryName}</span>
                       </div>
                       <MapPin className="w-3.5 h-3.5 text-cosmic-amber/50 flex-shrink-0" />
@@ -275,19 +275,19 @@ export default function MapSidebar({
 
       {/* ─── Quick Stats ─── */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-xs">
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-foreground/[0.03] border border-border text-xs">
           <Sparkles className="w-3 h-3 text-cosmic-teal" />
-          <span className="text-white font-semibold">{stats.totalMarkers}</span>
+          <span className="text-foreground font-semibold">{stats.totalMarkers}</span>
           <span className="text-cosmic-muted">Activities</span>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-xs">
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-foreground/[0.03] border border-border text-xs">
           <Globe className="w-3 h-3 text-cosmic-violet" />
-          <span className="text-white font-semibold">{countryCount}</span>
+          <span className="text-foreground font-semibold">{countryCount}</span>
           <span className="text-cosmic-muted">Countries</span>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 text-xs">
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-foreground/[0.03] border border-border text-xs">
           <Building2 className="w-3 h-3 text-cosmic-amber" />
-          <span className="text-white font-semibold">{cityCount}</span>
+          <span className="text-foreground font-semibold">{cityCount}</span>
           <span className="text-cosmic-muted">Cities</span>
         </div>
       </div>
@@ -306,7 +306,7 @@ export default function MapSidebar({
       <div className="mb-3">
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 text-sm text-cosmic-muted hover:text-white transition-colors mb-2 w-full"
+          className="flex items-center gap-2 text-sm text-cosmic-muted hover:text-foreground transition-colors mb-2 w-full"
         >
           <Filter className="w-3.5 h-3.5" />
           <span>Filter by type</span>
@@ -335,8 +335,8 @@ export default function MapSidebar({
                       onClick={() => onFilterChange(tab.key)}
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         isActive
-                          ? 'text-white border'
-                          : 'bg-white/[0.03] text-cosmic-muted border border-transparent hover:bg-white/[0.06] hover:text-white'
+                          ? 'text-foreground border'
+                          : 'bg-foreground/[0.03] text-cosmic-muted border border-transparent hover:bg-foreground/[0.06] hover:text-foreground'
                       }`}
                       style={isActive ? {
                         background: `${color}15`,
@@ -392,7 +392,7 @@ export default function MapSidebar({
                 >
                   <Link href={marker.url}>
                     <div
-                      className="group relative rounded-xl p-3 transition-all duration-200 hover:bg-white/[0.04] cursor-pointer"
+                      className="group relative rounded-xl p-3 transition-all duration-200 hover:bg-foreground/[0.04] cursor-pointer"
                       style={{
                         background: 'linear-gradient(135deg, rgba(12,16,32,0.5), rgba(5,8,19,0.3))',
                         borderLeft: `3px solid ${color}`,
@@ -427,7 +427,7 @@ export default function MapSidebar({
                               {marker.status}
                             </span>
                           </div>
-                          <h4 className="text-sm font-medium text-white truncate group-hover:text-cosmic-teal transition-colors">
+                          <h4 className="text-sm font-medium text-foreground truncate group-hover:text-cosmic-teal transition-colors">
                             {marker.title}
                           </h4>
                           <div className="flex items-center gap-3 mt-1.5">

@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import Link from 'next/link';
 import { Rocket, MapPin, Briefcase, Code2, Brain, Users, Palette, Server } from 'lucide-react';
 import Footer from '@/components/Footer';
@@ -65,22 +67,11 @@ const accentMap: Record<string, { bg: string; text: string; iconBg: string }> = 
 
 export default function CareersPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
-      <Starfield />
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg">CosmoGov</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-          <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-        </div>
-      </nav>
+    <div className="min-h-screen flex flex-col bg-card">
 
-      <main className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
+      <SiteHeader />
+
+      <main id="main-content" className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 cosmic-badge rounded-full px-4 py-1.5 mb-6">
             <Rocket className="w-3.5 h-3.5 text-cosmic-teal" />
@@ -104,7 +95,7 @@ export default function CareersPage() {
                     <job.icon className={`w-6 h-6 ${colors.text}`} />
                   </div>
                   <div className="flex-grow">
-                    <h2 className="text-xl font-bold text-white font-heading mb-2">{job.title}</h2>
+                    <h2 className="text-xl font-bold text-foreground font-heading mb-2">{job.title}</h2>
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                       <span className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted">
                         <Briefcase className="w-3.5 h-3.5" /> {job.department}
@@ -116,7 +107,7 @@ export default function CareersPage() {
                     <p className="text-cosmic-muted text-sm leading-relaxed mb-5">{job.description}</p>
                     <Link
                       href={`/careers/${job.id}`}
-                      className="inline-flex items-center gap-2 text-sm font-medium bg-cosmic-accent text-white hover:bg-cosmic-accent/90 px-4 py-2 rounded-lg transition-colors"
+                      className="inline-flex items-center gap-2 text-sm font-medium bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90 px-4 py-2 rounded-lg transition-colors"
                     >
                       Apply Now
                     </Link>
@@ -128,7 +119,7 @@ export default function CareersPage() {
         </div>
 
         <div className="mt-12 glass-card p-8 text-center">
-          <h3 className="text-xl font-bold text-white font-heading mb-3">Don&apos;t see your role?</h3>
+          <h3 className="text-xl font-bold text-foreground font-heading mb-3">Don&apos;t see your role?</h3>
           <p className="text-cosmic-muted text-sm leading-relaxed max-w-lg mx-auto">
             We are always looking for talented people who are passionate about civic technology and democratic innovation. Send your resume and a note about how you would like to contribute to careers@cosmogov.io.
           </p>

@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -21,118 +23,6 @@ import {
 } from 'lucide-react';
 import Footer from '@/components/Footer';
 
-/* ─── Starfield Background ─── */
-function Starfield() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext('2d'); if (!ctx) return;
-    let animId: number;
-    const stars: { x: number; y: number; r: number; a: number; d: number }[] = [];
-    const init = () => {
-      c.width = window.innerWidth; c.height = window.innerHeight;
-      stars.length = 0;
-      for (let i = 0; i < 220; i++) {
-        stars.push({ x: Math.random() * c.width, y: Math.random() * c.height, r: Math.random() * 1.5 + 0.3, a: Math.random(), d: (Math.random() - 0.5) * 0.01 });
-      }
-    };
-    init();
-    const draw = () => {
-      ctx.clearRect(0, 0, c.width, c.height);
-      for (const s of stars) {
-        s.a += s.d;
-        if (s.a > 1 || s.a < 0.1) s.d *= -1;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(200, 220, 255, ${s.a * 0.8})`;
-        ctx.fill();
-      }
-      animId = requestAnimationFrame(draw);
-    };
-    draw();
-    window.addEventListener('resize', init);
-    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', init); };
-  }, []);
-  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />;
-}
-
-/* ─── Navigation ─── */
-function Navigation() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handler);
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then(res => res.ok ? setIsLoggedIn(true) : setIsLoggedIn(false))
-      .catch(() => setIsLoggedIn(false));
-  }, []);
-
-  return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-[#04050b]/80 backdrop-blur-xl border-b border-white/5' : 'bg-[#04050b]/60 backdrop-blur-xl'}`}>
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg tracking-tight">CosmoGov</span>
-        </Link>
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/#governance" className="text-sm text-cosmic-muted hover:text-white transition-colors">Governance</Link>
-          <Link href="/#games" className="text-sm text-cosmic-muted hover:text-white transition-colors">Games</Link>
-          <Link href="/#ai" className="text-sm text-cosmic-muted hover:text-white transition-colors">AI Studio</Link>
-          <Link href="/#pricing" className="text-sm text-cosmic-muted hover:text-white transition-colors">Pricing</Link>
-          <Link href="/contact" className="text-sm text-cosmic-accent hover:text-cosmic-accent/80 transition-colors font-medium">Contact</Link>
-        </div>
-        <div className="hidden md:flex items-center gap-3">
-          {isLoggedIn ? (
-            <Link href="/dashboard">
-              <Button variant="ghost" className="text-cosmic-teal hover:text-cosmic-teal">
-                <LayoutDashboard className="w-4 h-4 mr-1" /> Dashboard
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/auth/login">
-              <Button variant="ghost" className="text-cosmic-muted hover:text-white">Log in</Button>
-            </Link>
-          )}
-          <Link href="/auth/signup">
-            <Button className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-white rounded-lg px-5">
-              Launch Free <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          </Link>
-        </div>
-        <button className="md:hidden text-white" onClick={() => setMobileOpen(!mobileOpen)}>
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
-        </button>
-      </div>
-      {mobileOpen && (
-        <div className="md:hidden bg-[#04050b]/95 backdrop-blur-xl border-b border-white/5 px-6 py-4 space-y-3">
-          <Link href="/#governance" className="block text-cosmic-muted hover:text-white py-2" onClick={() => setMobileOpen(false)}>Governance</Link>
-          <Link href="/#games" className="block text-cosmic-muted hover:text-white py-2" onClick={() => setMobileOpen(false)}>Games</Link>
-          <Link href="/#ai" className="block text-cosmic-muted hover:text-white py-2" onClick={() => setMobileOpen(false)}>AI Studio</Link>
-          <Link href="/#pricing" className="block text-cosmic-muted hover:text-white py-2" onClick={() => setMobileOpen(false)}>Pricing</Link>
-          <Link href="/contact" className="block text-cosmic-accent hover:text-cosmic-accent/80 py-2 font-medium" onClick={() => setMobileOpen(false)}>Contact</Link>
-          {isLoggedIn ? (
-            <Link href="/dashboard" className="block text-cosmic-teal hover:text-cosmic-teal py-2">
-              <LayoutDashboard className="w-4 h-4 inline mr-1" /> Dashboard
-            </Link>
-          ) : (
-            <Link href="/auth/login" className="block text-cosmic-muted hover:text-white py-2">Log in</Link>
-          )}
-          <Link href="/auth/signup"><Button className="w-full bg-cosmic-accent text-white rounded-lg">Launch Free</Button></Link>
-        </div>
-      )}
-    </nav>
-  );
-}
-
 /* ─── Hero Section ─── */
 function HeroSection() {
   return (
@@ -146,7 +36,7 @@ function HeroSection() {
         </div>
         <h1 className="text-5xl sm:text-7xl font-bold tracking-tight mb-6" style={{ animation: 'slideUp 0.8s ease-out 0.1s both' }}>
           <span className="text-gradient">Get In</span>{' '}
-          <span className="text-white">Touch</span>
+          <span className="text-foreground">Touch</span>
         </h1>
         <p className="text-lg sm:text-xl text-cosmic-muted max-w-2xl mx-auto leading-relaxed" style={{ animation: 'slideUp 0.8s ease-out 0.2s both' }}>
           Have a question, idea, or partnership opportunity? We&apos;d love to hear from you. Our team typically responds within 24 hours.
@@ -218,12 +108,12 @@ function ContactFormSection() {
                   <div className="w-16 h-16 rounded-full bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-6">
                     <CheckCircle2 className="w-8 h-8 text-cosmic-teal" />
                   </div>
-                  <h3 className="text-2xl font-semibold text-white mb-2 font-heading">Message Sent!</h3>
+                  <h3 className="text-2xl font-semibold text-foreground mb-2 font-heading">Message Sent!</h3>
                   <p className="text-cosmic-muted mb-6">Thank you for reaching out. We&apos;ll get back to you soon.</p>
                   <Button
                     onClick={() => setStatus('idle')}
                     variant="ghost"
-                    className="text-cosmic-muted hover:text-white border border-white/10"
+                    className="text-cosmic-muted hover:text-foreground border border-border"
                   >
                     Send Another Message
                   </Button>
@@ -239,7 +129,7 @@ function ContactFormSection() {
                         required
                         value={formData.name}
                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 focus-visible:border-cosmic-teal focus-visible:ring-cosmic-teal/20"
+                        className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 focus-visible:border-cosmic-teal focus-visible:ring-cosmic-teal/20"
                       />
                     </div>
                     <div className="space-y-2">
@@ -251,7 +141,7 @@ function ContactFormSection() {
                         required
                         value={formData.email}
                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 focus-visible:border-cosmic-teal focus-visible:ring-cosmic-teal/20"
+                        className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 focus-visible:border-cosmic-teal focus-visible:ring-cosmic-teal/20"
                       />
                     </div>
                   </div>
@@ -261,15 +151,15 @@ function ContactFormSection() {
                       value={formData.subject}
                       onValueChange={(val) => setFormData(prev => ({ ...prev, subject: val }))}
                     >
-                      <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-cosmic-teal/20">
+                      <SelectTrigger className="w-full bg-foreground/5 border-border text-foreground focus:ring-cosmic-teal/20">
                         <SelectValue placeholder="Select a subject" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#0B1022] border-white/10">
-                        <SelectItem value="General" className="text-white focus:bg-cosmic-accent/20 focus:text-white">General Inquiry</SelectItem>
-                        <SelectItem value="Support" className="text-white focus:bg-cosmic-accent/20 focus:text-white">Support</SelectItem>
-                        <SelectItem value="Sales" className="text-white focus:bg-cosmic-accent/20 focus:text-white">Sales</SelectItem>
-                        <SelectItem value="Partnership" className="text-white focus:bg-cosmic-accent/20 focus:text-white">Partnership</SelectItem>
-                        <SelectItem value="Feedback" className="text-white focus:bg-cosmic-accent/20 focus:text-white">Feedback</SelectItem>
+                      <SelectContent className="bg-card border-border">
+                        <SelectItem value="General" className="text-foreground focus:bg-cosmic-accent/20 focus:text-foreground">General Inquiry</SelectItem>
+                        <SelectItem value="Support" className="text-foreground focus:bg-cosmic-accent/20 focus:text-foreground">Support</SelectItem>
+                        <SelectItem value="Sales" className="text-foreground focus:bg-cosmic-accent/20 focus:text-foreground">Sales</SelectItem>
+                        <SelectItem value="Partnership" className="text-foreground focus:bg-cosmic-accent/20 focus:text-foreground">Partnership</SelectItem>
+                        <SelectItem value="Feedback" className="text-foreground focus:bg-cosmic-accent/20 focus:text-foreground">Feedback</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -282,7 +172,7 @@ function ContactFormSection() {
                       rows={6}
                       value={formData.message}
                       onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 focus-visible:border-cosmic-teal focus-visible:ring-cosmic-teal/20 resize-none"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 focus-visible:border-cosmic-teal focus-visible:ring-cosmic-teal/20 resize-none"
                     />
                   </div>
                   {status === 'error' && (
@@ -291,7 +181,7 @@ function ContactFormSection() {
                   <Button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="w-full bg-cosmic-accent hover:bg-cosmic-accent/90 text-white rounded-xl h-12 text-base font-semibold"
+                    className="w-full bg-cosmic-accent hover:bg-cosmic-accent/90 text-primary-foreground rounded-xl h-12 text-base font-semibold"
                   >
                     {status === 'loading' ? 'Sending...' : <><Send className="w-4 h-4 mr-2" /> Send Message</>}
                   </Button>
@@ -302,34 +192,34 @@ function ContactFormSection() {
 
           {/* Info Cards */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-[#0B1022] border-white/5">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
                 <div className="w-12 h-12 rounded-xl bg-cosmic-teal/10 flex items-center justify-center mb-4">
                   <Mail className="w-6 h-6 text-cosmic-teal" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2 font-heading">Email Us</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2 font-heading">Email Us</h3>
                 <p className="text-cosmic-muted text-sm mb-2">Reach out directly via email</p>
                 <a href="mailto:hello@cosmogov.io" className="text-cosmic-accent hover:text-cosmic-accent/80 text-sm font-medium transition-colors">hello@cosmogov.io</a>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#0B1022] border-white/5">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
                 <div className="w-12 h-12 rounded-xl bg-cosmic-amber/10 flex items-center justify-center mb-4">
                   <Clock className="w-6 h-6 text-cosmic-amber" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2 font-heading">Response Time</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2 font-heading">Response Time</h3>
                 <p className="text-cosmic-muted text-sm mb-2">We typically respond within</p>
                 <span className="text-cosmic-amber font-bold text-lg font-heading">&lt; 24 hours</span>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#0B1022] border-white/5">
+            <Card className="bg-card border-border">
               <CardContent className="p-6">
                 <div className="w-12 h-12 rounded-xl bg-cosmic-violet/10 flex items-center justify-center mb-4">
                   <MapPin className="w-6 h-6 text-cosmic-violet" />
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2 font-heading">Offices</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2 font-heading">Offices</h3>
                 <div className="space-y-2 text-sm text-cosmic-muted">
                   <div className="flex items-center gap-2">
                     <Globe className="w-3.5 h-3.5 text-cosmic-teal" />
@@ -408,9 +298,9 @@ function FAQSection() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between p-5 text-left hover:bg-white/[0.02] transition-colors"
+                className="w-full flex items-center justify-between p-5 text-left hover:bg-foreground/[0.02] transition-colors"
               >
-                <span className="text-sm font-medium text-white pr-4">{faq.q}</span>
+                <span className="text-sm font-medium text-foreground pr-4">{faq.q}</span>
                 {openIndex === i ? (
                   <ChevronUp className="w-4 h-4 text-cosmic-muted flex-shrink-0" />
                 ) : (
@@ -433,10 +323,10 @@ function FAQSection() {
 /* ─── Main Page ─── */
 export default function ContactPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
-      <Starfield />
-      <Navigation />
-      <main className="flex-grow relative z-10">
+    <div className="min-h-screen flex flex-col bg-card">
+
+      <SiteHeader />
+      <main id="main-content" className="flex-grow relative z-10">
         <HeroSection />
         <ContactFormSection />
         <FAQSection />

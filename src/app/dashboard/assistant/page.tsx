@@ -112,7 +112,7 @@ export default function AssistantPage() {
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border ${
               mode === m.id
                 ? `border-${m.color}/30 bg-${m.color}/10 text-${m.color}`
-                : 'border-white/5 text-cosmic-muted hover:text-white hover:border-white/10'
+                : 'border-border text-cosmic-muted hover:text-foreground hover:border-border'
             }`}
             style={mode === m.id ? { borderColor: `var(--color-${m.color})30`, background: `var(--color-${m.color})15`, color: `var(--color-${m.color})` } : {}}
           >
@@ -123,7 +123,7 @@ export default function AssistantPage() {
       </div>
 
       {/* Chat Area */}
-      <Card className="bg-[#0B1022] border-white/5 flex-grow mb-4 overflow-hidden">
+      <Card className="bg-card border-border flex-grow mb-4 overflow-hidden">
         <div ref={scrollRef} className="h-full overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-12">
@@ -135,7 +135,7 @@ export default function AssistantPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg mx-auto">
                 {suggestions.map(q => (
                   <button key={q} onClick={() => setInput(q)}
-                    className="text-xs bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 hover:border-white/10 rounded-xl px-3 py-2.5 text-cosmic-muted hover:text-white transition-all text-left">
+                    className="text-xs bg-foreground/[0.03] hover:bg-foreground/[0.06] border border-border hover:border-border rounded-xl px-3 py-2.5 text-cosmic-muted hover:text-foreground transition-all text-left">
                     <Lightbulb className="w-3 h-3 text-cosmic-amber inline mr-1.5" />{q}
                   </button>
                 ))}
@@ -144,7 +144,7 @@ export default function AssistantPage() {
           )}
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`} style={{ animation: 'slideUp 0.3s ease-out' }}>
-              <div className={`max-w-[85%] rounded-xl p-4 ${msg.role === 'user' ? 'bg-cosmic-accent/10 border border-cosmic-accent/20' : 'bg-white/[0.03] border border-white/5'}`}>
+              <div className={`max-w-[85%] rounded-xl p-4 ${msg.role === 'user' ? 'bg-cosmic-accent/10 border border-cosmic-accent/20' : 'bg-foreground/[0.03] border border-border'}`}>
                 {msg.role === 'assistant' && (
                   <div className="flex items-center gap-1.5 mb-2">
                     <Brain className="w-3 h-3 text-cosmic-teal" />
@@ -153,8 +153,8 @@ export default function AssistantPage() {
                 )}
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 {msg.role === 'assistant' && (
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/5">
-                    <button onClick={() => handleCopy(i, msg.content)} className="text-xs text-cosmic-muted hover:text-white transition-colors">
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
+                    <button onClick={() => handleCopy(i, msg.content)} className="text-xs text-cosmic-muted hover:text-foreground transition-colors">
                       {copied === i ? <><Check className="w-3 h-3 inline mr-1" />Copied</> : <><Copy className="w-3 h-3 inline mr-1" />Copy</>}
                     </button>
                   </div>
@@ -164,7 +164,7 @@ export default function AssistantPage() {
           ))}
           {loading && (
             <div className="flex justify-start" style={{ animation: 'slideUp 0.3s ease-out' }}>
-              <div className="bg-white/[0.03] border border-white/5 rounded-xl p-4">
+              <div className="bg-foreground/[0.03] border border-border rounded-xl p-4">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-cosmic-teal animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -187,12 +187,12 @@ export default function AssistantPage() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
             placeholder={mode === 'chat' ? 'Ask about governance...' : mode === 'proposal_draft' ? 'Describe the proposal you want to create...' : mode === 'analysis' ? 'Ask me to analyze voting data...' : 'Ask for governance coaching...'}
-            className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 resize-none pr-10"
+            className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 resize-none pr-10"
             rows={2}
           />
         </div>
         <Button onClick={handleSend} disabled={!input.trim() || loading}
-          className="bg-cosmic-accent text-white self-end rounded-xl h-10 w-10 p-0">
+          className="bg-cosmic-accent text-primary-foreground self-end rounded-xl h-10 w-10 p-0">
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </Button>
       </div>

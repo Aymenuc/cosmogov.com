@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import Link from 'next/link';
 import {
   Rocket, BookOpen, Code2, Compass, Cpu, Users, Shield,
@@ -58,22 +60,11 @@ const categories = [
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
-      <Starfield />
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg">CosmoGov</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-          <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-        </div>
-      </nav>
+    <div className="min-h-screen flex flex-col bg-card">
 
-      <main className="relative z-10 flex-grow max-w-5xl mx-auto px-6 py-12">
+      <SiteHeader />
+
+      <main id="main-content" className="relative z-10 flex-grow max-w-5xl mx-auto px-6 py-12">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 cosmic-badge rounded-full px-4 py-1.5 mb-6">
             <BookOpen className="w-3.5 h-3.5 text-cosmic-teal" />
@@ -96,7 +87,7 @@ export default function DocsPage() {
               >
                 <cat.icon className="w-6 h-6" style={{ color: cat.accent }} />
               </div>
-              <h2 className="text-lg font-semibold text-white mb-2 font-heading">{cat.title}</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-2 font-heading">{cat.title}</h2>
               <p className="text-cosmic-muted text-sm leading-relaxed mb-4">{cat.description}</p>
               <span className="inline-flex items-center gap-1.5 text-sm font-medium group-hover:gap-2.5 transition-all" style={{ color: cat.accent }}>
                 Explore <ArrowRight className="w-4 h-4" />

@@ -1,14 +1,14 @@
-import type { MetadataRoute } from 'next/server';
+import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'CosmoGov — Cosmic Governance Platform',
+    name: 'Cosmogov — Better decisions, made together',
     short_name: 'CosmoGov',
-    description: 'Interstellar civic OS for participatory democracy, governance, and community engagement',
+    description: 'A shared space for civic participation, community decisions, and visible progress',
     start_url: '/',
     display: 'standalone',
-    background_color: '#04050b',
-    theme_color: '#2D6BFF',
+    background_color: '#f7f8f3',
+    theme_color: '#27634b',
     orientation: 'portrait-primary',
     scope: '/',
     icons: [

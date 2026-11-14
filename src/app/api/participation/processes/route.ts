@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     if (phase) where.currentPhase = phase;
     if (scope) where.scope = scope;
     if (status === 'active') {
-      where.currentPhase = { not: 'closed' };
+      where.currentPhase = phase && phase !== 'closed' ? phase : { not: 'closed' };
       where.isPublic = true;
     } else if (status === 'closed') {
       where.currentPhase = 'closed';

@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import Link from 'next/link';
 import { Rocket, Shield, Database, Lock, UserCheck, Mail } from 'lucide-react';
 import Footer from '@/components/Footer';
@@ -38,22 +40,11 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
-      <Starfield />
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg">CosmoGov</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-          <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-        </div>
-      </nav>
+    <div className="min-h-screen flex flex-col bg-card">
 
-      <main className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
+      <SiteHeader />
+
+      <main id="main-content" className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 cosmic-badge rounded-full px-4 py-1.5 mb-6">
             <Shield className="w-3.5 h-3.5 text-cosmic-teal" />
@@ -75,7 +66,7 @@ export default function PrivacyPage() {
                 <div className="w-10 h-10 rounded-xl bg-cosmic-teal/10 flex items-center justify-center">
                   <section.icon className="w-5 h-5 text-cosmic-teal" />
                 </div>
-                <h2 className="text-xl font-bold text-white font-heading">{section.title}</h2>
+                <h2 className="text-xl font-bold text-foreground font-heading">{section.title}</h2>
               </div>
               <p className="text-cosmic-muted leading-relaxed">{section.content}</p>
             </div>

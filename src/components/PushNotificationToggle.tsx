@@ -120,12 +120,12 @@ export default function PushNotificationToggle() {
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-          subscribed ? 'bg-cosmic-teal/10' : 'bg-white/5'
+          subscribed ? 'bg-cosmic-teal/10' : 'bg-foreground/5'
         }`}>
           <Bell className={`w-4 h-4 ${subscribed ? 'text-cosmic-teal' : 'text-cosmic-muted'}`} />
         </div>
         <div>
-          <p className="text-sm font-medium text-white">Push Notifications</p>
+          <p className="text-sm font-medium text-foreground">Push Notifications</p>
           <p className="text-xs text-cosmic-muted">
             {subscribed
               ? 'You will receive push notifications for important updates'
@@ -141,7 +141,7 @@ export default function PushNotificationToggle() {
         className={
           subscribed
             ? 'text-cosmic-muted hover:text-cosmic-rose'
-            : 'bg-cosmic-teal text-white hover:bg-cosmic-teal/90'
+            : 'bg-cosmic-teal text-foreground hover:bg-cosmic-teal/90'
         }
         onClick={subscribed ? unsubscribe : subscribe}
         disabled={loading || permission === 'denied'}

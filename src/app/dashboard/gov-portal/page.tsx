@@ -171,12 +171,12 @@ function typeBadgeColor(type: string): string {
     binding_referendum: 'border-cosmic-rose/30 text-cosmic-rose bg-cosmic-rose/10',
     citizen_bill: 'border-cosmic-teal/30 text-cosmic-teal bg-cosmic-teal/10',
   };
-  return map[type] || 'border-white/10 text-cosmic-muted bg-white/5';
+  return map[type] || 'border-border text-cosmic-muted bg-foreground/5';
 }
 
 function statusBadgeColor(status: string): string {
   const map: Record<string, string> = {
-    collecting: 'border-white/10 text-cosmic-muted bg-white/5',
+    collecting: 'border-border text-cosmic-muted bg-foreground/5',
     threshold_reached: 'border-cosmic-amber/30 text-cosmic-amber bg-cosmic-amber/10',
     government_review: 'border-cosmic-violet/30 text-cosmic-violet bg-cosmic-violet/10',
     government_response: 'border-cosmic-teal/30 text-cosmic-teal bg-cosmic-teal/10',
@@ -185,13 +185,13 @@ function statusBadgeColor(status: string): string {
     passed: 'border-cosmic-success/30 text-cosmic-success bg-cosmic-success/10',
     enacted: 'border-cosmic-success/30 text-cosmic-success bg-cosmic-success/10',
     rejected: 'border-cosmic-rose/30 text-cosmic-rose bg-cosmic-rose/10',
-    expired: 'border-white/10 text-cosmic-muted bg-white/5',
-    draft: 'border-white/10 text-cosmic-muted bg-white/5',
+    expired: 'border-border text-cosmic-muted bg-foreground/5',
+    draft: 'border-border text-cosmic-muted bg-foreground/5',
     review: 'border-cosmic-violet/30 text-cosmic-violet bg-cosmic-violet/10',
     public_comment: 'border-cosmic-teal/30 text-cosmic-teal bg-cosmic-teal/10',
     amendment: 'border-cosmic-amber/30 text-cosmic-amber bg-cosmic-amber/10',
   };
-  return map[status] || 'border-white/10 text-cosmic-muted bg-white/5';
+  return map[status] || 'border-border text-cosmic-muted bg-foreground/5';
 }
 
 function formatStatus(status: string): string {
@@ -485,7 +485,7 @@ export default function GovPortalPage() {
           <div className="w-20 h-20 rounded-full bg-cosmic-rose/10 flex items-center justify-center mx-auto mb-6">
             <Shield className="w-10 h-10 text-cosmic-rose" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-3 font-heading">
+          <h1 className="text-3xl font-bold text-foreground mb-3 font-heading">
             Access Restricted
           </h1>
           <p className="text-cosmic-muted mb-8 leading-relaxed">
@@ -493,7 +493,7 @@ export default function GovPortalPage() {
             area is reserved for authorized CosmoGov officials only.
           </p>
           <Link href="/dashboard">
-            <Button className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-white rounded-xl px-6">
+            <Button className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-primary-foreground rounded-xl px-6">
               <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
             </Button>
           </Link>
@@ -587,7 +587,7 @@ export default function GovPortalPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-white">
+            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
             </Button>
           </Link>
@@ -609,7 +609,7 @@ export default function GovPortalPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-[#0B1022] border border-white/5 p-1 mb-6 overflow-x-auto flex-nowrap min-w-max h-auto gap-1">
+        <TabsList className="bg-card border border-border p-1 mb-6 overflow-x-auto flex-nowrap min-w-max h-auto gap-1">
           <TabsTrigger
             value="overview"
             className="data-[state=active]:bg-cosmic-teal/10 data-[state=active]:text-cosmic-teal"
@@ -686,7 +686,7 @@ export default function GovPortalPage() {
                   recentInitiatives.map((init) => (
                     <div
                       key={init.id}
-                      className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors"
+                      className="p-3 rounded-xl bg-foreground/[0.02] border border-border hover:border-border transition-colors"
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="min-w-0 flex-grow">
@@ -754,10 +754,10 @@ export default function GovPortalPage() {
                     return (
                       <div
                         key={bp.id}
-                        className={`p-3 rounded-xl bg-white/[0.02] border hover:border-white/10 transition-colors ${
+                        className={`p-3 rounded-xl bg-foreground/[0.02] border hover:border-border transition-colors ${
                           overdue
                             ? 'border-cosmic-rose/30'
-                            : 'border-white/5'
+                            : 'border-border'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2 mb-2">
@@ -836,7 +836,7 @@ export default function GovPortalPage() {
           <div className="glass-card rounded-2xl p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <Select value={initStatus} onValueChange={setInitStatus}>
-                <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-sm">
+                <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -849,14 +849,14 @@ export default function GovPortalPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
                 <Input
                   placeholder="Search initiatives..."
-                  className="pl-9 bg-white/5 border-white/10"
+                  className="pl-9 bg-foreground/5 border-border"
                   value={initSearch}
                   onChange={(e) => setInitSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchInitiatives()}
                 />
               </div>
               <Select value={initSort} onValueChange={setInitSort}>
-                <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-sm">
+                <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -919,7 +919,7 @@ export default function GovPortalPage() {
                         {init.signatureCount}/{init.signatureGoal}
                       </span>
                     </div>
-                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-cosmic-teal to-cosmic-accent rounded-full transition-all duration-700"
                         style={{
@@ -965,7 +965,7 @@ export default function GovPortalPage() {
           <div className="glass-card rounded-2xl p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <Select value={bpStatus} onValueChange={setBpStatus}>
-                <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-sm">
+                <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -979,14 +979,14 @@ export default function GovPortalPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
                 <Input
                   placeholder="Search binding proposals..."
-                  className="pl-9 bg-white/5 border-white/10"
+                  className="pl-9 bg-foreground/5 border-border"
                   value={bpSearch}
                   onChange={(e) => setBpSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchProposals()}
                 />
               </div>
               <Select value={bpSort} onValueChange={setBpSort}>
-                <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-sm">
+                <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1061,7 +1061,7 @@ export default function GovPortalPage() {
                           {bp.signatureCount}/{bp.signatureGoal}
                         </span>
                       </div>
-                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-gradient-to-r from-cosmic-rose to-cosmic-violet rounded-full transition-all duration-700"
                           style={{
@@ -1129,7 +1129,7 @@ export default function GovPortalPage() {
           <div className="glass-card rounded-2xl p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <Select value={legStatus} onValueChange={setLegStatus}>
-                <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-sm">
+                <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1143,7 +1143,7 @@ export default function GovPortalPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
                 <Input
                   placeholder="Search legislation..."
-                  className="pl-9 bg-white/5 border-white/10"
+                  className="pl-9 bg-foreground/5 border-border"
                   value={legSearch}
                   onChange={(e) => setLegSearch(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && fetchLegislation()}
@@ -1197,7 +1197,7 @@ export default function GovPortalPage() {
                           {leg.category && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] border-white/10 text-cosmic-muted"
+                              className="text-[10px] border-border text-cosmic-muted"
                             >
                               {leg.category}
                             </Badge>
@@ -1316,7 +1316,7 @@ export default function GovPortalPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="h-3 bg-white/5 rounded-full overflow-hidden mb-2">
+                  <div className="h-3 bg-foreground/5 rounded-full overflow-hidden mb-2">
                     <div
                       className="h-full bg-gradient-to-r from-cosmic-teal to-cosmic-accent rounded-full transition-all duration-700"
                       style={{ width: `${analytics.initiativeResponseRate}%` }}
@@ -1342,7 +1342,7 @@ export default function GovPortalPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="h-3 bg-white/5 rounded-full overflow-hidden mb-2">
+                  <div className="h-3 bg-foreground/5 rounded-full overflow-hidden mb-2">
                     <div
                       className="h-full bg-gradient-to-r from-cosmic-rose to-cosmic-violet rounded-full transition-all duration-700"
                       style={{ width: `${analytics.bindingResponseRate}%` }}
@@ -1389,7 +1389,7 @@ export default function GovPortalPage() {
                                 {data.responded}/{data.total} responded ({pct}%)
                               </span>
                             </div>
-                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-2 bg-foreground/5 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-gradient-to-r from-cosmic-amber to-cosmic-teal rounded-full transition-all duration-700"
                                 style={{ width: `${pct}%` }}
@@ -1441,7 +1441,7 @@ export default function GovPortalPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <Badge
                                   variant="outline"
-                                  className="text-[10px] border-white/10 text-cosmic-muted capitalize"
+                                  className="text-[10px] border-border text-cosmic-muted capitalize"
                                 >
                                   {formatType(category)}
                                 </Badge>
@@ -1450,7 +1450,7 @@ export default function GovPortalPage() {
                                   %)
                                 </span>
                               </div>
-                              <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                              <div className="h-2 bg-foreground/5 rounded-full overflow-hidden">
                                 <div
                                   className={`h-full bg-gradient-to-r ${grad} rounded-full transition-all duration-700`}
                                   style={{ width: `${pct}%` }}
@@ -1478,7 +1478,7 @@ export default function GovPortalPage() {
           if (!open) closeResponseDialog();
         }}
       >
-        <DialogContent className="glass-card rounded-2xl border-white/10 max-w-lg">
+        <DialogContent className="glass-card rounded-2xl border-border max-w-lg">
           {submitSuccess ? (
             <div className="py-8 text-center" style={{ animation: 'scaleIn 0.3s ease-out' }}>
               <div className="w-16 h-16 rounded-full bg-cosmic-success/10 flex items-center justify-center mx-auto mb-4">
@@ -1511,7 +1511,7 @@ export default function GovPortalPage() {
               {responseDialog.item && (
                 <div className="space-y-4 mt-2">
                   {/* Description preview */}
-                  <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                  <div className="p-3 rounded-lg bg-foreground/[0.02] border border-border">
                     <p className="text-xs text-cosmic-muted line-clamp-3">
                       {responseDialog.item.description}
                     </p>
@@ -1524,7 +1524,7 @@ export default function GovPortalPage() {
                     </label>
                     <Textarea
                       placeholder="Enter the official government response..."
-                      className="bg-white/5 border-white/10 min-h-[120px] resize-y"
+                      className="bg-foreground/5 border-border min-h-[120px] resize-y"
                       value={responseText}
                       onChange={(e) => setResponseText(e.target.value)}
                     />
@@ -1539,7 +1539,7 @@ export default function GovPortalPage() {
                       value={responseStatus}
                       onValueChange={setResponseStatus}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/10">
+                      <SelectTrigger className="bg-foreground/5 border-border">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -1565,7 +1565,7 @@ export default function GovPortalPage() {
                         </label>
                         <Textarea
                           placeholder="Assess the impact of this proposal..."
-                          className="bg-white/5 border-white/10 min-h-[80px] resize-y"
+                          className="bg-foreground/5 border-border min-h-[80px] resize-y"
                           value={impactAssessment}
                           onChange={(e) => setImpactAssessment(e.target.value)}
                         />
@@ -1576,7 +1576,7 @@ export default function GovPortalPage() {
                         </label>
                         <Input
                           placeholder="e.g., Art. 47 Sec. 3"
-                          className="bg-white/5 border-white/10"
+                          className="bg-foreground/5 border-border"
                           value={legalRef}
                           onChange={(e) => setLegalRef(e.target.value)}
                         />
@@ -1587,7 +1587,7 @@ export default function GovPortalPage() {
                         </label>
                         <Input
                           type="datetime-local"
-                          className="bg-white/5 border-white/10"
+                          className="bg-foreground/5 border-border"
                           value={voteDate}
                           onChange={(e) => setVoteDate(e.target.value)}
                         />
@@ -1606,7 +1606,7 @@ export default function GovPortalPage() {
                       Cancel
                     </Button>
                     <Button
-                      className="bg-cosmic-teal hover:bg-cosmic-teal/90 text-white rounded-xl px-6"
+                      className="bg-cosmic-teal hover:bg-cosmic-teal/90 text-foreground rounded-xl px-6"
                       onClick={submitResponse}
                       disabled={submitting || !responseText.trim()}
                     >

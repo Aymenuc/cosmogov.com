@@ -28,7 +28,7 @@ export default function OracleProtocolPage() {
         <h1 className="text-3xl font-bold font-heading mb-2">Oracle Results</h1>
         <div className="text-5xl font-bold font-heading text-gradient mb-2">+{totalXp} XP</div>
         <p className="text-cosmic-muted mb-6">Your predictions earned {totalXp} experience points</p>
-        <Link href="/dashboard/games"><Button className="bg-cosmic-accent text-white">Back to Games</Button></Link>
+        <Link href="/dashboard/games"><Button className="bg-cosmic-accent text-primary-foreground">Back to Games</Button></Link>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function OracleProtocolPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
+      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-cosmic-violet/10 flex items-center justify-center"><Eye className="w-5 h-5 text-cosmic-violet" /></div>
@@ -55,10 +55,10 @@ export default function OracleProtocolPage() {
         <CardContent className="p-6">
           <p className="text-xs text-cosmic-muted mb-2">Prediction {idx + 1} of {PROPOSALS.length}</p>
           <h2 className="text-lg font-semibold font-heading mb-4">{current.title}</h2>
-          <div className="mb-4 p-3 bg-white/5 rounded-lg">
+          <div className="mb-4 p-3 bg-foreground/5 rounded-lg">
             <p className="text-xs text-cosmic-muted mb-1">Community Prediction Odds</p>
             <div className="flex items-center gap-3">
-              <div className="flex-grow h-2 bg-white/5 rounded-full overflow-hidden">
+              <div className="flex-grow h-2 bg-foreground/5 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-cosmic-teal to-cosmic-accent rounded-full" style={{ width: `${current.odds}%` }} />
               </div>
               <span className="text-sm font-medium">{current.odds}% pass</span>
@@ -66,8 +66,8 @@ export default function OracleProtocolPage() {
           </div>
           <p className="text-sm text-cosmic-muted mb-3">Will this proposal pass or fail?</p>
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <button onClick={() => !revealed && setPrediction('pass')} className={`p-3 rounded-xl text-sm font-medium border transition-all ${prediction === 'pass' ? 'border-cosmic-teal/30 bg-cosmic-teal/5 text-cosmic-teal' : 'border-white/5 bg-white/5 text-cosmic-muted hover:border-white/10'}`}>Will Pass</button>
-            <button onClick={() => !revealed && setPrediction('fail')} className={`p-3 rounded-xl text-sm font-medium border transition-all ${prediction === 'fail' ? 'border-cosmic-rose/30 bg-cosmic-rose/5 text-cosmic-rose' : 'border-white/5 bg-white/5 text-cosmic-muted hover:border-white/10'}`}>Will Fail</button>
+            <button onClick={() => !revealed && setPrediction('pass')} className={`p-3 rounded-xl text-sm font-medium border transition-all ${prediction === 'pass' ? 'border-cosmic-teal/30 bg-cosmic-teal/5 text-cosmic-teal' : 'border-border bg-foreground/5 text-cosmic-muted hover:border-border'}`}>Will Pass</button>
+            <button onClick={() => !revealed && setPrediction('fail')} className={`p-3 rounded-xl text-sm font-medium border transition-all ${prediction === 'fail' ? 'border-cosmic-rose/30 bg-cosmic-rose/5 text-cosmic-rose' : 'border-border bg-foreground/5 text-cosmic-muted hover:border-border'}`}>Will Fail</button>
           </div>
           <div className="mb-4">
             <label className="text-xs text-cosmic-muted mb-2 block">Confidence: {confidence}/5</label>
@@ -83,9 +83,9 @@ export default function OracleProtocolPage() {
       </Card>
       <div className="flex justify-center">
         {!revealed ? (
-          <Button onClick={handleReveal} disabled={!prediction} className="bg-cosmic-violet text-white rounded-xl px-8">Reveal Outcome</Button>
+          <Button onClick={handleReveal} disabled={!prediction} className="bg-cosmic-violet text-foreground rounded-xl px-8">Reveal Outcome</Button>
         ) : (
-          <Button onClick={() => { setIdx(prev => prev + 1); setPrediction(null); setRevealed(false); if (idx >= PROPOSALS.length - 1) setFinished(true); }} className="bg-cosmic-accent text-white rounded-xl px-8">
+          <Button onClick={() => { setIdx(prev => prev + 1); setPrediction(null); setRevealed(false); if (idx >= PROPOSALS.length - 1) setFinished(true); }} className="bg-cosmic-accent text-primary-foreground rounded-xl px-8">
             {idx >= PROPOSALS.length - 1 ? 'See Results' : 'Next Prediction'}
           </Button>
         )}

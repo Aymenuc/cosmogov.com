@@ -93,7 +93,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   selection: { label: 'Selection', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20' },
   selected: { label: 'Selected', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20' },
   active: { label: 'Active', color: 'text-cosmic-success bg-cosmic-success/10 border-cosmic-success/20' },
-  completed: { label: 'Completed', color: 'text-cosmic-muted bg-white/5 border-white/10' },
+  completed: { label: 'Completed', color: 'text-cosmic-muted bg-foreground/5 border-border' },
 };
 
 export default function SortitionPage() {
@@ -209,7 +209,7 @@ export default function SortitionPage() {
             <Dices className="w-5 h-5 text-cosmic-violet" />
             <span className="text-cosmic-violet text-sm font-semibold tracking-wider uppercase">Democratic Lottery</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Sortition —{' '}
             <span className="text-gradient-violet">Fair Representation</span>
           </h1>
@@ -250,7 +250,7 @@ export default function SortitionPage() {
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all whitespace-nowrap ${
                 purposeFilter === tab.key
                   ? 'bg-cosmic-violet/20 text-cosmic-violet border-cosmic-violet/30'
-                  : 'bg-white/5 text-cosmic-muted border-white/10 hover:text-white hover:border-white/20'
+                  : 'bg-foreground/5 text-cosmic-muted border-border hover:text-foreground hover:border-border'
               }`}
             >
               {tab.label}
@@ -258,7 +258,7 @@ export default function SortitionPage() {
           ))}
         </div>
         <Button
-          className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90 shrink-0"
+          className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90 shrink-0"
           onClick={() => setCreateDialogOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" /> Create Pool
@@ -273,9 +273,9 @@ export default function SortitionPage() {
       ) : pools.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <Dices className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">No Sortition Pools Yet</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Sortition Pools Yet</h3>
           <p className="text-cosmic-muted text-sm mb-4">Be the first to create a democratic lottery pool for fair representation.</p>
-          <Button className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90" onClick={() => setCreateDialogOpen(true)}>
+          <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Create Pool
           </Button>
         </div>
@@ -301,7 +301,7 @@ export default function SortitionPage() {
                       {statusConfig.label}
                     </Badge>
                   </div>
-                  <h3 className="text-base font-semibold text-white group-hover:text-cosmic-violet transition-colors line-clamp-2">
+                  <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-violet transition-colors line-clamp-2">
                     {pool.name}
                   </h3>
                   <p className="text-xs text-cosmic-muted line-clamp-2 mt-1">
@@ -330,7 +330,7 @@ export default function SortitionPage() {
                   )}
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
                     <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                       <div className="w-5 h-5 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[9px] font-bold text-cosmic-violet">
                         {(pool.creator.name || 'U')[0].toUpperCase()}
@@ -371,11 +371,11 @@ export default function SortitionPage() {
 
       {/* Volunteer Dialog */}
       <Dialog open={volunteerDialogOpen} onOpenChange={setVolunteerDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg">
           {selectedPool && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-white flex items-center gap-2">
+                <DialogTitle className="text-foreground flex items-center gap-2">
                   <Handshake className="w-5 h-5 text-cosmic-violet" />
                   Volunteer for Sortition
                 </DialogTitle>
@@ -387,7 +387,7 @@ export default function SortitionPage() {
               {!volunteered ? (
                 <div className="space-y-4">
                   <div className="glass-card p-4 rounded-xl">
-                    <h3 className="text-white font-semibold mb-1">{selectedPool.name}</h3>
+                    <h3 className="text-foreground font-semibold mb-1">{selectedPool.name}</h3>
                     <p className="text-sm text-cosmic-muted line-clamp-3">{selectedPool.description}</p>
                     <div className="mt-2 flex items-center gap-3 text-xs text-cosmic-muted">
                       <span>{selectedPool.selectionSize} seats</span>
@@ -396,12 +396,12 @@ export default function SortitionPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-white">Demographics (for stratified selection)</h4>
+                    <h4 className="text-sm font-medium text-foreground">Demographics (for stratified selection)</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="text-xs text-cosmic-muted mb-1 block">Age Group</label>
                         <Select value={volunteerForm.ageGroup} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, ageGroup: v }))}>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                          <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
@@ -415,7 +415,7 @@ export default function SortitionPage() {
                       <div>
                         <label className="text-xs text-cosmic-muted mb-1 block">Gender</label>
                         <Select value={volunteerForm.gender} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, gender: v }))}>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                          <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
@@ -431,7 +431,7 @@ export default function SortitionPage() {
                       <label className="text-xs text-cosmic-muted mb-1 block">District / Region</label>
                       <Input
                         placeholder="Your district or region"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                        className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                         value={volunteerForm.district}
                         onChange={(e) => setVolunteerForm((f) => ({ ...f, district: e.target.value }))}
                       />
@@ -440,7 +440,7 @@ export default function SortitionPage() {
                       <label className="text-xs text-cosmic-muted mb-1 block">Occupation</label>
                       <Input
                         placeholder="Your occupation"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                        className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                         value={volunteerForm.occupation}
                         onChange={(e) => setVolunteerForm((f) => ({ ...f, occupation: e.target.value }))}
                       />
@@ -449,7 +449,7 @@ export default function SortitionPage() {
                       <label className="text-xs text-cosmic-muted mb-1 block">Why do you want to participate? (optional)</label>
                       <Textarea
                         placeholder="Share your motivation..."
-                        className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                        className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                         value={volunteerForm.motivation}
                         onChange={(e) => setVolunteerForm((f) => ({ ...f, motivation: e.target.value }))}
                       />
@@ -457,10 +457,10 @@ export default function SortitionPage() {
                   </div>
 
                   <DialogFooter>
-                    <Button variant="ghost" className="text-cosmic-muted hover:text-white" onClick={() => setVolunteerDialogOpen(false)}>
+                    <Button variant="ghost" className="text-cosmic-muted hover:text-foreground" onClick={() => setVolunteerDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90" onClick={handleVolunteer} disabled={volunteering}>
+                    <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90" onClick={handleVolunteer} disabled={volunteering}>
                       {volunteering ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Handshake className="w-4 h-4 mr-2" />}
                       Volunteer
                     </Button>
@@ -471,7 +471,7 @@ export default function SortitionPage() {
                   <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center bg-cosmic-violet/20">
                     <CheckCircle2 className="w-8 h-8 text-cosmic-violet" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">You&apos;ve Volunteered!</h3>
+                  <h3 className="text-lg font-semibold text-foreground">You&apos;ve Volunteered!</h3>
                   <p className="text-cosmic-muted text-sm">
                     Your name is now in the democratic lottery. Selection is random and fair — every volunteer has an equal chance.
                   </p>
@@ -491,9 +491,9 @@ export default function SortitionPage() {
 
       {/* Create Pool Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Zap className="w-5 h-5 text-cosmic-amber" />
               Create Sortition Pool
             </DialogTitle>
@@ -507,7 +507,7 @@ export default function SortitionPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Pool Name *</label>
               <Input
                 placeholder="e.g., Climate Action Citizen Assembly"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={createForm.name}
                 onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
               />
@@ -517,7 +517,7 @@ export default function SortitionPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Description *</label>
               <Textarea
                 placeholder="Describe the purpose and scope of this sortition pool..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[100px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[100px]"
                 value={createForm.description}
                 onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
               />
@@ -527,7 +527,7 @@ export default function SortitionPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Purpose</label>
                 <Select value={createForm.purpose} onValueChange={(v) => setCreateForm((f) => ({ ...f, purpose: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -546,7 +546,7 @@ export default function SortitionPage() {
                   type="number"
                   min={5}
                   max={500}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-border text-foreground"
                   value={createForm.selectionSize}
                   onChange={(e) => setCreateForm((f) => ({ ...f, selectionSize: parseInt(e.target.value) || 25 }))}
                 />
@@ -556,7 +556,7 @@ export default function SortitionPage() {
             <div>
               <label className="text-sm text-cosmic-muted mb-1 block">Selection Method</label>
               <Select value={createForm.selectionMethod} onValueChange={(v) => setCreateForm((f) => ({ ...f, selectionMethod: v }))}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -571,7 +571,7 @@ export default function SortitionPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">Term Starts</label>
                 <Input
                   type="datetime-local"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-border text-foreground"
                   value={createForm.termStartsAt}
                   onChange={(e) => setCreateForm((f) => ({ ...f, termStartsAt: e.target.value }))}
                 />
@@ -580,7 +580,7 @@ export default function SortitionPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">Term Ends</label>
                 <Input
                   type="datetime-local"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-border text-foreground"
                   value={createForm.termEndsAt}
                   onChange={(e) => setCreateForm((f) => ({ ...f, termEndsAt: e.target.value }))}
                 />
@@ -589,11 +589,11 @@ export default function SortitionPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" className="text-cosmic-muted hover:text-white" onClick={() => setCreateDialogOpen(false)}>
+            <Button variant="ghost" className="text-cosmic-muted hover:text-foreground" onClick={() => setCreateDialogOpen(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90"
+              className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90"
               onClick={handleCreate}
               disabled={creating || !createForm.name || !createForm.description}
             >

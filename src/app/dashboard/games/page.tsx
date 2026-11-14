@@ -140,7 +140,7 @@ export default function GamesPage() {
 
       {/* Stats Bar */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-cosmic-amber/10 flex items-center justify-center">
               <Zap className="w-5 h-5 text-cosmic-amber" />
@@ -151,7 +151,7 @@ export default function GamesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-cosmic-teal/10 flex items-center justify-center">
               <Gamepad2 className="w-5 h-5 text-cosmic-teal" />
@@ -162,7 +162,7 @@ export default function GamesPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-cosmic-violet/10 flex items-center justify-center">
               <Trophy className="w-5 h-5 text-cosmic-violet" />
@@ -184,8 +184,8 @@ export default function GamesPage() {
               onClick={() => setSelectedCategory(cat.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all border ${
                 selectedCategory === cat.id
-                  ? 'border-transparent text-white'
-                  : 'border-white/5 bg-transparent text-cosmic-muted hover:text-white hover:border-white/10'
+                  ? 'border-transparent text-foreground'
+                  : 'border-border bg-transparent text-cosmic-muted hover:text-foreground hover:border-border'
               }`}
               style={selectedCategory === cat.id ? { background: `${cat.color}20`, color: cat.color, borderColor: `${cat.color}30` } : {}}
             >
@@ -222,7 +222,7 @@ export default function GamesPage() {
                   key={ag.id}
                   onClick={() => setSelectedAge(ag.id)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                    selectedAge === ag.id ? 'border-cosmic-accent/30 bg-cosmic-accent/10 text-cosmic-accent' : 'border-white/5 text-cosmic-muted hover:text-white'
+                    selectedAge === ag.id ? 'border-cosmic-accent/30 bg-cosmic-accent/10 text-cosmic-accent' : 'border-border text-cosmic-muted hover:text-foreground'
                   }`}
                 >
                   {ag.name}
@@ -240,7 +240,7 @@ export default function GamesPage() {
                   key={tag}
                   onClick={() => toggleInterest(tag)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                    selectedInterests.includes(tag) ? 'border-cosmic-teal/30 bg-cosmic-teal/10 text-cosmic-teal' : 'border-white/5 text-cosmic-muted hover:text-white'
+                    selectedInterests.includes(tag) ? 'border-cosmic-teal/30 bg-cosmic-teal/10 text-cosmic-teal' : 'border-border text-cosmic-muted hover:text-foreground'
                   }`}
                 >
                   {tag}
@@ -260,7 +260,7 @@ export default function GamesPage() {
 
           return (
             <Link key={game.id} href={`/dashboard/games/${game.id}`}>
-              <Card className="bg-[#0B1022] border-white/5 hover:scale-[1.02] transition-all duration-300 cursor-pointer group h-full relative overflow-hidden"
+              <Card className="bg-card border-border hover:scale-[1.02] transition-all duration-300 cursor-pointer group h-full relative overflow-hidden"
                 style={{ borderColor: game.accentBorder }}>
                 <CardContent className="p-6 relative z-10">
                   {/* Animated background glow */}
@@ -290,10 +290,10 @@ export default function GamesPage() {
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
-                    <Badge variant="outline" className="text-[10px] border-white/10 capitalize">
+                    <Badge variant="outline" className="text-[10px] border-border capitalize">
                       {game.difficulty}
                     </Badge>
-                    <Badge variant="outline" className="text-[10px] border-white/10">
+                    <Badge variant="outline" className="text-[10px] border-border">
                       Ages {game.minAge}+
                     </Badge>
                     {catInfo && (
@@ -306,7 +306,7 @@ export default function GamesPage() {
                   {/* Interest tags */}
                   <div className="flex flex-wrap gap-1 mb-3">
                     {game.interests.map(i => (
-                      <span key={i} className="text-[10px] text-cosmic-muted bg-white/5 px-1.5 py-0.5 rounded">{i}</span>
+                      <span key={i} className="text-[10px] text-cosmic-muted bg-foreground/5 px-1.5 py-0.5 rounded">{i}</span>
                     ))}
                   </div>
 

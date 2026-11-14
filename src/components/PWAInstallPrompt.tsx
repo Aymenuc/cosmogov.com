@@ -86,7 +86,7 @@ export default function PWAInstallPrompt() {
         {/* Dismiss button */}
         <button
           onClick={handleDismiss}
-          className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors border border-white/10"
+          className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-foreground/10 hover:bg-foreground/20 flex items-center justify-center transition-colors border border-border"
           aria-label="Dismiss install prompt"
         >
           <X className="w-3 h-3 text-cosmic-muted" />
@@ -94,10 +94,10 @@ export default function PWAInstallPrompt() {
 
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center flex-shrink-0">
-            <Rocket className="w-5 h-5 text-white" />
+            <Rocket className="w-5 h-5 text-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white">Install CosmoGov</p>
+            <p className="text-sm font-semibold text-foreground">Install CosmoGov</p>
             <p className="text-xs text-cosmic-muted mt-0.5">Add to home screen for the full cosmic experience</p>
           </div>
         </div>

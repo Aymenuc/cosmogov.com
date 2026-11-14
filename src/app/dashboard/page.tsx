@@ -1,279 +1,397 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
-  Building2, FileText, Vote, Zap, Plus, Brain, Gamepad2,
-  ArrowRight, Clock, Users, Flame, TrendingUp, Target,
-  Sparkles, Shield, Eye, Search as SearchIcon, Crown,
-  Rocket, Star, Activity, ChevronRight
-} from 'lucide-react';
-
-interface User {
+  ArrowRight,
+  ArrowUpRight,
+  Bookmark,
+  Check,
+  CheckCheck,
+  CircleCheck,
+  Clock,
+  Globe2,
+  Leaf,
+  Plus,
+  Sparkles,
+  Users,
+  Vote,
+  Wallet,
+} from "lucide-react";
+import { useWorkspace } from "@/components/WorkspaceContext";
+import ProposalCard from "@/components/ProposalCard";
+import { type CivicProposal, isOpen } from "@/lib/civic";
+interface Community {
   id: string;
-  name: string | null;
-  email: string;
-  plan: string;
-  role: string;
-  totalXp: number;
-  level: number;
-  streak: number;
+  name: string;
+  slug: string;
+  memberCount: number;
 }
-
-interface Proposal {
-  id: string;
-  title: string;
-  status: string;
-  votingType: string;
-  _count: { votes: number; comments: number };
-  createdAt: string;
-  organization?: { name: string; slug: string } | null;
-}
-
 export default function OverviewPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [orgCount, setOrgCount] = useState(0);
-
+  const { user, saved } = useWorkspace();
+  const [proposals, setProposals] = useState<CivicProposal[]>([]);
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [view, setView] = useState("for-you");
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
-    fetch('/api/auth/me').then(r => r.json()).then(setUser).catch(() => {});
-    fetch('/api/proposals').then(r => r.json()).then(data => { setProposals(Array.isArray(data) ? data.slice(0, 5) : []); }).catch(() => {});
-    fetch('/api/organizations').then(r => r.json()).then(data => { setOrgCount(Array.isArray(data) ? data.length : 0); }).catch(() => {});
-  }, []);
-
-  const xpToNext = (user?.level || 1) * 500;
-  const currentXp = (user?.totalXp || 0) % xpToNext;
-  const xpProgress = (currentXp / xpToNext) * 100;
-
-  const stats = [
-    { label: 'Organizations', value: orgCount, icon: Building2, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10', trend: '+2 this week' },
-    { label: 'Active Proposals', value: proposals.filter(p => p.status === 'active').length, icon: FileText, color: 'text-cosmic-accent', bg: 'bg-cosmic-accent/10', trend: '3 pending vote' },
-    { label: 'Total Votes Cast', value: proposals.reduce((sum, p) => sum + (p._count?.votes || 0), 0), icon: Vote, color: 'text-cosmic-violet', bg: 'bg-cosmic-violet/10', trend: '+5 today' },
-    { label: 'XP Points', value: user?.totalXp || 0, icon: Zap, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10', trend: `Level ${user?.level || 1}` },
-  ];
-
-  const featuredGame = {
-    name: 'Neural Consensus',
-    tagline: 'Converge with the collective mind',
-    icon: Brain,
-    accent: '#2EE6C7',
-    href: '/dashboard/games/neural-consensus',
-  };
-
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+    Promise.all([
+      fetch("/api/proposals").then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      }),
+      fetch("/api/organizations").then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      }),
+    ])
+      .then(([p, c]) => {
+        if (!cancelled) {
+          setProposals(Array.isArray(p) ? p : []);
+          setCommunities(Array.isArray(c) ? c : []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled)
+          setError(
+            "Your community activity couldn’t be loaded. Please try again.",
+          );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retry]);
+  const active = proposals.filter(isOpen);
+  const needsVoice = active.filter(
+    (p) => !p.votes?.some((v) => v.voterId === user?.id),
+  );
+  const following = proposals.filter((p) => saved.includes(p.id));
+  const outcomes = proposals.filter(
+    (p) => p.status === "closed" || (p.status === "active" && !isOpen(p)),
+  );
+  const visible = (
+    view === "following"
+      ? following
+      : view === "outcomes"
+        ? outcomes
+        : needsVoice
+  )
+    .sort((a, b) => {
+      if (isOpen(a) !== isOpen(b)) return isOpen(a) ? -1 : 1;
+      return (
+        (a.closesAt ? new Date(a.closesAt).getTime() : Infinity) -
+        (b.closesAt ? new Date(b.closesAt).getTime() : Infinity)
+      );
+    })
+    .slice(0, 6);
+  const myVotes = proposals.filter((p) =>
+    p.votes?.some((v) => v.voterId === user?.id),
+  ).length;
   return (
-    <div>
-      {/* Welcome Hero */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          {user?.streak && user.streak > 0 && (
-            <div className="flex items-center gap-1 text-xs text-cosmic-amber cosmic-badge rounded-full px-2.5 py-1">
-              <Flame className="w-3 h-3" />
-              <span>{user.streak} day streak!</span>
-            </div>
-          )}
+    <div className="civic-desk">
+      <div className="app-page-heading">
+        <div>
+          <div className="eyebrow">
+            <span className="status-dot" /> YOUR EVERYDAY DEMOCRACY
+          </div>
+          <h1>
+            Your voice belongs here
+            {user?.name ? `, ${user.name.split(" ")[0]}` : ""}.
+          </h1>
+          <p>A small contribution today. A stronger community tomorrow.</p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold font-heading mb-1">
-          Welcome back, <span className="text-gradient">{user?.name || 'Explorer'}</span>
-        </h1>
-        <p className="text-cosmic-muted">Your governance cosmos is thriving. Level {user?.level || 1} — keep climbing.</p>
+        <Link href="/dashboard/proposals/new" className="civic-button">
+          <Plus size={15} />
+          Start an idea
+        </Link>
       </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        {stats.map(s => (
-          <Card key={s.label} className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all group">
-            <CardContent className="p-4">
-              <div className={`w-9 h-9 rounded-lg ${s.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                <s.icon className={`w-4 h-4 ${s.color}`} />
-              </div>
-              <p className="text-2xl font-bold font-heading">{s.value}</p>
-              <p className="text-xs text-cosmic-muted mt-0.5">{s.label}</p>
-              <p className="text-[10px] text-cosmic-teal mt-1">{s.trend}</p>
-            </CardContent>
-          </Card>
+      <section className="desk-welcome">
+        <div className="desk-welcome-copy">
+          <div className="eyebrow">FROM CONVERSATION TO CHANGE</div>
+          <h2>
+            {needsVoice.length > 0
+              ? "The next chapter needs your perspective."
+              : "Good communities start with a conversation."}
+          </h2>
+          <p>
+            {needsVoice.length > 0
+              ? `${needsVoice.length} open ${needsVoice.length === 1 ? "decision is" : "decisions are"} waiting for your voice. Take a moment to explore the ideas shaping your community.`
+              : "Find your people, share something worth discussing, and help shape what comes next."}
+          </p>
+          <Link
+            href={
+              needsVoice.length > 0
+                ? "/dashboard/proposals"
+                : "/dashboard/organizations"
+            }
+            className="text-link"
+          >
+            {needsVoice.length > 0
+              ? "Find a decision that matters to you"
+              : "Find your community"}
+            <ArrowUpRight size={16} />
+          </Link>
+        </div>
+        <div className="desk-welcome-art" aria-hidden="true">
+          <div className="welcome-orbit orbit-one" />
+          <div className="welcome-orbit orbit-two" />
+          <span className="art-circle art-people">
+            <Users />
+          </span>
+          <span className="art-circle art-leaf">
+            <Leaf />
+          </span>
+          <span className="art-circle art-vote">
+            <Vote />
+          </span>
+          <span className="art-center">
+            us<span>together, forward.</span>
+          </span>
+          <span className="art-spark">✳</span>
+        </div>
+      </section>
+      <section
+        className="desk-stats"
+        aria-label="Your participation at a glance"
+      >
+        {[
+          {
+            icon: Vote,
+            label: "Open decisions",
+            value: active.length,
+            note: "Available in your proposal feed",
+          },
+          {
+            icon: CheckCheck,
+            label: "Your contributions",
+            value: myVotes,
+            note: "Proposals you have voted on",
+          },
+          {
+            icon: Users,
+            label: "Your communities",
+            value: communities.length,
+            note: "Places where you belong",
+          },
+          {
+            icon: Bookmark,
+            label: "Following",
+            value: following.length,
+            note: "Saved on this browser",
+          },
+        ].map((stat) => (
+          <div key={stat.label}>
+            <div>
+              <stat.icon size={16} />
+              <span>{stat.label}</span>
+            </div>
+            <strong>{loading ? "—" : stat.value}</strong>
+            <small>{stat.note}</small>
+          </div>
         ))}
-      </div>
-
-      {/* XP Progress + Streak */}
-      <div className="grid lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <Card className="bg-[#0B1022] border-white/5 lg:col-span-2">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold flex items-center gap-2">
-                <Zap className="w-4 h-4 text-cosmic-amber" /> XP Progress
-              </h3>
-              <span className="text-xs text-cosmic-muted">Level {user?.level || 1}</span>
+      </section>
+      <div className="desk-columns">
+        <section className="desk-agenda">
+          <div className="app-section-heading">
+            <div>
+              <h2>Your participation, in focus.</h2>
+              <p>Take part. Stay curious. Keep the thread.</p>
             </div>
-            <div className="mb-2">
-              <div className="flex items-center justify-between text-sm mb-1">
-                <span className="text-cosmic-amber font-bold">{currentXp} XP</span>
-                <span className="text-cosmic-muted">{xpToNext} XP to next level</span>
-              </div>
-              <div className="h-3 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-cosmic-teal via-cosmic-accent to-cosmic-violet rounded-full transition-all duration-700"
-                  style={{ width: `${xpProgress}%` }} />
-              </div>
-            </div>
-            <p className="text-xs text-cosmic-muted">
-              {xpToNext - currentXp} XP needed to reach Level {(user?.level || 1) + 1}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[#0B1022] border-white/5">
-          <CardContent className="p-6">
-            <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
-              <Flame className="w-4 h-4 text-cosmic-amber" /> Daily Streak
-            </h3>
-            <div className="text-center">
-              <div className="text-4xl font-bold font-heading text-gradient-warm mb-1">
-                {user?.streak || 0}
-              </div>
-              <p className="text-xs text-cosmic-muted mb-3">{user?.streak ? 'consecutive days' : 'Start your streak!'}</p>
-              <div className="flex items-center justify-center gap-1">
-                {[...Array(7)].map((_, i) => (
-                  <div key={i} className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                    i < (user?.streak || 0) ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'bg-white/5 text-cosmic-muted/50'
-                  }`}>
-                    {i < (user?.streak || 0) ? <Star className="w-3 h-3" /> : i + 1}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <Link href="/dashboard/proposals/new">
-          <Card className="bg-[#0B1022] border-white/5 hover:border-cosmic-accent/20 transition-all cursor-pointer group h-full">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-cosmic-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Plus className="w-5 h-5 text-cosmic-accent" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Create Proposal</p>
-                <p className="text-xs text-cosmic-muted">Draft a new decision</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/dashboard/games">
-          <Card className="bg-[#0B1022] border-white/5 hover:border-cosmic-amber/20 transition-all cursor-pointer group h-full">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-cosmic-amber/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Gamepad2 className="w-5 h-5 text-cosmic-amber" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Play Games</p>
-                <p className="text-xs text-cosmic-muted">Earn XP with games</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/dashboard/assistant">
-          <Card className="bg-[#0B1022] border-white/5 hover:border-cosmic-teal/20 transition-all cursor-pointer group h-full">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-cosmic-teal/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Brain className="w-5 h-5 text-cosmic-teal" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Ask AI</p>
-                <p className="text-xs text-cosmic-muted">Get governance insights</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/dashboard/organizations">
-          <Card className="bg-[#0B1022] border-white/5 hover:border-cosmic-violet/20 transition-all cursor-pointer group h-full">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-cosmic-violet/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Building2 className="w-5 h-5 text-cosmic-violet" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Join Org</p>
-                <p className="text-xs text-cosmic-muted">Find communities</p>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Featured Game + Recent Proposals */}
-      <div className="grid lg:grid-cols-3 gap-3 sm:gap-6">
-        {/* Featured Game Spotlight */}
-        <Card className="bg-[#0B1022] border-white/5 lg:col-span-1 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-30" style={{
-            background: `radial-gradient(circle at 50% 0%, ${featuredGame.accent}15, transparent 60%)`
-          }} />
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-4 h-4 text-cosmic-amber" />
-              <span className="text-xs font-medium text-cosmic-amber">Featured Game</span>
-            </div>
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto"
-              style={{ background: `${featuredGame.accent}15` }}>
-              <featuredGame.icon className="w-8 h-8" style={{ color: featuredGame.accent }} />
-            </div>
-            <h3 className="text-xl font-bold font-heading text-center mb-1">{featuredGame.name}</h3>
-            <p className="text-xs text-center mb-4" style={{ color: featuredGame.accent }}>{featuredGame.tagline}</p>
-            <Link href={featuredGame.href}>
-              <Button className="w-full rounded-xl text-white" style={{ background: featuredGame.accent }}>
-                <Gamepad2 className="w-4 h-4 mr-2" /> Play Now
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Recent Proposals */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold font-heading">Recent Proposals</h2>
-            <Link href="/dashboard/proposals">
-              <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-white">
-                View All <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
+            <Link className="text-link" href="/dashboard/proposals">
+              See all <ArrowUpRight size={14} />
             </Link>
           </div>
-          <div className="space-y-3">
-            {proposals.length === 0 ? (
-              <Card className="bg-[#0B1022] border-white/5">
-                <CardContent className="p-8 text-center">
-                  <FileText className="w-10 h-10 text-cosmic-muted mx-auto mb-3 opacity-50" />
-                  <p className="text-cosmic-muted">No proposals yet</p>
-                  <Link href="/dashboard/proposals/new">
-                    <Button className="mt-3 bg-cosmic-accent text-white" size="sm">Create your first proposal</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ) : proposals.map(p => (
-              <Link key={p.id} href={`/dashboard/proposals/${p.id}`}>
-                <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all mb-2 cursor-pointer group">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div className="min-w-0 flex-grow">
-                      <p className="text-sm font-medium truncate group-hover:text-cosmic-accent transition-colors">{p.title}</p>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${p.status === 'active' ? 'bg-cosmic-teal/10 text-cosmic-teal' : p.status === 'closed' ? 'bg-cosmic-muted/10 text-cosmic-muted' : 'bg-cosmic-amber/10 text-cosmic-amber'}`}>
-                          {p.status}
-                        </span>
-                        {p.organization && <span className="text-xs text-cosmic-muted">{p.organization.name}</span>}
-                        <span className="text-xs text-cosmic-muted">{p.votingType.replace('_', ' ')}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-cosmic-muted ml-2 sm:ml-4">
-                      <span className="flex items-center gap-1"><Vote className="w-3 h-3" />{p._count?.votes || 0}</span>
-                      <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+          <div
+            className="desk-tabs"
+            role="tablist"
+            aria-label="Your participation feed"
+          >
+            {[
+              {
+                id: "for-you",
+                label: "Needs your voice",
+                count: needsVoice.length,
+              },
+              { id: "following", label: "Following", count: following.length },
+              {
+                id: "outcomes",
+                label: "Closed decisions",
+                count: outcomes.length,
+              },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                id={`desk-${tab.id}`}
+                role="tab"
+                aria-controls="desk-feed"
+                aria-selected={view === tab.id}
+                className={view === tab.id ? "active" : ""}
+                onClick={() => setView(tab.id)}
+              >
+                {tab.label}
+                <span>{tab.count}</span>
+              </button>
             ))}
           </div>
-        </div>
+          <div id="desk-feed" role="tabpanel" aria-labelledby={`desk-${view}`}>
+            {error ? (
+              <div className="empty-state" role="alert">
+                <p>{error}</p>
+                <button
+                  className="civic-button outline"
+                  onClick={() => setRetry((v) => v + 1)}
+                >
+                  Try again
+                </button>
+              </div>
+            ) : loading ? (
+              <div className="proposal-grid">
+                {[0, 1].map((i) => (
+                  <div className="proposal-skeleton" key={i} />
+                ))}
+              </div>
+            ) : visible.length > 0 ? (
+              <div className="proposal-grid">
+                {visible.map((p) => (
+                  <ProposalCard key={p.id} proposal={p} />
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <span className="empty-icon">
+                  {view === "following" ? (
+                    <Bookmark />
+                  ) : view === "outcomes" ? (
+                    <CheckCheck />
+                  ) : (
+                    <Leaf />
+                  )}
+                </span>
+                <h3>
+                  {view === "following"
+                    ? "Keep the ideas you care about close."
+                    : view === "outcomes"
+                      ? "The story continues after a vote."
+                      : "You’re ready for what comes next."}
+                </h3>
+                <p>
+                  {view === "following"
+                    ? "Select the bookmark on any proposal to follow it here. Your list is saved on this browser."
+                    : view === "outcomes"
+                      ? "Closed proposals will appear here. Follow implementation and official responses in Accountability."
+                      : active.length
+                        ? "You have voted on the open proposals in this feed. Explore more ways to participate."
+                        : "There are no open proposals in this feed yet. Start a conversation or explore a community process."}
+                </p>
+                <Link
+                  className="civic-button outline"
+                  href={
+                    view === "outcomes"
+                      ? "/dashboard/participation/accountability"
+                      : view === "following"
+                        ? "/dashboard/proposals"
+                        : "/dashboard/participation"
+                  }
+                >
+                  {view === "outcomes"
+                    ? "Follow community progress"
+                    : view === "following"
+                      ? "Browse proposals"
+                      : "Explore participation"}
+                  <ArrowUpRight size={14} />
+                </Link>
+              </div>
+            )}
+          </div>
+          <p className="feed-note">
+            Showing the latest 50 proposals available in your feed. Following is
+            stored on this browser.
+          </p>
+        </section>
+        <aside className="desk-right">
+          <section className="community-list">
+            <div className="app-section-heading">
+              <h2>Your people.</h2>
+              <Link
+                href="/dashboard/organizations"
+                aria-label="View your communities"
+              >
+                <ArrowUpRight size={15} />
+              </Link>
+            </div>
+            {communities.length > 0 ? (
+              communities.slice(0, 3).map((c) => (
+                <Link href={`/dashboard/organizations/${c.slug}`} key={c.id}>
+                  <span className="community-avatar">{c.name[0]}</span>
+                  <div>
+                    <strong>{c.name}</strong>
+                    <small>{c.memberCount} members</small>
+                  </div>
+                  <ArrowUpRight size={13} />
+                </Link>
+              ))
+            ) : (
+              <div className="community-empty">
+                <Users size={24} />
+                <p>A community makes every idea stronger.</p>
+                <Link href="/dashboard/organizations/new" className="text-link">
+                  Create your first community <Plus size={13} />
+                </Link>
+              </div>
+            )}
+          </section>
+          <section className="ways-to-participate">
+            <div className="eyebrow">FIND YOUR WAY IN</div>
+            <h2>More than a vote.</h2>
+            {[
+              {
+                icon: Wallet,
+                title: "Shape a shared budget",
+                copy: "Put priorities into practice.",
+                href: "/dashboard/participation/budget",
+              },
+              {
+                icon: Users,
+                title: "Join an assembly",
+                copy: "Make space for dialogue.",
+                href: "/dashboard/participation/assemblies",
+              },
+              {
+                icon: Globe2,
+                title: "See the bigger picture",
+                copy: "Discover activity on the map.",
+                href: "/dashboard/cosmic-map",
+              },
+            ].map((item) => (
+              <Link key={item.title} href={item.href}>
+                <span>
+                  <item.icon size={16} />
+                </span>
+                <div>
+                  <strong>{item.title}</strong>
+                  <small>{item.copy}</small>
+                </div>
+                <ArrowUpRight size={13} />
+              </Link>
+            ))}
+          </section>
+          <Link href="/dashboard/assistant" className="desk-ai">
+            <Sparkles size={19} />
+            <div>
+              <h3>A clearer starting point.</h3>
+              <p>Explore an idea with your AI assistant.</p>
+              <span>
+                Think it through <ArrowRight size={13} />
+              </span>
+            </div>
+          </Link>
+        </aside>
       </div>
     </div>
   );

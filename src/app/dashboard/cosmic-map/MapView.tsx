@@ -75,9 +75,9 @@ export default function MapView({
       attributionControl: true,
     });
 
-    // Dark tile layer
+    // Neutral civic basemap
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
         attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
         subdomains: 'abcd',
@@ -199,7 +199,7 @@ export default function MapView({
           <div style="position:relative;width:20px;height:20px;">
             <div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(46,230,199,0.2);animation:markerPulseRing 2s ease-out infinite;"></div>
             <div style="position:absolute;inset:-4px;border-radius:50%;background:rgba(46,230,199,0.3);animation:markerPulseRing 2s ease-out infinite 0.3s;"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#2EE6C7;border:3px solid #04050b;box-shadow:0 0 12px rgba(46,230,199,0.5);"></div>
+            <div style="width:20px;height:20px;border-radius:50%;background:#39765b;border:3px solid #f7f8f3;box-shadow:0 0 12px rgba(46,230,199,0.5);"></div>
           </div>
         `,
         className: '',
@@ -212,7 +212,7 @@ export default function MapView({
         zIndexOffset: 1000,
       })
         .bindPopup(
-          `<div style="padding:8px 12px;font-family:'Inter',system-ui,sans-serif;color:#F2F5FF;">
+          `<div style="padding:8px 12px;font-family:'Inter',system-ui,sans-serif;color:#203b2d;">
             <div style="font-size:13px;font-weight:600;">📍 Your Location</div>
           </div>`,
           { className: 'cosmic-popup', closeButton: false }
@@ -225,7 +225,7 @@ export default function MapView({
     <div
       ref={containerRef}
       className={className || 'w-full h-full'}
-      style={{ background: '#0A0E1A' }}
+      style={{ background: '#eef1e9' }}
     />
   );
 }

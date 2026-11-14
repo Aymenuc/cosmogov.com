@@ -17,7 +17,7 @@ import { MapMarkerData, ActivityType, ACTIVITY_COLORS, ACTIVITY_LABELS } from '.
 const MapView = dynamic(() => import('./MapView'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-[#0A0E1A]">
+    <div className="w-full h-full flex items-center justify-center bg-card">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <div className="w-14 h-14 rounded-full border-2 border-cosmic-teal/20 border-t-cosmic-teal animate-spin" />
@@ -199,9 +199,9 @@ export default function CosmicMapPage() {
         transition={{ duration: 0.5 }}
         className="relative overflow-hidden"
       >
-        <div className="relative z-10 px-4 lg:px-8 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#0A0E1A]/80 border-b border-white/5">
+        <div className="relative z-10 px-4 lg:px-8 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card/80 border-b border-border">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-teal/20 to-cosmic-violet/20 border border-white/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-teal/20 to-cosmic-violet/20 border border-border flex items-center justify-center">
               <Globe className="w-5 h-5 text-cosmic-teal" />
             </div>
             <div>
@@ -213,19 +213,19 @@ export default function CosmicMapPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-foreground/5 border border-border text-xs">
               <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cosmic-teal" />
-              <span className="text-white font-semibold">{stats.totalMarkers}</span>
+              <span className="text-foreground font-semibold">{stats.totalMarkers}</span>
               <span className="text-cosmic-muted">Activities</span>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-foreground/5 border border-border text-xs">
               <Navigation className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cosmic-violet" />
-              <span className="text-white font-semibold">{countryCount}</span>
+              <span className="text-foreground font-semibold">{countryCount}</span>
               <span className="text-cosmic-muted">Countries</span>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-foreground/5 border border-border text-xs">
               <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cosmic-amber" />
-              <span className="text-white font-semibold">{cityCount}</span>
+              <span className="text-foreground font-semibold">{cityCount}</span>
               <span className="text-cosmic-muted">Cities</span>
             </div>
 
@@ -293,7 +293,7 @@ export default function CosmicMapPage() {
           <div className="absolute top-3 right-14 z-[1000] hidden lg:block">
             <Button
               size="sm"
-              className="bg-[#0B1022]/90 text-cosmic-muted hover:text-white border border-white/10 backdrop-blur-sm h-8 w-8 p-0"
+              className="bg-card/90 text-cosmic-muted hover:text-foreground border border-border backdrop-blur-sm h-8 w-8 p-0"
               variant="outline"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
@@ -308,7 +308,7 @@ export default function CosmicMapPage() {
               className={`backdrop-blur-sm h-9 px-3 text-xs font-medium ${
                 mobileView === 'map'
                   ? 'bg-cosmic-teal/20 text-cosmic-teal border-cosmic-teal/30'
-                  : 'bg-[#0B1022]/90 text-cosmic-muted border-white/10'
+                  : 'bg-card/90 text-cosmic-muted border-border'
               } border`}
               variant="outline"
               onClick={() => setMobileView('map')}
@@ -320,7 +320,7 @@ export default function CosmicMapPage() {
               className={`backdrop-blur-sm h-9 px-3 text-xs font-medium ${
                 mobileView === 'list'
                   ? 'bg-cosmic-teal/20 text-cosmic-teal border-cosmic-teal/30'
-                  : 'bg-[#0B1022]/90 text-cosmic-muted border-white/10'
+                  : 'bg-card/90 text-cosmic-muted border-border'
               } border`}
               variant="outline"
               onClick={() => setMobileView('list')}
@@ -338,7 +338,7 @@ export default function CosmicMapPage() {
               animate={{ width: 360, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className={`hidden lg:block border-l border-white/5 bg-[#0A0E1A]/95 backdrop-blur-xl overflow-hidden flex-shrink-0`}
+              className={`hidden lg:block border-l border-border bg-card/95 backdrop-blur-xl overflow-hidden flex-shrink-0`}
             >
               <div className="p-4 h-full overflow-hidden">
                 <MapSidebar
@@ -363,14 +363,14 @@ export default function CosmicMapPage() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="fixed inset-0 top-14 z-50 lg:hidden bg-[#0A0E1A]/98 backdrop-blur-xl"
+              className="fixed inset-0 top-14 z-50 lg:hidden bg-card/98 backdrop-blur-xl"
             >
               <div className="h-full p-4 overflow-hidden flex flex-col">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold font-heading text-white">Activities</h2>
+                  <h2 className="text-lg font-bold font-heading text-foreground">Activities</h2>
                   <Button
                     size="sm"
-                    className="text-cosmic-muted hover:text-white h-8 w-8 p-0"
+                    className="text-cosmic-muted hover:text-foreground h-8 w-8 p-0"
                     variant="ghost"
                     onClick={() => setMobileView('map')}
                   >
@@ -424,8 +424,8 @@ function LayerControls({
     <div className="relative">
       <Button
         size="sm"
-        className={`bg-[#0B1022]/90 backdrop-blur-sm border text-xs font-medium h-8 px-2.5 gap-1.5 ${
-          open ? 'text-cosmic-teal border-cosmic-teal/30' : 'text-cosmic-muted border-white/10 hover:text-white'
+        className={`bg-card/90 backdrop-blur-sm border text-xs font-medium h-8 px-2.5 gap-1.5 ${
+          open ? 'text-cosmic-teal border-cosmic-teal/30' : 'text-cosmic-muted border-border hover:text-foreground'
         }`}
         variant="outline"
         onClick={() => setOpen(!open)}
@@ -453,7 +453,7 @@ function LayerControls({
                 <button
                   key={type}
                   onClick={() => onToggleType(type)}
-                  className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors text-left"
                 >
                   <div
                     className="w-4 h-4 rounded border-2 flex items-center justify-center transition-all"

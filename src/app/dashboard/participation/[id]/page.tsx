@@ -122,15 +122,15 @@ const PHASE_LABELS: Record<string, string> = {
 };
 const PHASE_COLORS: Record<string, string> = {
   information: 'text-cosmic-amber', proposal: 'text-cosmic-teal', deliberation: 'text-cosmic-violet',
-  voting: 'text-cosmic-accent', implementation: 'text-cosmic-amber', evaluation: 'text-cosmic-success', closed: 'text-white/30',
+  voting: 'text-cosmic-accent', implementation: 'text-cosmic-amber', evaluation: 'text-cosmic-success', closed: 'text-foreground/30',
 };
 const PHASE_BG: Record<string, string> = {
   information: 'bg-cosmic-amber', proposal: 'bg-cosmic-teal', deliberation: 'bg-cosmic-violet',
-  voting: 'bg-cosmic-accent', implementation: 'bg-cosmic-amber', evaluation: 'bg-cosmic-success', closed: 'bg-white/20',
+  voting: 'bg-cosmic-accent', implementation: 'bg-cosmic-amber', evaluation: 'bg-cosmic-success', closed: 'bg-foreground/20',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-white/20', in_progress: 'bg-cosmic-accent', completed: 'bg-cosmic-success', delayed: 'bg-cosmic-rose', cancelled: 'bg-white/10',
+  pending: 'bg-foreground/20', in_progress: 'bg-cosmic-accent', completed: 'bg-cosmic-success', delayed: 'bg-cosmic-rose', cancelled: 'bg-foreground/10',
 };
 
 function formatCurrency(cents: number, currency: string = 'USD') {
@@ -162,7 +162,7 @@ export default function ProcessDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [endorsingId, setEndorsingId] = useState<string | null>(null);
   const [expandedProposal, setExpandedProposal] = useState<string | null>(null);
-  const [comments, setComments] = useState<Record<string, Comment[]>>({});
+  const [comments, setComments] = useState<Record<string, { id: string; content: string; createdAt: string; author: { name: string | null } }[]>>({});
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -289,15 +289,15 @@ export default function ProcessDetailPage() {
                 {PHASE_LABELS[process.currentPhase]}
               </Badge>
               {process.organization && (
-                <Badge className="bg-white/5 text-cosmic-muted border border-white/10 text-[10px]">
+                <Badge className="bg-foreground/5 text-cosmic-muted border border-border text-[10px]">
                   <Building2 className="w-3 h-3 mr-1" /> {process.organization.name}
                 </Badge>
               )}
-              <Badge variant="outline" className="text-[10px] border-white/10 text-cosmic-muted capitalize">
+              <Badge variant="outline" className="text-[10px] border-border text-cosmic-muted capitalize">
                 <Globe2 className="w-3 h-3 mr-1" /> {process.scope}
               </Badge>
             </div>
-            <h1 className="font-heading text-2xl lg:text-3xl font-bold text-white mb-2">{process.title}</h1>
+            <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">{process.title}</h1>
             <p className="text-cosmic-muted text-sm max-w-3xl">{process.description}</p>
 
             {/* Meta */}
@@ -326,22 +326,22 @@ export default function ProcessDetailPage() {
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all ${
                         isActive ? 'border-cosmic-teal bg-cosmic-teal/20 glow-teal' :
                         isCompleted ? 'border-cosmic-teal/50 bg-cosmic-teal/10' :
-                        'border-white/10 bg-white/5'
+                        'border-border bg-foreground/5'
                       }`}>
                         {isCompleted ? (
                           <CheckCircle2 className="w-4 h-4 text-cosmic-teal" />
                         ) : isActive ? (
                           <Orbit className="w-3.5 h-3.5 text-cosmic-teal" />
                         ) : (
-                          <Circle className="w-3.5 h-3.5 text-white/20" />
+                          <Circle className="w-3.5 h-3.5 text-foreground/20" />
                         )}
                       </div>
                       {idx < phases.filter((p: {id: string}) => p.id !== 'closed').length - 1 && (
-                        <div className={`w-0.5 h-6 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-white/10'}`} />
+                        <div className={`w-0.5 h-6 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-foreground/10'}`} />
                       )}
                     </div>
                     <div className="pt-0.5">
-                      <p className={`text-sm font-medium ${isActive ? 'text-cosmic-teal' : isCompleted ? 'text-white/70' : 'text-white/30'}`}>
+                      <p className={`text-sm font-medium ${isActive ? 'text-cosmic-teal' : isCompleted ? 'text-foreground/70' : 'text-foreground/30'}`}>
                         {phase.name}
                       </p>
                     </div>
@@ -355,7 +355,7 @@ export default function ProcessDetailPage() {
 
       {/* Tab Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-white/5 border border-white/10 p-1 h-auto">
+        <TabsList className="bg-foreground/5 border border-border p-1 h-auto">
           <TabsTrigger value="proposals" className="data-[state=active]:bg-cosmic-teal/10 data-[state=active]:text-cosmic-teal text-cosmic-muted text-xs">
             <FileText className="w-3.5 h-3.5 mr-1.5" /> Proposals ({process.processProposals.length})
           </TabsTrigger>
@@ -373,11 +373,11 @@ export default function ProcessDetailPage() {
         {/* Proposals Tab */}
         <TabsContent value="proposals" className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg font-bold text-white">Community Proposals</h2>
+            <h2 className="font-heading text-lg font-bold text-foreground">Community Proposals</h2>
             {process.allowProposals && process.currentPhase !== 'closed' && (
               <Button
                 onClick={() => setShowNewProposal(!showNewProposal)}
-                className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90 text-sm"
+                className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90 text-sm"
               >
                 <Plus className="w-4 h-4 mr-1.5" /> New Proposal
               </Button>
@@ -388,16 +388,16 @@ export default function ProcessDetailPage() {
           {showNewProposal && (
             <Card className="glass-card-teal rounded-2xl">
               <CardContent className="p-6 space-y-4">
-                <h3 className="font-heading font-semibold text-white">Submit a Proposal</h3>
+                <h3 className="font-heading font-semibold text-foreground">Submit a Proposal</h3>
                 <Input
                   placeholder="Proposal title"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                   value={newProposal.title}
                   onChange={(e) => setNewProposal(p => ({ ...p, title: e.target.value }))}
                 />
                 <Textarea
                   placeholder="Describe your proposal in detail..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[120px]"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[120px]"
                   value={newProposal.description}
                   onChange={(e) => setNewProposal(p => ({ ...p, description: e.target.value }))}
                 />
@@ -405,14 +405,14 @@ export default function ProcessDetailPage() {
                   <Input
                     placeholder="Budget requested (optional)"
                     type="number"
-                    className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                    className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                     value={newProposal.budgetRequested}
                     onChange={(e) => setNewProposal(p => ({ ...p, budgetRequested: e.target.value }))}
                   />
                   <Button
                     onClick={handleCreateProposal}
                     disabled={submitting || !newProposal.title || !newProposal.description}
-                    className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90"
+                    className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90"
                   >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 mr-1.5" />}
                     Submit Proposal
@@ -426,7 +426,7 @@ export default function ProcessDetailPage() {
           {process.processProposals.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <FileText className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">No Proposals Yet</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No Proposals Yet</h3>
               <p className="text-cosmic-muted text-sm">Be the first to submit a proposal for this process.</p>
             </div>
           ) : (
@@ -464,12 +464,12 @@ export default function ProcessDetailPage() {
                         {/* Content */}
                         <div className="flex-grow min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-sm font-semibold text-white">{proposal.title}</h3>
+                            <h3 className="text-sm font-semibold text-foreground">{proposal.title}</h3>
                             <Badge className={`text-[9px] ${
                               proposal.status === 'published' ? 'bg-cosmic-teal/10 text-cosmic-teal border-cosmic-teal/20' :
                               proposal.status === 'accepted' ? 'bg-cosmic-success/10 text-cosmic-success border-cosmic-success/20' :
                               proposal.status === 'rejected' ? 'bg-cosmic-rose/10 text-cosmic-rose border-cosmic-rose/20' :
-                              'bg-white/5 text-cosmic-muted border-white/10'
+                              'bg-foreground/5 text-cosmic-muted border-border'
                             } border capitalize`}>
                               {proposal.status}
                             </Badge>
@@ -477,7 +477,7 @@ export default function ProcessDetailPage() {
 
                           {/* Support bar */}
                           <div className="flex items-center gap-2 mb-2">
-                            <div className="flex-grow h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="flex-grow h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                               <div className="h-full bg-gradient-to-r from-cosmic-teal to-cosmic-teal/60 rounded-full transition-all duration-700" style={{ width: `${supportPct}%` }} />
                             </div>
                             <span className="text-[10px] text-cosmic-muted">{supportPct}% support</span>
@@ -510,13 +510,13 @@ export default function ProcessDetailPage() {
 
                           {/* Expanded content */}
                           {isExpanded && (
-                            <div className="mt-3 pt-3 border-t border-white/5 space-y-3">
+                            <div className="mt-3 pt-3 border-t border-border space-y-3">
                               <p className="text-sm text-cosmic-muted">{proposal.description}</p>
 
                               {/* Comments */}
                               <div className="space-y-2">
                                 {(comments[proposal.id] || []).map((c: { id: string; content: string; createdAt: string; author: { name: string | null } }) => (
-                                  <div key={c.id} className="bg-white/3 rounded-lg p-3">
+                                  <div key={c.id} className="bg-foreground/3 rounded-lg p-3">
                                     <div className="flex items-center gap-2 mb-1">
                                       <div className="w-5 h-5 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[9px] font-bold text-cosmic-violet">
                                         {(c.author.name || 'A')[0].toUpperCase()}
@@ -530,7 +530,7 @@ export default function ProcessDetailPage() {
                                 <div className="flex gap-2">
                                   <Input
                                     placeholder="Write a comment..."
-                                    className="bg-white/5 border-white/10 text-white text-xs placeholder:text-cosmic-muted/50"
+                                    className="bg-foreground/5 border-border text-foreground text-xs placeholder:text-cosmic-muted/50"
                                     value={commentInputs[proposal.id] || ''}
                                     onChange={(e) => setCommentInputs(prev => ({ ...prev, [proposal.id]: e.target.value }))}
                                     onKeyDown={(e) => { if (e.key === 'Enter') handleSubmitComment(proposal.id); }}
@@ -555,7 +555,7 @@ export default function ProcessDetailPage() {
         {/* Budget Tab */}
         <TabsContent value="budget" className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg font-bold text-white">Budget Projects</h2>
+            <h2 className="font-heading text-lg font-bold text-foreground">Budget Projects</h2>
             {process.totalBudget > 0 && (
               <div className="glass-card-amber px-4 py-2 rounded-xl">
                 <div className="text-xs text-cosmic-amber">Total Budget</div>
@@ -567,7 +567,7 @@ export default function ProcessDetailPage() {
           {process.budgetProjects.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <Wallet className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">No Budget Projects</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No Budget Projects</h3>
               <p className="text-cosmic-muted text-sm">Budget projects will appear here when proposed.</p>
             </div>
           ) : (
@@ -576,12 +576,12 @@ export default function ProcessDetailPage() {
                 <Card key={project.id} className="glass-card-amber rounded-xl">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-start justify-between">
-                      <h3 className="text-sm font-semibold text-white">{project.title}</h3>
+                      <h3 className="text-sm font-semibold text-foreground">{project.title}</h3>
                       <Badge className={`text-[9px] border ${
                         project.status === 'approved' ? 'bg-cosmic-success/10 text-cosmic-success border-cosmic-success/20' :
                         project.status === 'implementing' ? 'bg-cosmic-amber/10 text-cosmic-amber border-cosmic-amber/20' :
                         project.status === 'completed' ? 'bg-cosmic-teal/10 text-cosmic-teal border-cosmic-teal/20' :
-                        'bg-white/5 text-cosmic-muted border-white/10'
+                        'bg-foreground/5 text-cosmic-muted border-border'
                       } capitalize`}>
                         {project.status}
                       </Badge>
@@ -601,13 +601,13 @@ export default function ProcessDetailPage() {
 
         {/* Accountability Tab */}
         <TabsContent value="accountability" className="mt-4 space-y-4">
-          <h2 className="font-heading text-lg font-bold text-white flex items-center gap-2">
+          <h2 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
             <Eye className="w-5 h-5 text-cosmic-violet" /> Implementation Tracking
           </h2>
           {process.milestones.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <Eye className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">No Milestones Yet</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No Milestones Yet</h3>
               <p className="text-cosmic-muted text-sm">Milestones will be added as proposals are implemented.</p>
             </div>
           ) : (
@@ -618,7 +618,7 @@ export default function ProcessDetailPage() {
                     <div className="flex items-center gap-3">
                       <div className={`w-3 h-3 rounded-full ${STATUS_COLORS[milestone.status]} flex-shrink-0`} />
                       <div className="flex-grow min-w-0">
-                        <h4 className="text-sm font-medium text-white">{milestone.title}</h4>
+                        <h4 className="text-sm font-medium text-foreground">{milestone.title}</h4>
                         <div className="flex items-center gap-3 mt-1 text-xs text-cosmic-muted">
                           <span className="capitalize">{milestone.status.replace('_', ' ')}</span>
                           {milestone.dueDate && (
@@ -643,36 +643,36 @@ export default function ProcessDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card className="glass-card rounded-2xl">
               <CardHeader className="pb-2">
-                <h3 className="font-heading font-semibold text-white">About This Process</h3>
+                <h3 className="font-heading font-semibold text-foreground">About This Process</h3>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-cosmic-muted">{process.description}</p>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Scope</span><span className="text-white capitalize">{process.scope}</span></div>
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Category</span><span className="text-white capitalize">{(process.category || 'General').replace('_', ' ')}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Scope</span><span className="text-foreground capitalize">{process.scope}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Category</span><span className="text-foreground capitalize">{(process.category || 'General').replace('_', ' ')}</span></div>
                   <div className="flex justify-between"><span className="text-cosmic-muted">Current Phase</span><span className={PHASE_COLORS[process.currentPhase]}>{PHASE_LABELS[process.currentPhase]}</span></div>
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Created</span><span className="text-white">{new Date(process.createdAt).toLocaleDateString()}</span></div>
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Organizer</span><span className="text-white">{process.creator.name || 'Unknown'}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Created</span><span className="text-foreground">{new Date(process.createdAt).toLocaleDateString()}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Organizer</span><span className="text-foreground">{process.creator.name || 'Unknown'}</span></div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="glass-card rounded-2xl">
               <CardHeader className="pb-2">
-                <h3 className="font-heading font-semibold text-white">Process Rules</h3>
+                <h3 className="font-heading font-semibold text-foreground">Process Rules</h3>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2 text-sm">
                   {process.allowProposals ? <CheckCircle2 className="w-4 h-4 text-cosmic-success" /> : <AlertCircle className="w-4 h-4 text-cosmic-rose" />}
-                  <span className={process.allowProposals ? 'text-white' : 'text-cosmic-muted'}>Proposal submission {process.allowProposals ? 'enabled' : 'disabled'}</span>
+                  <span className={process.allowProposals ? 'text-foreground' : 'text-cosmic-muted'}>Proposal submission {process.allowProposals ? 'enabled' : 'disabled'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   {process.allowComments ? <CheckCircle2 className="w-4 h-4 text-cosmic-success" /> : <AlertCircle className="w-4 h-4 text-cosmic-rose" />}
-                  <span className={process.allowComments ? 'text-white' : 'text-cosmic-muted'}>Comments {process.allowComments ? 'enabled' : 'disabled'}</span>
+                  <span className={process.allowComments ? 'text-foreground' : 'text-cosmic-muted'}>Comments {process.allowComments ? 'enabled' : 'disabled'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   {process.isPublic ? <CheckCircle2 className="w-4 h-4 text-cosmic-success" /> : <AlertCircle className="w-4 h-4 text-cosmic-amber" />}
-                  <span className={process.isPublic ? 'text-white' : 'text-cosmic-muted'}>Process is {process.isPublic ? 'public' : 'private'}</span>
+                  <span className={process.isPublic ? 'text-foreground' : 'text-cosmic-muted'}>Process is {process.isPublic ? 'public' : 'private'}</span>
                 </div>
               </CardContent>
             </Card>

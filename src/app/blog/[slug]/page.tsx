@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Rocket, Calendar, ArrowLeft, User } from 'lucide-react';
@@ -104,22 +106,11 @@ export default function BlogArticlePage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#04050b]">
-        <Starfield />
-        <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-              <Rocket className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-heading font-bold text-lg">CosmoGov</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-            <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-          </div>
-        </nav>
+      <div className="min-h-screen flex flex-col bg-card">
 
-        <main className="relative z-10 flex-grow flex items-center justify-center px-6">
+        <SiteHeader />
+
+        <main id="main-content" className="relative z-10 flex-grow flex items-center justify-center px-6">
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold font-heading mb-4">Post Not Found</h1>
             <p className="text-cosmic-muted text-lg mb-8">The article you&apos;re looking for doesn&apos;t exist or has been moved.</p>
@@ -139,26 +130,15 @@ export default function BlogArticlePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
-      <Starfield />
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg">CosmoGov</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-          <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-        </div>
-      </nav>
+    <div className="min-h-screen flex flex-col bg-card">
+
+      <SiteHeader />
 
       <main className="relative z-10 flex-grow max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Back link */}
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1.5 text-cosmic-muted hover:text-white transition-colors text-sm mb-8 group"
+          className="inline-flex items-center gap-1.5 text-cosmic-muted hover:text-foreground transition-colors text-sm mb-8 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Back to Blog
@@ -187,17 +167,17 @@ export default function BlogArticlePage() {
 
         {/* Author info */}
         <div className="mt-8 flex items-center gap-4 glass-card p-5 rounded-xl">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cosmic-teal/30 to-cosmic-violet/30 border border-white/10 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cosmic-teal/30 to-cosmic-violet/30 border border-border flex items-center justify-center shrink-0">
             <User className="w-5 h-5 text-cosmic-muted" />
           </div>
           <div>
-            <p className="text-white font-medium text-sm">CosmoGov Team</p>
+            <p className="text-foreground font-medium text-sm">CosmoGov Team</p>
             <p className="text-cosmic-muted text-xs">Building interstellar civic infrastructure</p>
           </div>
         </div>
 
         {/* Bottom back link */}
-        <div className="mt-10 pt-8 border-t border-white/5">
+        <div className="mt-10 pt-8 border-t border-border">
           <Link
             href="/blog"
             className={`inline-flex items-center gap-2 ${accentTextMap[post.accent]} hover:opacity-80 transition-opacity font-medium`}

@@ -229,7 +229,7 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
   }, []);
 
   return (
-    <div className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-white/5" style={{ background: '#04050b' }}>
+    <div className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-border" style={{ background: '#04050b' }}>
       <canvas ref={canvasRef} className="w-full" style={{ height: '260px' }} />
       <div className="absolute bottom-4 left-4 flex flex-wrap items-center gap-2 sm:gap-3">
         <div className="flex items-center gap-1.5">
@@ -317,7 +317,7 @@ export default function PulsePage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-white">
+            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
             </Button>
           </Link>
@@ -340,7 +340,7 @@ export default function PulsePage() {
 
       {/* Sentiment Indicator Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${data.sentiment.moodColor}15` }}>
@@ -354,7 +354,7 @@ export default function PulsePage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="w-8 h-8 rounded-lg bg-cosmic-violet/10 flex items-center justify-center mb-2">
               <FileText className="w-4 h-4 text-cosmic-violet" />
@@ -364,7 +364,7 @@ export default function PulsePage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="w-8 h-8 rounded-lg bg-cosmic-amber/10 flex items-center justify-center mb-2">
               <Zap className="w-4 h-4 text-cosmic-amber" />
@@ -374,7 +374,7 @@ export default function PulsePage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="w-8 h-8 rounded-lg bg-cosmic-teal/10 flex items-center justify-center mb-2">
               <Users className="w-4 h-4 text-cosmic-teal" />
@@ -387,7 +387,7 @@ export default function PulsePage() {
 
       <div className="grid lg:grid-cols-3 gap-3 sm:gap-6">
         {/* Live Activity Feed */}
-        <Card className="bg-[#0B1022] border-white/5 lg:col-span-2">
+        <Card className="bg-card border-border lg:col-span-2">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold font-heading mb-4 flex items-center gap-2">
               <Activity className="w-5 h-5 text-cosmic-teal" /> Live Activity Feed
@@ -399,16 +399,16 @@ export default function PulsePage() {
                 return (
                   <div
                     key={event.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-foreground/[0.02] border border-border hover:bg-foreground/[0.04] transition-colors"
                     style={{ animation: `slideUp 0.3s ease-out ${i * 0.05}s both` }}
                   >
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${color}15` }}>
                       <EventIcon className="w-4 h-4" style={{ color }} />
                     </div>
                     <div className="min-w-0 flex-grow">
-                      <p className="text-sm text-white">{event.description}</p>
+                      <p className="text-sm text-foreground">{event.description}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-[10px] border-white/10" style={{ color }}>
+                        <Badge variant="outline" className="text-[10px] border-border" style={{ color }}>
                           {event.detail}
                         </Badge>
                         <span className="text-[10px] text-cosmic-muted">
@@ -430,7 +430,7 @@ export default function PulsePage() {
         </Card>
 
         {/* Active Proposals Sidebar */}
-        <Card className="bg-[#0B1022] border-white/5">
+        <Card className="bg-card border-border">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold font-heading mb-4 flex items-center gap-2">
               <FileText className="w-5 h-5 text-cosmic-amber" /> Active Proposals
@@ -438,8 +438,8 @@ export default function PulsePage() {
             <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
               {data.proposals.map(p => (
                 <Link key={p.id} href={`/dashboard/proposals/${p.id}`}>
-                  <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors cursor-pointer mb-2">
-                    <p className="text-sm font-medium text-white mb-1 line-clamp-2">{p.title}</p>
+                  <div className="p-3 rounded-lg bg-foreground/[0.02] border border-border hover:bg-foreground/[0.04] transition-colors cursor-pointer mb-2">
+                    <p className="text-sm font-medium text-foreground mb-1 line-clamp-2">{p.title}</p>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-[10px] border-cosmic-teal/20 text-cosmic-teal">{p.status}</Badge>
                       <span className="text-[10px] text-cosmic-muted">{p.voteCount} votes</span>
