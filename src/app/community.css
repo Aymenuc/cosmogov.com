@@ -71,7 +71,7 @@
   background: var(--community-peach);
   color: #8b382b;
   border-radius: 100px;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 .hero-copy h1 {
@@ -151,7 +151,7 @@ h2 em,
   left: 17px;
   transform: rotate(-5deg);
   color: #514460;
-  font-size: 11px;
+  font-size: 12px;
 }
 .orbit-label svg {
   color: var(--civic-accent);
@@ -378,7 +378,7 @@ h2 em,
 }
 .desk-welcome .eyebrow {
   color: #7044a1;
-  font-size: 9px;
+  font-size: 12px;
 }
 .desk-welcome h2 {
   font-weight: 800;
@@ -418,7 +418,7 @@ h2 em,
   background: #ffcf4d;
   border-radius: 100px;
   transform: rotate(-4deg);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
   color: #3d2a42;
 }
@@ -472,7 +472,7 @@ h2 em,
   padding: 9px 12px;
   margin: 0;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .desk-tabs button.active {
   color: #5932c4;
@@ -698,7 +698,7 @@ h2 em,
     font-size: 15px;
   }
   .hero-copy > .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
   }
   .hero-actions {
     gap: 22px;
@@ -762,7 +762,7 @@ h2 em,
   .desk-art-label {
     bottom: 9px;
     right: 17px;
-    font-size: 9px;
+    font-size: 12px;
   }
   .desk-stats {
     gap: 10px;
@@ -771,7 +771,7 @@ h2 em,
     padding: 16px;
   }
   .desk-stats > div > div {
-    font-size: 11px;
+    font-size: 12px;
   }
   .desk-stats strong {
     font-size: 30px;

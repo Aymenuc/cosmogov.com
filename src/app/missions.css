@@ -83,7 +83,7 @@
   color: #70627f;
 }
 .mission-header .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-orb {
   width: 8px;
@@ -98,7 +98,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 10px 24px;
-  font-size: 11px;
+  font-size: 12px;
   color: #786c85;
   margin-top: 21px;
 }
@@ -167,7 +167,7 @@
   padding: 2px 6px;
   background: #e8ddff;
   color: #6741d9;
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-workbench {
   display: grid;
@@ -181,12 +181,12 @@
   min-width: 0;
 }
 .mission-team > .eyebrow {
-  font-size: 9px;
+  font-size: 12px;
   color: #766387;
   margin: 4px 0 8px;
 }
 .mission-team > p {
-  font-size: 11px;
+  font-size: 12px;
   color: #796d83;
   margin-bottom: 20px;
 }
@@ -248,7 +248,7 @@
 }
 .mission-agent small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #796b85;
   margin-top: 4px;
   line-height: 1.5;
@@ -256,7 +256,7 @@
 .mission-agent-number {
   margin-left: auto;
   color: #856b9d;
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-team-note {
   display: flex;
@@ -269,7 +269,7 @@
   color: #6c5884;
 }
 .mission-team-note p {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.85;
 }
 .mission-add-context {
@@ -277,7 +277,7 @@
   align-items: flex-start;
   gap: 7px;
   color: #6741d9;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   text-align: left;
   padding: 5px;
@@ -302,7 +302,7 @@
   min-width: 0;
 }
 .mission-output-heading .eyebrow {
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 1px;
   color: #786784;
 }
@@ -316,7 +316,7 @@
 .mission-output-heading .civic-button {
   min-height: 40px;
   padding: 10px 17px;
-  font-size: 11px;
+  font-size: 12px;
   gap: 9px;
   white-space: nowrap;
 }
@@ -340,7 +340,7 @@
 }
 .mission-search-option small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 4px;
   color: #796d83;
 }
@@ -349,7 +349,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  font-size: 11px;
+  font-size: 12px;
   margin-bottom: 16px;
   color: #796d83;
 }
@@ -373,7 +373,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 0.8px;
   color: #7b638f;
   margin-bottom: 20px;
@@ -389,7 +389,7 @@
   padding: 5px 9px;
   color: #28745b;
   letter-spacing: 0;
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-output > h2 {
   font-size: 28px;
@@ -430,7 +430,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   flex: none;
 }
@@ -446,7 +446,7 @@
 }
 .mission-citations a {
   color: #6741d9;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
 }
 .mission-questions {
@@ -512,7 +512,7 @@
   align-items: center;
   gap: 5px;
   color: #82718e;
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-adopt {
   background: #eee6ff;
@@ -530,7 +530,7 @@
   font-weight: 750;
 }
 .mission-adopt p {
-  font-size: 11px;
+  font-size: 12px;
   color: #715e87;
   line-height: 1.8;
   margin-top: 6px;
@@ -539,7 +539,7 @@
   flex: none;
   min-height: 40px;
   padding: 10px 15px;
-  font-size: 11px;
+  font-size: 12px;
   gap: 8px;
 }
 .mission-sources {
@@ -559,7 +559,7 @@
   background: #eee6ff;
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   margin-left: auto;
 }
 .mission-sources > div {
@@ -571,7 +571,7 @@
 }
 .mission-source-index {
   color: #6741d9;
-  font-size: 11px;
+  font-size: 12px;
 }
 .mission-sources strong {
   font-size: 12px;
@@ -579,13 +579,13 @@
 }
 .mission-sources small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #8a7895;
   margin-top: 5px;
   text-transform: capitalize;
 }
 .mission-sources > div p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   color: #776786;
   margin: 9px 0;
@@ -597,7 +597,7 @@
   align-items: center;
   gap: 5px;
   color: #6741d9;
-  font-size: 11px;
+  font-size: 12px;
 }
 .mission-next-steps {
   display: flex;
@@ -605,7 +605,7 @@
   flex-wrap: wrap;
   gap: 12px 24px;
   padding: 22px 0;
-  font-size: 11px;
+  font-size: 12px;
   color: #8a7895;
 }
 .mission-next-steps button {
@@ -619,7 +619,7 @@
 }
 .mission-small {
   color: #796d83;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.85;
   margin-block: 12px;
 }
@@ -719,7 +719,7 @@
   margin-bottom: 27px;
 }
 .mission-panel-heading .eyebrow {
-  font-size: 9px;
+  font-size: 12px;
   margin-bottom: 10px;
 }
 .mission-panel-heading h2 {
@@ -735,7 +735,7 @@
   margin-top: 8px;
 }
 .mission-panel-heading .civic-button {
-  font-size: 11px;
+  font-size: 12px;
   min-height: 40px;
   gap: 10px;
   flex: none;
@@ -759,7 +759,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 10px;
+  font-size: 12px;
   margin-bottom: 20px;
   color: #806693;
 }
@@ -797,7 +797,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: #6741d9;
   margin-bottom: 22px;
 }
@@ -805,7 +805,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 11px;
+  font-size: 12px;
   color: #796a86;
   margin-top: auto;
 }
@@ -819,7 +819,7 @@
   border-radius: 50%;
   color: #92583e;
   background: #ffded1;
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-input-grid > .mission-empty-output {
   grid-column: 1 / -1;
@@ -864,7 +864,7 @@
 }
 .mission-task-column small {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 12px;
   color: #7b6d86;
 }
 .mission-task-column article {
@@ -878,7 +878,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 12px;
   color: #8a7895;
 }
 .mission-task-column h4 {
@@ -888,7 +888,7 @@
   margin-block: 11px;
 }
 .mission-task-column article > p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   color: #796a86;
 }
@@ -904,7 +904,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 12px;
   color: #6741d9;
 }
 .mission-task-person {
@@ -913,10 +913,10 @@
   align-items: center;
   margin-top: 17px;
   color: #796a86;
-  font-size: 11px;
+  font-size: 12px;
 }
 .mission-column-empty {
-  font-size: 11px;
+  font-size: 12px;
   color: #887594;
   line-height: 1.9;
   padding: 25px 10px;
@@ -930,7 +930,7 @@
   margin-top: 25px;
 }
 .mission-generated-form > .eyebrow {
-  font-size: 9px;
+  font-size: 12px;
 }
 .mission-generated-form h3 {
   font-size: 23px;
@@ -979,7 +979,7 @@
 }
 .mission-field small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.8;
   color: #887594;
   margin-top: 7px;
@@ -1019,7 +1019,7 @@
   padding-top: 9px;
 }
 .mission-published-tool aside > h3 > span {
-  font-size: 11px;
+  font-size: 12px;
   padding: 4px 7px;
   border-radius: 5px;
   background: #eee6ff;
@@ -1047,12 +1047,12 @@
 .mission-response small {
   display: block;
   color: #8a7895;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 12px;
 }
 .mission-delete-response {
   color: #a54c43;
-  font-size: 11px;
+  font-size: 12px;
   padding: 14px 0;
 }
 .mission-dialog {
@@ -1091,7 +1091,7 @@
   overflow: hidden;
 }
 .mission-studio-hero .eyebrow {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 .mission-studio-hero h1 {
@@ -1164,7 +1164,7 @@
 }
 .studio-center > span {
   font-family: Inter, sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0;
   margin-top: 8px;
@@ -1179,7 +1179,7 @@
   background: #fffdf7;
   border: 1px solid #d8c9ec;
   border-radius: 13px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 650;
   box-shadow: 3px 4px 0 #d0bcea;
 }
@@ -1224,7 +1224,7 @@
 }
 .mission-section-label {
   color: #857191;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.3px;
   font-weight: 650;
   margin-bottom: 14px;
@@ -1240,7 +1240,7 @@
   gap: 12px;
   padding: 18px;
   border-radius: 14px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-align: left;
 }
@@ -1301,7 +1301,7 @@
   align-items: center;
   gap: 9px;
   color: #6741d9;
-  font-size: 10px;
+  font-size: 12px;
   margin-bottom: 23px;
 }
 .mission-list-card > div > span {
@@ -1329,7 +1329,7 @@
   display: flex;
   gap: 18px;
   color: #8a7895;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 25px;
   padding-top: 17px;
   border-top: 1px solid #eae1f1;
@@ -1381,12 +1381,12 @@
 .mission-studio-empty .civic-button {
   flex: none;
   margin-left: auto;
-  font-size: 11px;
+  font-size: 12px;
   min-height: 40px;
 }
 .mission-list-note {
   margin-top: 17px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .mission-studio-footnote {
   display: flex;
@@ -1406,7 +1406,7 @@
   font-weight: 650;
 }
 .mission-studio-footnote p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   margin-top: 5px;
   color: #8b7758;
@@ -1417,7 +1417,7 @@
   gap: 6px;
   margin-left: auto;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 12px;
 }
 @media (max-width: 1150px) {
   .mission-workbench {
@@ -1464,7 +1464,7 @@
   .mission-demo-banner {
     align-items: flex-start;
     flex-wrap: wrap;
-    font-size: 11px;
+    font-size: 12px;
     gap: 8px;
     padding: 13px;
   }
@@ -1490,11 +1490,11 @@
     display: none;
   }
   .mission-header-meta {
-    font-size: 10px;
+    font-size: 12px;
     gap: 10px;
   }
   .mission-header .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
   }
   .mission-tabs {
     gap: 4px;
@@ -1504,7 +1504,7 @@
   .mission-tabs > button {
     flex: none;
     padding: 11px 12px;
-    font-size: 11px;
+    font-size: 12px;
     gap: 7px;
   }
   .mission-workbench {
@@ -1535,7 +1535,7 @@
     border-radius: 10px;
   }
   .mission-agent small {
-    font-size: 8px;
+    font-size: 12px;
   }
   .mission-agent strong {
     font-size: 12px;
@@ -1554,7 +1554,7 @@
     font-size: 20px;
   }
   .mission-output-heading .eyebrow {
-    font-size: 7px;
+    font-size: 12px;
   }
   .mission-output {
     padding: 21px;
@@ -1573,7 +1573,7 @@
     padding: 16px;
   }
   .mission-questions li {
-    font-size: 11px;
+    font-size: 12px;
   }
   .mission-next-steps {
     gap: 12px;
@@ -1619,7 +1619,7 @@
     font-size: 44px;
   }
   .mission-studio-hero .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
     letter-spacing: 0.7px;
   }
   .mission-studio-orbit {
@@ -1629,7 +1629,7 @@
     margin-top: 14px;
   }
   .studio-node {
-    font-size: 10px;
+    font-size: 12px;
     padding: 10px 12px;
   }
   .node-scout {

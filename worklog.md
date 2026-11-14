@@ -178,3 +178,20 @@ Verification:
 - No horizontal overflow at 390, 768, 1024 and 1440px. Reduced-motion screenshots were byte-identical before and after the style removal.
 - `npx next build` passes.
 - Not run: `scripts/check-missions.cjs` (needs a disposable PostgreSQL).
+
+---
+Task: Landing drawings and a friendlier portal (14 Nov 2026)
+
+Work Log:
+- Landing: added a street-on-repair-day illustration (`CommonsStreet.tsx`), dot-screen step tiles with ink accents, paper tape on the mission board, a hand-drawn arrow, and scalloped band edges.
+- Portal: added stickers (`src/lib/stickers.ts`, `GET /api/stickers`, `src/components/stickers/`), the sticker book page at `/dashboard/stickers`, and a sticker strip plus shared garden on the civic desk.
+- Portal: mission starters by kind of group (`src/lib/missions/starters.ts`) on the mission studio page.
+- Portal: added `src/app/portal.css`; raised 218 sub-12px `font-size` declarations in the shared stylesheets to 12px.
+- Tests: `scripts/check-stickers.cjs` (7 rule tests) and a new browser check for stickers, the garden and starters.
+
+Verification:
+- `node --test scripts/check-stickers.cjs scripts/check-session.cjs scripts/check-voting.cjs`: all pass.
+- `node scripts/check-redesign.cjs`: 12 of 12 pass (one run failed once on first page compile and passed on re-run).
+- No horizontal overflow on the desk, sticker book and mission studio at 390, 768 and 1440px.
+- Not verified: `GET /api/stickers` against a real database (no database in this workspace; the browser checks use fixtures), and `scripts/check-missions.cjs`.
+

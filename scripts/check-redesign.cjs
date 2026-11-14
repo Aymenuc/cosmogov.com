@@ -130,6 +130,11 @@ async function fixtures(context) {
       status = 200;
     if (path === "/api/auth/me") data = user;
     else if (path === "/api/notifications") data = [];
+    else if (path === "/api/stickers")
+      data = {
+        counts: { missionsStarted: 1, communitiesJoined: 2, tasksDone: 3 },
+        garden: { tasksDone: 7, missions: 2 },
+      };
     else if (path === "/api/organizations") data = orgs;
     else if (path === "/api/proposals")
       data = proposals.filter(
@@ -465,6 +470,42 @@ async function fixtures(context) {
       assert.equal(createdProcess.title, "A better park");
     },
   );
+  await check("Sticker book, shared garden and group starters", async () => {
+    await app.goto(`${base}/dashboard`, { waitUntil: "networkidle" });
+    const strip = app.locator(".sticker-strip");
+    await strip.getByText("3 of 12 collected.", { exact: false }).waitFor();
+    assert.match(await strip.innerText(), /never for voting/);
+    await strip.getByText("Next up: Handy", { exact: true }).waitFor();
+    assert.match(await strip.innerText(), /3 of 5 so far/);
+    assert.equal(await app.locator(".garden-art .garden-flower").count(), 7);
+    await strip.getByRole("link", { name: /Open the book/ }).click();
+    await app.getByRole("heading", { name: "Your sticker book." }).waitFor();
+    assert.equal(await app.locator(".sticker-grid li").count(), 12);
+    assert.equal(await app.locator(".sticker-grid li.earned").count(), 3);
+    await app
+      .getByText("There are none for voting or signing.", { exact: true })
+      .waitFor();
+    await noOverflow(app, "sticker book");
+    await app.goto(`${base}/dashboard/missions`, { waitUntil: "networkidle" });
+    await app.getByRole("radio", { name: "Workplace", exact: true }).click();
+    await app
+      .getByRole("button", { name: "Cut our office waste" })
+      .click();
+    const dialog = app.getByRole("dialog");
+    await dialog.waitFor();
+    assert.match(
+      await dialog.locator("textarea").first().inputValue(),
+      /waste our workplace produces/,
+    );
+    await app.keyboard.press("Escape");
+    await app.reload({ waitUntil: "networkidle" });
+    assert.equal(
+      await app
+        .getByRole("radio", { name: "Workplace", exact: true })
+        .getAttribute("aria-checked"),
+      "true",
+    );
+  });
   await check(
     "Responsive workspace and dialogs at 375, 768, 1440px",
     async () => {

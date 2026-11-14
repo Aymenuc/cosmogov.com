@@ -1,4 +1,5 @@
 "use client";
+import "../portal.css";
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -16,6 +17,7 @@ import {
   FileSignature,
   FileText,
   Gamepad2,
+  Sticker,
   Globe2,
   Landmark,
   LayoutDashboard,
@@ -115,6 +117,7 @@ const toolGroups: { label: string; items: [string, string, LucideIcon][] }[] = [
     label: "Learn & grow",
     items: [
       ["AI agents", "/dashboard/ai-agents", Sparkles],
+      ["Sticker book", "/dashboard/stickers", Sticker],
       ["Civic games", "/dashboard/games", Gamepad2],
       ["Leaderboards", "/dashboard/leaderboards", Trophy],
       ["My reputation", "/dashboard/reputation", Star],
