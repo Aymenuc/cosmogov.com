@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { apiUser, apiFailure } from '@/lib/api-server';
 
 export async function GET() {
   try {
+    await apiUser();
     const leaderboard = await db.cosmicReputation.findMany({
       orderBy: { score: 'desc' },
       take: 50,
@@ -25,7 +27,6 @@ export async function GET() {
 
     return NextResponse.json({ leaderboard: result });
   } catch (error) {
-    console.error('Leaderboard error:', error);
-    return NextResponse.json({ error: 'Failed to load leaderboard' }, { status: 500 });
+    return apiFailure(error);
   }
 }
