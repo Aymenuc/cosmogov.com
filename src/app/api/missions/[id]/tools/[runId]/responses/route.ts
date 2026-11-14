@@ -68,11 +68,16 @@ export async function POST(
           noticeVersion: FORM_NOTICE_VERSION,
           notice: notice as Prisma.InputJsonValue,
         };
-        await tx.missionToolResponse.upsert({
+        const saved = await tx.missionToolResponse.upsert({
           where: { runId_authorId: { runId, authorId: user.id } },
           create: { missionId: id, runId, authorId: user.id, ...data },
           update: data,
         });
+        if (!offerToHelp)
+          await tx.missionMatch.updateMany({
+            where: { responseId: saved.id, status: "invited" },
+            data: { status: "withdrawn", respondedAt: new Date() },
+          });
       },
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );

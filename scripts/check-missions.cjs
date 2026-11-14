@@ -58,7 +58,10 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   const outsider = await db.user.create({ data: { email: 'outsider@example.test', name: 'Outside', passwordHash } });
   const org = await db.organization.create({ data: { name: 'Riverside neighbors', slug: 'mission-test-riverside', createdBy: owner.id, memberships: { create: [{ userId: owner.id, role: 'admin' }, { userId: member.id, role: 'member' }] } } });
   const logFd = fs.openSync(path.join(work, 'app.log'), 'w');
-  app = spawn(path.join(root, 'node_modules/.bin/next'), ['dev', '--webpack', '-p', String(appPort)], { cwd: root, env, stdio: ['ignore', logFd, logFd] });
+  const production = process.env.COSMOGOV_TEST_MODE === 'production';
+  app = production
+    ? spawn(process.execPath, [path.join(root, '.next/standalone/server.js')], { cwd: root, env: { ...env, NODE_ENV: 'production', HOSTNAME: '127.0.0.1', PORT: String(appPort) }, stdio: ['ignore', logFd, logFd] })
+    : spawn(path.join(root, 'node_modules/.bin/next'), ['dev', '--webpack', '-p', String(appPort)], { cwd: root, env, stdio: ['ignore', logFd, logFd] });
   const base = `http://127.0.0.1:${appPort}`;
   let ready = false;
   for (let i = 0; i < 120; i++) { if (app.exitCode !== null) throw Error('Test app exited: ' + fs.readFileSync(path.join(work, 'app.log'), 'utf8').slice(-1500)); try { const r = await fetch(base + '/api/auth/me'); if (r.status === 401) { ready = true; break; } } catch {} await delay(1000); }
@@ -73,6 +76,9 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     assert.equal((await api('', { cookie: 'cosmogov_session=' + Buffer.from(owner.id + ':1:forged').toString('base64') })).status, 401);
     const altered = ownerCookie.replace(/.$/, ownerCookie.at(-1) === 'a' ? 'b' : 'a');
     assert.equal((await api('', { cookie: altered })).status, 401);
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    const sameBytes = ownerCookie.slice(0, -1) + alphabet[alphabet.indexOf(ownerCookie.at(-1)) + 1];
+    assert.equal((await api('', { cookie: sameBytes })).status, 401);
   });
   await check('Create private and shared missions; reject nonmember organization access', async () => {
     const result = await api('', { method: 'POST', body: { title: 'Let’s make repair the easy choice.', goal: 'Bring neighbors together for a welcoming repair café.', location: 'Riverside', organizationId: org.id } }); assert.equal(result.status, 201); missionId = result.data.id;
@@ -200,6 +206,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   });
   await require("./check-integrity.cjs")({ check, db, base, owner, member, org, ownerCookie, memberCookie, login, passwordHash });
   await require("./check-mission-controls.cjs")({ check, db, base, owner, member, org, ownerCookie, memberCookie, login, passwordHash, cronSecret: env.CRON_SECRET });
+  await require("./check-coordination.cjs")({ check, db, base, owner, member, org, ownerCookie, memberCookie, outsiderCookie });
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
   const cookieValue = ownerCookie.slice(ownerCookie.indexOf('=') + 1); await context.addCookies([{ name: 'cosmogov_session', value: cookieValue, url: base }]);
@@ -285,6 +292,15 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     await form.getByRole('button', { name: 'Update my response', exact: true }).waitFor();
 
   });
+  await require('./check-coordination-ui.cjs')({ check, db, browser, page, base, owner, member, org, ownerCookie, memberCookie, pageErrors, screenshot, noOverflow });
+  await check('The portable staging check completes and cleans up against the local provider fixture', async () => {
+    const smokeUser = await db.user.create({ data: { email: 'staging-smoke@example.test', name: 'Staging check', passwordHash } });
+    const smoke = spawn(process.execPath, [path.join(root, 'scripts/check-staging.cjs')], { cwd: root, env: { ...env, COSMOGOV_STAGING_URL: base, COSMOGOV_STAGING_EMAIL: smokeUser.email, COSMOGOV_STAGING_PASSWORD: password }, stdio: ['ignore', 'pipe', 'pipe'] });
+    let log = ''; smoke.stdout.on('data', chunk => { log += chunk; }); smoke.stderr.on('data', chunk => { log += chunk; });
+    const code = await new Promise((resolve, reject) => { smoke.on('error', reject); smoke.on('close', resolve); });
+    fs.writeFileSync(path.join(output, 'staging-runner-fixture.log'), log);
+    assert.equal(code, 0, log); assert.equal(await db.mission.count({ where: { createdBy: smokeUser.id } }), 0);
+  });
   const publicPage = await browser.newPage({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); publicPage.on('pageerror', e => pageErrors.push(e.message));
   await check('Public example is labeled and supports plan adoption and a working shared form', async () => {
     await publicPage.goto(base + '/missions/demo', { waitUntil: 'networkidle', timeout: 120000 });
@@ -336,11 +352,20 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   });
   await check('Manual draft quota is separate from paid AI runs', async () => {
     const requestsBefore = modelRequests.length;
-    const count = await db.missionRun.count({ where: { requestedBy: owner.id, origin: { in: ['manual', 'edited'] } } });
+    const count = await db.missionRun.count({ where: { requestedBy: owner.id, stage: 'tool', origin: { in: ['manual', 'edited', 'template'] } } });
     await db.missionRun.createMany({ data: Array.from({ length: Math.max(0, 60 - count) }, () => ({ missionId, requestedBy: owner.id, stage: 'tool', origin: 'manual', status: 'failed', inputRevision: 0 })) });
     const revision = (await api('/' + missionId)).data.revision;
     assert.equal((await api(`/${missionId}/tools/drafts`, { method: 'POST', body: { tool: authoredTool, inputRevision: revision } })).status, 429);
     assert.equal(modelRequests.length, requestsBefore);
+  });
+  await check('Template-derived edits share the manual form quota', async () => {
+    const mission = await db.mission.create({ data: { title: 'Template quota fixture', goal: 'Form edits must keep the same quota.', createdBy: member.id } });
+    const output = { headline: authoredTool.title, summary: authoredTool.description, findings: [], questions: [], tasks: [], tool: authoredTool };
+    await db.missionRun.createMany({ data: Array.from({ length: 60 }, () => ({ missionId: mission.id, requestedBy: member.id, stage: 'tool', origin: 'template', status: 'completed', inputRevision: 0, output })) });
+    const source = await db.missionRun.findFirstOrThrow({ where: { missionId: mission.id } });
+    const before = modelRequests.length;
+    assert.equal((await api(`/${mission.id}/tools/drafts`, { method: 'POST', cookie: memberCookie, body: { tool: authoredTool, inputRevision: 0, sourceRunId: source.id } })).status, 429);
+    assert.equal(modelRequests.length, before);
   });
   fs.writeFileSync(path.join(output, 'results.json'), JSON.stringify({ checks, failures, pageErrors }, null, 2));
   console.log(JSON.stringify({ passed: checks.length, failed: failures.length, artifacts: output }));

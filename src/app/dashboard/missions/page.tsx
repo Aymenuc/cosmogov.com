@@ -21,6 +21,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import TemplateGallery from "@/components/missions/TemplateGallery";
 import type { MissionSummary } from "@/lib/missions/types";
 import {
   defaultGroupKind,
@@ -44,6 +45,7 @@ export default function MissionStudioPage() {
   const [formError, setFormError] = useState("");
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [templateId, setTemplateId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<GroupKind>(defaultGroupKind);
   // Remembering the kind of group is a convenience for this browser only.
@@ -89,6 +91,7 @@ export default function MissionStudioPage() {
     load();
   }, []);
   const start = (title = "", goal = "") => {
+    setTemplateId(null);
     setForm({ title, goal, location: "", organizationId: "" });
     setFormError("");
     setOpen(true);
@@ -103,6 +106,7 @@ export default function MissionStudioPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          templateId,
           organizationId: form.organizationId || null,
         }),
       });
@@ -214,6 +218,18 @@ export default function MissionStudioPage() {
           })}
         </div>
       </section>
+      <TemplateGallery
+        onChoose={(template) => {
+          start(template.name, template.goal);
+          setTemplateId(template.id);
+          setForm({
+            title: template.name,
+            goal: template.goal,
+            location: "",
+            organizationId: template.organizationId || "",
+          });
+        }}
+      />
       <section className="mission-list">
         <div className="mission-panel-heading">
           <div>

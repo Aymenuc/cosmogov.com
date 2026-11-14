@@ -74,7 +74,7 @@ export type Contribution = {
 export type MissionRun = {
   id: string;
   stage: MissionStage;
-  origin?: "ai" | "edited" | "manual";
+  origin?: "ai" | "edited" | "manual" | "template";
   derivedFromId?: string | null;
   status: string;
   inputRevision: number;
@@ -115,6 +115,7 @@ export type MissionTask = {
 export type Mission = {
   id: string;
   title: string;
+  templateCredit?: string | null;
   goal: string;
   location: string | null;
   organizationId: string | null;

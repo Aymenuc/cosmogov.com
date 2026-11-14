@@ -36,7 +36,8 @@ export async function POST(
         const count = await tx.missionRun.count({
           where: {
             requestedBy: user.id,
-            origin: { in: ["manual", "edited"] },
+            stage: "tool",
+            origin: { in: ["manual", "edited", "template"] },
             createdAt: { gt: new Date(Date.now() - 3_600_000) },
           },
         });
@@ -82,7 +83,13 @@ export async function POST(
             model: source?.model,
             provider: source?.provider,
             promptVersion: source?.promptVersion,
-            origin: source && source.origin !== "manual" ? "edited" : "manual",
+            origin: source
+              ? source.origin === "manual"
+                ? "manual"
+                : source.origin === "template"
+                  ? "template"
+                  : "edited"
+              : "manual",
             derivedFromId: source?.id,
             sources: (source?.sources || []) as Prisma.InputJsonValue,
             output: output as unknown as Prisma.InputJsonValue,

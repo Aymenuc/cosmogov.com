@@ -55,12 +55,17 @@ export async function GET(
     const forms = await db.missionRun.findMany({
       where: {
         missionId: id,
-        stage: "tool",
         OR: [
-          { formState: { in: ["published", "closed"] } },
-          ...(canManage
-            ? [{ formState: "unpublished" }]
-            : [{ toolResponses: { some: { authorId: user.id } } }]),
+          { stage: "plan", acceptedAt: { not: null } },
+          {
+            stage: "tool",
+            OR: [
+              { formState: { in: ["published", "closed"] } },
+              ...(canManage
+                ? [{ formState: "unpublished" }]
+                : [{ toolResponses: { some: { authorId: user.id } } }]),
+            ],
+          },
         ],
       },
       orderBy: { createdAt: "desc" },

@@ -55,6 +55,8 @@ import MissionTogether from "./MissionTogether";
 import MissionFormEditor from "./MissionFormEditor";
 import MissionControls from "./MissionControls";
 import FormManagement from "./FormManagement";
+import SuggestionBoard from "./SuggestionBoard";
+import SaveMissionTemplate from "./SaveMissionTemplate";
 import { formSettingsFrom, type FormSettings } from "@/lib/missions/forms";
 const icons = {
   research: Search,
@@ -218,7 +220,13 @@ export default function MissionRoom({
         stage: "tool",
         ...settings,
         formState: "draft",
-        origin: source && source.origin !== "manual" ? "edited" : "manual",
+        origin: source
+          ? source.origin === "manual"
+            ? "manual"
+            : source.origin === "template"
+              ? "template"
+              : "edited"
+          : "manual",
         derivedFromId: source?.id || null,
         status: "completed",
         inputRevision: mission.revision,
@@ -508,6 +516,13 @@ export default function MissionRoom({
           </div>
           <h1>{mission.title}</h1>
           <p>{mission.goal}</p>
+          {mission.templateCredit && (
+            <p className="mission-template-credit">
+              <BookOpen size={16} />
+              Started from {mission.templateCredit}. Review every draft for this
+              mission.
+            </p>
+          )}
           <div className="mission-header-meta">
             <span>
               <Users size={14} />
@@ -527,6 +542,11 @@ export default function MissionRoom({
           <strong>what’s possible.</strong>
         </div>
       </header>
+      {mission.canManage && (
+        <div className="mission-form-actions">
+          <SaveMissionTemplate mission={mission} demo={demo} />
+        </div>
+      )}
       {mission.canManage && (
         <MissionControls id={mission.id} title={mission.title} demo={demo} />
       )}
@@ -784,13 +804,15 @@ export default function MissionRoom({
                       <Sparkles size={13} />
                     )}
                     <span className="mission-origin-label">
-                      {run.origin === "manual"
-                        ? "Community-written form"
-                        : run.origin === "edited"
-                          ? "Community-edited AI form"
-                          : demo
-                            ? "Illustrative AI output"
-                            : "AI-assisted work"}
+                      {run.origin === "template"
+                        ? "Adapted from a community template"
+                        : run.origin === "manual"
+                          ? "Community-written form"
+                          : run.origin === "edited"
+                            ? "Community-edited AI form"
+                            : demo
+                              ? "Illustrative AI output"
+                              : "AI-assisted work"}
                     </span>
                     {!run.acceptedAt && (
                       <span className="mission-draft-badge">
@@ -908,7 +930,11 @@ export default function MissionRoom({
                           <p>{task.detail}</p>
                           <small>
                             <Clock size={12} />
-                            About {task.minutes} min · AI estimate
+                            About {task.minutes} min ·{" "}
+                            {run.origin === "template" ||
+                            run.origin === "manual"
+                              ? "Planning estimate"
+                              : "AI estimate"}
                           </small>
                         </div>
                       </div>
@@ -1254,6 +1280,13 @@ export default function MissionRoom({
               </div>
             ))}
           </div>
+          <SuggestionBoard
+            missionId={mission.id}
+            userId={userId}
+            demo={demo}
+            refreshKey={`${mission.revision}:${mission.tasks.map((task) => `${task.id}-${task.status}`).join(",")}:${mission.toolResponses.map((response) => response.updatedAt).join(",")}`}
+            onRefresh={refresh}
+          />
         </section>
       )}
       {tab === "tools" && (

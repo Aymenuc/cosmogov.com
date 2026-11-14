@@ -2431,3 +2431,127 @@
   line-height: 1.8;
   margin-block: 10px;
 }
+.mission-suggestions,
+.mission-template-gallery,
+.mission-outcomes {
+  margin-block: 34px;
+  padding-block: 26px;
+  border-block: 1px solid var(--civic-line);
+}
+.mission-suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 16px;
+}
+.mission-suggestion-grid article,
+.mission-template-card,
+.mission-outcome-card {
+  padding: 22px;
+  background: white;
+  border: 1px solid var(--civic-line);
+  border-radius: 18px;
+  min-width: 0;
+}
+.mission-suggestion-grid h3,
+.mission-template-card h3,
+.mission-outcome-card h3 {
+  font:
+    750 19px/1.4 Manrope,
+    sans-serif;
+  margin-block: 12px;
+  overflow-wrap: anywhere;
+}
+.mission-suggestion-grid p,
+.mission-template-card p,
+.mission-outcome-card p,
+.mission-template-preview p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #645573;
+  margin-block: 10px;
+  overflow-wrap: anywhere;
+}
+.mission-match-status {
+  display: inline-flex;
+  padding: 5px 9px;
+  background: #fff0c3;
+  border-radius: 7px;
+  font-size: 12px;
+  color: #745214;
+}
+.mission-template-card > span,
+.mission-outcome-card > span {
+  color: #5932c4;
+  font-size: 12px;
+}
+.mission-template-card small,
+.mission-outcome-card small {
+  display: block;
+  font-size: 12px;
+  color: #645573;
+  margin-block: 12px;
+}
+.mission-template-card .civic-button {
+  min-height: 44px;
+  margin-top: 12px;
+}
+.mission-template-preview {
+  border-top: 1px solid var(--civic-line);
+  padding-top: 18px;
+}
+.mission-template-preview h3 {
+  font-size: 16px;
+  font-weight: 750;
+  margin-bottom: 12px;
+}
+.mission-template-credit {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px !important;
+  color: #5932c4 !important;
+  padding-top: 12px;
+}
+.mission-template-credit svg {
+  flex: none;
+  margin-top: 5px;
+}
+.mission-outcome-card a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  gap: 6px;
+  color: var(--civic-accent);
+  font-size: 14px;
+}
+.mission-response-clocks {
+  margin-top: 24px;
+}
+.mission-response-clocks h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font:
+    750 19px Manrope,
+    sans-serif;
+}
+.mission-response-clocks a {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 18px;
+  margin-top: 12px;
+  background: white;
+  border: 1px solid var(--civic-line);
+  border-radius: 14px;
+  font-size: 14px;
+}
+.mission-response-clocks a strong {
+  flex: 1;
+}
+.mission-overdue {
+  color: #a44231;
+  background: #ffe7df;
+  border-radius: 6px;
+  padding: 3px 6px;
+}

@@ -3,6 +3,7 @@ import { formSettingsSchema } from "./forms";
 import type { Evidence } from "./types";
 const text = (max: number) => z.string().trim().min(1).max(max);
 export const createMissionSchema = z.object({
+  templateId: z.string().min(1).max(100).nullable().default(null),
   title: text(120),
   goal: text(2000),
   location: z.string().trim().max(150).default(""),
