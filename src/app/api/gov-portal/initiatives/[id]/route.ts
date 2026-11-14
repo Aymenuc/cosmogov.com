@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { sendEmail, govResponseInitiativeEmail } from '@/lib/email';
@@ -78,26 +78,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       });
     }
 
-    // Send email notifications (async, non-blocking)
-    const emailPayload = govResponseInitiativeEmail({
-      initiativeTitle: initiative.title,
-      responderName,
-      responseText: governmentResponse,
-      initiativeLink,
-      recipientName: '', // Will be filled per-recipient
+    // Send email notifications after the response, one personalised email per recipient
+    after(async () => {
+      const results = await Promise.allSettled(
+        allRecipients
+          .filter((recipient) => recipient.email)
+          .map((recipient) =>
+            sendEmail({
+              ...govResponseInitiativeEmail({
+                initiativeTitle: initiative.title,
+                responderName,
+                responseText: governmentResponse,
+                initiativeLink,
+                recipientName: recipient.name || 'there',
+              }),
+              to: recipient.email,
+            }),
+          ),
+      );
+      const failed = results.filter((r) => r.status === 'rejected' || !r.value.success).length;
+      if (failed) console.error(`[EMAIL] ${failed} gov response email(s) not sent`);
     });
-
-    for (const recipient of allRecipients) {
-      if (recipient.email) {
-        sendEmail({
-          ...emailPayload,
-          to: recipient.email,
-          subject: `Government Response: ${initiative.title}`,
-          html: emailPayload.html.replace('Hello ,', `Hello ${recipient.name || 'there'},`),
-          text: emailPayload.text?.replace('Hello ,', `Hello ${recipient.name || 'there'},`),
-        }).catch((err) => console.error('[EMAIL] Failed to send gov response email:', err));
-      }
-    }
 
     // Send push notifications (async, non-blocking)
     sendPushToUsers(
