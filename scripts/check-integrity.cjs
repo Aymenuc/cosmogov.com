@@ -100,6 +100,9 @@ module.exports = async function ({ check, db, base, owner, member, org, ownerCoo
     const first = await login(person.email), second = await login(person.email);
     assert.equal((await call('/api/auth/logout', { method: 'POST', cookie: first })).status, 200);
     assert.equal((await call('/api/auth/me', { cookie: first })).status, 401);
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    const alias = first.slice(0, -1) + alphabet[alphabet.indexOf(first.at(-1)) + 1];
+    assert.equal((await call('/api/auth/me', { cookie: alias })).status, 401);
     assert.equal((await call('/api/auth/me', { cookie: second })).status, 200);
     assert.equal((await call('/api/auth/sessions/revoke', { method: 'POST', cookie: second })).status, 200);
     assert.equal((await call('/api/auth/me', { cookie: second })).status, 401);

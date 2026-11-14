@@ -45,7 +45,11 @@ export function sessionClaims(
       .update(`${version}.${payload}`)
       .digest();
     const actual = Buffer.from(signature, "base64url");
-    if (actual.length !== expected.length || !timingSafeEqual(actual, expected))
+    if (
+      actual.length !== expected.length ||
+      actual.toString("base64url") !== signature ||
+      !timingSafeEqual(actual, expected)
+    )
       return null;
     const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
     if (
