@@ -21,6 +21,7 @@ const destinations = [
   ["Accountability & outcomes", "/dashboard/participation/accountability"],
   ["Community map", "/dashboard/cosmic-map"],
   ["My communities", "/dashboard/organizations"],
+  ["Sticker book", "/dashboard/stickers"],
   ["AI assistant", "/dashboard/assistant"],
   ["Settings", "/dashboard/settings"],
 ];
