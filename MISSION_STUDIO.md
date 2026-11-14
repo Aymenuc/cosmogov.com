@@ -4,7 +4,7 @@ Cosmogov now has a shared mission workspace at `/dashboard/missions`. Members br
 
 People can also build a form without AI or edit a generated form before publishing. Each save creates a new immutable draft with its origin (`ai`, `edited`, or `manual`) and a link to the source version. Published forms and their responses are preserved when a revision is created.
 
-The useful unit is a shared artifact: a research brief, a plan people can claim tasks from, or a published form with actual member responses. The creator or a community moderator reviews plans and forms before adopting them. Regular members can contribute context, take responsibility for tasks, and respond to published forms. Private missions are visible only to their creator; shared missions follow current organization membership.
+The useful unit is a shared artifact: a research brief, a plan people can claim tasks from, or a published form with actual member responses. The creator or a community moderator reviews plans and forms before adopting them. Regular members can contribute context, take responsibility for tasks, and respond to published forms. New forms default to organizer-only answers with a 90-day availability period; organizers can choose member-visible answers and 30, 90 or 365 days before publication. Existing forms retain their original member visibility and indefinite availability until replaced or removed. Private missions are visible only to their creator; shared missions follow current organization membership.
 
 ## What works
 
@@ -52,4 +52,10 @@ The repository already ignores TypeScript errors during builds. The full typeche
 
 This work incorporates Claude’s `claude/portal-stickers` branch at `d35332c`, including the interactive landing mission board, original illustrations, portal stickers and garden, group-specific mission starters, and intent-based participation entry. The mission review and readability improvements from `2ee77a5` remain. The form editor uses the same palette, typography, sticker artwork and quiet reading surfaces; it does not introduce a separate design system.
 
-Form closing/unpublishing, mission deletion, response export and visibility settings, retention controls, task event history, sensitive-question detection, and real-provider staging verification remain future work. The form editor reminds organizers to avoid sensitive questions; this reminder is not an automatic detector.
+Organizers can close, unpublish and reopen forms, stream a CSV export, and delete a mission after typing its title. Response exports neutralize spreadsheet formulas. Published form terms are immutable; changing visibility or retention requires a new version. Closed forms keep permitted responses readable and deletable, while new saves are blocked. An unpublished form is visible only to organizers and people with a saved response.
+
+Task completion requires a concrete note and optional evidence URL. Changes write an actor/time event in the same transaction as the task state. Evidence remains member-provided, not independently verified. AI runs record their configured provider/model and prompt version (provider-reported model takes precedence when available), and author metadata is replaced with contributor labels before requests. Names written inside source text can still be sent; the input dialog says so.
+
+Sensitive-question patterns flag common contact, identity, financial and personal-data requests. They require organizer-only answers and an explicit review basis before a form can be saved or published. This is a review aid and can miss sensitive questions; it does not establish a legal basis.
+
+Responses record the notice version and expiry at each save. Expired answers are hidden in reads and exports, and removed when their mission is opened. The daily authenticated cleanup job also removes expired answers, rate counters and token revocations. Configure CRON_SECRET and the hosting scheduler; Vercel uses the included daily cron. Live-provider staging verification remains pending a staging URL and configured credentials.

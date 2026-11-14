@@ -18,22 +18,30 @@ import {
 } from "@/components/ui/dialog";
 import StickerBadge from "@/components/stickers/StickerBadge";
 import MissionToolForm from "./MissionToolForm";
+import FormSettingsFields from "./FormSettingsFields";
+import {
+  defaultFormSettings,
+  formReviewError,
+  type FormSettings,
+} from "@/lib/missions/forms";
 import { toolSchema } from "@/lib/missions/validation";
 import type { MissionTool } from "@/lib/missions/types";
 import "@/app/portal.css";
 
 export default function MissionFormEditor({
   initialTool,
+  initialSettings = defaultFormSettings,
   basedOnAI = false,
   revisingPublished = false,
   onClose,
   onSave,
 }: {
   initialTool: MissionTool | null;
+  initialSettings?: FormSettings;
   basedOnAI?: boolean;
   revisingPublished?: boolean;
   onClose: () => void;
-  onSave: (tool: MissionTool) => Promise<void>;
+  onSave: (tool: MissionTool, settings: FormSettings) => Promise<void>;
 }) {
   const [tool, setTool] = useState<MissionTool>(() =>
     initialTool
@@ -46,6 +54,7 @@ export default function MissionFormEditor({
           ],
         },
   );
+  const [settings, setSettings] = useState<FormSettings>(initialSettings);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [discard, setDiscard] = useState(false);
@@ -144,9 +153,14 @@ export default function MissionFormEditor({
                 );
                 return;
               }
+              const reviewError = formReviewError(result.data, settings);
+              if (reviewError) {
+                setError(reviewError);
+                return;
+              }
               setBusy(true);
               try {
-                await onSave(result.data);
+                await onSave(result.data, settings);
               } catch (error) {
                 setError(
                   error instanceof Error
@@ -319,6 +333,15 @@ export default function MissionFormEditor({
                 <Plus size={17} />
                 Add a question
               </button>
+              <FormSettingsFields
+                tool={tool}
+                value={settings}
+                onChange={(value) => {
+                  setSettings(value);
+                  setDirty(true);
+                  setDiscard(false);
+                }}
+              />
               <p className="mission-editor-question-note">
                 Ask for practical offers and needs. Everyone’s name is already
                 attached to their response, so leave out contact details and

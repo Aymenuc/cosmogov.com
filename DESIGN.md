@@ -60,3 +60,9 @@ The form editor continues Claude’s landing and portal redesign: a lilac invita
 Managers can build a form by hand or revise an AI draft, including title, introduction, text/choice questions, options, required answers and order. Saving creates a new draft; publishing is a separate review step. Authorship labels distinguish community-written forms from AI-assisted and community-edited AI forms. Revising a published form leaves its original version and answers intact.
 
 Verification for the combined redesign and form editor: Webpack production build passed; 26 real-API/disposable-database/browser mission checks, 13 browser regression checks against the standalone production build, and 19 sticker/session/voting rule checks passed. The illustrated homepage path is visited before full-page screenshots so its scroll-triggered artwork is captured in its visible state. Local screenshots are under `artifacts/missions` and `artifacts/editor-regression` and remain ignored by Git. The repository-wide typecheck still reports 16 pre-existing diagnostics.
+
+## Mission controls and evidence
+
+Forms show visibility and availability terms before submission. Organizers choose those terms in the editor; new forms start with organizer-only answers and 90 days. A review panel flags possible sensitive questions, requests a stated need, and restricts flagged forms to organizer-only answers. Close, unpublish, reopen and export controls sit beside the reviewed form. Archived answers remain available only to the respondent and permitted organizers.
+
+Task completion opens a small evidence dialog rather than immediately marking work done. Completion notes, optional source links and recent actor history sit with each task. The mission settings dialog requires the exact mission title before permanent deletion. These surfaces use the existing calm cards, violet controls, peach review panels and sky privacy notices.

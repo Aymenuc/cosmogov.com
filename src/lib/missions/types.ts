@@ -40,6 +40,7 @@ export type Evidence = {
   url?: string;
   kind: "source" | "perspective" | "constraint" | "web";
   author?: string;
+  authorId?: string;
 };
 export type MissionTool = {
   title: string;
@@ -79,6 +80,14 @@ export type MissionRun = {
   inputRevision: number;
   sources: Evidence[];
   output: MissionOutput | null;
+  formState?: "draft" | "published" | "closed" | "unpublished";
+  responseVisibility?: "organizers" | "members";
+  retentionDays?: number | null;
+  sensitiveReason?: string | null;
+  responseCount?: number;
+  model?: string | null;
+  provider?: string | null;
+  promptVersion?: string | null;
   error: string | null;
   searchStatus: string;
   acceptedAt: string | null;
@@ -87,6 +96,13 @@ export type MissionRun = {
   completedAt: string | null;
 };
 export type MissionTask = {
+  evidence?: { note: string; url: string; actor: string; at: string }[];
+  events?: {
+    id: string;
+    action: string;
+    createdAt: string;
+    actor: { name: string | null } | null;
+  }[];
   id: string;
   title: string;
   detail: string;
@@ -116,6 +132,8 @@ export type Mission = {
     runId: string;
     authorId: string;
     author: { name: string | null };
+    offerToHelp?: boolean;
+    expiresAt?: string | null;
     values: Record<string, string>;
     updatedAt: string;
   }[];

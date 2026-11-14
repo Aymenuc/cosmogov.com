@@ -47,7 +47,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ choices: [{ message: { content: JSON.stringify(result) } }] }));
   });
   await new Promise(resolve => modelServer.listen(0, '127.0.0.1', resolve));
-  const env = { ...process.env, DATABASE_URL: databaseUrl, DIRECT_URL: databaseUrl, SESSION_SECRET: crypto.randomBytes(32).toString('hex'), Z_AI_USE_OPENAI_COMPAT: '1', Z_AI_SKIP_CHAT_TEMPLATE_KWARGS: '1', Z_AI_BASE_URL: `http://127.0.0.1:${modelServer.address().port}/v1`, Z_AI_API_KEY: 'isolated-test-provider', MISSION_WEB_SEARCH: '0', NODE_ENV: 'development', NEXT_TELEMETRY_DISABLED: '1' };
+  const env = { ...process.env, DATABASE_URL: databaseUrl, DIRECT_URL: databaseUrl, SESSION_SECRET: crypto.randomBytes(32).toString('hex'), Z_AI_USE_OPENAI_COMPAT: '1', Z_AI_SKIP_CHAT_TEMPLATE_KWARGS: '1', Z_AI_BASE_URL: `http://127.0.0.1:${modelServer.address().port}/v1`, Z_AI_API_KEY: 'isolated-test-provider', MISSION_WEB_SEARCH: '0', CRON_SECRET: crypto.randomBytes(32).toString('hex'), EMAIL_PROVIDER: 'stub', NODE_ENV: 'development', NEXT_TELEMETRY_DISABLED: '1' };
   const migration = spawnSync(path.join(root, 'node_modules/.bin/prisma'), ['migrate', 'deploy'], { cwd: root, env, encoding: 'utf8' });
   fs.writeFileSync(path.join(output, 'migrations.log'), migration.stdout + migration.stderr);
   assert.equal(migration.status, 0, 'Disposable database migration failed'); checks.push('All migrations apply to an empty PostgreSQL database'); console.log('PASS All migrations apply to an empty PostgreSQL database');
@@ -97,7 +97,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
   await check('AI work is manager-only; real route invokes provider and saves source references', async () => {
     assert.equal((await api(`/${missionId}/runs`, { method: 'POST', cookie: memberCookie, body: { stage: 'research' } })).status, 403);
     const result = await api(`/${missionId}/runs`, { method: 'POST', body: { stage: 'research' } }); assert.equal(result.status, 200);
-    const room = (await api('/' + missionId)).data; assert.equal(room.runs[0].status, 'completed'); assert.equal(room.runs[0].sources[0].id, sourceId); assert.equal(room.runs[0].output.findings[0].sourceIds[0], sourceId);
+    const room = (await api('/' + missionId)).data; assert.equal(room.runs[0].status, 'completed'); assert.ok(room.runs[0].model); assert.ok(room.runs[0].promptVersion); assert.ok(!('authorId' in modelRequests.at(-1).sources[0])); assert.match(modelRequests.at(-1).sources[0].author, /^Contributor /); assert.equal(room.runs[0].sources[0].id, sourceId); assert.equal(room.runs[0].output.findings[0].sourceIds[0], sourceId);
     assert.ok(modelRequests.some(request => request.stage === 'research'));
   });
   await check('Unconfigured web search is explicit and never invents web references', async () => {
@@ -131,7 +131,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     const results = await Promise.all([api(`/${missionId}/tasks/${task.id}`, { method: 'PATCH', body: { action: 'claim' } }), api(`/${missionId}/tasks/${task.id}`, { method: 'PATCH', cookie: memberCookie, body: { action: 'claim' } })]);
     assert.deepEqual(results.map(r => r.status).sort(), [200, 409]);
     const claimed = (await api('/' + missionId)).data.tasks[0]; const claimant = claimed.assignedToId === member.id ? memberCookie : ownerCookie;
-    assert.equal((await api(`/${missionId}/tasks/${task.id}`, { method: 'PATCH', cookie: claimant, body: { action: 'complete' } })).status, 200);
+    assert.equal((await api(`/${missionId}/tasks/${task.id}`, { method: 'PATCH', cookie: claimant, body: { action: 'complete', evidence: { note: 'The room has been confirmed with the venue manager.' } } })).status, 200);
     assert.equal((await api(`/${missionId}/tasks/${task.id}`, { method: 'PATCH', body: { action: 'claim' } })).status, 409);
   });
   await check('Generated tools require publication and validate actual member responses', async () => {
@@ -199,6 +199,7 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     await db.membership.create({ data: { userId: member.id, organizationId: org.id } });
   });
   await require("./check-integrity.cjs")({ check, db, base, owner, member, org, ownerCookie, memberCookie, login, passwordHash });
+  await require("./check-mission-controls.cjs")({ check, db, base, owner, member, org, ownerCookie, memberCookie, login, passwordHash, cronSecret: env.CRON_SECRET });
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' });
   const cookieValue = ownerCookie.slice(ownerCookie.indexOf('=') + 1); await context.addCookies([{ name: 'cosmogov_session', value: cookieValue, url: base }]);
@@ -270,6 +271,19 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     assert.equal(await dialog.getByLabel('Form title', { exact: true }).inputValue(), 'Our revised Saturday welcome');
     await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
     await dialog.getByRole('button', { name: 'Discard changes', exact: true }).click();
+    await form.getByRole('button', { name: 'Close answers', exact: true }).click();
+    await form.getByText('This form is closed to answers.', { exact: false }).waitFor();
+    assert.equal(await form.getByRole('button', { name: 'Update my response', exact: true }).isDisabled(), true);
+    await form.getByRole('button', { name: 'Reopen form', exact: true }).click();
+    const downloadPromise = page.waitForEvent('download');
+    await form.getByRole('button', { name: 'Export answers', exact: true }).click();
+    const download = await downloadPromise; assert.equal(await download.failure(), null);
+    await download.saveAs(path.join(output, 'fixture-response-export.csv'));
+    await form.getByRole('button', { name: 'Unpublish', exact: true }).click();
+    const archived = page.locator('.mission-archived-form').filter({ has: page.getByRole('heading', { name: 'Our Saturday welcome', exact: true }) });
+    await archived.getByRole('button', { name: 'Reopen form', exact: true }).click();
+    await form.getByRole('button', { name: 'Update my response', exact: true }).waitFor();
+
   });
   const publicPage = await browser.newPage({ viewport: { width: 1440, height: 1000 }, serviceWorkers: 'block' }); publicPage.on('pageerror', e => pageErrors.push(e.message));
   await check('Public example is labeled and supports plan adoption and a working shared form', async () => {
@@ -282,6 +296,8 @@ async function noOverflow(page) { const sizes = await page.evaluate(() => [docum
     await publicPage.getByRole('link', { name: 'Read reference 1', exact: true }).first().click(); assert.equal(await publicPage.locator('.mission-sources[open]').count(), 1);
     await publicPage.getByRole('button', { name: /Maker.*A plan you can use/ }).click(); await publicPage.getByRole('button', { name: 'Adopt this plan' }).click(); await publicPage.getByRole('button', { name: 'Add tasks to the board' }).click();
     await publicPage.getByRole('button', { name: 'I can do this' }).first().click(); await publicPage.getByRole('button', { name: 'Mark done' }).click();
+    await publicPage.getByLabel('What was completed?').fill('The venue confirmed the room for our illustrative session.');
+    await publicPage.getByRole('button', { name: 'Save evidence and mark done' }).click();
     await publicPage.getByText('1 small win, together', { exact: true }).waitFor();
     await screenshot(publicPage, 'mission-progress-desktop.png');
     await publicPage.getByRole('button', { name: /AI workbench/ }).click();
