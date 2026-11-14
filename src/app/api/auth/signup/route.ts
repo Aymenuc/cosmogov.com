@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -84,9 +84,13 @@ export async function POST(req: NextRequest) {
       { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
     );
     await createSession(user.id);
-    sendEmail(
-      { ...welcomeEmail({ recipientName: user.name || "there", role: user.role }), to: user.email },
-    ).catch(() => {});
+    after(async () => {
+      const result = await sendEmail({
+        ...welcomeEmail({ recipientName: user.name || "there", role: user.role }),
+        to: user.email,
+      });
+      if (!result.success) console.error("[EMAIL] Welcome email not sent:", result.error);
+    });
     return NextResponse.json(
       {
         id: user.id,

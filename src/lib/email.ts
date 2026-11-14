@@ -7,9 +7,16 @@
  * - Welcome emails
  * - Password reset
  *
- * Currently uses a stub/logging implementation. To enable real email delivery,
- * configure the SMTP environment variables and set EMAIL_PROVIDER=smtp.
- * Alternatively, set EMAIL_PROVIDER=resend and add your Resend API key.
+ * Delivery is chosen by EMAIL_PROVIDER:
+ * - unset or "stub": emails are only logged (nothing is sent)
+ * - "resend": sent through Resend with RESEND_API_KEY
+ * - "smtp": sent through nodemailer with the SMTP_* variables
+ *
+ * The sender comes from EMAIL_FROM (or RESEND_FROM_EMAIL); its domain must be
+ * verified with the provider. Links in emails are made absolute with APP_URL.
+ *
+ * Callers in route handlers should send from `after()` (next/server) so the
+ * request can respond first without the platform freezing the send midway.
  */
 
 export interface EmailPayload {
@@ -20,7 +27,27 @@ export interface EmailPayload {
   from?: string;
 }
 
-const DEFAULT_FROM = 'CosmoGov <noreply@cosmogov.app>';
+const DEFAULT_FROM =
+  process.env.EMAIL_FROM?.trim() ||
+  process.env.RESEND_FROM_EMAIL?.trim() ||
+  'CosmoGov <noreply@cosmogov.com>';
+
+const APP_URL = (process.env.APP_URL?.trim() || 'https://www.cosmogov.com').replace(/\/+$/, '');
+
+/** Turn an in-app path such as `/dashboard` into a link that works from an inbox. */
+export function absoluteUrl(link: string): string {
+  return link.startsWith('/') ? `${APP_URL}${link}` : link;
+}
+
+/** Escape text written by users before it is placed inside email HTML. */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 /**
  * Send an email notification.
@@ -139,6 +166,11 @@ export function govResponseInitiativeEmail(params: {
   initiativeLink: string;
   recipientName: string;
 }): Omit<EmailPayload, "to"> {
+  const name = escapeHtml(params.recipientName);
+  const responder = escapeHtml(params.responderName);
+  const title = escapeHtml(params.initiativeTitle);
+  const response = escapeHtml(params.responseText);
+  const link = absoluteUrl(params.initiativeLink);
   return {
     subject: `Government Response: ${params.initiativeTitle}`,
     html: `
@@ -148,17 +180,17 @@ export function govResponseInitiativeEmail(params: {
           <p style="color: #94a3b8; font-size: 14px;">Government Response Received</p>
         </div>
         <div style="background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <p style="margin: 0 0 8px; font-size: 14px; color: #94a3b8;">Hello ${params.recipientName},</p>
+          <p style="margin: 0 0 8px; font-size: 14px; color: #94a3b8;">Hello ${name},</p>
           <p style="margin: 0 0 16px; font-size: 14px;">
-            <strong style="color: #38bdf8;">${params.responderName}</strong> has submitted an official government response to the initiative:
+            <strong style="color: #38bdf8;">${responder}</strong> has submitted an official government response to the initiative:
           </p>
-          <h2 style="color: #ffffff; font-size: 16px; margin: 0 0 12px;">${params.initiativeTitle}</h2>
+          <h2 style="color: #ffffff; font-size: 16px; margin: 0 0 12px;">${title}</h2>
           <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-            <p style="margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${params.responseText}</p>
+            <p style="margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${response}</p>
           </div>
         </div>
         <div style="text-align: center;">
-          <a href="${params.initiativeLink}" style="display: inline-block; background: linear-gradient(135deg, #38bdf8, #8b5cf6); color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          <a href="${link}" style="display: inline-block; background: linear-gradient(135deg, #38bdf8, #8b5cf6); color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
             View Full Response
           </a>
         </div>
@@ -167,7 +199,7 @@ export function govResponseInitiativeEmail(params: {
         </p>
       </div>
     `,
-    text: `Government Response: ${params.initiativeTitle}\n\nHello ${params.recipientName},\n\n${params.responderName} has responded to the initiative "${params.initiativeTitle}":\n\n${params.responseText}\n\nView the full response: ${params.initiativeLink}`,
+    text: `Government Response: ${params.initiativeTitle}\n\nHello ${params.recipientName},\n\n${params.responderName} has responded to the initiative "${params.initiativeTitle}":\n\n${params.responseText}\n\nView the full response: ${link}`,
   };
 }
 
@@ -182,8 +214,13 @@ export function govResponseBindingProposalEmail(params: {
   recipientName: string;
   voteDate?: string;
 }): Omit<EmailPayload, "to"> {
+  const name = escapeHtml(params.recipientName);
+  const responder = escapeHtml(params.responderName);
+  const title = escapeHtml(params.proposalTitle);
+  const response = escapeHtml(params.responseText);
+  const link = absoluteUrl(params.proposalLink);
   const voteDateSection = params.voteDate
-    ? `<p style="margin: 12px 0 0; font-size: 14px; color: #f59e0b;"><strong>Scheduled Vote:</strong> ${params.voteDate}</p>`
+    ? `<p style="margin: 12px 0 0; font-size: 14px; color: #f59e0b;"><strong>Scheduled Vote:</strong> ${escapeHtml(params.voteDate)}</p>`
     : '';
 
   return {
@@ -195,18 +232,18 @@ export function govResponseBindingProposalEmail(params: {
           <p style="color: #94a3b8; font-size: 14px;">Binding Proposal — Government Response</p>
         </div>
         <div style="background: rgba(244,63,94,0.05); border: 1px solid rgba(244,63,94,0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <p style="margin: 0 0 8px; font-size: 14px; color: #94a3b8;">Hello ${params.recipientName},</p>
+          <p style="margin: 0 0 8px; font-size: 14px; color: #94a3b8;">Hello ${name},</p>
           <p style="margin: 0 0 16px; font-size: 14px;">
-            <strong style="color: #f43f5e;">${params.responderName}</strong> has submitted an official government response to the binding proposal:
+            <strong style="color: #f43f5e;">${responder}</strong> has submitted an official government response to the binding proposal:
           </p>
-          <h2 style="color: #ffffff; font-size: 16px; margin: 0 0 12px;">${params.proposalTitle}</h2>
+          <h2 style="color: #ffffff; font-size: 16px; margin: 0 0 12px;">${title}</h2>
           <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-            <p style="margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${params.responseText}</p>
+            <p style="margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${response}</p>
           </div>
           ${voteDateSection}
         </div>
         <div style="text-align: center;">
-          <a href="${params.proposalLink}" style="display: inline-block; background: linear-gradient(135deg, #f43f5e, #8b5cf6); color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          <a href="${link}" style="display: inline-block; background: linear-gradient(135deg, #f43f5e, #8b5cf6); color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
             View Full Response
           </a>
         </div>
@@ -215,7 +252,7 @@ export function govResponseBindingProposalEmail(params: {
         </p>
       </div>
     `,
-    text: `Government Response: ${params.proposalTitle}\n\nHello ${params.recipientName},\n\n${params.responderName} has responded to the binding proposal "${params.proposalTitle}":\n\n${params.responseText}\n${params.voteDate ? `\nScheduled Vote: ${params.voteDate}\n` : ''}\nView the full response: ${params.proposalLink}`,
+    text: `Government Response: ${params.proposalTitle}\n\nHello ${params.recipientName},\n\n${params.responderName} has responded to the binding proposal "${params.proposalTitle}":\n\n${params.responseText}\n${params.voteDate ? `\nScheduled Vote: ${params.voteDate}\n` : ''}\nView the full response: ${link}`,
   };
 }
 
@@ -229,6 +266,10 @@ export function legislationStatusUpdateEmail(params: {
   legislationLink: string;
   recipientName: string;
 }): Omit<EmailPayload, "to"> {
+  const name = escapeHtml(params.recipientName);
+  const title = escapeHtml(params.legislationTitle);
+  const status = escapeHtml(params.newStatus);
+  const link = absoluteUrl(params.legislationLink);
   return {
     subject: `Legislation Update: ${params.legislationTitle}`,
     html: `
@@ -238,23 +279,23 @@ export function legislationStatusUpdateEmail(params: {
           <p style="color: #94a3b8; font-size: 14px;">Legislation Status Update</p>
         </div>
         <div style="background: rgba(139,92,246,0.05); border: 1px solid rgba(139,92,246,0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <p style="margin: 0 0 8px; font-size: 14px; color: #94a3b8;">Hello ${params.recipientName},</p>
+          <p style="margin: 0 0 8px; font-size: 14px; color: #94a3b8;">Hello ${name},</p>
           <p style="margin: 0 0 16px; font-size: 14px;">
-            The legislation <strong style="color: #8b5cf6;">${params.legislationTitle}</strong> has been updated:
+            The legislation <strong style="color: #8b5cf6;">${title}</strong> has been updated:
           </p>
           <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px;">
-            <p style="margin: 0; font-size: 14px;"><strong>New Status:</strong> <span style="color: #38bdf8;">${params.newStatus}</span></p>
-            ${params.governmentNote ? `<p style="margin: 8px 0 0; font-size: 14px;"><strong>Government Note:</strong> ${params.governmentNote}</p>` : ''}
+            <p style="margin: 0; font-size: 14px;"><strong>New Status:</strong> <span style="color: #38bdf8;">${status}</span></p>
+            ${params.governmentNote ? `<p style="margin: 8px 0 0; font-size: 14px;"><strong>Government Note:</strong> ${escapeHtml(params.governmentNote)}</p>` : ''}
           </div>
         </div>
         <div style="text-align: center;">
-          <a href="${params.legislationLink}" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6, #38bdf8); color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          <a href="${link}" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6, #38bdf8); color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
             View Legislation
           </a>
         </div>
       </div>
     `,
-    text: `Legislation Update: ${params.legislationTitle}\n\nNew Status: ${params.newStatus}\n${params.governmentNote ? `Note: ${params.governmentNote}\n` : ''}\nView: ${params.legislationLink}`,
+    text: `Legislation Update: ${params.legislationTitle}\n\nNew Status: ${params.newStatus}\n${params.governmentNote ? `Note: ${params.governmentNote}\n` : ''}\nView: ${link}`,
   };
 }
 
@@ -263,7 +304,8 @@ export function legislationStatusUpdateEmail(params: {
  */
 export function welcomeEmail(params: { recipientName: string; role: string }): Omit<EmailPayload, "to"> {
   const roleLabel = params.role === 'gov_official' ? 'Government Official' : params.role;
-  const dashboardLink = params.role === 'gov_official' ? '/dashboard/gov-portal' : '/dashboard';
+  const dashboardLink = absoluteUrl(params.role === 'gov_official' ? '/dashboard/gov-portal' : '/dashboard');
+  const name = escapeHtml(params.recipientName);
 
   return {
     subject: 'Welcome to CosmoGov — Your Cosmic Civic Platform',
@@ -274,7 +316,7 @@ export function welcomeEmail(params: { recipientName: string; role: string }): O
           <p style="color: #94a3b8; font-size: 14px;">Interstellar Civic OS</p>
         </div>
         <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <p style="margin: 0 0 16px; font-size: 16px;">Welcome, <strong style="color: #38bdf8;">${params.recipientName}</strong>!</p>
+          <p style="margin: 0 0 16px; font-size: 16px;">Welcome, <strong style="color: #38bdf8;">${name}</strong>!</p>
           <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6;">
             You have joined CosmoGov as a <strong style="color: #f59e0b;">${roleLabel}</strong>. 
             Your account is ready to participate in governance, propose changes, and make your voice heard.

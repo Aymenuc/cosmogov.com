@@ -7,7 +7,7 @@
  * Setup:
  * 1. Generate VAPID keys: npx web-push generate-vapid-keys
  * 2. Set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in .env
- * 3. Set VAPID_SUBJECT to your email or URL (e.g., mailto:noreply@cosmogov.app)
+ * 3. Set VAPID_SUBJECT to your email or URL (e.g., mailto:support@cosmogov.com)
  */
 
 import { db } from './db';
@@ -15,7 +15,7 @@ import { db } from './db';
 // VAPID configuration from environment
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:noreply@cosmogov.app';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:support@cosmogov.com';
 
 export interface PushNotificationPayload {
   title: string;

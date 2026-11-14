@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { sendEmail, legislationStatusUpdateEmail } from '@/lib/email';
@@ -46,17 +46,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         },
       });
 
-      // Email notification (async, non-blocking)
-      if (legislation.creator.email) {
-        sendEmail(
-          { ...legislationStatusUpdateEmail({
-            legislationTitle: legislation.title,
-            newStatus: status,
-            governmentNote,
-            legislationLink,
-            recipientName: legislation.creator.name || 'there',
-          }), to: legislation.creator.email }
-        ).catch((err) => console.error('[EMAIL] Failed to send legislation update email:', err));
+      // Email notification, sent after the response
+      const creatorEmail = legislation.creator.email;
+      if (creatorEmail) {
+        after(async () => {
+          const result = await sendEmail({
+            ...legislationStatusUpdateEmail({
+              legislationTitle: legislation.title,
+              newStatus: status,
+              governmentNote,
+              legislationLink,
+              recipientName: legislation.creator.name || 'there',
+            }),
+            to: creatorEmail,
+          });
+          if (!result.success) console.error('[EMAIL] Legislation update email not sent:', result.error);
+        });
       }
 
       // Push notification (async, non-blocking)
