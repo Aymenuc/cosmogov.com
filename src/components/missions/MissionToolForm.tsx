@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowUpRight, Check, Users } from "lucide-react";
 import { answerNotice } from "@/lib/missions/forms";
 import type { MissionTool } from "@/lib/missions/types";
@@ -32,12 +32,18 @@ export default function MissionToolForm({
   );
   const [offerToHelp, setOfferToHelp] = useState(initialOfferToHelp);
   const [saved, setSaved] = useState(false);
-  const savedValues = JSON.stringify(initialValues || {});
-  useEffect(() => {
-    setValues(JSON.parse(savedValues));
+  const initialSnapshot = JSON.stringify([
+    initialValues || {},
+    initialOfferToHelp,
+  ]);
+  const [previousSnapshot, setPreviousSnapshot] = useState(initialSnapshot);
+  // Reset edits when the stored answer changes, before rendering its controls.
+  if (previousSnapshot !== initialSnapshot) {
+    setPreviousSnapshot(initialSnapshot);
+    setValues(initialValues || {});
+    setOfferToHelp(initialOfferToHelp);
     setSaved(false);
-  }, [savedValues]);
-  useEffect(() => setOfferToHelp(initialOfferToHelp), [initialOfferToHelp]);
+  }
   return (
     <form
       className="mission-generated-form"

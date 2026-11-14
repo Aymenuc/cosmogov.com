@@ -1,6 +1,6 @@
 import {
   chatCompletionsCreate,
-  useNvidiaOpenAICompat,
+  isOpenAICompatible,
 } from "@/lib/ai-completions";
 import { createZAI } from "@/lib/z-ai-client";
 import { parseMissionOutput, safeSourceUrl } from "./validation";
@@ -18,7 +18,7 @@ const instructions: Record<MissionStage, string> = {
 export async function searchMissionSources(query: string): Promise<Evidence[]> {
   // Search is a separately configured capability; OpenAI-compatible chat endpoints
   // do not imply support for the SDK's web_search function.
-  if (process.env.MISSION_WEB_SEARCH !== "1" || useNvidiaOpenAICompat())
+  if (process.env.MISSION_WEB_SEARCH !== "1" || isOpenAICompatible())
     throw new Error("Search is not configured");
   const client = await createZAI();
   const results = await client.functions.invoke("web_search", {

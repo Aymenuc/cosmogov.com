@@ -17,18 +17,31 @@ import ProposalCard from "@/components/ProposalCard";
 export default function ProposalsPage() {
   const { saved, user } = useWorkspace();
   const [proposals, setProposals] = useState<CivicProposal[]>([]);
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("active");
-  const [category, setCategory] = useState("all");
+  const [query, setQueryValue] = useState("");
+  const [status, setStatusValue] = useState("active");
+  const [category, setCategoryValue] = useState("all");
   const [following, setFollowing] = useState(false);
   const [sort, setSort] = useState("recent");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    let cancelled = false;
+  const changeFilter = (
+    current: string,
+    next: string,
+    setValue: (value: string) => void,
+  ) => {
+    if (current === next) return;
     setLoading(true);
     setError("");
+    setValue(next);
+  };
+  const setQuery = (value: string) => changeFilter(query, value, setQueryValue);
+  const setStatus = (value: string) =>
+    changeFilter(status, value, setStatusValue);
+  const setCategory = (value: string) =>
+    changeFilter(category, value, setCategoryValue);
+  useEffect(() => {
+    let cancelled = false;
     const params = new URLSearchParams();
     if (status !== "all") params.set("status", status);
     if (category !== "all") params.set("category", category);
@@ -56,7 +69,11 @@ export default function ProposalsPage() {
     };
   }, [status, category, query, retry]);
   const filtered = proposals
-    .filter((p) => (!following || saved.includes(p.id)) && (status !== "active" || isOpen(p)))
+    .filter(
+      (p) =>
+        (!following || saved.includes(p.id)) &&
+        (status !== "active" || isOpen(p)),
+    )
     .sort((a, b) =>
       sort === "closing"
         ? (a.closesAt ? new Date(a.closesAt).getTime() : Infinity) -
@@ -173,7 +190,11 @@ export default function ProposalsPage() {
           <p>{error}</p>
           <button
             className="civic-button outline"
-            onClick={() => setRetry((v) => v + 1)}
+            onClick={() => {
+              setLoading(true);
+              setError("");
+              setRetry((v) => v + 1);
+            }}
           >
             Try again
           </button>

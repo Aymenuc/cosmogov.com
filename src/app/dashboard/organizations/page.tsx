@@ -26,8 +26,6 @@ export default function OrganizationsPage() {
   const [retry, setRetry] = useState(0);
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError("");
     fetch("/api/organizations")
       .then(async (res) => {
         if (!res.ok) throw new Error();
@@ -93,7 +91,11 @@ export default function OrganizationsPage() {
           <p>{error}</p>
           <button
             className="civic-button outline"
-            onClick={() => setRetry((v) => v + 1)}
+            onClick={() => {
+              setLoading(true);
+              setError("");
+              setRetry((v) => v + 1);
+            }}
           >
             Try again
           </button>
