@@ -38,8 +38,9 @@ export default function MissionControls({
           <DialogTitle>Delete this mission?</DialogTitle>
           <DialogDescription>
             This permanently removes the mission, its contributions, AI outputs,
-            tasks, history and form responses. Download any response exports
-            first.
+            tasks, history, form responses and templates saved from it. Missions
+            already started from those templates keep their copies and credit.
+            Download any response exports first.
           </DialogDescription>
           {demo ? (
             <p>
