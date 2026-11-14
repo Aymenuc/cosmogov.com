@@ -49,13 +49,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       // Email notification (async, non-blocking)
       if (legislation.creator.email) {
         sendEmail(
-          legislationStatusUpdateEmail({
+          { ...legislationStatusUpdateEmail({
             legislationTitle: legislation.title,
             newStatus: status,
             governmentNote,
             legislationLink,
             recipientName: legislation.creator.name || 'there',
-          })
+          }), to: legislation.creator.email }
         ).catch((err) => console.error('[EMAIL] Failed to send legislation update email:', err));
       }
 

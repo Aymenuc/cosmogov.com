@@ -197,10 +197,10 @@ export default function AuthExperience({
                   autoComplete={signup ? "new-password" : "current-password"}
                   placeholder={
                     signup
-                      ? "Create a password (at least 6 characters)"
+                      ? "Create a password (at least 10 characters)"
                       : "Enter your password"
                   }
-                  minLength={signup ? 6 : undefined}
+                  minLength={signup ? 10 : undefined}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -217,7 +217,7 @@ export default function AuthExperience({
             </div>
             {signup && role === "gov_official" && (
               <div className="auth-field">
-                <label htmlFor="gov-code">Government verification code</label>
+                <label htmlFor="gov-code">Official invitation code</label>
                 <input
                   id="gov-code"
                   name="govCode"
@@ -228,8 +228,7 @@ export default function AuthExperience({
                   required
                 />
                 <small>
-                  Your administrator provides this code to verify your official
-                  account.
+                  An administrator issues a single-use invitation tied to your email.
                 </small>
               </div>
             )}

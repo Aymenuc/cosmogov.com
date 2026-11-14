@@ -70,8 +70,8 @@ interface Proposal {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  binding_proposal: { label: 'Binding Proposal', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Gavel },
-  binding_referendum: { label: 'Binding Referendum', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Scale },
+  binding_proposal: { label: 'Formal proposal', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Gavel },
+  binding_referendum: { label: 'Referendum request', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Scale },
   citizen_bill: { label: 'Citizen Bill', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: FileSignature },
 };
 
@@ -180,7 +180,7 @@ export default function BindingProposalDetailPage() {
       {/* Back navigation */}
       <Link href="/dashboard/participation/binding-proposals" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" />
-        Back to Binding Proposals
+        Back to Formal response proposals
       </Link>
 
       {/* Header — Title, type badge, category badge */}
@@ -213,14 +213,14 @@ export default function BindingProposalDetailPage() {
         </div>
       </div>
 
-      {/* LARGE Signature Progress Bar */}
+      {/* LARGE Reviewed signature progress Bar */}
       <Card className="glass-card rounded-2xl border-cosmic-rose/20">
         <CardContent className="pt-6">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-cosmic-muted flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
-                Signature Progress
+                Reviewed signature progress
               </span>
               <span className={`text-xl sm:text-2xl font-bold font-heading ${isThresholdReached ? 'text-cosmic-teal' : 'text-foreground'}`}>
                 {proposal.signatureCount.toLocaleString()} / {proposal.signatureGoal.toLocaleString()}
@@ -402,7 +402,7 @@ export default function BindingProposalDetailPage() {
                       <span className="text-sm font-medium text-foreground truncate">{sig.user.name || 'Anonymous'}</span>
                       {sig.verified && (
                         <Badge className="text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20 text-[9px] border">
-                          Verified
+                          Eligibility reviewed
                         </Badge>
                       )}
                     </div>

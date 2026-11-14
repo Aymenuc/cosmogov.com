@@ -2302,3 +2302,10 @@
     font-size: 16px;
   }
 }
+.integrity-controls { display: grid; gap: 24px; }
+.integrity-controls .mission-panel { padding: 24px; background: white; border: 1px solid var(--civic-line); border-radius: 18px; }
+.integrity-controls h2 { font: 750 22px Manrope, sans-serif; margin-bottom: 12px; }
+.integrity-controls p { font-size: 14px; line-height: 1.8; margin: 10px 0; }
+.integrity-controls article { border-top: 1px solid var(--civic-line); margin-top: 22px; padding-top: 18px; }
+.integrity-controls .mission-response-notice { flex-wrap: wrap; }
+.integrity-controls code { overflow-wrap: anywhere; font-size: 14px; max-width: 100%; }

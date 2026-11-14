@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import IntegrityControls from '@/components/admin/IntegrityControls';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -204,6 +205,7 @@ export default function AdminPortalPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="bg-card border border-border p-1 mb-6 overflow-x-auto flex-nowrap min-w-max h-auto gap-1">
+          <TabsTrigger value="integrity">Invitations & eligibility</TabsTrigger>
           <TabsTrigger value="overview" className="data-[state=active]:bg-cosmic-rose/10 data-[state=active]:text-cosmic-rose">
             <Activity className="w-4 h-4 mr-1.5" /> Overview
           </TabsTrigger>
@@ -228,6 +230,7 @@ export default function AdminPortalPage() {
         </TabsList>
 
         {/* OVERVIEW TAB */}
+        <TabsContent value="integrity"><IntegrityControls /></TabsContent>
         <TabsContent value="overview">
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

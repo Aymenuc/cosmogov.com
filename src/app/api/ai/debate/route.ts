@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const debates = await db.debateSession.findMany({
       where,
       include: {
-        creator: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        creator: { select: { id: true, name: true, avatarUrl: true } },
         assembly: { select: { id: true, name: true, slug: true } },
         meeting: { select: { id: true, title: true } },
         participants: {
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         energyLevel: 0.5,
       },
       include: {
-        creator: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        creator: { select: { id: true, name: true, avatarUrl: true } },
         assembly: { select: { id: true, name: true, slug: true } },
       },
     });

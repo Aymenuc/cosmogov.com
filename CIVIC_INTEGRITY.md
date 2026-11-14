@@ -1,0 +1,15 @@
+# Civic integrity changes
+
+Proposal APIs return totals and only the caller’s ballot. Creator emails and other people’s ballots are omitted. Organization proposals follow current membership, and only their creator or community moderators may edit them. Content and voting rules are locked after a ballot exists. Only the implemented yes/no and single-choice methods can receive ballots. Voting does not award XP. These ballots remain linked to accounts in PostgreSQL; the product does not promise anonymous or end-to-end-verifiable elections.
+
+Budget allocations are integer amounts bounded by each participant’s allowance (the process budget) across projects in that process. The server locks the process and checks the sum in a serializable transaction. Setting an allocation to zero removes it. The displayed remaining allowance is personal; combined support from many voters is not money spent. Only the voting phase accepts allocations.
+
+Signature creation and count updates are transactional. A formal response threshold counts only signatures reviewed by an administrator. The admin records the review basis without identity documents. This records a human eligibility check; it does not independently prove identity, residency, uniqueness across accounts or a legal duty to respond. The interface no longer presents a user-created threshold as legally binding. Later official response states are preserved; collecting and threshold states are reconciled to reviewed counts by the migration.
+
+All four HTTP seed routes were removed. Dynamic route fallbacks may return 405 rather than 404, but cannot execute seed operations. The public government signup codes were removed. Administrators issue cryptographically random, single-use, email-bound invitations; only a hash is stored, and invitations expire in 48 hours by default. Codes are shown once and are shared manually by the administrator.
+
+Signed sessions check a user revocation version. Logout revokes its individual token, and “Sign out everywhere” revokes all current sessions. Production still requires a shared random SESSION_SECRET. Login, signup, invitations, proposal creation/voting/comments, allocation and signing have persistent database rate limits. Only Vercel’s own forwarding header is trusted for client throttling on Vercel; direct/local deployments share the client bucket and retain account-based login limits. A different reverse proxy needs a deliberately configured trusted-client policy.
+
+Migration: `20261114200000_civic_integrity`. Apply through `npm run db:migrate:deploy`. Cleanup of expired rate buckets and revoked tokens is part of the maintenance job added with mission retention controls.
+
+Run `scripts/check-missions.cjs` with the disposable PostgreSQL harness to include `scripts/check-integrity.cjs`. It checks seed rejection, invitation properties, ballot privacy, unauthorized edits, no voting XP, unsupported methods, concurrent allowance enforcement, signature review thresholds, every exported admin/government handler, token revocation and login throttling. Tests use fixture accounts and stub email; no real invitations or messages are sent.

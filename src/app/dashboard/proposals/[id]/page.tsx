@@ -190,7 +190,7 @@ export default function ProposalDetailPage() {
   if (!options.length) options = ["For", "Against"];
   const open = isOpen(proposal);
   const mine = proposal.votes.find((v) => v.voterId === user?.id);
-  const total = proposal.votes.length;
+  const total = proposal._count?.votes ?? proposal.voteTotals?.reduce((sum, row) => sum + row.count, 0) ?? proposal.votes.length;
   const quorumMet = total >= proposal.quorum;
   const isSaved = saved.includes(proposal.id);
   return (
@@ -399,9 +399,7 @@ export default function ProposalDetailPage() {
                 </span>
               </div>
               {options.map((value) => {
-                const count = proposal.votes.filter(
-                  (v) => v.option === value,
-                ).length;
+                const count = proposal.voteTotals?.find(row => row.option === value)?.count ?? proposal.votes.filter(v => v.option === value).length;
                 const percent = total ? (count / total) * 100 : 0;
                 return (
                   <div key={value} className="result-row">
@@ -523,9 +521,7 @@ export default function ProposalDetailPage() {
               <div>
                 <dt>Voter visibility</dt>
                 <dd>
-                  {proposal.isAnonymous
-                    ? "Anonymous voting"
-                    : "Names visible to members"}
+                  Only your own ballot is shown. Results use totals.
                 </dd>
               </div>
             </dl>
@@ -566,28 +562,7 @@ export default function ProposalDetailPage() {
               <ArrowUpRight size={14} />
             </Link>
           </div>
-          {!proposal.isAnonymous && (
-            <section>
-              <h2>People in the conversation.</h2>
-              {proposal.votes.length === 0 ? (
-                <p className="section-context">
-                  Voters will appear here as the conversation grows.
-                </p>
-              ) : (
-                <div className="recent-voters">
-                  {proposal.votes.slice(0, 6).map((v) => (
-                    <div key={v.id}>
-                      <span className="user-avatar small">
-                        {(v.voter?.name || "C")[0]}
-                      </span>
-                      <span>{v.voter?.name || "Community member"}</span>
-                      <Check size={12} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
+          <section><h2>Your ballot and privacy</h2><p className="section-context">Members see result totals and their own ballot. Ballots remain linked to accounts in the database; this is not an anonymous ballot system.</p></section>
           <Link href="/dashboard/assistant" className="desk-ai">
             <Sparkles size={19} />
             <div>

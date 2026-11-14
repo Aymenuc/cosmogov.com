@@ -17,10 +17,12 @@ export function signSession(
   userId: string,
   secret: string,
   now = Date.now(),
+  sessionVersion = 0,
 ): string {
   const payload = Buffer.from(
     JSON.stringify({
       sub: userId,
+      ver: sessionVersion,
       iat: now,
       exp: now + SESSION_LIFETIME_MS,
       nonce: randomBytes(16).toString("hex"),
@@ -29,11 +31,11 @@ export function signSession(
   const message = `v1.${payload}`;
   return `${message}.${createHmac("sha256", secret).update(message).digest("base64url")}`;
 }
-export function verifySession(
+export function sessionClaims(
   token: string,
   secret: string,
   now = Date.now(),
-): string | null {
+): { userId: string; version: number; expiresAt: number } | null {
   try {
     if (token.length > 2000) return null;
     const [version, payload, signature, extra] = token.split(".");
@@ -43,7 +45,11 @@ export function verifySession(
       .update(`${version}.${payload}`)
       .digest();
     const actual = Buffer.from(signature, "base64url");
-    if (actual.length !== expected.length || !timingSafeEqual(actual, expected))
+    if (
+      actual.length !== expected.length ||
+      actual.toString("base64url") !== signature ||
+      !timingSafeEqual(actual, expected)
+    )
       return null;
     const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
     if (
@@ -60,8 +66,18 @@ export function verifySession(
       data.exp - data.iat !== SESSION_LIFETIME_MS
     )
       return null;
-    return data.sub;
+    const versionNumber = data.ver ?? 0;
+    if (!Number.isSafeInteger(versionNumber) || versionNumber < 0) return null;
+    return { userId: data.sub, version: versionNumber, expiresAt: data.exp };
   } catch {
     return null;
   }
+}
+
+export function verifySession(
+  token: string,
+  secret: string,
+  now = Date.now(),
+): string | null {
+  return sessionClaims(token, secret, now)?.userId || null;
 }

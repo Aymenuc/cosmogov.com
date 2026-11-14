@@ -20,6 +20,7 @@ model User {
   avatarUrl     String?
   passwordHash  String?
   plan          String   @default("community") // community, team, guild, enterprise
+  sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
   level         Int      @default(1)
@@ -1039,6 +1040,7 @@ model BindingProposalSignature {
   userId          String
   comment         String?
   verified        Boolean  @default(false) // identity verification status
+  verificationNote String?
   verifiedAt      DateTime?
   createdAt       DateTime @default(now())
 
@@ -1166,4 +1168,28 @@ model MissionToolResponse {
 
   @@unique([runId, authorId])
   @@index([missionId])
+}
+
+// Only hashes of invitation and revocation tokens are stored.
+model OfficialInvitation {
+  id String @id @default(cuid())
+  tokenHash String @unique
+  email String
+  createdBy String
+  expiresAt DateTime
+  usedAt DateTime?
+  usedBy String?
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+model RevokedSession {
+  tokenHash String @id
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+model RateLimitBucket {
+  key String @id
+  count Int @default(1)
+  expiresAt DateTime
+  @@index([expiresAt])
 }
