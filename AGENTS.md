@@ -8,6 +8,16 @@ Everything here was checked against the code on `redesign/civic-experience` at
 commit `cbb9b8f` (14 Nov 2026) by reading it. Nothing was run against a live
 database. Where a claim was not verified, it says so.
 
+**Not covered: missions and AI-drafted community forms.** The owner reports later
+work in which AI turns a mission into a working community form (for example
+collecting repair skills or equipment offers), with responses saved beside the
+mission's plan and tasks, and AI drafts that show their references and
+unanswered questions. None of that code was on GitHub when this file was written,
+so nothing below describes it. Once it is pushed, read it first, then update the
+repository map (section 3), the defect list (section 6) and the roadmap (section 7)
+before following them. The product rules in section 1 and the design system in
+section 5 still apply to it.
+
 Related files: `DESIGN.md` (what the redesign changed and how it was verified),
 `worklog.md` (history of earlier agents), `agent-ctx/` (notes per feature).
 
