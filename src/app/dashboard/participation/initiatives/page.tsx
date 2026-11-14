@@ -80,7 +80,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   voting: { label: 'Voting', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20' },
   enacted: { label: 'Enacted', color: 'text-cosmic-success bg-cosmic-success/10 border-cosmic-success/20' },
   rejected: { label: 'Rejected', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20' },
-  expired: { label: 'Expired', color: 'text-cosmic-muted bg-white/5 border-white/10' },
+  expired: { label: 'Expired', color: 'text-cosmic-muted bg-foreground/5 border-border' },
 };
 
 /**
@@ -256,7 +256,7 @@ export default function InitiativesPage() {
             <Zap className="w-5 h-5 text-cosmic-violet" />
             <span className="text-cosmic-violet text-sm font-semibold tracking-wider uppercase">Citizen Initiatives</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Power to the{' '}
             <span className="text-gradient">People</span>
           </h1>
@@ -298,8 +298,8 @@ export default function InitiativesPage() {
             onClick={() => setCategoryFilter('all')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
               categoryFilter === 'all'
-                ? 'bg-white/15 text-white border-white/30'
-                : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-foreground/15 text-foreground border-border'
+                : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -315,7 +315,7 @@ export default function InitiativesPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
                   isSelected
                     ? `${cat.bgColor} ${cat.color} ${cat.borderColor} ring-1 ring-current/20`
-                    : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                    : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
                 }`}
               >
                 <CatIcon className="w-3.5 h-3.5" />
@@ -333,13 +333,13 @@ export default function InitiativesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search initiatives..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             />
           </div>
           <Select value={filters.type} onValueChange={(v) => setFilters((f) => ({ ...f, type: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -351,7 +351,7 @@ export default function InitiativesPage() {
             </SelectContent>
           </Select>
           <Select value={filters.status} onValueChange={(v) => setFilters((f) => ({ ...f, status: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -364,7 +364,7 @@ export default function InitiativesPage() {
             </SelectContent>
           </Select>
           <Select value={filters.sort} onValueChange={(v) => setFilters((f) => ({ ...f, sort: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
@@ -375,7 +375,7 @@ export default function InitiativesPage() {
           </Select>
         </div>
         <Button
-          className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90 shrink-0"
+          className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90 shrink-0"
           onClick={() => setCreateDialogOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" /> Launch Initiative
@@ -398,7 +398,7 @@ export default function InitiativesPage() {
           })()}
           <button
             onClick={() => setCategoryFilter('all')}
-            className="text-xs text-cosmic-muted hover:text-white transition-colors underline underline-offset-2"
+            className="text-xs text-cosmic-muted hover:text-foreground transition-colors underline underline-offset-2"
           >
             Clear
           </button>
@@ -416,7 +416,7 @@ export default function InitiativesPage() {
       ) : filteredInitiatives.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <FileSignature className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             {categoryFilter !== 'all' ? 'No Matching Initiatives' : 'No Initiatives Yet'}
           </h3>
           <p className="text-cosmic-muted text-sm mb-4">
@@ -426,13 +426,13 @@ export default function InitiativesPage() {
           </p>
           {categoryFilter !== 'all' ? (
             <Button
-              className="bg-white/10 text-white hover:bg-white/20"
+              className="bg-foreground/10 text-foreground hover:bg-foreground/20"
               onClick={() => setCategoryFilter('all')}
             >
               Clear Category Filter
             </Button>
           ) : (
-            <Button className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90" onClick={() => setCreateDialogOpen(true)}>
+            <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90" onClick={() => setCreateDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" /> Launch Initiative
             </Button>
           )}
@@ -482,7 +482,7 @@ export default function InitiativesPage() {
                       </Badge>
                     )}
                   </div>
-                  <h3 className="text-base font-semibold text-white group-hover:text-cosmic-teal transition-colors line-clamp-2">
+                  <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-teal transition-colors line-clamp-2">
                     {initiative.title}
                   </h3>
                   <p className="text-xs text-cosmic-muted line-clamp-2 mt-1">
@@ -501,7 +501,7 @@ export default function InitiativesPage() {
                         {progress}%
                       </span>
                     </div>
-                    <div className="relative h-2.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="relative h-2.5 bg-foreground/5 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-1000 ease-out ${
                           isThresholdReached
@@ -530,13 +530,13 @@ export default function InitiativesPage() {
                             Official Response
                           </Badge>
                         </div>
-                        <p className="text-xs text-white/90 line-clamp-3 whitespace-pre-wrap">{initiative.governmentResponse}</p>
+                        <p className="text-xs text-foreground/90 line-clamp-3 whitespace-pre-wrap">{initiative.governmentResponse}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
                     <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                       <div className="w-5 h-5 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[9px] font-bold text-cosmic-violet">
                         {(initiative.creator.name || 'U')[0].toUpperCase()}
@@ -576,11 +576,11 @@ export default function InitiativesPage() {
 
       {/* Sign Initiative Dialog */}
       <Dialog open={signDialogOpen} onOpenChange={setSignDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg">
           {selectedInitiative && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-white flex items-center gap-2">
+                <DialogTitle className="text-foreground flex items-center gap-2">
                   <PenTool className="w-5 h-5 text-cosmic-violet" />
                   Sign This Initiative
                 </DialogTitle>
@@ -611,13 +611,13 @@ export default function InitiativesPage() {
                         return null;
                       })()}
                     </div>
-                    <h3 className="text-white font-semibold mb-1">{selectedInitiative.title}</h3>
+                    <h3 className="text-foreground font-semibold mb-1">{selectedInitiative.title}</h3>
                     <p className="text-sm text-cosmic-muted line-clamp-3">{selectedInitiative.description}</p>
                     <div className="mt-3 flex items-center gap-3">
                       <div className="flex-grow">
                         <Progress
                           value={progressPercent(selectedInitiative.signatureCount, selectedInitiative.signatureGoal)}
-                          className="h-2 bg-white/5"
+                          className="h-2 bg-foreground/5"
                         />
                       </div>
                       <span className="text-xs text-cosmic-muted whitespace-nowrap">
@@ -630,7 +630,7 @@ export default function InitiativesPage() {
                     <label className="text-sm text-cosmic-muted mb-1 block">Why are you signing? (optional)</label>
                     <Textarea
                       placeholder="Share your reason for supporting this initiative..."
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                       value={signComment}
                       onChange={(e) => setSignComment(e.target.value)}
                     />
@@ -639,13 +639,13 @@ export default function InitiativesPage() {
                   <DialogFooter>
                     <Button
                       variant="ghost"
-                      className="text-cosmic-muted hover:text-white"
+                      className="text-cosmic-muted hover:text-foreground"
                       onClick={() => setSignDialogOpen(false)}
                     >
                       Cancel
                     </Button>
                     <Button
-                      className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90"
+                      className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90"
                       onClick={handleSign}
                       disabled={signing}
                     >
@@ -659,7 +659,7 @@ export default function InitiativesPage() {
                   <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${thresholdJustReached ? 'bg-cosmic-teal/20 glow-teal' : 'bg-cosmic-success/20'}`}>
                     <CheckCircle2 className={`w-8 h-8 ${thresholdJustReached ? 'text-cosmic-teal' : 'text-cosmic-success'}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">You&apos;ve Signed!</h3>
+                  <h3 className="text-lg font-semibold text-foreground">You&apos;ve Signed!</h3>
                   <p className="text-cosmic-muted text-sm">
                     {thresholdJustReached
                       ? '🎉 Threshold Reached! This initiative now requires a government response.'
@@ -689,9 +689,9 @@ export default function InitiativesPage() {
 
       {/* Create Initiative Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-cosmic-amber" />
               Launch New Initiative
             </DialogTitle>
@@ -705,7 +705,7 @@ export default function InitiativesPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Title *</label>
               <Input
                 placeholder="What change do you want to see?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={createForm.title}
                 onChange={(e) => setCreateForm((f) => ({ ...f, title: e.target.value }))}
               />
@@ -715,7 +715,7 @@ export default function InitiativesPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Description *</label>
               <Textarea
                 placeholder="Describe the initiative in detail. What problem does it address? What solution are you proposing?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[100px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[100px]"
                 value={createForm.description}
                 onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
               />
@@ -724,7 +724,7 @@ export default function InitiativesPage() {
             <div>
               <label className="text-sm text-cosmic-muted mb-1 block">Category</label>
               <Select value={createForm.category} onValueChange={(v) => setCreateForm((f) => ({ ...f, category: v }))}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -747,7 +747,7 @@ export default function InitiativesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Type</label>
                 <Select value={createForm.type} onValueChange={(v) => setCreateForm((f) => ({ ...f, type: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -765,7 +765,7 @@ export default function InitiativesPage() {
                   type="number"
                   min={10}
                   max={100000}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-border text-foreground"
                   value={createForm.signatureGoal}
                   onChange={(e) => setCreateForm((f) => ({ ...f, signatureGoal: parseInt(e.target.value) || 1000 }))}
                 />
@@ -776,7 +776,7 @@ export default function InitiativesPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Closing Date</label>
               <Input
                 type="datetime-local"
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-foreground/5 border-border text-foreground"
                 value={createForm.closesAt}
                 onChange={(e) => setCreateForm((f) => ({ ...f, closesAt: e.target.value }))}
               />
@@ -786,13 +786,13 @@ export default function InitiativesPage() {
           <DialogFooter>
             <Button
               variant="ghost"
-              className="text-cosmic-muted hover:text-white"
+              className="text-cosmic-muted hover:text-foreground"
               onClick={() => setCreateDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90"
+              className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description}
             >

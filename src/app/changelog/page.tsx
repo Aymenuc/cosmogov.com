@@ -1,5 +1,7 @@
 'use client';
 
+import SiteHeader from '@/components/SiteHeader';
+
 import Link from 'next/link';
 import { Rocket, Sparkles, Bug, Wrench } from 'lucide-react';
 import Footer from '@/components/Footer';
@@ -87,22 +89,11 @@ const versions = [
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#04050b]">
-      <Starfield />
-      <nav className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-            <Rocket className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-heading font-bold text-lg">CosmoGov</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login" className="text-sm text-cosmic-muted hover:text-white transition-colors">Log in</Link>
-          <Link href="/auth/signup" className="text-sm bg-cosmic-accent text-white px-4 py-1.5 rounded-lg hover:bg-cosmic-accent/90 transition-colors">Sign up free</Link>
-        </div>
-      </nav>
+    <div className="min-h-screen flex flex-col bg-card">
 
-      <main className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
+      <SiteHeader />
+
+      <main id="main-content" className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 cosmic-badge rounded-full px-4 py-1.5 mb-6">
             <Rocket className="w-3.5 h-3.5 text-cosmic-teal" />
@@ -119,7 +110,7 @@ export default function ChangelogPage() {
         {/* Timeline */}
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-white/5 hidden sm:block" />
+          <div className="absolute left-6 top-0 bottom-0 w-px bg-foreground/5 hidden sm:block" />
 
           <div className="space-y-12">
             {versions.map((v, idx) => (
@@ -135,7 +126,7 @@ export default function ChangelogPage() {
                 {/* Version card */}
                 <div className="glass-card p-8">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6">
-                    <h2 className="text-2xl font-bold text-white font-heading">{v.version}</h2>
+                    <h2 className="text-2xl font-bold text-foreground font-heading">{v.version}</h2>
                     <span
                       className="inline-flex items-center text-xs font-medium px-3 py-1 rounded-full"
                       style={{ background: `${v.accent}15`, color: v.accent }}
@@ -148,7 +139,7 @@ export default function ChangelogPage() {
                     <div className="mb-6">
                       <div className="flex items-center gap-2 mb-3">
                         <Sparkles className="w-4 h-4 text-cosmic-teal" />
-                        <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Features</h3>
+                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Features</h3>
                       </div>
                       <ul className="space-y-2">
                         {v.features.map((feature, i) => (
@@ -165,7 +156,7 @@ export default function ChangelogPage() {
                     <div className="mb-6">
                       <div className="flex items-center gap-2 mb-3">
                         <Bug className="w-4 h-4 text-cosmic-rose" />
-                        <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Bug Fixes</h3>
+                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Bug Fixes</h3>
                       </div>
                       <ul className="space-y-2">
                         {v.fixes.map((fix, i) => (
@@ -182,7 +173,7 @@ export default function ChangelogPage() {
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Wrench className="w-4 h-4 text-cosmic-amber" />
-                        <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Improvements</h3>
+                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Improvements</h3>
                       </div>
                       <ul className="space-y-2">
                         {v.improvements.map((improvement, i) => (

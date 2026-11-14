@@ -69,18 +69,18 @@ export default function CreateProposalPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4" onClick={() => router.back()}>
+      <Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4" onClick={() => router.back()}>
         <ArrowLeft className="w-4 h-4 mr-1" /> Back
       </Button>
       <h1 className="text-2xl font-bold font-heading mb-6">Create Proposal</h1>
-      <Card className="bg-[#0B1022] border-white/5">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">Title</label>
               <div className="flex gap-2">
                 <Input value={title} onChange={e => setTitle(e.target.value)} required placeholder="What should we decide?"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50" />
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50" />
                 <Button type="button" variant="ghost" className="text-cosmic-teal hover:text-cosmic-teal/80 whitespace-nowrap"
                   onClick={handleAIGenerate} disabled={aiLoading || !title}>
                   {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
@@ -92,13 +92,13 @@ export default function CreateProposalPage() {
               <label className="text-sm text-cosmic-muted mb-1.5 block">Description</label>
               <Textarea value={description} onChange={e => setDescription(e.target.value)} required rows={8}
                 placeholder="Describe the proposal in detail..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 resize-y" />
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 resize-y" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-cosmic-muted mb-1.5 block">Category</label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="governance">Governance</SelectItem>
                     <SelectItem value="technology">Technology</SelectItem>
@@ -111,11 +111,10 @@ export default function CreateProposalPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1.5 block">Voting Type</label>
                 <Select value={votingType} onValueChange={setVotingType}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="yes_no">Yes / No</SelectItem>
                     <SelectItem value="single_choice">Single Choice</SelectItem>
-                    <SelectItem value="ranked_choice">Ranked Choice</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -123,7 +122,7 @@ export default function CreateProposalPage() {
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">Options (comma-separated)</label>
               <Input value={options} onChange={e => setOptions(e.target.value)}
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 placeholder="For, Against" />
             </div>
 
@@ -134,7 +133,7 @@ export default function CreateProposalPage() {
               showMap
             />
 
-            <Button type="submit" className="w-full bg-cosmic-accent text-white rounded-xl h-11" disabled={loading}>
+            <Button type="submit" className="w-full bg-cosmic-accent text-primary-foreground rounded-xl h-11" disabled={loading}>
               {loading ? 'Creating...' : 'Create Proposal'}
             </Button>
           </form>

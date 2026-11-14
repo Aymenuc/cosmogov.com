@@ -146,7 +146,7 @@ const PHASE_CONFIG: Record<string, { label: string; color: string; bg: string }>
   debate: { label: 'Debate', color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10 border-cosmic-amber/20' },
   deliberation: { label: 'Deliberation', color: 'text-cosmic-violet', bg: 'bg-cosmic-violet/10 border-cosmic-violet/20' },
   consensus: { label: 'Consensus', color: 'text-cosmic-success', bg: 'bg-cosmic-success/10 border-cosmic-success/20' },
-  closing: { label: 'Closing', color: 'text-cosmic-muted', bg: 'bg-white/5 border-white/10' },
+  closing: { label: 'Closing', color: 'text-cosmic-muted', bg: 'bg-foreground/5 border-border' },
 };
 
 /* ═══════════════════════════════════════════
@@ -690,7 +690,7 @@ function CosmicDebateCanvas({
   speechBubbles: SpeechBubble[];
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>();
+  const animFrameRef = useRef<number | undefined>(undefined);
   const starsRef = useRef<Star[]>([]);
   const initializedRef = useRef(false);
 
@@ -833,7 +833,7 @@ function AgentPreviewCard({ agent }: { agent: Agent }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all group h-full">
+      <Card className="bg-card border-border hover:border-border transition-all group h-full">
         <CardContent className="p-4 text-center">
           {/* Mini cosmic avatar */}
           <div className="relative w-16 h-16 mx-auto mb-3" style={{ animation: 'floatDrift 4s ease-in-out infinite' }}>
@@ -1001,7 +1001,7 @@ function CreateDebateModal({
           }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-white/5">
+          <div className="flex items-center justify-between p-5 border-b border-border">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-cosmic-accent/10 flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-cosmic-accent" />
@@ -1011,7 +1011,7 @@ function CreateDebateModal({
                 <p className="text-[11px] text-cosmic-muted">Start a cosmic debate session</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-foreground/5 transition-colors">
               <X className="w-4 h-4 text-cosmic-muted" />
             </button>
           </div>
@@ -1024,7 +1024,7 @@ function CreateDebateModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Budget Allocation for 2026"
-                className="bg-white/5 border-white/10 text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50"
+                className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50"
               />
             </div>
 
@@ -1034,7 +1034,7 @@ function CreateDebateModal({
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g., How should we distribute the city budget?"
-                className="bg-white/5 border-white/10 text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50"
+                className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50"
               />
             </div>
 
@@ -1045,7 +1045,7 @@ function CreateDebateModal({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Provide context for the debate..."
                 rows={3}
-                className="bg-white/5 border-white/10 text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50 resize-none"
+                className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50 resize-none"
               />
             </div>
 
@@ -1078,18 +1078,18 @@ function CreateDebateModal({
           </div>
 
           {/* Footer */}
-          <div className="p-5 border-t border-white/5 flex items-center gap-3">
+          <div className="p-5 border-t border-border flex items-center gap-3">
             <Button
               variant="outline"
               onClick={onClose}
-              className="flex-1 border-white/10 text-cosmic-muted hover:text-white rounded-xl"
+              className="flex-1 border-border text-cosmic-muted hover:text-foreground rounded-xl"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!title.trim() || !topic.trim() || creating}
-              className="flex-1 bg-cosmic-accent text-white rounded-xl hover:bg-cosmic-accent/90 relative overflow-hidden"
+              className="flex-1 bg-cosmic-accent text-primary-foreground rounded-xl hover:bg-cosmic-accent/90 relative overflow-hidden"
             >
               {creating ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -1456,13 +1456,13 @@ export default function AssemblyHallPage() {
     return (
       <div className={`flex flex-col ${isFullscreen ? 'fixed inset-0 z-50' : '-m-4 lg:-m-8'}`} style={{ background: '#04050b' }}>
         {/* Top bar */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-[#04050b]/80 backdrop-blur-xl">
+        <div className="shrink-0 flex items-center justify-between px-4 py-2.5 border-b border-border bg-card/80 backdrop-blur-xl">
           <div className="flex items-center gap-3 min-w-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={leaveDebate}
-              className="text-cosmic-muted hover:text-white shrink-0 h-7 px-2"
+              className="text-cosmic-muted hover:text-foreground shrink-0 h-7 px-2"
             >
               <ChevronRight className="w-4 h-4 rotate-180 mr-1" />
               Back
@@ -1483,7 +1483,7 @@ export default function AssemblyHallPage() {
             {/* Consensus */}
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-cosmic-muted hidden sm:block">Consensus</span>
-              <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="w-20 h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
@@ -1500,7 +1500,7 @@ export default function AssemblyHallPage() {
               variant="ghost"
               size="sm"
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="text-cosmic-muted hover:text-white h-7 w-7 p-0"
+              className="text-cosmic-muted hover:text-foreground h-7 w-7 p-0"
             >
               {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
             </Button>
@@ -1544,15 +1544,15 @@ export default function AssemblyHallPage() {
           </div>
 
           {/* Right Panel: Chat/Messages */}
-          <div className="lg:w-[30%] flex flex-col border-l border-white/5 bg-[#04050b] min-h-0">
+          <div className="lg:w-[30%] flex flex-col border-l border-border bg-card min-h-0">
             {/* Chat header */}
-            <div className="shrink-0 px-4 py-3 border-b border-white/5">
+            <div className="shrink-0 px-4 py-3 border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-cosmic-accent" />
                   <span className="text-sm font-heading font-bold">Assembly Chat</span>
                 </div>
-                <Badge variant="outline" className="text-[9px] rounded-full border-white/10 text-cosmic-muted">
+                <Badge variant="outline" className="text-[9px] rounded-full border-border text-cosmic-muted">
                   {messages.length} messages
                 </Badge>
               </div>
@@ -1603,15 +1603,15 @@ export default function AssemblyHallPage() {
             </ScrollArea>
 
             {/* Input area */}
-            <div className="shrink-0 p-3 border-t border-white/5 bg-[#070A12]">
+            <div className="shrink-0 p-3 border-t border-border bg-card">
               {/* Options row */}
               <div className="flex items-center gap-2 mb-2">
                 <Select value={targetLang} onValueChange={setTargetLang}>
-                  <SelectTrigger className="h-7 text-[10px] bg-white/5 border-white/10 rounded-lg w-[100px]">
+                  <SelectTrigger className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
                     <Languages className="w-3 h-3 mr-1 text-cosmic-teal" />
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0B1022] border-white/10">
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="es">Español</SelectItem>
                     <SelectItem value="fr">Français</SelectItem>
@@ -1623,11 +1623,11 @@ export default function AssemblyHallPage() {
                 </Select>
 
                 <Select value={simplifyLevel} onValueChange={setSimplifyLevel}>
-                  <SelectTrigger className="h-7 text-[10px] bg-white/5 border-white/10 rounded-lg w-[100px]">
+                  <SelectTrigger className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
                     <BookOpen className="w-3 h-3 mr-1 text-pink-400" />
                     <SelectValue placeholder="Simplify" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0B1022] border-white/10">
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="">Off</SelectItem>
                     <SelectItem value="simple">Simple</SelectItem>
                     <SelectItem value="eli5">ELI5</SelectItem>
@@ -1660,14 +1660,14 @@ export default function AssemblyHallPage() {
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder="Share your thoughts with the assembly..."
-                  className="bg-white/5 border-white/10 text-sm rounded-xl placeholder:text-cosmic-muted/40 focus:border-cosmic-accent/50"
+                  className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/40 focus:border-cosmic-accent/50"
                   disabled={sending}
                 />
                 <Button
                   onClick={sendMessage}
                   disabled={!messageInput.trim() || sending}
                   size="sm"
-                  className="bg-cosmic-accent text-white rounded-xl h-9 w-9 p-0 shrink-0"
+                  className="bg-cosmic-accent text-primary-foreground rounded-xl h-9 w-9 p-0 shrink-0"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
@@ -1733,7 +1733,7 @@ export default function AssemblyHallPage() {
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Button
               onClick={() => setShowCreateModal(true)}
-              className="bg-cosmic-accent text-white rounded-xl px-6 h-11 text-sm font-medium"
+              className="bg-cosmic-accent text-primary-foreground rounded-xl px-6 h-11 text-sm font-medium"
             >
               <Rocket className="w-4 h-4 mr-2" />
               Launch Assembly
@@ -1741,7 +1741,7 @@ export default function AssemblyHallPage() {
             {activeDebates.length > 0 && (
               <Button
                 variant="outline"
-                className="border-white/10 text-cosmic-muted hover:text-white hover:border-white/20 rounded-xl px-6 h-11"
+                className="border-border text-cosmic-muted hover:text-foreground hover:border-border rounded-xl px-6 h-11"
                 onClick={() => {
                   const el = document.getElementById('active-debates');
                   el?.scrollIntoView({ behavior: 'smooth' });
@@ -1754,16 +1754,16 @@ export default function AssemblyHallPage() {
 
           {/* Animated orbit preview */}
           <div className="relative w-48 h-48 mx-auto mt-10">
-            <div className="absolute inset-0 rounded-full border border-white/5" style={{ animation: 'orbitSpin 20s linear infinite' }}>
+            <div className="absolute inset-0 rounded-full border border-border" style={{ animation: 'orbitSpin 20s linear infinite' }}>
               <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-indigo-500" style={{ boxShadow: '0 0 10px rgba(99,102,241,0.6)' }} />
             </div>
-            <div className="absolute inset-4 rounded-full border border-white/5" style={{ animation: 'orbitSpin 14s linear infinite reverse' }}>
+            <div className="absolute inset-4 rounded-full border border-border" style={{ animation: 'orbitSpin 14s linear infinite reverse' }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-amber-500" style={{ boxShadow: '0 0 8px rgba(245,158,11,0.6)' }} />
             </div>
-            <div className="absolute inset-8 rounded-full border border-white/5" style={{ animation: 'orbitSpin 10s linear infinite' }}>
+            <div className="absolute inset-8 rounded-full border border-border" style={{ animation: 'orbitSpin 10s linear infinite' }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-violet-500" style={{ boxShadow: '0 0 8px rgba(139,92,246,0.6)' }} />
             </div>
-            <div className="absolute inset-12 rounded-full border border-white/5" style={{ animation: 'orbitSpin 8s linear infinite reverse' }}>
+            <div className="absolute inset-12 rounded-full border border-border" style={{ animation: 'orbitSpin 8s linear infinite reverse' }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-emerald-500" style={{ boxShadow: '0 0 8px rgba(16,185,129,0.6)' }} />
             </div>
             {/* Center star */}
@@ -1834,7 +1834,7 @@ export default function AssemblyHallPage() {
         </div>
 
         {activeDebates.length === 0 ? (
-          <Card className="bg-[#0B1022] border-white/5">
+          <Card className="bg-card border-border">
             <CardContent className="p-10 text-center">
               <div className="w-14 h-14 rounded-2xl bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-4">
                 <Waves className="w-7 h-7 text-cosmic-teal/40" />
@@ -1843,7 +1843,7 @@ export default function AssemblyHallPage() {
               <p className="text-sm text-cosmic-muted mb-4">Launch a new assembly to see AI agents in action.</p>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-cosmic-accent text-white rounded-xl"
+                className="bg-cosmic-accent text-primary-foreground rounded-xl"
               >
                 <Plus className="w-4 h-4 mr-2" /> Launch Assembly
               </Button>
@@ -1861,7 +1861,7 @@ export default function AssemblyHallPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1, duration: 0.4 }}
                 >
-                  <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all group cursor-pointer" onClick={() => joinDebate(debate.id)}>
+                  <Card className="bg-card border-border hover:border-border transition-all group cursor-pointer" onClick={() => joinDebate(debate.id)}>
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-3">
                         <div className="min-w-0 flex-grow">
@@ -1894,7 +1894,7 @@ export default function AssemblyHallPage() {
                           <span className="text-cosmic-muted">Consensus</span>
                           <span className="text-cosmic-success font-mono font-bold">{pct}%</span>
                         </div>
-                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700"
                             style={{
@@ -1905,7 +1905,7 @@ export default function AssemblyHallPage() {
                         </div>
                       </div>
 
-                      <Button size="sm" className="w-full bg-cosmic-accent/10 text-cosmic-accent hover:bg-cosmic-accent hover:text-white rounded-xl h-8 text-xs transition-all">
+                      <Button size="sm" className="w-full bg-cosmic-accent/10 text-cosmic-accent hover:bg-cosmic-accent hover:text-primary-foreground rounded-xl h-8 text-xs transition-all">
                         Enter Assembly <ArrowUpRight className="w-3 h-3 ml-1.5" />
                       </Button>
                     </CardContent>
@@ -1954,14 +1954,14 @@ export default function AssemblyHallPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.15, duration: 0.5 }}
             >
-              <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all h-full group relative overflow-hidden">
+              <Card className="bg-card border-border hover:border-border transition-all h-full group relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-0.5" style={{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)`, opacity: 0.5 }} />
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${item.color}12` }}>
                       <item.icon className="w-6 h-6" style={{ color: item.color }} />
                     </div>
-                    <span className="text-3xl font-bold font-heading text-white/10">{item.step}</span>
+                    <span className="text-3xl font-bold font-heading text-foreground/10">{item.step}</span>
                   </div>
                   <h3 className="text-base font-semibold font-heading mb-2">{item.title}</h3>
                   <p className="text-sm text-cosmic-muted leading-relaxed">{item.desc}</p>

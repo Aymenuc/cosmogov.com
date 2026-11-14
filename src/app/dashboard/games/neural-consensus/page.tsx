@@ -84,7 +84,7 @@ export default function NeuralConsensusPage() {
         </Card>
         <div className="flex items-center justify-center gap-4">
           <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted">Back to Games</Button></Link>
-          <Button className="bg-cosmic-accent text-white" onClick={() => { setRound(0); setSelected(null); setRevealed(false); setTotalXp(0); setFinished(false); }}>Play Again</Button>
+          <Button className="bg-cosmic-accent text-primary-foreground" onClick={() => { setRound(0); setSelected(null); setRevealed(false); setTotalXp(0); setFinished(false); }}>Play Again</Button>
         </div>
       </div>
     );
@@ -92,7 +92,7 @@ export default function NeuralConsensusPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
+      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export default function NeuralConsensusPage() {
       {/* Progress */}
       <div className="flex gap-2 mb-6">
         {ROUNDS.map((_, i) => (
-          <div key={i} className={`h-1.5 flex-grow rounded-full ${i < round ? 'bg-cosmic-teal' : i === round ? 'bg-cosmic-teal/40' : 'bg-white/5'}`} />
+          <div key={i} className={`h-1.5 flex-grow rounded-full ${i < round ? 'bg-cosmic-teal' : i === round ? 'bg-cosmic-teal/40' : 'bg-foreground/5'}`} />
         ))}
       </div>
 
@@ -126,7 +126,7 @@ export default function NeuralConsensusPage() {
                     transform: `scale(${1 + pct / 100})`,
                   }} />
                 )}
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${isSelected ? 'bg-cosmic-teal/20 text-cosmic-teal ring-2 ring-cosmic-teal/40' : 'bg-white/5 text-cosmic-muted'}`}
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${isSelected ? 'bg-cosmic-teal/20 text-cosmic-teal ring-2 ring-cosmic-teal/40' : 'bg-foreground/5 text-cosmic-muted'}`}
                   style={{ transform: revealed ? `scale(${0.8 + pct / 100})` : 'scale(1)' }}>
                   {revealed ? `${pct}%` : (i + 1)}
                 </div>
@@ -152,17 +152,17 @@ export default function NeuralConsensusPage() {
               const isMatch = selected === opt;
               return (
                 <button key={opt} onClick={() => handleSelect(opt)} disabled={revealed}
-                  className={`p-4 rounded-xl text-sm font-medium transition-all border text-left relative overflow-hidden ${isMatch ? 'border-cosmic-teal/30 bg-cosmic-teal/5' : 'border-white/5 bg-white/5 hover:border-white/10'} ${revealed ? 'cursor-default' : 'cursor-pointer'}`}>
+                  className={`p-4 rounded-xl text-sm font-medium transition-all border text-left relative overflow-hidden ${isMatch ? 'border-cosmic-teal/30 bg-cosmic-teal/5' : 'border-border bg-foreground/5 hover:border-border'} ${revealed ? 'cursor-default' : 'cursor-pointer'}`}>
                   {revealed && (
                     <div className="absolute inset-0 bg-cosmic-teal/10" style={{ width: `${pct}%`, transition: 'width 1s ease-out' }} />
                   )}
                   <div className="relative">
                     <div className="flex items-center justify-between mb-1">
-                      <span className={isMatch ? 'text-cosmic-teal' : 'text-white'}>{opt}</span>
+                      <span className={isMatch ? 'text-cosmic-teal' : 'text-foreground'}>{opt}</span>
                       {revealed && <span className="text-xs text-cosmic-muted">{pct}% chose this</span>}
                     </div>
                     {revealed && (
-                      <div className="h-1 bg-white/5 rounded-full overflow-hidden mt-1">
+                      <div className="h-1 bg-foreground/5 rounded-full overflow-hidden mt-1">
                         <div className="h-full bg-cosmic-teal/50 rounded-full" style={{ width: `${pct}%`, transition: 'width 1s ease-out' }} />
                       </div>
                     )}
@@ -182,7 +182,7 @@ export default function NeuralConsensusPage() {
             Reveal Consensus
           </Button>
         ) : (
-          <Button onClick={handleNext} className="bg-cosmic-accent text-white rounded-xl px-8" disabled={submitting}>
+          <Button onClick={handleNext} className="bg-cosmic-accent text-primary-foreground rounded-xl px-8" disabled={submitting}>
             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : round < ROUNDS.length - 1 ? 'Next Round' : 'See Results'}
           </Button>
         )}

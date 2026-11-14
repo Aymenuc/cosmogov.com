@@ -23,14 +23,14 @@ export default function ChronoAutopsyPage() {
       <div className="w-20 h-20 rounded-2xl bg-cosmic-violet/10 flex items-center justify-center mx-auto mb-6"><Rewind className="w-10 h-10 text-cosmic-violet" /></div>
       <h1 className="text-3xl font-bold font-heading mb-2">Autopsy Complete</h1>
       <div className="text-5xl font-bold font-heading text-gradient mb-2">+{totalXp} XP</div>
-      <Link href="/dashboard/games"><Button className="bg-cosmic-accent text-white mt-6">Back to Games</Button></Link>
+      <Link href="/dashboard/games"><Button className="bg-cosmic-accent text-primary-foreground mt-6">Back to Games</Button></Link>
     </div>;
   }
 
   const current = AUTOPSIES[idx];
   return (
     <div className="max-w-2xl mx-auto">
-      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
+      <Link href="/dashboard/games"><Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4"><ArrowLeft className="w-4 h-4 mr-1" /> Games</Button></Link>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-cosmic-violet/10 flex items-center justify-center"><Clock className="w-5 h-5 text-cosmic-violet" /></div><div><h1 className="text-xl font-bold font-heading">Chrono Autopsy</h1><p className="text-xs text-cosmic-violet">Reverse-engineer failure</p></div></div>
         <div className="flex items-center gap-1 text-cosmic-amber text-sm font-medium"><Zap className="w-4 h-4" />{totalXp} XP</div>
@@ -56,7 +56,7 @@ export default function ChronoAutopsyPage() {
           <div className="space-y-2">
             {current.options.map(opt => (
               <button key={opt} onClick={() => !revealed && setSelected(opt)} disabled={revealed}
-                className={`w-full p-3 rounded-xl text-sm font-medium border transition-all text-left ${selected === opt ? 'border-cosmic-violet/30 bg-cosmic-violet/5 text-cosmic-violet' : 'border-white/5 bg-white/5 text-cosmic-muted hover:border-white/10'}`}>
+                className={`w-full p-3 rounded-xl text-sm font-medium border transition-all text-left ${selected === opt ? 'border-cosmic-violet/30 bg-cosmic-violet/5 text-cosmic-violet' : 'border-border bg-foreground/5 text-cosmic-muted hover:border-border'}`}>
                 {selected === opt && <Check className="w-3 h-3 inline mr-2" />}{opt}
               </button>
             ))}
@@ -71,9 +71,9 @@ export default function ChronoAutopsyPage() {
       </Card>
       <div className="flex justify-center">
         {!revealed ? (
-          <Button onClick={() => { if (selected) { setRevealed(true); const xp = selected === current.correct ? Math.floor(60 + Math.random() * 80) : 5; setTotalXp(prev => prev + xp); } }} disabled={!selected} className="bg-cosmic-violet text-white rounded-xl px-8">Submit Diagnosis</Button>
+          <Button onClick={() => { if (selected) { setRevealed(true); const xp = selected === current.correct ? Math.floor(60 + Math.random() * 80) : 5; setTotalXp(prev => prev + xp); } }} disabled={!selected} className="bg-cosmic-violet text-foreground rounded-xl px-8">Submit Diagnosis</Button>
         ) : (
-          <Button onClick={() => { setIdx(prev => prev + 1); setSelected(null); setRevealed(false); if (idx >= AUTOPSIES.length - 1) setFinished(true); }} className="bg-cosmic-accent text-white rounded-xl px-8">{idx >= AUTOPSIES.length - 1 ? 'See Results' : 'Next Autopsy'}</Button>
+          <Button onClick={() => { setIdx(prev => prev + 1); setSelected(null); setRevealed(false); if (idx >= AUTOPSIES.length - 1) setFinished(true); }} className="bg-cosmic-accent text-primary-foreground rounded-xl px-8">{idx >= AUTOPSIES.length - 1 ? 'See Results' : 'Next Autopsy'}</Button>
         )}
       </div>
     </div>

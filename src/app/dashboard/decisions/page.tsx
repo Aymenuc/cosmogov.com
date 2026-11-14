@@ -1,52 +1,130 @@
-'use client';
-
-import { Card, CardContent } from '@/components/ui/card';
-import { Target, TrendingUp, Brain, Search, Shield, Clock, BarChart3 } from 'lucide-react';
-
-const metrics = [
-  { name: 'Brier Score', value: '0.23', trend: '+5%', desc: 'Prediction calibration accuracy', icon: Target, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10' },
-  { name: 'Coordination Index', value: '87%', trend: '+12%', desc: 'How well the group aligns', icon: Brain, color: 'text-cosmic-violet', bg: 'bg-cosmic-violet/10' },
-  { name: 'Bias Detection Rate', value: '73%', trend: '+8%', desc: 'Correctly identified biases', icon: Search, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10' },
-  { name: 'Doctrine Accuracy', value: '81%', trend: '+3%', desc: 'Strategic decision accuracy', icon: Shield, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10' },
-  { name: 'Anomaly Spot Rate', value: '68%', trend: '+15%', desc: 'Anomalies correctly identified', icon: Search, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10' },
-  { name: 'Pre-Mortem Accuracy', value: '76%', trend: '+9%', desc: 'Failure cause identification', icon: Clock, color: 'text-cosmic-violet', bg: 'bg-cosmic-violet/10' },
-];
-
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowUpRight, CheckCheck, ClipboardList, Search } from "lucide-react";
+import type { CivicProposal } from "@/lib/civic";
+import ProposalCard from "@/components/ProposalCard";
 export default function DecisionsPage() {
-  const weeklyTrend = [65, 68, 71, 74, 72, 78, 81];
-  const maxVal = Math.max(...weeklyTrend);
-
+  const [proposals, setProposals] = useState<CivicProposal[]>([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/proposals?status=closed")
+      .then(async (res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) setProposals(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled)
+          setError(
+            "Your decision record couldn’t be loaded. Please try again.",
+          );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retry]);
+  const filtered = proposals.filter(
+    (p) =>
+      p.title.toLowerCase().includes(query.toLowerCase()) ||
+      p.organization?.name.toLowerCase().includes(query.toLowerCase()),
+  );
   return (
     <div>
-      <div className="mb-6"><h1 className="text-2xl font-bold font-heading">Decision Quality</h1><p className="text-cosmic-muted text-sm">How well your organization makes decisions</p></div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {metrics.map(m => (
-          <Card key={m.name} className="bg-[#0B1022] border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-9 h-9 rounded-lg ${m.bg} flex items-center justify-center`}><m.icon className={`w-4 h-4 ${m.color}`} /></div>
-                <span className="text-xs text-cosmic-teal">{m.trend}</span>
-              </div>
-              <p className="text-2xl font-bold font-heading">{m.value}</p>
-              <p className="text-sm font-medium mt-0.5">{m.name}</p>
-              <p className="text-xs text-cosmic-muted">{m.desc}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <Card className="bg-[#0B1022] border-white/5">
-        <CardContent className="p-6">
-          <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-cosmic-accent" /> Weekly Quality Trend</h3>
-          <div className="flex items-end gap-2 h-32">
-            {weeklyTrend.map((v, i) => (
-              <div key={i} className="flex-grow flex flex-col items-center gap-1">
-                <div className="w-full rounded-t-lg bg-gradient-to-t from-cosmic-accent to-cosmic-teal" style={{ height: `${(v / maxVal) * 100}%` }} />
-                <span className="text-xs text-cosmic-muted">W{i + 1}</span>
-              </div>
-            ))}
+      <div className="app-page-heading">
+        <div>
+          <div className="eyebrow">
+            <CheckCheck size={13} /> THE COMMUNITY RECORD
           </div>
-        </CardContent>
-      </Card>
+          <h1>A vote is a beginning.</h1>
+          <p>
+            Revisit closed proposals. See the recorded choices. Stay connected
+            to what happens next.
+          </p>
+        </div>
+        <Link
+          href="/dashboard/participation/accountability"
+          className="civic-button outline"
+        >
+          Follow implementation <ArrowUpRight size={14} />
+        </Link>
+      </div>
+      <div className="proposal-intro-strip">
+        <ClipboardList size={21} />
+        <p>
+          <strong>A clear record, without assumptions.</strong> Closed voting
+          doesn’t automatically mean a project is approved or implemented.
+          Follow official responses and milestones in Accountability.
+        </p>
+      </div>
+      <div className="app-search" style={{ marginBottom: 25 }}>
+        <Search size={16} />
+        <input
+          aria-label="Search closed decisions"
+          placeholder="Find a decision or community..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+      {loading ? (
+        <div className="proposal-grid full">
+          {[0, 1, 2].map((i) => (
+            <div className="proposal-skeleton" key={i} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="empty-state" role="alert">
+          <p>{error}</p>
+          <button
+            className="civic-button outline"
+            onClick={() => {
+              setLoading(true);
+              setError("");
+              setRetry((v) => v + 1);
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      ) : filtered.length ? (
+        <div className="proposal-grid full">
+          {filtered.map((p) => (
+            <ProposalCard key={p.id} proposal={p} />
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <span className="empty-icon">
+            <CheckCheck />
+          </span>
+          <h3>
+            {query
+              ? "No decisions match your search."
+              : "A shared history starts here."}
+          </h3>
+          <p>
+            {query
+              ? "Try a different title or community."
+              : "When a proposal closes, its record will appear here. Explore an open conversation to add your perspective today."}
+          </p>
+          <Link href="/dashboard/proposals" className="civic-button outline">
+            Explore proposals <ArrowUpRight size={14} />
+          </Link>
+        </div>
+      )}
+      <p className="feed-note">
+        Showing up to 50 recently closed proposals. Results and implementation
+        are separate stages.
+      </p>
     </div>
   );
 }

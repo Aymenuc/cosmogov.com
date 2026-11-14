@@ -20,6 +20,7 @@ model User {
   avatarUrl     String?
   passwordHash  String?
   plan          String   @default("community") // community, team, guild, enterprise
+  sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
   level         Int      @default(1)
@@ -81,6 +82,13 @@ model User {
   bindingProposalSignatures BindingProposalSignature[]
   surveyResponses  SurveyResponse[]
   pushSubscriptions PushSubscription[]
+  missions Mission[] @relation("MissionCreator")
+  missionContributions MissionContribution[]
+  missionRuns MissionRun[] @relation("MissionRequester")
+  missionTasks MissionTask[] @relation("MissionAssignee")
+  missionToolResponses MissionToolResponse[]
+  missionEvents MissionEvent[]
+  missionTemplates MissionTemplate[] @relation("TemplateAuthor")
 }
 
 model Organization {
@@ -110,6 +118,8 @@ model Organization {
   proposals   Proposal[]
   invitations Invitation[]
   participatoryProcesses ParticipatoryProcess[]
+  missions Mission[]
+  missionTemplates MissionTemplate[]
 }
 
 model Membership {
@@ -1033,6 +1043,7 @@ model BindingProposalSignature {
   userId          String
   comment         String?
   verified        Boolean  @default(false) // identity verification status
+  verificationNote String?
   verifiedAt      DateTime?
   createdAt       DateTime @default(now())
 
@@ -1052,4 +1063,209 @@ model PushSubscription {
   createdAt   DateTime @default(now())
 
   user        User @relation(fields: [userId], references: [id])
+}
+
+// Shared mission work. Private missions belong to their creator; organization
+// missions are visible only to current members of that organization.
+model Mission {
+  toolResponses MissionToolResponse[]
+  events MissionEvent[]
+  templateId String?
+  templateCredit String?
+  template MissionTemplate? @relation("TemplateUses", fields: [templateId], references: [id], onDelete: SetNull)
+  savedTemplates MissionTemplate[] @relation("TemplateSource")
+  matches MissionMatch[]
+  id             String    @id @default(cuid())
+  title          String
+  goal           String
+  location       String?
+  organizationId String?
+  createdBy      String
+  revision       Int       @default(0)
+  runLeaseUntil  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  creator       User                  @relation("MissionCreator", fields: [createdBy], references: [id])
+  organization  Organization?         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contributions MissionContribution[]
+  runs          MissionRun[]
+  tasks         MissionTask[]
+
+  @@index([organizationId, updatedAt])
+  @@index([createdBy, updatedAt])
+}
+
+model MissionContribution {
+  id        String   @id @default(cuid())
+  missionId String
+  authorId  String
+  kind      String // perspective, constraint, source
+  title     String
+  content   String
+  url       String?
+  createdAt DateTime @default(now())
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id])
+
+  @@index([missionId, createdAt])
+}
+
+model MissionRun {
+  toolResponses MissionToolResponse[]
+  events MissionEvent[]
+  formState String @default("draft")
+  responseVisibility String @default("members")
+  retentionDays Int?
+  sensitiveReason String?
+  model String?
+  provider String?
+  promptVersion String?
+  closedAt DateTime?
+  stateChangedBy String?
+  id            String    @id @default(cuid())
+  missionId     String
+  requestedBy   String
+  origin        String    @default("ai") // ai, edited, manual
+  derivedFromId String?
+  derivedFrom   MissionRun? @relation("MissionFormVersions", fields: [derivedFromId], references: [id], onDelete: SetNull)
+  versions      MissionRun[] @relation("MissionFormVersions")
+  stage         String // research, perspectives, plan, tool
+  status        String    @default("running") // running, completed, failed
+  inputRevision Int
+  sources       Json      @default("[]")
+  output        Json?
+  error         String?
+  searchStatus  String    @default("not_requested")
+  reviewedBy    String?
+  acceptedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  mission   Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  requester User          @relation("MissionRequester", fields: [requestedBy], references: [id])
+  tasks     MissionTask[]
+
+  @@index([missionId, createdAt])
+  @@index([requestedBy, createdAt])
+  @@index([derivedFromId])
+}
+
+model MissionTask {
+  evidence Json @default("[]")
+  events MissionEvent[]
+  matches MissionMatch[]
+  id           String   @id @default(cuid())
+  missionId    String
+  runId        String
+  position     Int
+  title        String
+  detail       String
+  minutes      Int
+  status       String   @default("open") // open, claimed, done
+  assignedToId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  mission  Mission    @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  run      MissionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  assignee User?      @relation("MissionAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@unique([runId, position])
+  @@index([missionId, createdAt])
+}
+
+model MissionToolResponse {
+  matches MissionMatch[]
+  id        String   @id @default(cuid())
+  missionId String
+  runId     String
+  authorId  String
+  expiresAt DateTime?
+  noticeVersion String @default("legacy-notice")
+  notice Json @default("{}")
+  offerToHelp Boolean @default(false)
+  values    Json
+  updatedAt DateTime @updatedAt
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  run     MissionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  author  User @relation(fields: [authorId], references: [id])
+
+  @@unique([runId, authorId])
+  @@index([missionId])
+}
+
+// Only hashes of invitation and revocation tokens are stored.
+model OfficialInvitation {
+  id String @id @default(cuid())
+  tokenHash String @unique
+  email String
+  createdBy String
+  expiresAt DateTime
+  usedAt DateTime?
+  usedBy String?
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+model RevokedSession {
+  tokenHash String @id
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+model RateLimitBucket {
+  key String @id
+  count Int @default(1)
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
+model MissionEvent {
+  id String @id @default(cuid())
+  missionId String
+  taskId String?
+  runId String?
+  actorId String?
+  action String
+  detail Json @default("{}")
+  createdAt DateTime @default(now())
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  task MissionTask? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  run MissionRun? @relation(fields: [runId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  @@index([missionId, createdAt])
+}
+
+model MissionMatch {
+  id String @id @default(cuid())
+  missionId String
+  taskId String
+  responseId String
+  invitedBy String
+  status String @default("invited")
+  terms Json
+  createdAt DateTime @default(now())
+  respondedAt DateTime?
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  task MissionTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  response MissionToolResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  @@unique([taskId, responseId])
+  @@index([missionId, createdAt])
+}
+model MissionTemplate {
+  id String @id @default(cuid())
+  name String
+  goal String
+  createdBy String
+  authorName String
+  organizationId String?
+  sourceMissionId String?
+  content Json
+  createdAt DateTime @default(now())
+  author User @relation("TemplateAuthor", fields: [createdBy], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sourceMission Mission? @relation("TemplateSource", fields: [sourceMissionId], references: [id], onDelete: Cascade)
+  uses Mission[] @relation("TemplateUses")
+  @@index([organizationId, createdAt])
 }

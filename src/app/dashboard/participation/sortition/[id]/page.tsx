@@ -176,9 +176,9 @@ export default function SortitionDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <Dices className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-white mb-2">Pool Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Pool Not Found</h3>
         <Link href="/dashboard/participation/sortition">
-          <Button className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90">
+          <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sortition
           </Button>
         </Link>
@@ -216,7 +216,7 @@ export default function SortitionDetailPage() {
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       {/* Back navigation */}
-      <Link href="/dashboard/participation/sortition" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-white transition-colors">
+      <Link href="/dashboard/participation/sortition" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" />
         Back to Sortition
       </Link>
@@ -234,7 +234,7 @@ export default function SortitionDetailPage() {
               {pool.selectionMethod === 'stratified_random' ? 'Stratified Random' : 'Simple Random'}
             </Badge>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-2">
             {pool.name}
           </h1>
           <p className="text-cosmic-muted text-sm sm:text-base max-w-3xl">
@@ -264,7 +264,7 @@ export default function SortitionDetailPage() {
       {/* Status Timeline */}
       <Card className="glass-card rounded-2xl">
         <CardHeader className="pb-2">
-          <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-cosmic-violet" />
             Selection Timeline
           </h2>
@@ -281,13 +281,13 @@ export default function SortitionDetailPage() {
                       ? 'bg-cosmic-violet/20 text-cosmic-violet border-cosmic-violet/30'
                       : isCompleted
                       ? 'bg-cosmic-success/10 text-cosmic-success border-cosmic-success/20'
-                      : 'bg-white/5 text-cosmic-muted border-white/10'
+                      : 'bg-foreground/5 text-cosmic-muted border-border'
                   }`}>
-                    {isCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : isActive ? <Dices className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5 rounded-full bg-white/10" />}
+                    {isCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : isActive ? <Dices className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5 rounded-full bg-foreground/10" />}
                     {step.label}
                   </div>
                   {idx < STATUS_STEPS.length - 1 && (
-                    <div className={`w-4 sm:w-8 h-0.5 mx-1 ${isCompleted ? 'bg-cosmic-success/30' : 'bg-white/10'}`} />
+                    <div className={`w-4 sm:w-8 h-0.5 mx-1 ${isCompleted ? 'bg-cosmic-success/30' : 'bg-foreground/10'}`} />
                   )}
                 </div>
               );
@@ -300,7 +300,7 @@ export default function SortitionDetailPage() {
       {pool.criteria && pool.criteria !== '{}' && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Shield className="w-5 h-5 text-cosmic-amber" />
               Selection Criteria
             </h2>
@@ -317,11 +317,11 @@ export default function SortitionDetailPage() {
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-1">This pool is recruiting!</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-1">This pool is recruiting!</h3>
                 <p className="text-cosmic-muted text-sm">Volunteer now to be considered for random selection. Every citizen has an equal chance.</p>
               </div>
               <Button
-                className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90 shrink-0"
+                className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90 shrink-0"
                 onClick={() => {
                   setVolunteerForm({ ageGroup: '', gender: '', district: '', occupation: '', motivation: '' });
                   setVolunteered(false);
@@ -339,7 +339,7 @@ export default function SortitionDetailPage() {
       {pool.status === 'recruiting' && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Play className="w-5 h-5 text-cosmic-amber" />
               Run Selection (Admin)
             </h2>
@@ -350,7 +350,7 @@ export default function SortitionDetailPage() {
               {pool.selectionMethod === 'stratified_random' && ' Stratified selection will respect demographic targets as closely as possible.'}
             </p>
             <Button
-              className="bg-cosmic-amber text-white hover:bg-cosmic-amber/90"
+              className="bg-cosmic-amber text-foreground hover:bg-cosmic-amber/90"
               onClick={handleRunSelection}
               disabled={runningSelection || (pool.candidates?.length || 0) === 0}
             >
@@ -365,7 +365,7 @@ export default function SortitionDetailPage() {
       {selectedMembers.length > 0 && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-cosmic-success" />
               Selected Members ({selectedMembers.length})
             </h2>
@@ -384,11 +384,11 @@ export default function SortitionDetailPage() {
                     )}
                   </Avatar>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{member.name || 'Anonymous'}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{member.name || 'Anonymous'}</p>
                     {member.demographics && Object.keys(member.demographics).length > 0 && (
                       <div className="flex gap-1.5 mt-1 flex-wrap">
                         {Object.entries(member.demographics).map(([key, val]) => (
-                          <span key={key} className="text-[10px] text-cosmic-muted bg-white/5 px-1.5 py-0.5 rounded">
+                          <span key={key} className="text-[10px] text-cosmic-muted bg-foreground/5 px-1.5 py-0.5 rounded">
                             {val}
                           </span>
                         ))}
@@ -406,7 +406,7 @@ export default function SortitionDetailPage() {
       {Object.keys(demographicTargets).length > 0 && selectedMembers.length > 0 && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-cosmic-amber" />
               Demographic Breakdown
             </h2>
@@ -415,7 +415,7 @@ export default function SortitionDetailPage() {
             <div className="space-y-4">
               {Object.entries(demographicTargets).map(([dimension, targets]) => (
                 <div key={dimension}>
-                  <h3 className="text-sm font-medium text-white mb-2 capitalize">{dimension}</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-2 capitalize">{dimension}</h3>
                   <div className="space-y-2">
                     {Object.entries(targets).map(([category, targetRatio]) => {
                       const actual = demographicBreakdown[dimension]?.[category] || 0;
@@ -432,13 +432,13 @@ export default function SortitionDetailPage() {
                             </span>
                           </div>
                           <div className="flex gap-1">
-                            <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2 bg-foreground/5 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-cosmic-amber/50 rounded-full"
                                 style={{ width: `${targetPercent}%` }}
                               />
                             </div>
-                            <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2 bg-foreground/5 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${Math.abs(actualPercent - targetPercent) <= 10 ? 'bg-cosmic-violet' : 'bg-cosmic-rose'}`}
                                 style={{ width: `${actualPercent}%` }}
@@ -460,7 +460,7 @@ export default function SortitionDetailPage() {
       {pool.candidates && pool.candidates.length > 0 && (
         <Card className="glass-card rounded-2xl">
           <CardHeader className="pb-2">
-            <h2 className="font-heading text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Users className="w-5 h-5 text-cosmic-violet" />
               Candidates ({pool.candidates.length})
             </h2>
@@ -492,13 +492,13 @@ export default function SortitionDetailPage() {
                     </Avatar>
                     <div className="min-w-0 flex-grow">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-white truncate">{candidate.user.name || 'Anonymous'}</span>
+                        <span className="text-sm font-medium text-foreground truncate">{candidate.user.name || 'Anonymous'}</span>
                         <Badge className={`${sc} text-[9px] border`}>{candidate.status}</Badge>
                       </div>
                       {Object.keys(demo).length > 0 && (
                         <div className="flex gap-1.5 mt-1 flex-wrap">
                           {Object.entries(demo).map(([key, val]) => (
-                            <span key={key} className="text-[10px] text-cosmic-muted bg-white/5 px-1.5 py-0.5 rounded capitalize">{val}</span>
+                            <span key={key} className="text-[10px] text-cosmic-muted bg-foreground/5 px-1.5 py-0.5 rounded capitalize">{val}</span>
                           ))}
                         </div>
                       )}
@@ -513,11 +513,11 @@ export default function SortitionDetailPage() {
 
       {/* Volunteer Dialog */}
       <Dialog open={volunteerDialogOpen} onOpenChange={setVolunteerDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg">
           {pool && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-white flex items-center gap-2">
+                <DialogTitle className="text-foreground flex items-center gap-2">
                   <Handshake className="w-5 h-5 text-cosmic-violet" />
                   Volunteer for {pool.name}
                 </DialogTitle>
@@ -532,7 +532,7 @@ export default function SortitionDetailPage() {
                     <div>
                       <label className="text-xs text-cosmic-muted mb-1 block">Age Group</label>
                       <Select value={volunteerForm.ageGroup} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, ageGroup: v }))}>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                        <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
@@ -546,7 +546,7 @@ export default function SortitionDetailPage() {
                     <div>
                       <label className="text-xs text-cosmic-muted mb-1 block">Gender</label>
                       <Select value={volunteerForm.gender} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, gender: v }))}>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                        <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
@@ -562,7 +562,7 @@ export default function SortitionDetailPage() {
                     <label className="text-xs text-cosmic-muted mb-1 block">District / Region</label>
                     <Input
                       placeholder="Your district or region"
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                       value={volunteerForm.district}
                       onChange={(e) => setVolunteerForm((f) => ({ ...f, district: e.target.value }))}
                     />
@@ -571,7 +571,7 @@ export default function SortitionDetailPage() {
                     <label className="text-xs text-cosmic-muted mb-1 block">Occupation</label>
                     <Input
                       placeholder="Your occupation"
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                       value={volunteerForm.occupation}
                       onChange={(e) => setVolunteerForm((f) => ({ ...f, occupation: e.target.value }))}
                     />
@@ -580,17 +580,17 @@ export default function SortitionDetailPage() {
                     <label className="text-xs text-cosmic-muted mb-1 block">Why do you want to participate? (optional)</label>
                     <Textarea
                       placeholder="Share your motivation..."
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                       value={volunteerForm.motivation}
                       onChange={(e) => setVolunteerForm((f) => ({ ...f, motivation: e.target.value }))}
                     />
                   </div>
 
                   <DialogFooter>
-                    <Button variant="ghost" className="text-cosmic-muted hover:text-white" onClick={() => setVolunteerDialogOpen(false)}>
+                    <Button variant="ghost" className="text-cosmic-muted hover:text-foreground" onClick={() => setVolunteerDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90" onClick={handleVolunteer} disabled={volunteering}>
+                    <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90" onClick={handleVolunteer} disabled={volunteering}>
                       {volunteering ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Handshake className="w-4 h-4 mr-2" />}
                       Volunteer
                     </Button>
@@ -601,7 +601,7 @@ export default function SortitionDetailPage() {
                   <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center bg-cosmic-violet/20">
                     <CheckCircle2 className="w-8 h-8 text-cosmic-violet" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">You&apos;ve Volunteered!</h3>
+                  <h3 className="text-lg font-semibold text-foreground">You&apos;ve Volunteered!</h3>
                   <p className="text-cosmic-muted text-sm">
                     You are now in the democratic lottery. Every volunteer has an equal chance of being selected.
                   </p>

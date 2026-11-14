@@ -42,20 +42,20 @@ export default function EditProposalPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4" onClick={() => router.back()}><ArrowLeft className="w-4 h-4 mr-1" /> Back</Button>
+      <Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4" onClick={() => router.back()}><ArrowLeft className="w-4 h-4 mr-1" /> Back</Button>
       <h1 className="text-2xl font-bold font-heading mb-6">Edit Proposal</h1>
-      <Card className="bg-[#0B1022] border-white/5">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">Title</label>
-              <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-white/5 border-white/10 text-white" />
+              <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-foreground/5 border-border text-foreground" />
             </div>
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">Description</label>
-              <Textarea value={description} onChange={e => setDescription(e.target.value)} required rows={8} className="bg-white/5 border-white/10 text-white resize-y" />
+              <Textarea value={description} onChange={e => setDescription(e.target.value)} required rows={8} className="bg-foreground/5 border-border text-foreground resize-y" />
             </div>
-            <Button type="submit" className="w-full bg-cosmic-accent text-white rounded-xl h-11" disabled={saving}>
+            <Button type="submit" className="w-full bg-cosmic-accent text-primary-foreground rounded-xl h-11" disabled={saving}>
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>

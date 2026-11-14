@@ -1,494 +1,455 @@
-'use client';
-
-import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+"use client";
+import "../portal.css";
+import { useEffect, useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, FileText, Building2, Gamepad2, Brain,
-  BarChart3, Trophy, Settings, LogOut, Menu, X, Rocket,
-  Flame, Zap, Search, Target, Shield, Bell, ChevronDown,
-  Home, Crown, User, CreditCard, Inbox, MessageSquare,
-  Star, Activity, Megaphone, Wallet, Eye,
-  FileSignature, Users, Calendar, Sparkles, Orbit, Globe,
-  Scale, ClipboardList, Dices, Gavel, Landmark
-} from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  plan: string;
-  role: string;
-  totalXp: number;
-  level: number;
-  streak: number;
-}
-
+  ArrowUpRight,
+  Bell,
+  BookOpen,
+  Building2,
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  CircleHelp,
+  FileSignature,
+  FileText,
+  Gamepad2,
+  Sticker,
+  Globe2,
+  Landmark,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  MessageCircle,
+  Plus,
+  Search,
+  Settings,
+  Shield,
+  Sparkles,
+  Target,
+  Trophy,
+  Users,
+  Vote,
+  Wallet,
+  X,
+  BarChart3,
+  Scale,
+  ClipboardList,
+  Dices,
+  Gavel,
+  Eye,
+  Activity,
+  Star,
+} from "lucide-react";
+import Brand, { BrandMark } from "@/components/Brand";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  WorkspaceProvider,
+  type WorkspaceUser,
+} from "@/components/WorkspaceContext";
+import CommandMenu from "@/components/CommandMenu";
 interface Notification {
   id: string;
-  type: string;
   title: string;
   message: string;
   read: boolean;
   link?: string;
-  createdAt: string;
 }
-
-const navSections = [
+const mainLinks = [
+  { label: "Mission studio", href: "/dashboard/missions", icon: Sparkles },
+  { label: "My civic desk", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Sticker book", href: "/dashboard/stickers", icon: Sticker },
   {
-    label: null, // No header for overview
+    label: "Explore participation",
+    href: "/dashboard/participation",
+    icon: Globe2,
+  },
+  { label: "Proposals & voting", href: "/dashboard/proposals", icon: Vote },
+  { label: "My communities", href: "/dashboard/organizations", icon: Users },
+  { label: "Community map", href: "/dashboard/cosmic-map", icon: Landmark },
+  {
+    label: "Accountability",
+    href: "/dashboard/participation/accountability",
+    icon: Eye,
+  },
+];
+const toolGroups: { label: string; items: [string, string, LucideIcon][] }[] = [
+  {
+    label: "Participation tools",
     items: [
-      { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
+      ["Budgets", "/dashboard/participation/budget", Wallet],
+      ["Legislation", "/dashboard/participation/legislation", Scale],
+      ["Surveys & polls", "/dashboard/participation/surveys", ClipboardList],
+      [
+        "Citizen initiatives",
+        "/dashboard/participation/initiatives",
+        FileSignature,
+      ],
+      [
+        "Binding proposals",
+        "/dashboard/participation/binding-proposals",
+        Gavel,
+      ],
+      ["Assemblies", "/dashboard/participation/assemblies", Users],
+      ["Meetings", "/dashboard/participation/meetings", Calendar],
+      ["Sortition", "/dashboard/participation/sortition", Dices],
     ],
   },
   {
-    label: 'Participate',
+    label: "Community & insights",
     items: [
-      { href: '/dashboard/participation', icon: Megaphone, label: 'Hub' },
-      { href: '/dashboard/participation/budget', icon: Wallet, label: 'Budget' },
-      { href: '/dashboard/participation/legislation', icon: Scale, label: 'Legislation' },
-      { href: '/dashboard/participation/surveys', icon: ClipboardList, label: 'Surveys' },
-      { href: '/dashboard/participation/sortition', icon: Dices, label: 'Sortition' },
-      { href: '/dashboard/participation/binding-proposals', icon: Gavel, label: 'Binding Proposals' },
-      { href: '/dashboard/participation/initiatives', icon: FileSignature, label: 'Initiatives' },
-      { href: '/dashboard/participation/accountability', icon: Eye, label: 'Accountability' },
-      { href: '/dashboard/participation/assemblies', icon: Users, label: 'Assemblies' },
-      { href: '/dashboard/participation/meetings', icon: Calendar, label: 'Meetings' },
+      ["Decision log", "/dashboard/decisions", Target],
+      ["Community discussions", "/dashboard/chat", MessageCircle],
+      ["Assembly hall", "/dashboard/assembly-hall", Building2],
+      ["Global explorer", "/dashboard/explore", Globe2],
+      ["Governance pulse", "/dashboard/pulse", Activity],
+      ["Analytics", "/dashboard/analytics", BarChart3],
     ],
   },
   {
-    label: 'Propose & Decide',
+    label: "Learn & grow",
     items: [
-      { href: '/dashboard/proposals', icon: FileText, label: 'Proposals' },
-      { href: '/dashboard/decisions', icon: Target, label: 'Decisions' },
-    ],
-  },
-  {
-    label: 'Community',
-    items: [
-      { href: '/dashboard/organizations', icon: Building2, label: 'Organizations' },
-      { href: '/dashboard/assembly-hall', icon: Star, label: 'Assembly Hall' },
-      { href: '/dashboard/chat', icon: MessageSquare, label: 'Chat Rooms' },
-    ],
-  },
-  {
-    label: 'Explore',
-    items: [
-      { href: '/dashboard/cosmic-map', icon: Globe, label: 'Cosmic Map' },
-      { href: '/dashboard/explore', icon: Orbit, label: 'Global Explorer' },
-      { href: '/dashboard/pulse', icon: Activity, label: 'Governance Pulse' },
-    ],
-  },
-  {
-    label: 'AI & Intelligence',
-    items: [
-      { href: '/dashboard/ai-agents', icon: Sparkles, label: 'AI Agents' },
-      { href: '/dashboard/assistant', icon: Brain, label: 'AI Assistant' },
-      { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
-    ],
-  },
-  {
-    label: 'Progress',
-    items: [
-      { href: '/dashboard/games', icon: Gamepad2, label: 'Games' },
-      { href: '/dashboard/leaderboards', icon: Trophy, label: 'Leaderboards' },
-      { href: '/dashboard/reputation', icon: Star, label: 'Cosmic Score' },
-    ],
-  },
-  {
-    label: null, // No header for utility items
-    items: [
-      { href: '/dashboard/search', icon: Search, label: 'Search' },
-      { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
+      ["AI agents", "/dashboard/ai-agents", Sparkles],
+      ["Civic games", "/dashboard/games", Gamepad2],
+      ["Leaderboards", "/dashboard/leaderboards", Trophy],
+      ["My reputation", "/dashboard/reputation", Star],
     ],
   },
 ];
-
-// Gov Portal nav item — only visible for gov_official, admin, super_admin
-const govPortalNavItem = { href: '/dashboard/gov-portal', icon: Landmark, label: 'Gov Portal' };
-
-const planColors: Record<string, string> = {
-  community: 'bg-white/10 text-cosmic-muted',
-  team: 'bg-cosmic-accent/20 text-cosmic-accent',
-  guild: 'bg-cosmic-violet/20 text-cosmic-violet',
-  enterprise: 'bg-cosmic-amber/20 text-cosmic-amber',
-};
-
-const planLabels: Record<string, string> = {
-  community: 'Community',
-  team: 'Team',
-  guild: 'Guild',
-  enterprise: 'Enterprise',
-};
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+const allLabels = [
+  ...mainLinks.map((item) => [item.href, item.label]),
+  ...toolGroups.flatMap((group) =>
+    group.items.map(([label, href]) => [href, label]),
+  ),
+  ["/dashboard/settings", "Settings"],
+  ["/dashboard/assistant", "AI assistant"],
+  ["/dashboard/admin", "Administration"],
+  ["/dashboard/gov-portal", "Government portal"],
+].sort((a, b) => b[0].length - a[0].length);
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [user, setUser] = useState<WorkspaceUser | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setMobileOpen(false);
+  }
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const notifRef = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
+  const [error, setError] = useState("");
   useEffect(() => {
-    fetch('/api/auth/me')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data) { setUser(data); setLoading(false); }
-        else { router.push('/auth/login'); }
+    let alive = true;
+    fetch("/api/auth/me")
+      .then(async (res) => {
+        if (res.status === 401) {
+          router.replace("/auth/login");
+          return;
+        }
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (alive) setUser(data);
       })
-      .catch(() => router.push('/auth/login'));
-  }, [router]);
-
-  useEffect(() => {
-    if (user) {
-      fetch('/api/notifications')
-        .then(r => r.ok ? r.json() : [])
-        .then(data => setNotifications(Array.isArray(data) ? data.slice(0, 10) : []))
-        .catch(() => {});
-    }
-  }, [user]);
-
-  // Close dropdowns on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
+      .catch(() => {
+        if (alive)
+          setError("We couldn’t load your workspace. Please try again.");
+      });
+    return () => {
+      alive = false;
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/');
+  }, [router]);
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/notifications")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setNotifications(Array.isArray(data) ? data.slice(0, 10) : []),
+      )
+      .catch(() => {});
+  }, [user]);
+  const logout = async () => {
+    const res = await fetch("/api/auth/logout", { method: "POST" });
+    if (res.ok) router.push("/");
+    else setError("Sign out failed. Please try again.");
   };
-
-  const markAllRead = async () => {
-    await fetch('/api/notifications/read-all', { method: 'POST' });
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cosmic-teal to-cosmic-violet animate-pulse flex items-center justify-center">
-            <Rocket className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-cosmic-teal animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full bg-cosmic-accent animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full bg-cosmic-violet animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
-          <span className="text-cosmic-muted text-sm">Loading cosmos...</span>
+  const activeHref = allLabels.find(
+    ([href]) =>
+      pathname === href ||
+      (href !== "/dashboard" && pathname.startsWith(`${href}/`)),
+  )?.[0];
+  const pageTitle =
+    allLabels.find(([href]) => href === activeHref)?.[1] || "Your workspace";
+  const isAdmin = ["admin", "super_admin"].includes(user?.role || "");
+  const isOfficial = isAdmin || user?.role === "gov_official";
+  const unread = notifications.filter((item) => !item.read).length;
+  const sideContent = (
+    <>
+      <div className="sidebar-brand">
+        <Brand />
+        <span className="beta-label">BETA</span>
+      </div>
+      <div className="workspace-label">
+        <span className="workspace-symbol">
+          <Globe2 size={19} />
+        </span>
+        <div>
+          <strong>Your civic workspace</strong>
+          <span>A place to make a difference</span>
         </div>
+      </div>
+      <Link href="/dashboard/missions" className="civic-button sidebar-create">
+        <Plus size={16} />
+        Start a mission
+      </Link>
+      <nav aria-label="Workspace navigation" className="workspace-nav">
+        <div className="nav-group-label">YOUR COMMUNITY</div>
+        {mainLinks.map((item) => (
+          <Link
+            key={item.href}
+            aria-current={activeHref === item.href ? "page" : undefined}
+            className={
+              activeHref === item.href
+                ? "workspace-nav-link active"
+                : "workspace-nav-link"
+            }
+            href={item.href}
+          >
+            <item.icon size={17} strokeWidth={1.6} />
+            <span>{item.label}</span>
+            {activeHref === item.href && <span className="nav-active-dot" />}
+          </Link>
+        ))}
+        <div className="workspace-tool-groups">
+          {toolGroups.map((group) => (
+            <details
+              key={group.label}
+              open={
+                group.items.some(([, href]) => activeHref === href) || undefined
+              }
+            >
+              <summary>
+                {group.label}
+                <ChevronDown size={13} />
+              </summary>
+              <div>
+                {group.items.map(([label, href, Icon]) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={activeHref === href ? "page" : undefined}
+                    className={
+                      activeHref === href
+                        ? "workspace-nav-link active"
+                        : "workspace-nav-link"
+                    }
+                  >
+                    <Icon size={16} strokeWidth={1.6} />
+                    <span>{label}</span>
+                  </Link>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+        {isOfficial && (
+          <Link
+            href="/dashboard/gov-portal"
+            className={`workspace-nav-link ${activeHref === "/dashboard/gov-portal" ? "active" : ""}`}
+          >
+            <Landmark size={17} />
+            Government portal
+          </Link>
+        )}
+        {isAdmin && (
+          <Link
+            href="/dashboard/admin"
+            className={`workspace-nav-link ${activeHref === "/dashboard/admin" ? "active" : ""}`}
+          >
+            <Shield size={17} />
+            Administration
+          </Link>
+        )}
+      </nav>
+      <div className="sidebar-bottom">
+        <Link href="/dashboard/assistant" className="assistant-link">
+          <span>
+            <Sparkles size={16} />A little clarity, with AI
+          </span>
+          <ArrowUpRight size={15} />
+        </Link>
+        <Link href="/docs" className="workspace-nav-link">
+          <CircleHelp size={16} />
+          Help & documentation
+        </Link>
+        <Link href="/dashboard/settings" className="sidebar-user">
+          <span className="user-avatar">
+            {(user?.name || "You").slice(0, 1).toUpperCase()}
+          </span>
+          <span>
+            <strong>{user?.name || "Your account"}</strong>
+            <small>{user?.plan || "Community"} plan</small>
+          </span>
+          <Settings size={16} />
+        </Link>
+        <button className="sidebar-signout" onClick={logout}>
+          <LogOut size={13} />
+          Sign out
+        </button>
+      </div>
+    </>
+  );
+  if (!user)
+    return (
+      <div className="workspace-loading">
+        <BrandMark />
+        <h1>{error || "Making room for your voice…"}</h1>
+        {error ? (
+          <button
+            className="civic-button"
+            onClick={() => window.location.reload()}
+          >
+            Try again
+          </button>
+        ) : (
+          <div className="loading-line" />
+        )}
       </div>
     );
-  }
-
-  const xpToNext = (user?.level || 1) * 500;
-  const xpProgress = ((user?.totalXp || 0) % xpToNext) / xpToNext * 100;
-  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
-  const isGovOfficial = user?.role === 'gov_official' || isAdmin;
-
   return (
-    <div className="min-h-screen flex overflow-x-hidden">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-white/5 bg-[#04050b]/50 backdrop-blur-xl">
-        <div className="p-4">
-          {/* Logo + Back to Home */}
-          <div className="flex items-center justify-between mb-2">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Rocket className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-heading font-bold text-lg">CosmoGov</span>
-            </Link>
-          </div>
-          <Link href="/" className="flex items-center gap-1.5 text-xs text-cosmic-muted hover:text-cosmic-teal transition-colors py-1">
-            <Home className="w-3 h-3" /> Back to Home
-          </Link>
-        </div>
-
-        {/* User Info */}
-        {user && (
-          <div className="px-4 mb-4">
-            <div className="glass-card p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-9 h-9 rounded-full bg-cosmic-accent/20 flex items-center justify-center text-sm font-bold text-cosmic-accent ring-2 ring-cosmic-accent/10">
-                  {(user.name || 'U')[0].toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-grow">
-                  <p className="text-sm font-medium truncate">{user.name}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-cosmic-muted">Lv.{user.level}</span>
-                    {user.streak > 0 && (
-                      <span className="flex items-center gap-0.5 text-xs text-cosmic-amber">
-                        <Flame className="w-3 h-3" />{user.streak}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              {/* XP Progress */}
-              <div className="flex items-center gap-2 text-xs mb-2">
-                <Zap className="w-3 h-3 text-cosmic-amber" />
-                <span className="text-cosmic-amber">{user.totalXp} XP</span>
-                <div className="flex-grow h-1.5 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-cosmic-teal to-cosmic-accent rounded-full transition-all duration-700" style={{ width: `${xpProgress}%` }} />
-                </div>
-              </div>
-              {/* Plan Badge */}
-              <div className="flex items-center justify-between">
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${planColors[user.plan] || planColors.community}`}>
-                  {planLabels[user.plan] || 'Community'}
-                </span>
-                {isAdmin && (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-cosmic-rose/20 text-cosmic-rose">
-                    Admin
-                  </span>
-                )}
-                {user.role === 'gov_official' && !isAdmin && (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-cosmic-teal/20 text-cosmic-teal">
-                    Gov Official
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <nav className="flex-grow px-3 overflow-y-auto scrollbar-thin" style={{ scrollbarGutter: 'stable' }}>
-          {navSections.map((section, si) => (
-            <div key={si} className={si > 0 ? 'mt-4' : ''}>
-              {section.label && (
-                <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-cosmic-muted/50">
-                  {section.label}
-                </div>
-              )}
-              <div className="space-y-0.5">
-                {section.items.map(item => {
-                  const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
-                  return (
-                    <Link key={item.href} href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${active ? 'bg-cosmic-accent/10 text-cosmic-accent' : 'text-cosmic-muted hover:text-white hover:bg-white/5'}`}>
-                      <item.icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-          {/* Gov Portal & Admin Links */}
-          {(isAdmin || isGovOfficial) && (
-            <div className="mt-4">
-              <div className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-cosmic-muted/50">Administration</div>
-              {isGovOfficial && (
-                <Link href="/dashboard/gov-portal"
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${pathname.startsWith('/dashboard/gov-portal') ? 'bg-cosmic-teal/10 text-cosmic-teal' : 'text-cosmic-muted hover:text-cosmic-teal hover:bg-cosmic-teal/5'}`}>
-                  <Landmark className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">Gov Portal</span>
-                </Link>
-              )}
-              {isAdmin && (
-                <Link href="/dashboard/admin"
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${pathname.startsWith('/dashboard/admin') ? 'bg-cosmic-rose/10 text-cosmic-rose' : 'text-cosmic-muted hover:text-cosmic-rose hover:bg-cosmic-rose/5'}`}>
-                  <Shield className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">Admin Portal</span>
-                </Link>
-              )}
-            </div>
-          )}
-        </nav>
-
-        <div className="p-4 border-t border-white/5">
-          <Button variant="ghost" className="w-full justify-start text-cosmic-muted hover:text-cosmic-rose" onClick={handleLogout}>
-            <LogOut className="w-4 h-4 mr-2" /> Log Out
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Area */}
-      <div className="flex-grow flex flex-col min-h-screen min-w-0">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-40 h-14 bg-[#04050b]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 lg:px-6">
-          <div className="flex items-center gap-3">
-            {/* Mobile menu toggle */}
-            <button className="lg:hidden text-white p-1" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-            {/* Mobile logo */}
-            <Link href="/" className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cosmic-teal to-cosmic-violet flex items-center justify-center">
-                <Rocket className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="font-heading font-bold">CosmoGov</span>
-            </Link>
-            {/* Breadcrumb / Page title */}
-            <div className="block lg:hidden">
-              <span className="text-sm text-cosmic-muted truncate">
-                {navSections.flatMap(s => s.items).find(i => pathname === i.href || (i.href !== '/dashboard' && pathname.startsWith(i.href)))?.label || 'Dashboard'}
-              </span>
-            </div>
-            <div className="hidden lg:block">
-              <span className="text-sm text-cosmic-muted">
-                {navSections.flatMap(s => s.items).find(i => pathname === i.href || (i.href !== '/dashboard' && pathname.startsWith(i.href)))?.label || 'Dashboard'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <div className="relative" ref={notifRef}>
+    <WorkspaceProvider user={user}>
+      <div className="workspace-shell">
+        <aside className="workspace-sidebar">{sideContent}</aside>
+        <div className="workspace-body">
+          <header className="workspace-topbar">
+            <div className="workspace-breadcrumb">
               <button
-                onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
+                className="mobile-workspace-toggle"
+                aria-label="Open navigation"
+                onClick={() => setMobileOpen(true)}
               >
-                <Bell className="w-4 h-4 text-cosmic-muted" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-cosmic-rose text-[10px] font-bold text-white flex items-center justify-center animate-pulse">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
+                <Menu size={21} />
               </button>
-              {notifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm glass-card p-0 rounded-xl overflow-hidden" style={{ animation: 'scaleIn 0.2s ease-out' }}>
-                  <div className="flex items-center justify-between p-3 border-b border-white/5">
-                    <span className="text-sm font-semibold">Notifications</span>
-                    {unreadCount > 0 && (
-                      <button onClick={markAllRead} className="text-xs text-cosmic-accent hover:text-cosmic-teal transition-colors">
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
-                  <div className="max-h-72 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="p-6 text-center text-sm text-cosmic-muted">No notifications yet</div>
-                    ) : notifications.map(n => (
-                      <div key={n.id} className={`p-3 border-b border-white/5 hover:bg-white/5 transition-colors ${!n.read ? 'bg-cosmic-accent/5' : ''}`}>
-                        <p className="text-sm font-medium">{n.title}</p>
-                        <p className="text-xs text-cosmic-muted mt-0.5">{n.message}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <span>Workspace</span>
+              <ChevronRight size={12} />
+              <strong>{pageTitle}</strong>
             </div>
-
-            {/* User Menu */}
-            <div className="relative" ref={userMenuRef}>
+            <div className="workspace-top-actions">
+              <CommandMenu />
               <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                className="notification-trigger"
+                aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}
+                onClick={() => setNotifOpen(true)}
               >
-                <div className="w-7 h-7 rounded-full bg-cosmic-accent/20 flex items-center justify-center text-xs font-bold text-cosmic-accent">
-                  {(user?.name || 'U')[0].toUpperCase()}
-                </div>
-                <ChevronDown className="w-3 h-3 text-cosmic-muted" />
+                <Bell size={18} />
+                {unread > 0 && <span />}
               </button>
-              {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-2rem)] glass-card p-0 rounded-xl overflow-hidden" style={{ animation: 'scaleIn 0.2s ease-out' }}>
-                  <div className="p-3 border-b border-white/5">
-                    <p className="text-sm font-medium">{user?.name}</p>
-                    <p className="text-xs text-cosmic-muted">{user?.email}</p>
-                  </div>
-                  <div className="py-1">
-                    <Link href="/dashboard/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-cosmic-muted hover:text-white hover:bg-white/5 transition-colors">
-                      <User className="w-4 h-4" /> Profile & Settings
-                    </Link>
-                    <Link href="/dashboard/settings" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-cosmic-muted hover:text-white hover:bg-white/5 transition-colors">
-                      <CreditCard className="w-4 h-4" /> Billing
-                    </Link>
-                    {isAdmin && (
-                      <Link href="/dashboard/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-cosmic-rose hover:text-cosmic-rose hover:bg-cosmic-rose/5 transition-colors">
-                        <Shield className="w-4 h-4" /> Admin Portal
-                      </Link>
-                    )}
-                    {isGovOfficial && (
-                      <Link href="/dashboard/gov-portal" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-cosmic-teal hover:text-cosmic-teal hover:bg-cosmic-teal/5 transition-colors">
-                        <Landmark className="w-4 h-4" /> Gov Portal
-                      </Link>
-                    )}
-                    <Link href="/" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-cosmic-muted hover:text-white hover:bg-white/5 transition-colors">
-                      <Home className="w-4 h-4" /> Back to Home
-                    </Link>
-                    <button onClick={() => { setUserMenuOpen(false); handleLogout(); }} className="flex items-center gap-2 px-3 py-2 text-sm text-cosmic-rose hover:bg-cosmic-rose/5 transition-colors w-full">
-                      <LogOut className="w-4 h-4" /> Log Out
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {/* Mobile Nav Overlay */}
-        {mobileOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-[#04050b]/95 backdrop-blur-xl pt-14 overflow-y-auto">
-            <nav className="p-4 pb-8">
-              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-cosmic-teal hover:bg-cosmic-teal/5">
-                <Home className="w-5 h-5" /> Back to Home
+              <Link
+                href="/dashboard/settings"
+                className="user-avatar small"
+                aria-label="Your profile"
+              >
+                {(user.name || "Y")[0].toUpperCase()}
               </Link>
-              {navSections.map((section, si) => (
-                <div key={si} className={si > 0 ? 'mt-4' : 'mt-2'}>
-                  {section.label && (
-                    <div className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-cosmic-muted/50">
-                      {section.label}
-                    </div>
-                  )}
-                  <div className="space-y-0.5">
-                    {section.items.map(item => {
-                      const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
-                      return (
-                        <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm ${active ? 'bg-cosmic-accent/10 text-cosmic-accent' : 'text-cosmic-muted hover:text-white'}`}>
-                          <item.icon className="w-5 h-5 flex-shrink-0" /> <span className="truncate">{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-              {(isAdmin || isGovOfficial) && (
-                <div className="mt-4">
-                  <div className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-cosmic-muted/50">Administration</div>
-                  {isGovOfficial && (
-                    <Link href="/dashboard/gov-portal" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-cosmic-teal">
-                      <Landmark className="w-5 h-5 flex-shrink-0" /> <span className="truncate">Gov Portal</span>
-                    </Link>
-                  )}
-                  {isAdmin && (
-                    <Link href="/dashboard/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-cosmic-rose">
-                      <Shield className="w-5 h-5 flex-shrink-0" /> <span className="truncate">Admin Portal</span>
-                    </Link>
-                  )}
-                </div>
+            </div>
+          </header>
+          <main className="workspace-main" id="main-content">
+            <div className="workspace-content">
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
               )}
-              <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-cosmic-rose w-full mt-4">
-                <LogOut className="w-5 h-5 flex-shrink-0" /> Log Out
+              {children}
+            </div>
+          </main>
+          <footer className="workspace-footer">
+            <span>Small actions. Shared progress.</span>
+            <Link href="/">Made possible by cosmogov.</Link>
+          </footer>
+        </div>
+        <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
+          <DialogContent
+            className="mobile-workspace-menu"
+            showCloseButton={false}
+          >
+            <DialogTitle className="sr-only">Workspace navigation</DialogTitle>
+            <DialogDescription className="sr-only">
+              Choose a destination in your civic workspace.
+            </DialogDescription>
+            <button
+              className="mobile-menu-close"
+              aria-label="Close navigation"
+              onClick={() => setMobileOpen(false)}
+            >
+              <X size={21} />
+            </button>
+            {sideContent}
+          </DialogContent>
+        </Dialog>
+        <Dialog open={notifOpen} onOpenChange={setNotifOpen}>
+          <DialogContent className="notifications-dialog">
+            <DialogTitle>Keep the conversation going.</DialogTitle>
+            <DialogDescription>
+              Your community updates and official responses.
+            </DialogDescription>
+            {unread > 0 && (
+              <button
+                className="text-link"
+                onClick={async () => {
+                  const res = await fetch("/api/notifications/read-all", {
+                    method: "POST",
+                  });
+                  if (res.ok)
+                    setNotifications((items) =>
+                      items.map((item) => ({ ...item, read: true })),
+                    );
+                }}
+              >
+                <Check size={14} />
+                Mark all as read
               </button>
-            </nav>
-          </div>
-        )}
-
-        {/* Main Content */}
-        <main className="flex-grow p-4 lg:p-8">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
+            )}
+            <div className="notification-list">
+              {notifications.length === 0 ? (
+                <div className="empty-state">
+                  <Bell size={28} />
+                  <h3>You’re all caught up.</h3>
+                  <p>Community updates will appear here.</p>
+                </div>
+              ) : (
+                notifications.map((item) => (
+                  <div key={item.id} className={item.read ? "" : "unread"}>
+                    <strong>{item.title}</strong>
+                    <p>{item.message}</p>
+                    {item.link?.startsWith("/dashboard") && (
+                      <Link
+                        href={item.link}
+                        onClick={() => setNotifOpen(false)}
+                        className="text-link"
+                      >
+                        View update <ArrowUpRight size={14} />
+                      </Link>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-      <PWAInstallPrompt />
-    </div>
+    </WorkspaceProvider>
   );
 }

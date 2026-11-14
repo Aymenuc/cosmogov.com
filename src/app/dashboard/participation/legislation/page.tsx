@@ -74,7 +74,7 @@ interface Stats {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  draft: { label: 'Draft', color: 'text-cosmic-muted bg-white/10 border-white/10', icon: FileText },
+  draft: { label: 'Draft', color: 'text-cosmic-muted bg-foreground/10 border-border', icon: FileText },
   review: { label: 'In Review', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: Clock },
   public_comment: { label: 'Public Comment', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20', icon: MessageSquare },
   amendment: { label: 'Amendment', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: GitPullRequest },
@@ -166,7 +166,7 @@ export default function LegislationPage() {
     const supportPct = Math.round((support / total) * 100);
     return (
       <div className="flex items-center gap-2">
-        <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden max-w-[80px]">
+        <div className="flex-1 h-1.5 bg-foreground/5 rounded-full overflow-hidden max-w-[80px]">
           <div className="h-full bg-cosmic-teal rounded-full" style={{ width: `${supportPct}%` }} />
         </div>
         <span className="text-[10px] text-cosmic-teal">{support}</span>
@@ -186,7 +186,7 @@ export default function LegislationPage() {
             <Scale className="w-5 h-5 text-cosmic-amber" />
             <span className="text-cosmic-amber text-sm font-semibold tracking-wider uppercase">Collaborative Legislation</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
             Draft, Debate,{' '}
             <span className="text-gradient-warm">Enact</span>
           </h1>
@@ -228,7 +228,7 @@ export default function LegislationPage() {
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
                 isActive
                   ? 'bg-cosmic-amber/20 text-cosmic-amber border-cosmic-amber/30'
-                  : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                  : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
               }`}
             >
               {TabIcon && <TabIcon className="w-3 h-3" />}
@@ -246,13 +246,13 @@ export default function LegislationPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search legislation..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Button
-            className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90 shrink-0"
+            className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 shrink-0"
             onClick={() => setCreateDialogOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" /> Propose Legislation
@@ -265,8 +265,8 @@ export default function LegislationPage() {
             onClick={() => setCategoryFilter('all')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
               categoryFilter === 'all'
-                ? 'bg-white/15 text-white border-white/30'
-                : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-foreground/15 text-foreground border-border'
+                : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -282,7 +282,7 @@ export default function LegislationPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 border ${
                   isSelected
                     ? `${cat.bgColor} ${cat.color} ${cat.borderColor} ring-1 ring-current/20`
-                    : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10 hover:text-white'
+                    : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10 hover:text-foreground'
                 }`}
               >
                 <CatIcon className="w-3.5 h-3.5" />
@@ -301,13 +301,13 @@ export default function LegislationPage() {
       ) : legislation.length === 0 ? (
         <div className="glass-card p-12 rounded-2xl text-center">
           <Scale className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">No Legislation Found</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No Legislation Found</h3>
           <p className="text-cosmic-muted text-sm mb-4">
             {statusFilter !== 'all' || categoryFilter !== 'all'
               ? 'No bills match your current filters. Try adjusting your search criteria.'
               : 'Be the first to propose legislation and shape the future of your community.'}
           </p>
-          <Button className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90" onClick={() => setCreateDialogOpen(true)}>
+          <Button className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Propose Legislation
           </Button>
         </div>
@@ -340,7 +340,7 @@ export default function LegislationPage() {
                         {statusCfg.label}
                       </Badge>
                     </div>
-                    <h3 className="text-base font-semibold text-white group-hover:text-cosmic-amber transition-colors line-clamp-2">
+                    <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-amber transition-colors line-clamp-2">
                       {bill.title}
                     </h3>
                     <p className="text-xs text-cosmic-muted line-clamp-2 mt-1">
@@ -352,7 +352,7 @@ export default function LegislationPage() {
                     {bill.sponsorName && (
                       <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                         <User className="w-3 h-3" />
-                        Sponsored by <span className="text-white">{bill.sponsorName}</span>
+                        Sponsored by <span className="text-foreground">{bill.sponsorName}</span>
                       </div>
                     )}
 
@@ -360,7 +360,7 @@ export default function LegislationPage() {
                     <VoteRatio support={bill.voteSupportCount} oppose={bill.voteOpposeCount} />
 
                     {/* Footer Stats */}
-                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1 text-xs text-cosmic-muted">
                           <MessageSquare className="w-3.5 h-3.5" />
@@ -385,9 +385,9 @@ export default function LegislationPage() {
 
       {/* Create Legislation Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-cosmic-amber" />
               Propose New Legislation
             </DialogTitle>
@@ -402,7 +402,7 @@ export default function LegislationPage() {
                 <label className="text-sm text-cosmic-muted mb-1 block">Bill Number (optional)</label>
                 <Input
                   placeholder="e.g., HB-2026-042"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 font-mono"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 font-mono"
                   value={createForm.billNumber}
                   onChange={(e) => setCreateForm((f) => ({ ...f, billNumber: e.target.value }))}
                 />
@@ -410,7 +410,7 @@ export default function LegislationPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Category</label>
                 <Select value={createForm.category} onValueChange={(v) => setCreateForm((f) => ({ ...f, category: v }))}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -426,7 +426,7 @@ export default function LegislationPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Title *</label>
               <Input
                 placeholder="What is this legislation about?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={createForm.title}
                 onChange={(e) => setCreateForm((f) => ({ ...f, title: e.target.value }))}
               />
@@ -436,7 +436,7 @@ export default function LegislationPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Description *</label>
               <Textarea
                 placeholder="Summarize the purpose and key provisions of this legislation..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                 value={createForm.description}
                 onChange={(e) => setCreateForm((f) => ({ ...f, description: e.target.value }))}
               />
@@ -446,7 +446,7 @@ export default function LegislationPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Sponsor Name</label>
               <Input
                 placeholder="Who is sponsoring this bill?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={createForm.sponsorName}
                 onChange={(e) => setCreateForm((f) => ({ ...f, sponsorName: e.target.value }))}
               />
@@ -456,7 +456,7 @@ export default function LegislationPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Full Text (optional)</label>
               <Textarea
                 placeholder="Paste the full legislative text here..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[120px] font-mono text-xs"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[120px] font-mono text-xs"
                 value={createForm.fullText}
                 onChange={(e) => setCreateForm((f) => ({ ...f, fullText: e.target.value }))}
               />
@@ -467,7 +467,7 @@ export default function LegislationPage() {
               <Input
                 type="number"
                 min={1}
-                className="bg-white/5 border-white/10 text-white w-32"
+                className="bg-foreground/5 border-border text-foreground w-32"
                 value={createForm.quorumRequired}
                 onChange={(e) => setCreateForm((f) => ({ ...f, quorumRequired: parseInt(e.target.value) || 100 }))}
               />
@@ -475,11 +475,11 @@ export default function LegislationPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" className="text-cosmic-muted hover:text-white" onClick={() => setCreateDialogOpen(false)}>
+            <Button variant="ghost" className="text-cosmic-muted hover:text-foreground" onClick={() => setCreateDialogOpen(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-amber text-[#0B1022] hover:bg-cosmic-amber/90"
+              className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description}
             >

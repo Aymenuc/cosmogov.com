@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Vercel / CI: Prisma requires DIRECT_URL when in schema, but you may only set
  * DATABASE_URL first. Fall back so migrate deploy can run. Prefer a real

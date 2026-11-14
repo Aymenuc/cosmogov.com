@@ -102,7 +102,7 @@ interface LegislationDetail {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  draft: { label: 'Draft', color: 'text-cosmic-muted bg-white/10 border-white/10', icon: FileText },
+  draft: { label: 'Draft', color: 'text-cosmic-muted bg-foreground/10 border-border', icon: FileText },
   review: { label: 'In Review', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: Clock },
   public_comment: { label: 'Public Comment', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20', icon: MessageSquare },
   amendment: { label: 'Amendment', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: GitPullRequest },
@@ -123,7 +123,7 @@ const TIMELINE_STEPS = [
 ];
 
 const COMMENT_TYPE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  comment: { label: 'Comment', color: 'text-cosmic-muted bg-white/10 border-white/10', icon: MessageSquare },
+  comment: { label: 'Comment', color: 'text-cosmic-muted bg-foreground/10 border-border', icon: MessageSquare },
   suggestion: { label: 'Suggestion', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20', icon: Sparkles },
   question: { label: 'Question', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: HelpCircle },
   objection: { label: 'Objection', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: AlertCircle },
@@ -299,9 +299,9 @@ export default function LegislationDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <Scale className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-white mb-2">Legislation Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Legislation Not Found</h3>
         <p className="text-cosmic-muted text-sm mb-4">This bill may have been removed or the link is incorrect.</p>
-        <Button className="bg-cosmic-amber text-[#0B1022]" onClick={() => router.push('/dashboard/participation/legislation')}>
+        <Button className="bg-cosmic-amber text-primary-foreground" onClick={() => router.push('/dashboard/participation/legislation')}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Legislation
         </Button>
       </div>
@@ -323,7 +323,7 @@ export default function LegislationDetailPage() {
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       {/* Back nav + Bill Number */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" className="text-cosmic-muted hover:text-white p-2" onClick={() => router.push('/dashboard/participation/legislation')}>
+        <Button variant="ghost" className="text-cosmic-muted hover:text-foreground p-2" onClick={() => router.push('/dashboard/participation/legislation')}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
         {legislation.billNumber && (
@@ -343,7 +343,7 @@ export default function LegislationDetailPage() {
 
       {/* Title + Description */}
       <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-2">
+        <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-2">
           {legislation.title}
         </h1>
         <p className="text-cosmic-muted text-sm sm:text-base max-w-3xl">
@@ -354,13 +354,13 @@ export default function LegislationDetailPage() {
             {legislation.sponsorName && (
               <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                 <User className="w-3 h-3" />
-                Sponsor: <span className="text-white">{legislation.sponsorName}</span>
+                Sponsor: <span className="text-foreground">{legislation.sponsorName}</span>
               </div>
             )}
             {cosponsors.length > 0 && (
               <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                 <Orbit className="w-3 h-3" />
-                Co-sponsors: <span className="text-white">{cosponsors.join(', ')}</span>
+                Co-sponsors: <span className="text-foreground">{cosponsors.join(', ')}</span>
               </div>
             )}
           </div>
@@ -387,25 +387,25 @@ export default function LegislationDetailPage() {
                         ? 'bg-cosmic-rose'
                         : isCompleted
                         ? 'bg-cosmic-teal/60'
-                        : 'bg-white/10'
+                        : 'bg-foreground/10'
                     }`}
                   >
                     {isCompleted && (
-                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
-                    {isRejected && <ThumbsDown className="w-3 h-3 text-white" />}
-                    {isActive && <Orbit className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#0B1022]" />}
+                    {isRejected && <ThumbsDown className="w-3 h-3 text-foreground" />}
+                    {isActive && <Orbit className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
                   </div>
                   <span className={`text-[9px] sm:text-[10px] leading-tight text-center truncate max-w-[56px] ${
-                    isActive ? 'text-cosmic-amber font-semibold' : isCompleted ? 'text-cosmic-muted' : 'text-white/30'
+                    isActive ? 'text-cosmic-amber font-semibold' : isCompleted ? 'text-cosmic-muted' : 'text-foreground/30'
                   }`}>
                     {step.label}
                   </span>
                 </div>
                 {idx < TIMELINE_STEPS.length - 1 && (
-                  <div className={`h-px flex-grow mx-0.5 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-white/10'}`} />
+                  <div className={`h-px flex-grow mx-0.5 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-foreground/10'}`} />
                 )}
               </div>
             );
@@ -422,9 +422,9 @@ export default function LegislationDetailPage() {
             <Collapsible open={fullTextOpen} onOpenChange={setFullTextOpen}>
               <Card className="glass-card rounded-xl">
                 <CollapsibleTrigger asChild>
-                  <CardHeader className="cursor-pointer hover:bg-white/[0.02] transition-colors">
+                  <CardHeader className="cursor-pointer hover:bg-foreground/[0.02] transition-colors">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                         <FileText className="w-4 h-4 text-cosmic-amber" />
                         Full Legislative Text
                       </h3>
@@ -468,7 +468,7 @@ export default function LegislationDetailPage() {
                 <Button
                   className={`flex-1 sm:flex-none min-w-[120px] ${
                     userVote?.position === 'support'
-                      ? 'bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90'
+                      ? 'bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90'
                       : 'bg-cosmic-teal/10 text-cosmic-teal border border-cosmic-teal/20 hover:bg-cosmic-teal/20'
                   }`}
                   variant={userVote?.position === 'support' ? 'default' : 'ghost'}
@@ -481,7 +481,7 @@ export default function LegislationDetailPage() {
                 <Button
                   className={`flex-1 sm:flex-none min-w-[120px] ${
                     userVote?.position === 'oppose'
-                      ? 'bg-cosmic-rose text-white hover:bg-cosmic-rose/90'
+                      ? 'bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90'
                       : 'bg-cosmic-rose/10 text-cosmic-rose border border-cosmic-rose/20 hover:bg-cosmic-rose/20'
                   }`}
                   variant={userVote?.position === 'oppose' ? 'default' : 'ghost'}
@@ -494,8 +494,8 @@ export default function LegislationDetailPage() {
                 <Button
                   className={`flex-1 sm:flex-none min-w-[120px] ${
                     userVote?.position === 'abstain'
-                      ? 'bg-white/20 text-white hover:bg-white/30'
-                      : 'bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10'
+                      ? 'bg-foreground/20 text-foreground hover:bg-foreground/30'
+                      : 'bg-foreground/5 text-cosmic-muted border border-border hover:bg-foreground/10'
                   }`}
                   variant={userVote?.position === 'abstain' ? 'default' : 'ghost'}
                   onClick={() => handleVote('abstain')}
@@ -509,7 +509,7 @@ export default function LegislationDetailPage() {
               {/* Vote bar */}
               {voteCounts.total > 0 && (
                 <div className="space-y-2">
-                  <div className="h-3 bg-white/5 rounded-full overflow-hidden flex">
+                  <div className="h-3 bg-foreground/5 rounded-full overflow-hidden flex">
                     {voteCounts.support > 0 && (
                       <div
                         className="h-full bg-cosmic-teal transition-all duration-700"
@@ -518,7 +518,7 @@ export default function LegislationDetailPage() {
                     )}
                     {voteCounts.abstain > 0 && (
                       <div
-                        className="h-full bg-white/20 transition-all duration-700"
+                        className="h-full bg-foreground/20 transition-all duration-700"
                         style={{ width: `${(voteCounts.abstain / voteCounts.total) * 100}%` }}
                       />
                     )}
@@ -541,12 +541,12 @@ export default function LegislationDetailPage() {
           {/* Comments & Amendments Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="flex items-center justify-between mb-3">
-              <TabsList className="bg-white/5 border border-white/10">
-                <TabsTrigger value="comments" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-cosmic-muted">
+              <TabsList className="bg-foreground/5 border border-border">
+                <TabsTrigger value="comments" className="data-[state=active]:bg-foreground/10 data-[state=active]:text-foreground text-cosmic-muted">
                   <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
                   Comments ({legislation.comments.length})
                 </TabsTrigger>
-                <TabsTrigger value="amendments" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-cosmic-muted">
+                <TabsTrigger value="amendments" className="data-[state=active]:bg-foreground/10 data-[state=active]:text-foreground text-cosmic-muted">
                   <GitPullRequest className="w-3.5 h-3.5 mr-1.5" />
                   Amendments ({legislation.amendments.length})
                 </TabsTrigger>
@@ -577,7 +577,7 @@ export default function LegislationDetailPage() {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
                           isActive
                             ? `${cfg.color} ring-1 ring-current/20`
-                            : 'bg-white/5 text-cosmic-muted border-white/10 hover:bg-white/10'
+                            : 'bg-foreground/5 text-cosmic-muted border-border hover:bg-foreground/10'
                         }`}
                       >
                         <CfgIcon className="w-3 h-3" />
@@ -588,19 +588,19 @@ export default function LegislationDetailPage() {
                 </div>
                 <Input
                   placeholder="Section reference (optional, e.g., Section 3.2)"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 text-xs"
+                  className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 text-xs"
                   value={commentSectionRef}
                   onChange={(e) => setCommentSectionRef(e.target.value)}
                 />
                 <div className="flex gap-2">
                   <Textarea
                     placeholder="Share your thoughts on this legislation..."
-                    className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[60px]"
+                    className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[60px]"
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
                   />
                   <Button
-                    className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90 self-end shrink-0"
+                    className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90 self-end shrink-0"
                     onClick={handleComment}
                     disabled={submittingComment || !commentContent.trim()}
                   >
@@ -630,7 +630,7 @@ export default function LegislationDetailPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-sm font-medium text-white">{comment.user.name || 'Anonymous'}</span>
+                              <span className="text-sm font-medium text-foreground">{comment.user.name || 'Anonymous'}</span>
                               <Badge className={`${typeCfg.color} text-[9px] border py-0 px-1.5`}>
                                 <TypeIcon className="w-2.5 h-2.5 mr-0.5" />
                                 {typeCfg.label}
@@ -646,14 +646,14 @@ export default function LegislationDetailPage() {
 
                             {/* Replies */}
                             {replies.length > 0 && (
-                              <div className="mt-3 ml-4 space-y-2 border-l border-white/5 pl-3">
+                              <div className="mt-3 ml-4 space-y-2 border-l border-border pl-3">
                                 {replies.map((reply) => (
                                   <div key={reply.id} className="flex items-start gap-2">
                                     <div className="w-5 h-5 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[8px] font-bold text-cosmic-violet shrink-0">
                                       {(reply.user.name || 'U')[0].toUpperCase()}
                                     </div>
                                     <div>
-                                      <span className="text-xs font-medium text-white mr-2">{reply.user.name || 'Anonymous'}</span>
+                                      <span className="text-xs font-medium text-foreground mr-2">{reply.user.name || 'Anonymous'}</span>
                                       <span className="text-xs text-cosmic-muted">{reply.content}</span>
                                     </div>
                                   </div>
@@ -692,7 +692,7 @@ export default function LegislationDetailPage() {
                       <Card key={amendment.id} className="glass-card rounded-xl">
                         <CardHeader className="pb-2">
                           <div className="flex items-start justify-between mb-1 flex-wrap gap-1.5">
-                            <h4 className="text-sm font-semibold text-white flex-1 min-w-0">
+                            <h4 className="text-sm font-semibold text-foreground flex-1 min-w-0">
                               {amendment.title}
                             </h4>
                             <Badge className={`${amendStatusCfg.color} text-[10px] border`}>
@@ -727,12 +727,12 @@ export default function LegislationDetailPage() {
 
                           {amendment.rationale && (
                             <p className="text-xs text-cosmic-muted italic">
-                              <strong className="text-white not-italic">Rationale:</strong> {amendment.rationale}
+                              <strong className="text-foreground not-italic">Rationale:</strong> {amendment.rationale}
                             </p>
                           )}
 
                           {/* Footer */}
-                          <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                          <div className="flex items-center justify-between pt-2 border-t border-border">
                             <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                               <div className="w-5 h-5 rounded-full bg-cosmic-violet/20 flex items-center justify-center text-[9px] font-bold text-cosmic-violet">
                                 {(amendment.proposer.name || 'U')[0].toUpperCase()}
@@ -768,20 +768,20 @@ export default function LegislationDetailPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-cosmic-muted">Version</span>
-                  <span className="text-white font-mono">v{legislation.currentVersion}</span>
+                  <span className="text-foreground font-mono">v{legislation.currentVersion}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-cosmic-muted">Introduced</span>
-                  <span className="text-white">{formatDate(legislation.createdAt)}</span>
+                  <span className="text-foreground">{formatDate(legislation.createdAt)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-cosmic-muted">Last Updated</span>
-                  <span className="text-white">{formatDate(legislation.updatedAt)}</span>
+                  <span className="text-foreground">{formatDate(legislation.updatedAt)}</span>
                 </div>
                 {legislation.votingOpensAt && (
                   <div className="flex items-center justify-between">
                     <span className="text-cosmic-muted">Voting Opens</span>
-                    <span className="text-white">{formatDate(legislation.votingOpensAt)}</span>
+                    <span className="text-foreground">{formatDate(legislation.votingOpensAt)}</span>
                   </div>
                 )}
                 {legislation.votingClosesAt && (
@@ -798,7 +798,7 @@ export default function LegislationDetailPage() {
                 )}
                 <div className="flex items-center justify-between">
                   <span className="text-cosmic-muted">Quorum</span>
-                  <span className="text-white">{legislation.quorumRequired} votes</span>
+                  <span className="text-foreground">{legislation.quorumRequired} votes</span>
                 </div>
               </div>
             </CardContent>
@@ -858,9 +858,9 @@ export default function LegislationDetailPage() {
 
       {/* Propose Amendment Dialog */}
       <Dialog open={amendDialogOpen} onOpenChange={setAmendDialogOpen}>
-        <DialogContent className="bg-[#0B1022] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border text-foreground max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <GitPullRequest className="w-5 h-5 text-cosmic-violet" />
               Propose Amendment
             </DialogTitle>
@@ -874,7 +874,7 @@ export default function LegislationDetailPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Amendment Title *</label>
               <Input
                 placeholder="What section or provision are you amending?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
                 value={amendForm.title}
                 onChange={(e) => setAmendForm((f) => ({ ...f, title: e.target.value }))}
               />
@@ -884,7 +884,7 @@ export default function LegislationDetailPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Description *</label>
               <Textarea
                 placeholder="Describe the proposed change..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[80px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[80px]"
                 value={amendForm.description}
                 onChange={(e) => setAmendForm((f) => ({ ...f, description: e.target.value }))}
               />
@@ -894,7 +894,7 @@ export default function LegislationDetailPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Section Reference</label>
               <Input
                 placeholder="e.g., Section 3.2"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 font-mono"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 font-mono"
                 value={amendForm.sectionRef}
                 onChange={(e) => setAmendForm((f) => ({ ...f, sectionRef: e.target.value }))}
               />
@@ -905,7 +905,7 @@ export default function LegislationDetailPage() {
                 <label className="text-sm text-cosmic-rose mb-1 block">Original Text</label>
                 <Textarea
                   placeholder="The current text you want to change..."
-                  className="bg-cosmic-rose/5 border-cosmic-rose/10 text-white placeholder:text-cosmic-muted/50 min-h-[60px] text-xs font-mono"
+                  className="bg-cosmic-rose/5 border-cosmic-rose/10 text-foreground placeholder:text-cosmic-muted/50 min-h-[60px] text-xs font-mono"
                   value={amendForm.originalText}
                   onChange={(e) => setAmendForm((f) => ({ ...f, originalText: e.target.value }))}
                 />
@@ -914,7 +914,7 @@ export default function LegislationDetailPage() {
                 <label className="text-sm text-cosmic-teal mb-1 block">Proposed Text</label>
                 <Textarea
                   placeholder="Your proposed replacement text..."
-                  className="bg-cosmic-teal/5 border-cosmic-teal/10 text-white placeholder:text-cosmic-muted/50 min-h-[60px] text-xs font-mono"
+                  className="bg-cosmic-teal/5 border-cosmic-teal/10 text-foreground placeholder:text-cosmic-muted/50 min-h-[60px] text-xs font-mono"
                   value={amendForm.proposedText}
                   onChange={(e) => setAmendForm((f) => ({ ...f, proposedText: e.target.value }))}
                 />
@@ -925,7 +925,7 @@ export default function LegislationDetailPage() {
               <label className="text-sm text-cosmic-muted mb-1 block">Rationale</label>
               <Textarea
                 placeholder="Why is this amendment needed?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[60px]"
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[60px]"
                 value={amendForm.rationale}
                 onChange={(e) => setAmendForm((f) => ({ ...f, rationale: e.target.value }))}
               />
@@ -933,11 +933,11 @@ export default function LegislationDetailPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" className="text-cosmic-muted hover:text-white" onClick={() => setAmendDialogOpen(false)}>
+            <Button variant="ghost" className="text-cosmic-muted hover:text-foreground" onClick={() => setAmendDialogOpen(false)}>
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-violet text-white hover:bg-cosmic-violet/90"
+              className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90"
               onClick={handleAmendment}
               disabled={submittingAmend || !amendForm.title || !amendForm.description}
             >

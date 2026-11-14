@@ -1,4 +1,5 @@
 'use client';
+import SessionControls from '@/components/SessionControls';
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -100,7 +101,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold font-heading mb-6">Settings</h1>
 
       <Tabs defaultValue="profile">
-        <TabsList className="bg-[#0B1022] border border-white/5 p-1 mb-6 overflow-x-auto flex-nowrap min-w-max">
+        <TabsList className="bg-card border border-border p-1 mb-6 overflow-x-auto flex-nowrap min-w-max">
           <TabsTrigger value="profile" className="data-[state=active]:bg-cosmic-accent/10 data-[state=active]:text-cosmic-accent">
             <User className="w-4 h-4 mr-1.5" /> Profile
           </TabsTrigger>
@@ -117,7 +118,7 @@ export default function SettingsPage() {
 
         {/* PROFILE TAB */}
         <TabsContent value="profile">
-          <Card className="bg-[#0B1022] border-white/5 mb-6">
+          <Card className="bg-card border-border mb-6">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <User className="w-4 h-4 text-cosmic-accent" /> Profile Information
@@ -133,23 +134,23 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="outline" className={`text-[10px] capitalize ${currentPlan.color}`}>{user.plan}</Badge>
                       {user.role === 'admin' && <Badge className="text-[10px] bg-cosmic-rose/20 text-cosmic-rose border-0">Admin</Badge>}
-                      <Badge variant="outline" className="text-[10px] border-white/10">Lv.{user.level}</Badge>
+                      <Badge variant="outline" className="text-[10px] border-border">Lv.{user.level}</Badge>
                     </div>
                   </div>
                 </div>
                 <div>
                   <label className="text-sm text-cosmic-muted mb-1.5 block">Display Name</label>
-                  <Input value={name} onChange={e => setName(e.target.value)} className="bg-white/5 border-white/10 text-white" />
+                  <Input value={name} onChange={e => setName(e.target.value)} className="bg-foreground/5 border-border text-foreground" />
                 </div>
                 <div>
                   <label className="text-sm text-cosmic-muted mb-1.5 block">Email</label>
-                  <Input value={user.email} disabled className="bg-white/5 border-white/10 text-cosmic-muted" />
+                  <Input value={user.email} disabled className="bg-foreground/5 border-border text-cosmic-muted" />
                   <p className="text-xs text-cosmic-muted mt-1">Email changes require verification</p>
                 </div>
                 <div>
                   <label className="text-sm text-cosmic-muted mb-1.5 block">Age Group</label>
                   <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white">
+                    className="w-full bg-foreground/5 border border-border rounded-lg px-3 py-2 text-sm text-foreground">
                     <option value="youth">Youth (13-17)</option>
                     <option value="young_adult">Young Adult (18-25)</option>
                     <option value="adult">Adult (26-55)</option>
@@ -167,7 +168,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="flex justify-end pt-2">
-                  <Button onClick={handleSave} disabled={saving} className="bg-cosmic-accent text-white rounded-xl">
+                  <Button onClick={handleSave} disabled={saving} className="bg-cosmic-accent text-primary-foreground rounded-xl">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : saved ? <Check className="w-4 h-4 mr-1" /> : <Save className="w-4 h-4 mr-1" />}
                     {saved ? 'Saved!' : 'Save Changes'}
                   </Button>
@@ -176,7 +177,8 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0B1022] border-cosmic-rose/10">
+          <SessionControls />
+          <Card className="bg-card border-cosmic-rose/10">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-2 flex items-center gap-2 text-cosmic-rose">
                 <AlertTriangle className="w-4 h-4" /> Danger Zone
@@ -189,7 +191,7 @@ export default function SettingsPage() {
 
         {/* PLAN & BILLING TAB */}
         <TabsContent value="plan">
-          <Card className="bg-[#0B1022] border-white/5 mb-6">
+          <Card className="bg-card border-border mb-6">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <Crown className="w-4 h-4 text-cosmic-violet" /> Current Plan
@@ -210,14 +212,14 @@ export default function SettingsPage() {
                 ))}
               </div>
               {user.plan !== 'guild' && user.plan !== 'enterprise' && (
-                <Button className="bg-cosmic-violet text-white rounded-xl">
+                <Button className="bg-cosmic-violet text-foreground rounded-xl">
                   <ArrowUpRight className="w-4 h-4 mr-1" /> Upgrade Plan
                 </Button>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0B1022] border-white/5">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-cosmic-accent" /> Billing History
@@ -229,7 +231,7 @@ export default function SettingsPage() {
 
         {/* NOTIFICATIONS TAB */}
         <TabsContent value="notifications">
-          <Card className="bg-[#0B1022] border-white/5">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <Bell className="w-4 h-4 text-cosmic-amber" /> Notification Preferences
@@ -242,13 +244,13 @@ export default function SettingsPage() {
                   { key: 'system', label: 'System Alerts', desc: 'Important platform updates and maintenance' },
                   { key: 'mentions', label: 'Mentions', desc: 'When someone mentions you in a comment' },
                 ].map(s => (
-                  <div key={s.key} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                  <div key={s.key} className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                     <div>
                       <p className="text-sm font-medium">{s.label}</p>
                       <p className="text-xs text-cosmic-muted">{s.desc}</p>
                     </div>
                     <div
-                      className={`w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${notifSettings[s.key as keyof typeof notifSettings] ? 'bg-cosmic-teal' : 'bg-white/10'}`}
+                      className={`w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${notifSettings[s.key as keyof typeof notifSettings] ? 'bg-cosmic-teal' : 'bg-foreground/10'}`}
                       onClick={() => setNotifSettings(prev => ({ ...prev, [s.key]: !prev[s.key as keyof typeof prev] }))}
                     >
                       <div className={`w-5 h-5 rounded-full bg-white transition-transform ${notifSettings[s.key as keyof typeof notifSettings] ? 'translate-x-4' : ''}`} />
@@ -258,7 +260,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Push Notifications */}
-              <div className="mt-6 pt-4 border-t border-white/5">
+              <div className="mt-6 pt-4 border-t border-border">
                 <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                   <Bell className="w-4 h-4 text-cosmic-teal" /> Browser Push Notifications
                 </h3>
@@ -270,7 +272,7 @@ export default function SettingsPage() {
 
         {/* PREFERENCES TAB */}
         <TabsContent value="preferences">
-          <Card className="bg-[#0B1022] border-white/5 mb-6">
+          <Card className="bg-card border-border mb-6">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <Globe className="w-4 h-4 text-cosmic-teal" /> Interests
@@ -282,7 +284,7 @@ export default function SettingsPage() {
                     key={tag}
                     onClick={() => toggleInterest(tag)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                      selectedInterests.includes(tag) ? 'border-cosmic-teal/30 bg-cosmic-teal/10 text-cosmic-teal' : 'border-white/5 text-cosmic-muted hover:text-white'
+                      selectedInterests.includes(tag) ? 'border-cosmic-teal/30 bg-cosmic-teal/10 text-cosmic-teal' : 'border-border text-cosmic-muted hover:text-foreground'
                     }`}
                   >
                     {tag}
@@ -292,13 +294,13 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0B1022] border-white/5">
+          <Card className="bg-card border-border">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
                 <Gamepad2 className="w-4 h-4 text-cosmic-amber" /> Game Preferences
               </h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                   <div>
                     <p className="text-sm font-medium">Animated Game Effects</p>
                     <p className="text-xs text-cosmic-muted">Canvas animations and visual effects during games</p>
@@ -307,16 +309,16 @@ export default function SettingsPage() {
                     <div className="w-5 h-5 rounded-full bg-white translate-x-4 transition-transform" />
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                   <div>
                     <p className="text-sm font-medium">Sound Effects</p>
                     <p className="text-xs text-cosmic-muted">Audio feedback during game interactions</p>
                   </div>
-                  <div className="w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer bg-white/10">
+                  <div className="w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer bg-foreground/10">
                     <div className="w-5 h-5 rounded-full bg-white transition-transform" />
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                   <div>
                     <p className="text-sm font-medium">Difficulty Hint</p>
                     <p className="text-xs text-cosmic-muted">Show recommended difficulty based on your level</p>
@@ -327,7 +329,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               <div className="flex justify-end pt-4">
-                <Button onClick={handleSave} disabled={saving} className="bg-cosmic-accent text-white rounded-xl">
+                <Button onClick={handleSave} disabled={saving} className="bg-cosmic-accent text-primary-foreground rounded-xl">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Save className="w-4 h-4 mr-1" />}
                   Save Preferences
                 </Button>

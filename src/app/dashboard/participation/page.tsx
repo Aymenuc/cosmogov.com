@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import StartProcessDialog from '@/components/StartProcessDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,9 +22,15 @@ import {
   Clock,
   Plus,
   ArrowRight,
+  ArrowUpRight,
   Sparkles,
   Orbit,
-  HandMetal,
+  ClipboardList,
+  Dices,
+  Eye,
+  PenLine,
+  Scale,
+  Vote,
   Building2,
   Globe2,
   MapPin,
@@ -37,6 +44,82 @@ import {
   getCategory,
   resolveCategory,
 } from '@/lib/categories';
+
+// What people come here to do, in their words, and the tool made for it.
+const intents = [
+  {
+    want: 'Get something done',
+    tool: 'Mission studio',
+    copy: 'Bring a goal. Get help researching it, planning it and gathering what you need.',
+    href: '/dashboard/missions',
+    icon: Sparkles,
+    tint: 'sun',
+  },
+  {
+    want: 'Decide something together',
+    tool: 'Proposals & voting',
+    copy: 'Put a question to your group, discuss it, and vote with the rules in view.',
+    href: '/dashboard/proposals',
+    icon: Vote,
+    tint: 'lilac',
+  },
+  {
+    want: 'Share out a budget',
+    tool: 'Budgets',
+    copy: 'Let people propose projects and choose where the money goes.',
+    href: '/dashboard/participation/budget',
+    icon: Wallet,
+    tint: 'mint',
+  },
+  {
+    want: 'Ask what people think',
+    tool: 'Surveys & polls',
+    copy: 'A few quick questions when you need a sense of the room.',
+    href: '/dashboard/participation/surveys',
+    icon: ClipboardList,
+    tint: 'sky',
+  },
+  {
+    want: 'Gather support for an idea',
+    tool: 'Initiatives',
+    copy: 'Collect signatures to show an idea has backing.',
+    href: '/dashboard/participation/initiatives',
+    icon: PenLine,
+    tint: 'peach',
+  },
+  {
+    want: 'Talk it through',
+    tool: 'Assemblies',
+    copy: 'Bring people together to discuss before anything is decided.',
+    href: '/dashboard/participation/assemblies',
+    icon: Users,
+    tint: 'lilac',
+  },
+  {
+    want: 'Pick a panel by lottery',
+    tool: 'Sortition',
+    copy: 'Draw a small group at random to look closely at a question.',
+    href: '/dashboard/participation/sortition',
+    icon: Dices,
+    tint: 'sun',
+  },
+  {
+    want: 'Shape a rule or policy',
+    tool: 'Legislation',
+    copy: 'Read a draft text, comment on it, and suggest changes.',
+    href: '/dashboard/participation/legislation',
+    icon: Scale,
+    tint: 'sky',
+  },
+  {
+    want: 'See what happened next',
+    tool: 'Accountability',
+    copy: 'Follow what was promised and what has been done.',
+    href: '/dashboard/participation/accountability',
+    icon: Eye,
+    tint: 'mint',
+  },
+];
 
 interface Process {
   id: string;
@@ -88,7 +171,7 @@ const PHASE_COLORS: Record<string, string> = {
   voting: 'bg-cosmic-accent',
   implementation: 'bg-cosmic-amber',
   evaluation: 'bg-cosmic-success',
-  closed: 'bg-white/20',
+  closed: 'bg-foreground/20',
 };
 
 const SCOPE_CONFIG: Record<string, { label: string; icon: React.ElementType }> = {
@@ -145,22 +228,22 @@ function PhaseStepper({ currentPhase, phases: phasesJson }: { currentPhase: stri
                     ? `bg-cosmic-teal glow-teal scale-110`
                     : isCompleted
                     ? 'bg-cosmic-teal/60'
-                    : 'bg-white/10'
+                    : 'bg-foreground/10'
                 }`}
               >
                 {isCompleted && (
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
-                {isActive && <Orbit className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#0B1022]" />}
+                {isActive && <Orbit className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary-foreground" />}
               </div>
-              <span className={`text-[10px] sm:text-[9px] leading-tight text-center truncate max-w-[56px] sm:max-w-[48px] ${isActive ? 'text-cosmic-teal font-semibold' : isCompleted ? 'text-cosmic-muted' : 'text-white/30'}`}>
+              <span className={`text-[10px] sm:text-[9px] leading-tight text-center truncate max-w-[56px] sm:max-w-[48px] ${isActive ? 'text-cosmic-teal font-semibold' : isCompleted ? 'text-cosmic-muted' : 'text-foreground/30'}`}>
                 {phase.name}
               </span>
             </div>
             {idx < phases.filter((p) => p.id !== 'closed').length - 1 && (
-              <div className={`h-px flex-grow mx-0.5 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-white/10'}`} />
+              <div className={`h-px flex-grow mx-0.5 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-foreground/10'}`} />
             )}
           </div>
         );
@@ -172,7 +255,6 @@ function PhaseStepper({ currentPhase, phases: phasesJson }: { currentPhase: stri
 export default function ParticipationHub() {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<Stats>({ activeProcesses: 0, totalParticipants: 0, proposalsSubmitted: 0, budgetAllocated: 0 });
   const [filters, setFilters] = useState({ category: 'all', phase: 'all', scope: 'all', search: '' });
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -200,12 +282,6 @@ export default function ParticipationHub() {
           );
         }
         setProcesses(filtered);
-        setStats({
-          activeProcesses: data.total,
-          totalParticipants: filtered.reduce((s: number, p: Process) => s + p.participantCount, 0),
-          proposalsSubmitted: filtered.reduce((s: number, p: Process) => s + p.proposalCount, 0),
-          budgetAllocated: filtered.reduce((s: number, p: Process) => s + p.budgetAllocated, 0),
-        });
       }
     } catch (err) {
       console.error(err);
@@ -244,64 +320,42 @@ export default function ParticipationHub() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-teal p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Megaphone className="w-5 h-5 text-cosmic-teal" />
-            <span className="text-cosmic-teal text-sm font-semibold tracking-wider uppercase">e-Participation Hub</span>
+      <div className="app-page-heading">
+        <div>
+          <div className="eyebrow">
+            <span className="status-dot" /> MORE THAN A VOTE
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-            Your Voice, Your Community,{' '}
-            <span className="text-gradient">Your Power</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            Shape the future of your community through participatory democracy. Propose ideas, deliberate with neighbors, vote on budgets, and hold leaders accountable.
-          </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            {[
-              { label: 'Active Processes', value: stats.activeProcesses, icon: Orbit, color: 'text-cosmic-teal' },
-              { label: 'Participants', value: stats.totalParticipants, icon: Users, color: 'text-cosmic-accent' },
-              { label: 'Proposals', value: stats.proposalsSubmitted, icon: FileText, color: 'text-cosmic-violet' },
-              { label: 'Budget Allocated', value: formatCurrency(stats.budgetAllocated), icon: Wallet, color: 'text-cosmic-amber' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
-                </p>
-              </div>
-            ))}
-          </div>
+          <h1>What do you want to do together?</h1>
+          <p>Pick what you’re trying to do. Each card opens the tool made for it.</p>
         </div>
+        <button className="civic-button" onClick={() => setShowCreateModal(true)}>
+          <Plus size={15} />
+          Start a process
+        </button>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-        {[
-          { label: 'Create Process', icon: Plus, href: '#', colorClass: 'bg-cosmic-teal/10', iconColor: 'text-cosmic-teal', desc: 'Start a new participatory process' },
-          { label: 'Budget Projects', icon: Wallet, href: '/dashboard/participation/budget', colorClass: 'bg-cosmic-amber/10', iconColor: 'text-cosmic-amber', desc: 'Allocate community funds' },
-          { label: 'Sign Initiatives', icon: HandMetal, href: '#', colorClass: 'bg-cosmic-violet/10', iconColor: 'text-cosmic-violet', desc: 'Support citizen petitions' },
-          { label: 'Join Assembly', icon: Users, href: '#', colorClass: 'bg-cosmic-accent/10', iconColor: 'text-cosmic-accent', desc: 'Participate in deliberation' },
-        ].map((action) => (
-          <Link
-            key={action.label}
-            href={action.href}
-            className="glass-card p-3 sm:p-4 rounded-xl hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
-          >
-            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${action.colorClass} flex items-center justify-center mb-2 sm:mb-3 transition-all`}>
-              <action.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${action.iconColor}`} />
-            </div>
-            <h3 className="text-xs sm:text-sm font-semibold text-white mb-1">{action.label}</h3>
-            <p className="text-[10px] sm:text-xs text-cosmic-muted">{action.desc}</p>
-          </Link>
+      <ul className="intent-grid">
+        {intents.map((intent) => (
+          <li key={intent.want}>
+            <Link href={intent.href} className={`intent-card tint-${intent.tint}`}>
+              <span className="intent-icon">
+                <intent.icon size={22} aria-hidden="true" />
+              </span>
+              <strong>{intent.want}</strong>
+              <span>{intent.copy}</span>
+              <small>
+                {intent.tool} <ArrowUpRight size={14} aria-hidden="true" />
+              </small>
+            </Link>
+          </li>
         ))}
+      </ul>
+
+      <StartProcessDialog open={showCreateModal} onOpenChange={setShowCreateModal} />
+
+      <div className="intent-divider">
+        <h2>Or join a process that’s already under way</h2>
+        <p>A process is a longer piece of shared work with stages, from first ideas to a decision.</p>
       </div>
 
       {/* Browse by Aspect — Category Group Cards */}
@@ -320,12 +374,12 @@ export default function ParticipationHub() {
                 className={`glass-card p-3 sm:p-4 rounded-xl cursor-pointer hover:scale-[1.02] transition-all ${
                   isActive
                     ? 'ring-1 ring-cosmic-accent/60 border-cosmic-accent/30'
-                    : 'border-white/5'
+                    : 'border-border'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <GroupIcon className="w-4 h-4 sm:w-5 sm:h-5 text-cosmic-accent" />
-                  <span className="font-medium text-xs sm:text-sm text-white">{group.label}</span>
+                  <span className="font-medium text-xs sm:text-sm text-foreground">{group.label}</span>
                   {isActive && (
                     <ChevronRight className="w-4 h-4 text-cosmic-accent ml-auto" />
                   )}
@@ -345,13 +399,13 @@ export default function ParticipationHub() {
                           e.stopPropagation();
                           handleCategoryChipClick(catId);
                         }}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium transition-all cursor-pointer ${cat.bgColor} ${cat.color} ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-foreground transition-all cursor-pointer ${cat.bgColor} ${
                           isChipSelected
-                            ? `ring-1 ${cat.borderColor} ${cat.bgColor.replace('/10', '/25')}`
-                            : 'opacity-70 hover:opacity-100'
+                            ? `ring-2 ring-foreground ${cat.bgColor.replace('/10', '/25')}`
+                            : ''
                         }`}
                       >
-                        <CatIcon className="w-2.5 h-2.5" />
+                        <CatIcon className={`w-3 h-3 ${cat.color}`} />
                         {cat.label}
                       </span>
                     );
@@ -371,13 +425,13 @@ export default function ParticipationHub() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
             <Input
               placeholder="Search processes..."
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50"
+              className="pl-10 bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             />
           </div>
           <Select value={filters.phase} onValueChange={(v) => setFilters((f) => ({ ...f, phase: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Phase" />
             </SelectTrigger>
             <SelectContent>
@@ -391,7 +445,7 @@ export default function ParticipationHub() {
             </SelectContent>
           </Select>
           <Select value={filters.scope} onValueChange={(v) => setFilters((f) => ({ ...f, scope: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Scope" />
             </SelectTrigger>
             <SelectContent>
@@ -411,8 +465,8 @@ export default function ParticipationHub() {
             onClick={() => setFilters((f) => ({ ...f, category: 'all' }))}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
               filters.category === 'all'
-                ? 'bg-white/15 text-white ring-1 ring-white/20'
-                : 'bg-white/5 text-cosmic-muted hover:bg-white/10'
+                ? 'bg-foreground/15 text-foreground ring-1 ring-foreground/20'
+                : 'bg-foreground/5 text-cosmic-muted hover:bg-foreground/10'
             }`}
           >
             <FileText className="w-3 h-3" />
@@ -426,13 +480,14 @@ export default function ParticipationHub() {
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChipClick(cat.id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                aria-pressed={isSelected}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium text-foreground whitespace-nowrap transition-all shrink-0 ${
                   isSelected
-                    ? `${cat.bgColor.replace('/10', '/25')} ${cat.color} ring-1 ${cat.borderColor}`
-                    : `${cat.bgColor} ${cat.color} opacity-60 hover:opacity-100`
+                    ? `${cat.bgColor.replace('/10', '/25')} ring-2 ring-foreground`
+                    : `${cat.bgColor} hover:ring-1 hover:ring-foreground/40`
                 }`}
               >
-                <CatIcon className="w-3 h-3" />
+                <CatIcon className={`w-3.5 h-3.5 ${cat.color}`} />
                 {cat.label}
               </button>
             );
@@ -443,9 +498,9 @@ export default function ParticipationHub() {
       {/* Active Processes Grid */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="font-heading text-xl font-bold text-foreground flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-cosmic-teal" />
-            Active Processes
+            Processes under way
           </h2>
           <span className="text-sm text-cosmic-muted">{processes.length} processes</span>
         </div>
@@ -457,11 +512,11 @@ export default function ParticipationHub() {
         ) : processes.length === 0 ? (
           <div className="glass-card p-12 rounded-2xl text-center">
             <Megaphone className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">No Active Processes</h3>
-            <p className="text-cosmic-muted text-sm mb-4">Be the first to start a participatory process in your community.</p>
-            <Button className="bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90">
-              <Plus className="w-4 h-4 mr-2" /> Create New Process
-            </Button>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Nothing under way yet</h3>
+            <p className="text-foreground text-sm mb-4">Start a process when a piece of shared work needs stages and time.</p>
+            <button className="civic-button outline" onClick={() => setShowCreateModal(true)}>
+              <Plus size={15} /> Start the first one
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
@@ -485,7 +540,7 @@ export default function ParticipationHub() {
                           {scopeConfig.label}
                         </div>
                       </div>
-                      <h3 className="text-base font-semibold text-white group-hover:text-cosmic-teal transition-colors line-clamp-2">
+                      <h3 className="text-base font-semibold text-foreground group-hover:text-cosmic-teal transition-colors line-clamp-2">
                         {process.title}
                       </h3>
                       {process.shortDescription && (
@@ -502,12 +557,12 @@ export default function ParticipationHub() {
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${PHASE_COLORS[process.currentPhase]} ${process.currentPhase !== 'closed' ? 'animate-pulse' : ''}`} />
                         <span className="text-xs text-cosmic-muted">
-                          Current: <span className="text-white font-medium">{PHASE_LABELS[process.currentPhase]}</span>
+                          Current: <span className="text-foreground font-medium">{PHASE_LABELS[process.currentPhase]}</span>
                         </span>
                       </div>
 
                       {/* Stats Row */}
-                      <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
                         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                           <div className="flex items-center gap-1 text-xs text-cosmic-muted">
                             <Users className="w-3.5 h-3.5" />

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
   const org = await db.organization.findUnique({
     where: { slug },
     include: {
-      memberships: { include: { user: { select: { id: true, name: true, email: true, totalXp: true, level: true } } } },
+      memberships: { include: { user: { select: { id: true, name: true, totalXp: true, level: true } } } },
       proposals: { include: { _count: { select: { votes: true } } }, orderBy: { createdAt: 'desc' }, take: 10 },
       _count: { select: { memberships: true, proposals: true } },
     },

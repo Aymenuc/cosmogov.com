@@ -1,102 +1,133 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getSession } from '@/lib/auth';
-
-export async function GET(request: NextRequest) {
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import {
+  apiUser,
+  apiFailure,
+  ApiError,
+  rateLimit,
+  canReadProcess,
+} from "@/lib/api-server";
+export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const category = searchParams.get('category');
-    const type = searchParams.get('type');
-
-    const where: Record<string, unknown> = {};
-    if (status && status !== 'all') where.status = status;
-    if (category && category !== 'all') where.category = category;
-    if (type && type !== 'all') where.type = type;
-
+    const user = await apiUser();
+    const params = req.nextUrl.searchParams;
     const proposals = await db.bindingProposal.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
+      where: {
+        OR: [
+          { processId: null },
+          {
+            process: {
+              OR: [
+                { isPublic: true },
+                { createdBy: user.id },
+                {
+                  organization: { memberships: { some: { userId: user.id } } },
+                },
+              ],
+            },
+          },
+        ],
+        ...(params.get("status") && params.get("status") !== "all"
+          ? { status: params.get("status")! }
+          : {}),
+        ...(params.get("category") && params.get("category") !== "all"
+          ? { category: params.get("category")! }
+          : {}),
+        ...(params.get("type") && params.get("type") !== "all"
+          ? { type: params.get("type")! }
+          : {}),
+      },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         signatures: {
-          take: 5,
-          orderBy: { createdAt: 'desc' },
+          where: { userId: user.id },
           select: {
             id: true,
             comment: true,
             createdAt: true,
+            verified: true,
             user: { select: { id: true, name: true, avatarUrl: true } },
           },
         },
         _count: { select: { signatures: true } },
       },
+      orderBy: { createdAt: "desc" },
+      take: 100,
     });
-
-    const stats = {
-      activeProposals: await db.bindingProposal.count({
-        where: { status: { in: ['collecting', 'threshold_reached', 'government_review', 'government_response', 'scheduled_vote'] } },
-      }),
-      totalSignatures: await db.bindingProposalSignature.count(),
-      governmentResponses: await db.bindingProposal.count({
-        where: { status: { in: ['government_response', 'scheduled_vote', 'passed', 'enacted'] } },
-      }),
-      enacted: await db.bindingProposal.count({ where: { status: 'enacted' } }),
-    };
-
-    return NextResponse.json({ proposals, stats });
+    const counts = await db.bindingProposalSignature.groupBy({
+      by: ["proposalId"],
+      where: { proposalId: { in: proposals.map((p) => p.id) }, verified: true },
+      _count: { _all: true },
+    });
+    const safe = proposals.map((p) => ({
+      ...p,
+      isBinding: false,
+      legalStatus: "not_verified",
+      signatureCount:
+        counts.find((count) => count.proposalId === p.id)?._count._all || 0,
+    }));
+    return NextResponse.json({
+      proposals: safe,
+      stats: {
+        activeProposals: safe.filter((p) =>
+          [
+            "collecting",
+            "threshold_reached",
+            "government_review",
+            "government_response",
+            "scheduled_vote",
+          ].includes(p.status),
+        ).length,
+        totalSignatures: safe.reduce((sum, p) => sum + p.signatureCount, 0),
+        governmentResponses: safe.filter((p) => p.governmentResponse).length,
+        enacted: safe.filter((p) => p.status === "enacted").length,
+      },
+    });
   } catch (error) {
-    console.error('Error fetching binding proposals:', error);
-    return NextResponse.json({ error: 'Failed to fetch binding proposals' }, { status: 500 });
+    return apiFailure(error);
   }
 }
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-
-    const body = await request.json();
-    const {
-      title,
-      description,
-      category,
-      type,
-      signatureGoal,
-      legalReference,
-      impactAssessment,
-      responseDeadline,
-      closesAt,
-      processId,
-    } = body;
-
-    if (!title || !description) {
-      return NextResponse.json({ error: 'Title and description are required' }, { status: 400 });
+    const user = await apiUser();
+    await rateLimit("binding-create", user.id, 20, 3600);
+    const data = z
+      .object({
+        title: z.string().trim().min(1).max(200),
+        description: z.string().trim().min(1).max(20000),
+        category: z.string().max(50).nullish(),
+        type: z
+          .enum(["binding_proposal", "binding_referendum", "citizen_bill"])
+          .default("binding_proposal"),
+        signatureGoal: z.number().int().min(1).max(10000000).default(5000),
+        legalReference: z.string().max(2000).nullish(),
+        impactAssessment: z.string().max(10000).nullish(),
+        responseDeadline: z.string().datetime().nullish(),
+        closesAt: z.string().datetime().nullish(),
+        processId: z.string().max(100).nullish(),
+      })
+      .parse(await req.json());
+    if (data.processId) {
+      const process = await db.participatoryProcess.findUnique({
+        where: { id: data.processId },
+      });
+      if (!process || !(await canReadProcess(process, user.id)))
+        throw new ApiError(404, "Process not found.");
     }
-
     const proposal = await db.bindingProposal.create({
       data: {
-        title,
-        description,
-        category: category || null,
-        type: type || 'binding_proposal',
-        signatureGoal: signatureGoal || 5000,
-        legalReference: legalReference || null,
-        impactAssessment: impactAssessment || null,
-        responseDeadline: responseDeadline ? new Date(responseDeadline) : null,
-        closesAt: closesAt ? new Date(closesAt) : null,
-        processId: processId || null,
-        isBinding: true,
-        createdBy: session.id,
-      },
-      include: {
-        creator: { select: { id: true, name: true, avatarUrl: true } },
+        ...data,
+        responseDeadline: data.responseDeadline
+          ? new Date(data.responseDeadline)
+          : null,
+        closesAt: data.closesAt ? new Date(data.closesAt) : null,
+        createdBy: user.id,
+        isBinding: false,
       },
     });
-
     return NextResponse.json({ proposal }, { status: 201 });
   } catch (error) {
-    console.error('Error creating binding proposal:', error);
-    return NextResponse.json({ error: 'Failed to create binding proposal' }, { status: 500 });
+    return apiFailure(error);
   }
 }

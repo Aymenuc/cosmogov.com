@@ -37,27 +37,27 @@ export default function NewOrganizationPage() {
 
   return (
     <div className="max-w-lg mx-auto">
-      <Button variant="ghost" className="text-cosmic-muted hover:text-white mb-4" onClick={() => router.back()}><ArrowLeft className="w-4 h-4 mr-1" /> Back</Button>
+      <Button variant="ghost" className="text-cosmic-muted hover:text-foreground mb-4" onClick={() => router.back()}><ArrowLeft className="w-4 h-4 mr-1" /> Back</Button>
       <h1 className="text-2xl font-bold font-heading mb-6">Create Organization</h1>
-      <Card className="bg-[#0B1022] border-white/5">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">Organization Name</label>
               <Input value={name} onChange={e => handleSlug(e.target.value)} required placeholder="Stargate Collective"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50" />
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50" />
             </div>
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">URL Slug</label>
               <Input value={slug} onChange={e => setSlug(e.target.value)} required placeholder="stargate"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50" />
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50" />
             </div>
             <div>
               <label className="text-sm text-cosmic-muted mb-1.5 block">Description</label>
               <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="What does this organization govern?"
-                className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 resize-none" rows={3} />
+                className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 resize-none" rows={3} />
             </div>
-            <Button type="submit" className="w-full bg-cosmic-accent text-white rounded-xl h-11" disabled={loading}>
+            <Button type="submit" className="w-full bg-cosmic-accent text-primary-foreground rounded-xl h-11" disabled={loading}>
               {loading ? 'Creating...' : <><Building2 className="w-4 h-4 mr-1" /> Create Organization</>}
             </Button>
           </form>

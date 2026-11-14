@@ -1,54 +1,69 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getSession } from '@/lib/auth';
-
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import {
+  apiUser,
+  apiFailure,
+  ApiError,
+  rateLimit,
+  canReadProcess,
+} from "@/lib/api-server";
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-
+    const user = await apiUser();
+    await rateLimit("initiative-signature", user.id, 30, 3600);
     const { id } = await params;
-    const body = await request.json();
-    const { comment } = body;
-
-    const initiative = await db.citizenInitiative.findUnique({ where: { id } });
-    if (!initiative) return NextResponse.json({ error: 'Initiative not found' }, { status: 404 });
-
-    if (initiative.status === 'enacted' || initiative.status === 'rejected' || initiative.status === 'expired') {
-      return NextResponse.json({ error: 'This initiative is no longer accepting signatures' }, { status: 400 });
-    }
-
-    const existing = await db.initiativeSignature.findUnique({
-      where: { initiativeId_userId: { initiativeId: id, userId: session.id } },
-    });
-
-    if (existing) return NextResponse.json({ error: 'You have already signed this initiative' }, { status: 409 });
-
-    const signature = await db.initiativeSignature.create({
-      data: {
-        initiativeId: id,
-        userId: session.id,
-        comment: comment || null,
-      },
-    });
-
-    const newCount = initiative.signatureCount + 1;
-    const newStatus = newCount >= initiative.signatureGoal && initiative.status === 'collecting'
-      ? 'threshold_reached'
-      : initiative.status;
-
-    await db.citizenInitiative.update({
+    const { comment } = z
+      .object({ comment: z.string().trim().max(2000).optional() })
+      .parse(await req.json());
+    const initiative = await db.citizenInitiative.findUnique({
       where: { id },
-      data: { signatureCount: newCount, status: newStatus },
+      include: { process: true },
     });
-
-    return NextResponse.json({
-      signature,
-      signatureCount: newCount,
-      thresholdReached: newStatus === 'threshold_reached',
-    }, { status: 201 });
+    if (
+      !initiative ||
+      (initiative.process &&
+        !(await canReadProcess(initiative.process, user.id)))
+    )
+      throw new ApiError(404, "Initiative not found.");
+    const result = await db.$transaction(
+      async (tx) => {
+        const current = await tx.citizenInitiative.update({
+          where: { id },
+          data: { updatedAt: new Date() },
+        });
+        if (
+          !["collecting", "threshold_reached"].includes(current.status) ||
+          (current.closesAt && current.closesAt <= new Date())
+        )
+          throw new ApiError(
+            409,
+            "This initiative is no longer accepting signatures.",
+          );
+        const signature = await tx.initiativeSignature.create({
+          data: { initiativeId: id, userId: user.id, comment: comment || null },
+        });
+        const count = await tx.initiativeSignature.count({
+          where: { initiativeId: id },
+        });
+        const reached = count >= current.signatureGoal;
+        await tx.citizenInitiative.update({
+          where: { id },
+          data: {
+            signatureCount: count,
+            status: reached ? "threshold_reached" : "collecting",
+          },
+        });
+        return { signature, signatureCount: count, thresholdReached: reached };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    console.error('Error signing initiative:', error);
-    return NextResponse.json({ error: 'Failed to sign initiative' }, { status: 500 });
+    return apiFailure(error);
   }
 }

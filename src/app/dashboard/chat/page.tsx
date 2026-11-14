@@ -74,6 +74,8 @@ const EMOJI_LIST = [
   '🙌', '💪', '🤝', '💎', '🪐', '🌌', '🛸', '✨',
 ];
 
+const getCategoryConfig = (category: string) => CATEGORIES.find(item => item.id === category) || CATEGORIES[0];
+
 // ─── Component ───────────────────────────────────────────────────────
 export default function ChatPage() {
   // User
@@ -368,7 +370,7 @@ export default function ChatPage() {
       <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cosmic-teal to-cosmic-violet animate-pulse flex items-center justify-center">
-            <MessageSquare className="w-6 h-6 text-white" />
+            <MessageSquare className="w-6 h-6 text-foreground" />
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-cosmic-teal animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -386,7 +388,7 @@ export default function ChatPage() {
       {/* ─── Left Sidebar: Room List ──────────────────────────────── */}
       <div className="w-72 flex-shrink-0 hidden md:flex flex-col glass-card overflow-hidden">
         {/* Header */}
-        <div className="p-4 border-b border-white/5">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-cosmic-teal/10 flex items-center justify-center">
@@ -400,7 +402,7 @@ export default function ChatPage() {
                   <Plus className="w-4 h-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="glass-card border-white/10">
+              <DialogContent className="glass-card border-border">
                 <DialogHeader>
                   <DialogTitle className="font-heading">Create New Room</DialogTitle>
                 </DialogHeader>
@@ -411,7 +413,7 @@ export default function ChatPage() {
                       value={newRoomName}
                       onChange={e => setNewRoomName(e.target.value)}
                       placeholder="Enter room name..."
-                      className="bg-white/5 border-white/10 text-white mt-1"
+                      className="bg-foreground/5 border-border text-foreground mt-1"
                     />
                   </div>
                   <div>
@@ -420,17 +422,17 @@ export default function ChatPage() {
                       value={newRoomDesc}
                       onChange={e => setNewRoomDesc(e.target.value)}
                       placeholder="What's this room about?"
-                      className="bg-white/5 border-white/10 text-white mt-1 resize-none"
+                      className="bg-foreground/5 border-border text-foreground mt-1 resize-none"
                       rows={2}
                     />
                   </div>
                   <div>
                     <Label className="text-sm text-cosmic-muted">Category</Label>
                     <Select value={newRoomCategory} onValueChange={setNewRoomCategory}>
-                      <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
+                      <SelectTrigger className="bg-foreground/5 border-border text-foreground mt-1">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#0B1022] border-white/10">
+                      <SelectContent className="bg-card border-border">
                         {CATEGORIES.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
                             <span className="flex items-center gap-2">
@@ -441,7 +443,7 @@ export default function ChatPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button onClick={handleCreateRoom} disabled={!newRoomName.trim()} className="w-full bg-cosmic-accent text-white">
+                  <Button onClick={handleCreateRoom} disabled={!newRoomName.trim()} className="w-full bg-cosmic-accent text-primary-foreground">
                     <Plus className="w-4 h-4 mr-2" /> Create Room
                   </Button>
                 </div>
@@ -455,24 +457,24 @@ export default function ChatPage() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search rooms..."
-              className="bg-white/5 border-white/10 text-white text-xs h-8 pl-8"
+              className="bg-foreground/5 border-border text-foreground text-xs h-8 pl-8"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2">
-                <X className="w-3 h-3 text-cosmic-muted hover:text-white" />
+                <X className="w-3 h-3 text-cosmic-muted hover:text-foreground" />
               </button>
             )}
           </div>
         </div>
 
         {/* Category Filter */}
-        <div className="flex gap-1 p-3 overflow-x-auto border-b border-white/5">
+        <div className="flex gap-1 p-3 overflow-x-auto border-b border-border">
           <button
             onClick={() => setCategoryFilter('all')}
             className={`px-2.5 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap transition-all ${
               categoryFilter === 'all'
                 ? 'bg-cosmic-accent/15 text-cosmic-accent border border-cosmic-accent/30'
-                : 'text-cosmic-muted hover:text-white hover:bg-white/5 border border-transparent'
+                : 'text-cosmic-muted hover:text-foreground hover:bg-foreground/5 border border-transparent'
             }`}
           >
             All
@@ -484,7 +486,7 @@ export default function ChatPage() {
               className={`px-2.5 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap transition-all flex items-center gap-1 ${
                 categoryFilter === cat.id
                   ? `bg-${cat.color}/15 text-${cat.color} border border-${cat.color}/30`
-                  : 'text-cosmic-muted hover:text-white hover:bg-white/5 border border-transparent'
+                  : 'text-cosmic-muted hover:text-foreground hover:bg-foreground/5 border border-transparent'
               }`}
               style={categoryFilter === cat.id ? {
                 background: `color-mix(in srgb, var(--color-${cat.color}) 15%, transparent)`,
@@ -518,12 +520,12 @@ export default function ChatPage() {
                     className={`w-full text-left p-3 rounded-xl transition-all group ${
                       isActive
                         ? 'bg-cosmic-accent/10 border border-cosmic-accent/20'
-                        : 'hover:bg-white/5 border border-transparent'
+                        : 'hover:bg-foreground/5 border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <catConfig.icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: `var(--color-${catConfig.color})` }} />
-                      <span className={`text-sm font-medium truncate ${isActive ? 'text-white' : 'text-cosmic-muted group-hover:text-white'}`}>
+                      <span className={`text-sm font-medium truncate ${isActive ? 'text-foreground' : 'text-cosmic-muted group-hover:text-foreground'}`}>
                         {room.name}
                       </span>
                       {room.type === 'private' && <Lock className="w-3 h-3 text-cosmic-amber flex-shrink-0" />}
@@ -622,7 +624,7 @@ export default function ChatPage() {
                     if (isSystem) {
                       return (
                         <div key={msg.id} className="flex justify-center py-2">
-                          <span className="text-[10px] text-cosmic-muted bg-white/5 px-3 py-1 rounded-full">
+                          <span className="text-[10px] text-cosmic-muted bg-foreground/5 px-3 py-1 rounded-full">
                             {msg.content}
                           </span>
                         </div>
@@ -657,8 +659,8 @@ export default function ChatPage() {
                           )}
                           <div className={`rounded-xl px-3 py-2 text-sm leading-relaxed ${
                             isOwn
-                              ? 'bg-cosmic-accent/15 border border-cosmic-accent/20 text-white'
-                              : 'bg-white/5 border border-white/5 text-cosmic-text'
+                              ? 'bg-cosmic-accent/15 border border-cosmic-accent/20 text-foreground'
+                              : 'bg-foreground/5 border border-border text-cosmic-text'
                           }`}>
                             {msg.content}
                           </div>
@@ -708,7 +710,7 @@ export default function ChatPage() {
                           <button
                             key={emoji}
                             onClick={() => addEmoji(emoji)}
-                            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-sm"
+                            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-foreground/10 transition-colors text-sm"
                           >
                             {emoji}
                           </button>
@@ -723,14 +725,14 @@ export default function ChatPage() {
                     onChange={e => handleTyping(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                     placeholder="Type a message..."
-                    className="bg-white/5 border-white/10 text-white text-sm h-9"
+                    className="bg-foreground/5 border-border text-foreground text-sm h-9"
                     disabled={sendingMessage}
                   />
                 </div>
                 <Button
                   onClick={sendMessage}
                   disabled={!messageInput.trim() || sendingMessage}
-                  className="h-9 w-9 p-0 bg-cosmic-accent text-white hover:bg-cosmic-accent/80 rounded-lg"
+                  className="h-9 w-9 p-0 bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/80 rounded-lg"
                 >
                   {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
@@ -762,10 +764,10 @@ export default function ChatPage() {
 
       {/* ─── Right Sidebar: Members ──────────────────────────────── */}
       <div className={`w-64 flex-shrink-0 hidden lg:flex flex-col glass-card overflow-hidden rounded-xl ${showMobileMembers ? '!flex fixed right-4 top-20 z-50 w-72' : ''}`}>
-        <div className="p-4 border-b border-white/5">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between">
             <h3 className="font-heading font-bold text-sm">Members</h3>
-            <Badge variant="outline" className="text-[10px] border-white/10 text-cosmic-muted bg-white/5">
+            <Badge variant="outline" className="text-[10px] border-border text-cosmic-muted bg-foreground/5">
               {roomMembers.length}
             </Badge>
           </div>
@@ -787,7 +789,7 @@ export default function ChatPage() {
                 .map(member => {
                   const isOnline = onlineUsers.includes(member.userId);
                   return (
-                    <div key={member.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                    <div key={member.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-foreground/5 transition-colors">
                       <div className="relative">
                         <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
                           style={{
@@ -803,7 +805,7 @@ export default function ChatPage() {
                         }`} />
                       </div>
                       <div className="min-w-0">
-                        <p className={`text-xs font-medium truncate ${isOnline ? 'text-white' : 'text-cosmic-muted'}`}>
+                        <p className={`text-xs font-medium truncate ${isOnline ? 'text-foreground' : 'text-cosmic-muted'}`}>
                           {member.user?.name || 'Unknown'}
                         </p>
                         <p className="text-[9px] text-cosmic-muted">
@@ -864,32 +866,32 @@ function MobileRoomList({
   return (
     <div className="md:hidden">
       <Button variant="outline" size="sm" onClick={() => setOpen(!open)}
-        className="border-white/10 bg-white/5 text-cosmic-muted">
+        className="border-border bg-foreground/5 text-cosmic-muted">
         <Hash className="w-3 h-3 mr-1" />
         {selectedRoom?.name || 'Rooms'}
         <ChevronDown className="w-3 h-3 ml-1" />
       </Button>
       {open && (
-        <div className="fixed inset-0 z-50 bg-[#04050b]/95 backdrop-blur-xl p-4 pt-16 overflow-y-auto" style={{ animation: 'fadeIn 0.2s ease-out' }}>
+        <div className="fixed inset-0 z-50 bg-card/95 backdrop-blur-xl p-4 pt-16 overflow-y-auto" style={{ animation: 'fadeIn 0.2s ease-out' }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-heading font-bold text-lg">Chat Rooms</h2>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)} className="text-cosmic-muted">
               <X className="w-5 h-5" />
             </Button>
           </div>
-          <Button variant="outline" size="sm" className="w-full mb-4 border-dashed border-white/10 text-cosmic-muted"
+          <Button variant="outline" size="sm" className="w-full mb-4 border-dashed border-border text-cosmic-muted"
             onClick={() => setShowCreate(!showCreate)}>
             <Plus className="w-4 h-4 mr-2" /> Create Room
           </Button>
           {showCreate && (
             <div className="glass-card p-4 mb-4 space-y-3">
-              <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Room name..." className="bg-white/5 border-white/10 text-white" />
-              <Textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Description..." className="bg-white/5 border-white/10 text-white resize-none" rows={2} />
+              <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Room name..." className="bg-foreground/5 border-border text-foreground" />
+              <Textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Description..." className="bg-foreground/5 border-border text-foreground resize-none" rows={2} />
               <Select value={newCat} onValueChange={setNewCat}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                <SelectTrigger className="bg-foreground/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#0B1022] border-white/10">
+                <SelectContent className="bg-card border-border">
                   {CATEGORIES.map(cat => (
                     <SelectItem key={cat.id} value={cat.id}>
                       <span className="flex items-center gap-2"><cat.icon className="w-3 h-3" /> {cat.label}</span>
@@ -897,7 +899,7 @@ function MobileRoomList({
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={handleCreate} disabled={!newName.trim()} className="w-full bg-cosmic-accent text-white">
+              <Button onClick={handleCreate} disabled={!newName.trim()} className="w-full bg-cosmic-accent text-primary-foreground">
                 Create
               </Button>
             </div>
@@ -910,7 +912,7 @@ function MobileRoomList({
                   key={room.id}
                   onClick={() => { onSelectRoom(room); setOpen(false); }}
                   className={`w-full text-left p-3 rounded-xl transition-all ${
-                    selectedRoom?.id === room.id ? 'bg-cosmic-accent/10 border border-cosmic-accent/20' : 'hover:bg-white/5 border border-transparent'
+                    selectedRoom?.id === room.id ? 'bg-cosmic-accent/10 border border-cosmic-accent/20' : 'hover:bg-foreground/5 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-2">

@@ -1,0 +1,474 @@
+/* The workspace's own layer, loaded by src/app/dashboard/layout.tsx.
+   It brings the sticker language into the portal where it marks a moment of
+   welcome or thanks. Reading and deciding surfaces stay quiet. No new hue. */
+.workspace-shell .tint-lilac {
+  --tint-bg: #eee6ff;
+  --tint-ink: #5932c4;
+}
+.workspace-shell .tint-mint {
+  --tint-bg: #dff5e8;
+  --tint-ink: #28745b;
+}
+.workspace-shell .tint-sky {
+  --tint-bg: #e1f3ff;
+  --tint-ink: #226784;
+}
+.workspace-shell .tint-sun {
+  --tint-bg: #fff0c3;
+  --tint-ink: #7b570c;
+}
+.workspace-shell .tint-peach {
+  --tint-bg: #ffe7df;
+  --tint-ink: #a44231;
+}
+.workspace-shell .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── A sticker ────────────────────────────────────────────────────────── */
+.sticker {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+.sticker > svg:first-child {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.sticker > svg:last-child {
+  position: relative;
+  color: var(--tint-ink);
+}
+.sticker-shape {
+  fill: var(--tint-bg);
+  stroke: #29223d;
+  stroke-width: 3;
+}
+.sticker-shadow {
+  fill: #29223d;
+  stroke: #29223d;
+  stroke-width: 3;
+}
+.sticker-inner {
+  fill: #fffdf7;
+  opacity: 0.8;
+}
+.sticker.empty .sticker-shape {
+  fill: #fffdf7;
+  stroke: #d5c6eb;
+  stroke-width: 2.5;
+  stroke-dasharray: 5 6;
+  stroke-linecap: round;
+}
+.sticker.empty > svg:last-child {
+  color: #706779;
+}
+
+/* ── The desk: welcome, stickers and the shared garden ────────────────── */
+.workspace-shell .desk-welcome {
+  border: 2px solid #29223d;
+  box-shadow: 6px 7px 0 #29223d;
+}
+.desk-rewards {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 16px;
+  margin: 22px 0 38px;
+}
+.sticker-strip {
+  display: grid;
+  gap: 18px;
+  padding: 22px 24px;
+  background: #fff;
+  border: 1px solid var(--civic-line);
+  border-radius: 18px;
+}
+.sticker-strip-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sticker-strip h3,
+.garden-panel h3 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.sticker-strip-heading p,
+.garden-panel p {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #29223d;
+}
+.sticker-strip-heading .text-link {
+  flex: none;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.sticker-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sticker-row li {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 92px;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: center;
+}
+.sticker-row li:nth-child(odd) .sticker.earned {
+  transform: rotate(-5deg);
+}
+.sticker-row li:nth-child(even) .sticker.earned {
+  transform: rotate(4deg);
+}
+.sticker-next {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 14px;
+  margin: 0;
+  padding: 13px 16px;
+  background: #fff0c3;
+  border: 1px solid #f2dd9d;
+  border-radius: 14px;
+  color: #29223d;
+}
+.sticker-next strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 800;
+}
+.sticker-next span {
+  grid-column: 1;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.sticker-next > svg {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+a.sticker-next {
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+a.sticker-next:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px #39225e14;
+}
+.garden-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 22px 24px 0;
+  background: #e1f3ff;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.garden-art {
+  display: block;
+  width: calc(100% + 48px);
+  max-width: none;
+  margin-inline: -24px;
+  height: auto;
+}
+
+/* ── The sticker book page ────────────────────────────────────────────── */
+.sticker-book {
+  display: grid;
+  gap: 26px;
+}
+.sticker-book > .garden-panel {
+  flex-direction: row;
+  align-items: end;
+  padding: 26px 0 0 28px;
+}
+.sticker-book > .garden-panel > div {
+  flex: 0 0 300px;
+  padding-bottom: 26px;
+}
+.sticker-book > .garden-panel .garden-art {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sticker-grid li {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 8px;
+  padding: 26px 20px 22px;
+  background: #fff;
+  border: 1px solid var(--civic-line);
+  border-radius: 18px;
+  text-align: center;
+}
+.sticker-grid li.earned {
+  border-color: #29223d;
+}
+.sticker-grid li:nth-child(3n + 1) .sticker.earned {
+  transform: rotate(-5deg);
+}
+.sticker-grid li:nth-child(3n + 2) .sticker.earned {
+  transform: rotate(4deg);
+}
+.sticker-grid h2 {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.sticker-grid p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.sticker-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  margin-top: 6px;
+  padding: 6px 14px;
+  background: #dff5e8;
+  color: #28745b;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+}
+a.sticker-state {
+  background: #eee6ff;
+  color: #5932c4;
+}
+a.sticker-state:hover {
+  background: #e3d7fb;
+}
+.sticker-rules {
+  padding: 26px 28px;
+  background: #eee6ff;
+  border-radius: 18px;
+}
+.sticker-rules h2 {
+  font-size: 19px;
+  font-weight: 800;
+}
+.sticker-rules ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 32px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ── Mission starters for every kind of group ─────────────────────────── */
+.workspace-shell .mission-section-label {
+  font-size: 12px;
+  color: #5932c4;
+}
+.group-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.group-kinds button {
+  min-height: 44px;
+  padding: 8px 16px;
+  background: #fff;
+  color: #29223d;
+  border: 2px solid #d5c6eb;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 650;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s,
+    background 0.2s;
+}
+.group-kinds button:hover {
+  border-color: #29223d;
+}
+.group-kinds button.selected {
+  background: #ffcf4d;
+  border-color: #29223d;
+  box-shadow: 3px 3px 0 #29223d;
+  transform: translate(-1px, -1px);
+}
+.group-kind-blurb {
+  margin: 14px 0 16px;
+  font-size: 14px;
+  color: #29223d;
+}
+.workspace-shell .mission-starters button:not([role="radio"]) {
+  font-size: 15px;
+  font-weight: 700;
+  min-height: 64px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.workspace-shell .mission-starters button:not([role="radio"]):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px #39225e12;
+}
+
+/* ── Explore participation: start from what you want to do ───────────── */
+.intent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.intent-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 22px 22px 20px;
+  background: var(--tint-bg);
+  color: #29223d;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.intent-card:hover,
+.intent-card:focus-visible {
+  border-color: #29223d;
+  box-shadow: 5px 6px 0 #29223d;
+  transform: translate(-2px, -2px);
+}
+.intent-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+  background: #fffdf7;
+  color: var(--tint-ink);
+  border-radius: 14px;
+}
+.intent-card strong {
+  font-family: Manrope, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+}
+.intent-card > span:not(.intent-icon) {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.intent-card small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  color: var(--tint-ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.intent-divider {
+  margin-top: 12px;
+  padding-top: 26px;
+  border-top: 1px solid var(--civic-line);
+}
+.intent-divider h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.intent-divider p {
+  margin-top: 6px;
+  font-size: 15px;
+  color: #29223d;
+}
+
+@media (max-width: 1000px) {
+  .intent-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .desk-rewards {
+    grid-template-columns: 1fr;
+  }
+  .sticker-book > .garden-panel {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 22px 24px 0;
+  }
+  .sticker-book > .garden-panel > div {
+    flex: none;
+    padding-bottom: 0;
+  }
+  .sticker-book > .garden-panel .garden-art {
+    width: calc(100% + 48px);
+    margin-inline: -24px;
+  }
+}
+@media (max-width: 760px) {
+  .workspace-shell .desk-welcome {
+    box-shadow: 4px 5px 0 #29223d;
+  }
+  .sticker-strip {
+    padding: 18px;
+  }
+  .sticker-strip-heading {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sticker-row {
+    gap: 14px 8px;
+  }
+  .sticker-row li {
+    width: calc((100% - 16px) / 3);
+  }
+  .sticker-rules ul {
+    grid-template-columns: 1fr;
+  }
+  .intent-grid {
+    grid-template-columns: 1fr;
+  }
+  .workspace-shell .mission-starters > div:last-child {
+    grid-template-columns: 1fr;
+  }
+}

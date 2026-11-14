@@ -1,56 +1,165 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Building2, Plus, Search, Users, FileText, ArrowRight } from 'lucide-react';
-
-interface Org { id: string; name: string; slug: string; description: string | null; plan: string; role: string; memberCount: number; proposalCount: number; }
-
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  FileText,
+  Globe2,
+  Plus,
+  Search,
+  Users,
+} from "lucide-react";
+interface Community {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  role: string;
+  memberCount: number;
+  proposalCount: number;
+}
 export default function OrganizationsPage() {
-  const [orgs, setOrgs] = useState<Org[]>([]);
-  const [search, setSearch] = useState('');
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState("");
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
-    fetch('/api/organizations').then(r => r.json()).then(data => { setOrgs(Array.isArray(data) ? data : []); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
-
-  const filtered = orgs.filter(o => o.name.toLowerCase().includes(search.toLowerCase()));
-
+    let cancelled = false;
+    fetch("/api/organizations")
+      .then(async (res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) setCommunities(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled)
+          setError("We couldn’t load your communities. Please try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retry]);
+  const filtered = communities.filter((c) =>
+    `${c.name} ${c.description || ""}`
+      .toLowerCase()
+      .includes(query.toLowerCase()),
+  );
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div><h1 className="text-2xl font-bold font-heading">Organizations</h1><p className="text-cosmic-muted text-sm">Your governance communities</p></div>
-        <Link href="/dashboard/organizations/new"><Button className="bg-cosmic-accent text-white rounded-xl"><Plus className="w-4 h-4 mr-1" /> New Org</Button></Link>
+      <div className="app-page-heading">
+        <div>
+          <div className="eyebrow">
+            <Users size={13} /> YOUR PEOPLE, YOUR POSSIBILITIES
+          </div>
+          <h1>Find a sense of together.</h1>
+          <p>The places where your ideas meet people who care.</p>
+        </div>
+        <Link href="/dashboard/organizations/new" className="civic-button">
+          <Plus size={15} />
+          Create a community
+        </Link>
       </div>
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
-        <Input placeholder="Search organizations..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50" />
+      <div className="proposal-toolbar">
+        <div className="app-search">
+          <Search size={16} />
+          <input
+            aria-label="Search your communities"
+            placeholder="Search your communities..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <Link href="/dashboard/explore" className="following-filter">
+          <Globe2 size={15} />
+          Explore more
+        </Link>
       </div>
-      {loading ? <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">{[1,2,3].map(i => <div key={i} className="h-44 bg-[#0B1022] rounded-xl animate-pulse" />)}</div> : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(org => (
-            <Link key={org.id} href={`/dashboard/organizations/${org.slug}`}>
-              <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all cursor-pointer group h-full">
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cosmic-teal/20 to-cosmic-violet/20 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-cosmic-teal" />
-                    </div>
-                    <div className="min-w-0"><h3 className="font-medium text-sm truncate">{org.name}</h3><p className="text-xs text-cosmic-muted">{org.role}</p></div>
-                  </div>
-                  {org.description && <p className="text-xs text-cosmic-muted mb-3 line-clamp-2">{org.description}</p>}
-                  <div className="flex items-center gap-4 text-xs text-cosmic-muted">
-                    <span className="flex items-center gap-1"><Users className="w-3 h-3" />{org.memberCount}</span>
-                    <span className="flex items-center gap-1"><FileText className="w-3 h-3" />{org.proposalCount}</span>
-                  </div>
-                </CardContent>
-              </Card>
+      {loading ? (
+        <div className="proposal-grid full">
+          {[0, 1, 2].map((i) => (
+            <div className="proposal-skeleton" key={i} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="empty-state" role="alert">
+          <p>{error}</p>
+          <button
+            className="civic-button outline"
+            onClick={() => {
+              setLoading(true);
+              setError("");
+              setRetry((v) => v + 1);
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      ) : filtered.length ? (
+        <div className="community-grid">
+          {filtered.map((c, i) => (
+            <Link
+              href={`/dashboard/organizations/${c.slug}`}
+              key={c.id}
+              className="community-card"
+            >
+              <div className={`community-card-banner tone-${i % 3}`}>
+                <span>{c.name[0]}</span>
+                <span className="community-role">{c.role}</span>
+                <Globe2 size={90} strokeWidth={0.7} />
+              </div>
+              <div className="community-card-copy">
+                <h2>{c.name}</h2>
+                <p>
+                  {c.description ||
+                    "A shared space to participate, discuss, and decide together."}
+                </p>
+                <div>
+                  <span>
+                    <Users size={13} />
+                    {c.memberCount} members
+                  </span>
+                  <span>
+                    <FileText size={13} />
+                    {c.proposalCount} proposals
+                  </span>
+                </div>
+                <span className="community-open">
+                  Open community <ArrowUpRight size={14} />
+                </span>
+              </div>
             </Link>
           ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <span className="empty-icon">
+            <Users />
+          </span>
+          <h3>
+            {query
+              ? "Your people might use a different name."
+              : "A shared future needs a shared space."}
+          </h3>
+          <p>
+            {query
+              ? "Try another search to find one of your communities."
+              : "Create a community for your neighborhood, organization, or group. Bring people in and start with one good question."}
+          </p>
+          <Link
+            href={query ? "/dashboard/explore" : "/dashboard/organizations/new"}
+            className="civic-button outline"
+          >
+            {query
+              ? "Explore the wider community"
+              : "Create your first community"}
+            <ArrowUpRight size={14} />
+          </Link>
         </div>
       )}
     </div>

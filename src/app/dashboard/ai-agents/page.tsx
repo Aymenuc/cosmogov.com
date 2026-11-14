@@ -395,7 +395,7 @@ const containerVariants = {
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
 export default function AIAgentsPage() {
@@ -480,12 +480,12 @@ export default function AIAgentsPage() {
           </p>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4 sm:mt-6">
             <Link href="/dashboard/participation/assemblies">
-              <Button className="bg-cosmic-accent text-white rounded-xl">
+              <Button className="bg-cosmic-accent text-primary-foreground rounded-xl">
                 <Users className="w-4 h-4 mr-2" /> Enter Assembly Hall
               </Button>
             </Link>
             <Link href="#how-it-works">
-              <Button variant="outline" className="border-white/10 text-cosmic-muted hover:text-white hover:border-white/20 rounded-xl">
+              <Button variant="outline" className="border-border text-cosmic-muted hover:text-foreground hover:border-border rounded-xl">
                 How It Works <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
@@ -507,7 +507,7 @@ export default function AIAgentsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all group">
+            <Card className="bg-card border-border hover:border-border transition-all group">
               <CardContent className="p-4">
                 <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                   <stat.icon className={`w-4 h-4 ${stat.color}`} />
@@ -545,7 +545,7 @@ export default function AIAgentsPage() {
 
             return (
               <motion.div key={agent.id} variants={cardVariants}>
-                <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all group h-full overflow-hidden">
+                <Card className="bg-card border-border hover:border-border transition-all group h-full overflow-hidden">
                   <CardContent className="p-6">
                     {/* Avatar */}
                     <div className="mb-5">
@@ -558,7 +558,7 @@ export default function AIAgentsPage() {
                         <h3 className="text-lg font-bold font-heading">{agent.name}</h3>
                         <Badge
                           variant="outline"
-                          className="text-[10px] px-2 py-0 rounded-full border-white/10"
+                          className="text-[10px] px-2 py-0 rounded-full border-border"
                           style={{
                             color: JSON.parse(agent.avatarConfig || '{}').primaryColor || '#6366f1',
                             borderColor: `${JSON.parse(agent.avatarConfig || '{}').primaryColor || '#6366f1'}40`,
@@ -584,7 +584,7 @@ export default function AIAgentsPage() {
                       {capabilities.map((cap) => (
                         <span
                           key={cap}
-                          className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/5 text-cosmic-muted"
+                          className="text-[10px] px-2 py-0.5 rounded-full bg-foreground/5 border border-border text-cosmic-muted"
                         >
                           {cap.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                         </span>
@@ -595,7 +595,7 @@ export default function AIAgentsPage() {
                     <Link href="/dashboard/participation/assemblies" className="block">
                       <Button
                         variant="outline"
-                        className="w-full border-white/10 text-cosmic-muted hover:text-white hover:border-white/20 rounded-xl group/btn"
+                        className="w-full border-border text-cosmic-muted hover:text-foreground hover:border-border rounded-xl group/btn"
                       >
                         <Radio className="w-3.5 h-3.5 mr-2" style={{ color: JSON.parse(agent.avatarConfig || '{}').primaryColor }} />
                         View in Assembly
@@ -647,7 +647,7 @@ export default function AIAgentsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.15, duration: 0.5 }}
             >
-              <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all h-full group relative overflow-hidden">
+              <Card className="bg-card border-border hover:border-border transition-all h-full group relative overflow-hidden">
                 {/* Step accent line */}
                 <div className="absolute top-0 left-0 w-full h-0.5" style={{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)`, opacity: 0.5 }} />
 
@@ -656,7 +656,7 @@ export default function AIAgentsPage() {
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${item.color}12` }}>
                       <item.icon className="w-6 h-6" style={{ color: item.color }} />
                     </div>
-                    <span className="text-3xl font-bold font-heading text-white/10">{item.step}</span>
+                    <span className="text-3xl font-bold font-heading text-foreground/10">{item.step}</span>
                   </div>
                   <h3 className="text-base font-semibold font-heading mb-2">{item.title}</h3>
                   <p className="text-sm text-cosmic-muted leading-relaxed">{item.description}</p>
@@ -687,14 +687,14 @@ export default function AIAgentsPage() {
             <p className="text-sm text-cosmic-muted mt-1">Active assembly sessions powered by AI agents</p>
           </div>
           <Link href="/dashboard/participation/assemblies">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-white">
+            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
               View All <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
           </Link>
         </div>
 
         {debates.length === 0 ? (
-          <Card className="bg-[#0B1022] border-white/5">
+          <Card className="bg-card border-border">
             <CardContent className="p-10 text-center">
               <div className="w-14 h-14 rounded-2xl bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-4">
                 <Waves className="w-7 h-7 text-cosmic-teal/50" />
@@ -702,7 +702,7 @@ export default function AIAgentsPage() {
               <h3 className="text-base font-semibold font-heading mb-1">No Active Debates</h3>
               <p className="text-sm text-cosmic-muted mb-4">Start a new debate session in the Assembly Hall to see AI agents in action.</p>
               <Link href="/dashboard/participation/assemblies">
-                <Button className="bg-cosmic-accent text-white rounded-xl">
+                <Button className="bg-cosmic-accent text-primary-foreground rounded-xl">
                   <Users className="w-4 h-4 mr-2" /> Go to Assembly Hall
                 </Button>
               </Link>
@@ -717,7 +717,7 @@ export default function AIAgentsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.4 }}
               >
-                <Card className="bg-[#0B1022] border-white/5 hover:border-white/10 transition-all group">
+                <Card className="bg-card border-border hover:border-border transition-all group">
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-3">
                       <div className="min-w-0 flex-grow">
@@ -748,7 +748,7 @@ export default function AIAgentsPage() {
                         <span className="text-cosmic-muted">Consensus Level</span>
                         <span className="text-cosmic-success font-medium">{Math.round((debate.consensusLevel || 0) * 100)}%</span>
                       </div>
-                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-700"
                           style={{
@@ -761,12 +761,12 @@ export default function AIAgentsPage() {
 
                     {/* Phase badge + Join button */}
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-[10px] rounded-full border-white/10 text-cosmic-muted">
+                      <Badge variant="outline" className="text-[10px] rounded-full border-border text-cosmic-muted">
                         <Circle className="w-1.5 h-1.5 mr-1 fill-cosmic-amber text-cosmic-amber" />
                         {debate.phase || 'opening'}
                       </Badge>
                       <Link href="/dashboard/participation/assemblies">
-                        <Button size="sm" className="bg-cosmic-accent text-white rounded-lg h-7 text-xs px-3">
+                        <Button size="sm" className="bg-cosmic-accent text-primary-foreground rounded-lg h-7 text-xs px-3">
                           Join <ArrowUpRight className="w-3 h-3 ml-1" />
                         </Button>
                       </Link>

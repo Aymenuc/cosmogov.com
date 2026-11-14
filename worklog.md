@@ -158,3 +158,91 @@ Stage Summary:
 - Signup page supports government official registration with verification codes
 - Push notification toggle in settings page
 - All features compile and build successfully
+
+---
+Task: Mission design clarity and visible community contribution (14 Nov 2026)
+
+- Added a mission contribution strip using actual input authors, task assignees, responses and completion states.
+- Separated draft and accepted presentation; adopted plans and published forms identify the reviewer and date.
+- Made references open by default and highlighted cited sources; moved open questions to peach and answer visibility into a sky notice.
+- Increased mission labels and reading text and enlarged key touch targets.
+- Extended existing integration checks for acceptance attribution, dynamic progress, draft states, source visibility and 1024px layouts.
+- Verification: Webpack production build passed (107 static pages); 21 disposable-PostgreSQL/API/browser mission checks, 11 production-build UI regression checks, 4 session checks and 8 voting checks passed. Targeted lint passed for the contribution component, mission types and detail route. Repository-wide typecheck retains the same 16 existing errors. Live external AI and deployment services were not exercised.
+
+---
+Task: Landing page redesign (14 Nov 2026)
+
+Work Log:
+- Replaced the static hero preview with an interactive mission board (`src/components/landing/MissionBoard.tsx`, data in `missions.ts`): three illustrative goals, four AI steps, references and open questions on each draft, and equal adopt / leave-out choices. No model is called.
+- Replaced the three-step "how it works" grid with a scroll-drawn mission path (`MissionPath.tsx`) and six original SVG illustrations (`StepArt.tsx`). Motion is skipped under reduced motion.
+- Replaced the stock-photo section with a wall of mission ideas.
+- Added `src/app/landing.css`, loaded only by the landing page. Raised all landing text to 12px or more, and header and footer text to 13px or more.
+- Removed the unused `MissionPreview` component and the style rules for removed sections (about 440 lines across `civic.css`, `community.css`, `missions.css`).
+- Header link order now matches the page: How it works, Platform, Pricing.
+- Added two FAQ entries: whether the AI steps are independent agents, and whether a draft can be wrong.
+- Extended `scripts/check-redesign.cjs` to cover the mission board.
+
+Verification:
+- `node scripts/check-redesign.cjs`: 11 of 11 pass. `node --test scripts/check-session.cjs scripts/check-voting.cjs`: 12 of 12 pass.
+- ESLint clean on changed files. `tsc --noEmit` still reports the 16 pre-existing diagnostics and no new ones.
+- No horizontal overflow at 390, 768, 1024 and 1440px. Reduced-motion screenshots were byte-identical before and after the style removal.
+- `npx next build` passes.
+- Not run: `scripts/check-missions.cjs` (needs a disposable PostgreSQL).
+
+---
+Task: Landing drawings and a friendlier portal (14 Nov 2026)
+
+Work Log:
+- Landing: added a street-on-repair-day illustration (`CommonsStreet.tsx`), dot-screen step tiles with ink accents, paper tape on the mission board, a hand-drawn arrow, and scalloped band edges.
+- Portal: added stickers (`src/lib/stickers.ts`, `GET /api/stickers`, `src/components/stickers/`), the sticker book page at `/dashboard/stickers`, and a sticker strip plus shared garden on the civic desk.
+- Portal: mission starters by kind of group (`src/lib/missions/starters.ts`) on the mission studio page.
+- Portal: added `src/app/portal.css`; raised 218 sub-12px `font-size` declarations in the shared stylesheets to 12px.
+- Tests: `scripts/check-stickers.cjs` (7 rule tests) and a new browser check for stickers, the garden and starters.
+
+Verification:
+- `node --test scripts/check-stickers.cjs scripts/check-session.cjs scripts/check-voting.cjs`: all pass.
+- `node scripts/check-redesign.cjs`: 12 of 12 pass (one run failed once on first page compile and passed on re-run).
+- No horizontal overflow on the desk, sticker book and mission studio at 390, 768 and 1440px.
+- Not verified: `GET /api/stickers` against a real database (no database in this workspace; the browser checks use fixtures), and `scripts/check-missions.cjs`.
+- Follow-up: moved the sticker book into the main sidebar list, and rebuilt the Explore participation page around nine plain-language intent cards; fixed category chip contrast and wired the empty-state button to the process dialog.
+
+---
+Task: Editable mission forms within Claude’s redesign (14 Nov 2026)
+
+- Created `feat/editable-mission-forms` from the current integration branch, then merged Claude’s `claude/portal-stickers` work at `d35332c`. Kept the clearer mission review states and larger reading text when resolving CSS conflicts; retained both work logs.
+- Added a form editor with the existing scalloped sticker, lilac header, white question cards, live preview, mobile layout and explicit unsaved-change handling.
+- Managers can build without AI or revise generated/published forms. Saves create immutable versions, distinguish manual and AI-edited origins, preserve references, and leave published responses intact.
+- Added a migration for form origin and source-version lineage. Form save routes enforce manager access, shared validation, source membership, context revisions and a separate 60-draft hourly limit. Manual saves do not consume paid AI run quota.
+- Extended the real-database and browser suite for manual creation, invalid schemas, source-version access, revision preservation, publication and the editor layouts.
+- Verification: production Webpack build passed (109 static pages). All 26 disposable-PostgreSQL/API/browser mission checks passed, including the three migrations, manual authoring, version preservation, input/access validation, publish/respond flows and editor sizes at 390/768/1024/1440px. All 13 production browser checks passed, including Claude’s interactive landing board, illustrated scrolling path, stickers, garden and mission starters, plus editing and publishing an AI form in the public example. Seven sticker rules, four session rules and eight voting rules passed. Targeted editor/route/schema lint passed. The typecheck retains the same 16 existing errors. External AI/search providers and a deployed staging database were not exercised.
+
+---
+Task: Civic integrity recommendations (14 Nov 2026)
+
+- Removed HTTP seed handlers and public official codes. Added administrator-issued hashed, expiring, email-bound invitations and eligibility review controls.
+- Proposal reads return totals and the caller’s own ballot. Creator emails and other ballots are omitted; proposal edits require creator/moderator access and content/rules lock after voting starts.
+- Removed voting XP and unsupported ranked-choice creation/submission. Added persistent throttles and logout/all-session revocation.
+- Budget allowance and signature counts use serializable transactions. Reviewed signatures, not unverified submissions, determine formal-response thresholds. Removed unsupported legal-binding claims.
+- Added admin invitation/review UI and “Sign out everywhere,” preserving the shared redesign. Enabled React strict mode.
+- Verification: 35 disposable-database/API/browser checks passed, including nine new integrity checks covering every exported admin and government handler; nine vote rule tests and four session tests passed. Final combined build and browser regression checks will follow the mission-controls work.
+
+---
+Task: Mission lifecycle, privacy and traceability (14 Nov 2026)
+
+- Added form close/unpublish/reopen, organizer CSV exports, exact-title mission deletion, per-version response visibility/expiry and stored submission notices. Existing forms retain their prior sharing terms.
+- Added server-enforced sensitive-question review, private answer settings, response/contribution throttles, expiry filtering and an authenticated scheduled cleanup job.
+- AI runs record provider/model/prompt version. Contributor metadata is pseudonymized before sending to the provider; source text can still contain names and the input dialog makes that explicit.
+- Task changes have transactional actor history. Completion requires a note with optional evidence; the UI displays member-provided evidence without claiming independent verification.
+- Verification so far: 42 disposable-database/API/browser checks and four form-rule tests passed. Additional close/export/archive browser checks are included for the combined final verification. Live staging remains pending a staging URL and configured provider.
+
+---
+Task: Community coordination and checked release (14 Nov 2026)
+
+- Added opt-in shared-word task suggestions, organizer invitations and participant acceptance. Acceptance claims an open task atomically; withdrawing consent withdraws pending invitations. Suggestions do not infer ability or rank people.
+- Added permission-aware completion evidence to Accountability and recorded formal-response deadlines. Milestones cannot be complete without evidence or lose all evidence while remaining complete.
+- Added credited personal/community templates from selected adopted plans and published forms. Reuse creates reviewable drafts without copying participation data. Source deletion removes templates while preserving already-adapted missions and credit. Template edits share the manual form quota.
+- Added a portable staging runner that creates a private synthetic mission, runs all four AI steps, adopts/publishes, claims/completes/responds/exports/closes and deletes its own records. Its test uses the isolated local model, not a paid provider.
+- Fixed application TypeScript diagnostics and removed build error suppression. The standalone WebSocket example has separate dependencies and is outside the application typecheck. Fixed React loading, search, navigation and saved-follow synchronization without disabling React lint rules. Replaced the fabricated leaderboard with authenticated recorded activity data.
+- The production checks found alternate base64url signature spellings. Verification now requires canonical encoding, preventing a token from bypassing per-token revocation by changing ignored encoding bits. Tests cover all final signature characters and equivalent-byte aliases before access and after logout.
+- Final validation: strict Webpack production build passed (111 static pages), application typecheck has zero diagnostics, full ESLint has zero errors and one pre-existing App Router font warning. All 53 disposable-PostgreSQL/API/browser checks passed against the packaged production application. All 13 broader production browser regression checks and 26 session/voting/sticker/form rules passed. Screenshots were inspected at desktop and mobile widths.
+- Public deployment check: cosmogov.com redirects to www.cosmogov.com and still serves the earlier Interstellar Civic OS design. The workspace preview serves the redesign. GitHub's old Vercel deployment records are failed April deployments; direct Vercel API requests currently return HTTP 403 without deployment credentials. Production publishing and live-provider verification remain pending the hosting connection/configuration; pushing code alone is not represented as a live deployment.

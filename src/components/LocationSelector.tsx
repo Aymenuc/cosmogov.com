@@ -177,7 +177,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
     }
   };
 
-  const selectClasses = 'bg-white/5 border-white/10 text-white';
+  const selectClasses = 'bg-foreground/5 border-border text-foreground';
   const placeholderClasses = 'text-cosmic-muted/50';
 
   if (compact) {
@@ -203,14 +203,14 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             <SelectTrigger className={`${selectClasses} h-8 text-xs`}>
               <SelectValue placeholder="Country" className={placeholderClasses} />
             </SelectTrigger>
-            <SelectContent className="bg-[#0B1022] border-white/10 max-h-60">
+            <SelectContent className="bg-card border-border max-h-60">
               {loadingCountries ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="w-4 h-4 animate-spin text-cosmic-teal" />
                 </div>
               ) : (
                 countries.map(c => (
-                  <SelectItem key={c.id} value={c.id} className="text-white text-xs focus:bg-white/5 focus:text-white">
+                  <SelectItem key={c.id} value={c.id} className="text-foreground text-xs focus:bg-foreground/5 focus:text-foreground">
                     {c.emoji && <span className="mr-1">{c.emoji}</span>}{c.name}
                   </SelectItem>
                 ))
@@ -222,14 +222,14 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             <SelectTrigger className={`${selectClasses} h-8 text-xs`}>
               <SelectValue placeholder="State" className={placeholderClasses} />
             </SelectTrigger>
-            <SelectContent className="bg-[#0B1022] border-white/10 max-h-60">
+            <SelectContent className="bg-card border-border max-h-60">
               {loadingStates ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="w-4 h-4 animate-spin text-cosmic-teal" />
                 </div>
               ) : (
                 states.map(s => (
-                  <SelectItem key={s.id} value={s.id} className="text-white text-xs focus:bg-white/5 focus:text-white">
+                  <SelectItem key={s.id} value={s.id} className="text-foreground text-xs focus:bg-foreground/5 focus:text-foreground">
                     {s.name}
                   </SelectItem>
                 ))
@@ -241,14 +241,14 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             <SelectTrigger className={`${selectClasses} h-8 text-xs`}>
               <SelectValue placeholder="City" className={placeholderClasses} />
             </SelectTrigger>
-            <SelectContent className="bg-[#0B1022] border-white/10 max-h-60">
+            <SelectContent className="bg-card border-border max-h-60">
               {loadingCities ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="w-4 h-4 animate-spin text-cosmic-teal" />
                 </div>
               ) : (
                 cities.map(c => (
-                  <SelectItem key={c.id} value={c.id} className="text-white text-xs focus:bg-white/5 focus:text-white">
+                  <SelectItem key={c.id} value={c.id} className="text-foreground text-xs focus:bg-foreground/5 focus:text-foreground">
                     {c.name}
                   </SelectItem>
                 ))
@@ -274,7 +274,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             <MapPin className="w-4 h-4 text-cosmic-teal" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white">Location</h3>
+            <h3 className="text-sm font-semibold text-foreground">Location</h3>
             <p className="text-xs text-cosmic-muted">Where is this initiative based?</p>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             <SelectTrigger className={`${selectClasses} w-full`}>
               <SelectValue placeholder="Select a country" className={placeholderClasses} />
             </SelectTrigger>
-            <SelectContent className="bg-[#0B1022] border-white/10 max-h-64">
+            <SelectContent className="bg-card border-border max-h-64">
               {loadingCountries ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="w-4 h-4 animate-spin text-cosmic-teal" />
@@ -310,7 +310,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
                 </div>
               ) : (
                 countries.map(c => (
-                  <SelectItem key={c.id} value={c.id} className="text-white focus:bg-white/5 focus:text-white">
+                  <SelectItem key={c.id} value={c.id} className="text-foreground focus:bg-foreground/5 focus:text-foreground">
                     {c.emoji && <span className="mr-1.5">{c.emoji}</span>}{c.name}
                   </SelectItem>
                 ))
@@ -336,9 +336,9 @@ export default function LocationSelector({ value, onChange, compact = false, sho
                 <SelectValue placeholder="Select a state / region" className={placeholderClasses} />
               )}
             </SelectTrigger>
-            <SelectContent className="bg-[#0B1022] border-white/10 max-h-64">
+            <SelectContent className="bg-card border-border max-h-64">
               {states.map(s => (
-                <SelectItem key={s.id} value={s.id} className="text-white focus:bg-white/5 focus:text-white">
+                <SelectItem key={s.id} value={s.id} className="text-foreground focus:bg-foreground/5 focus:text-foreground">
                   {s.name}
                 </SelectItem>
               ))}
@@ -363,9 +363,9 @@ export default function LocationSelector({ value, onChange, compact = false, sho
                 <SelectValue placeholder="Select a city" className={placeholderClasses} />
               )}
             </SelectTrigger>
-            <SelectContent className="bg-[#0B1022] border-white/10 max-h-64">
+            <SelectContent className="bg-card border-border max-h-64">
               {cities.map(c => (
-                <SelectItem key={c.id} value={c.id} className="text-white focus:bg-white/5 focus:text-white">
+                <SelectItem key={c.id} value={c.id} className="text-foreground focus:bg-foreground/5 focus:text-foreground">
                   {c.name}
                 </SelectItem>
               ))}
@@ -391,7 +391,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
 
       {/* Mini map preview */}
       {showMap && value?.latitude != null && value?.longitude != null && (
-        <div className="rounded-lg overflow-hidden border border-white/10 h-40 bg-[#070A12] flex items-center justify-center">
+        <div className="rounded-lg overflow-hidden border border-border h-40 bg-card flex items-center justify-center">
           <div className="text-center">
             <MapPin className="w-6 h-6 text-cosmic-teal mx-auto mb-1" />
             <p className="text-xs text-cosmic-muted">

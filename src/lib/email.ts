@@ -138,7 +138,7 @@ export function govResponseInitiativeEmail(params: {
   responseText: string;
   initiativeLink: string;
   recipientName: string;
-}): EmailPayload {
+}): Omit<EmailPayload, "to"> {
   return {
     subject: `Government Response: ${params.initiativeTitle}`,
     html: `
@@ -181,7 +181,7 @@ export function govResponseBindingProposalEmail(params: {
   proposalLink: string;
   recipientName: string;
   voteDate?: string;
-}): EmailPayload {
+}): Omit<EmailPayload, "to"> {
   const voteDateSection = params.voteDate
     ? `<p style="margin: 12px 0 0; font-size: 14px; color: #f59e0b;"><strong>Scheduled Vote:</strong> ${params.voteDate}</p>`
     : '';
@@ -228,7 +228,7 @@ export function legislationStatusUpdateEmail(params: {
   governmentNote?: string;
   legislationLink: string;
   recipientName: string;
-}): EmailPayload {
+}): Omit<EmailPayload, "to"> {
   return {
     subject: `Legislation Update: ${params.legislationTitle}`,
     html: `
@@ -261,7 +261,7 @@ export function legislationStatusUpdateEmail(params: {
 /**
  * Welcome Email
  */
-export function welcomeEmail(params: { recipientName: string; role: string }): EmailPayload {
+export function welcomeEmail(params: { recipientName: string; role: string }): Omit<EmailPayload, "to"> {
   const roleLabel = params.role === 'gov_official' ? 'Government Official' : params.role;
   const dashboardLink = params.role === 'gov_official' ? '/dashboard/gov-portal' : '/dashboard';
 

@@ -82,7 +82,7 @@ interface QuestionStat {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  draft: { label: 'Draft', color: 'text-cosmic-muted bg-white/5 border-white/10' },
+  draft: { label: 'Draft', color: 'text-cosmic-muted bg-foreground/5 border-border' },
   active: { label: 'Active', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20' },
   paused: { label: 'Paused', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20' },
   closed: { label: 'Closed', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20' },
@@ -190,9 +190,9 @@ export default function SurveyDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <AlertCircle className="w-12 h-12 text-cosmic-rose/50 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-white mb-2">Survey Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Survey Not Found</h3>
         <p className="text-cosmic-muted text-sm mb-4">{error || 'This survey does not exist or has been removed.'}</p>
-        <Button className="bg-white/10 text-white hover:bg-white/20" onClick={() => router.push('/dashboard/participation/surveys')}>
+        <Button className="bg-foreground/10 text-foreground hover:bg-foreground/20" onClick={() => router.push('/dashboard/participation/surveys')}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Surveys
         </Button>
       </div>
@@ -210,7 +210,7 @@ export default function SurveyDetailPage() {
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 text-cosmic-muted hover:text-white hover:bg-white/5 mt-0.5"
+          className="shrink-0 text-cosmic-muted hover:text-foreground hover:bg-foreground/5 mt-0.5"
           onClick={() => router.push('/dashboard/participation/surveys')}
         >
           <ArrowLeft className="w-5 h-5" />
@@ -225,12 +225,12 @@ export default function SurveyDetailPage() {
               {statusConfig.label}
             </Badge>
             {survey.anonymous && (
-              <Badge className="bg-white/5 text-cosmic-muted border-white/10 border text-[10px]">
+              <Badge className="bg-foreground/5 text-cosmic-muted border-border border text-[10px]">
                 Anonymous
               </Badge>
             )}
           </div>
-          <h1 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1">
+          <h1 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1">
             {survey.title}
           </h1>
           <p className="text-cosmic-muted text-sm sm:text-base">
@@ -263,7 +263,7 @@ export default function SurveyDetailPage() {
           <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center bg-cosmic-teal/20 glow-teal">
             <CheckCircle2 className="w-8 h-8 text-cosmic-teal" />
           </div>
-          <h3 className="text-lg font-semibold text-white">Thank You!</h3>
+          <h3 className="text-lg font-semibold text-foreground">Thank You!</h3>
           <p className="text-cosmic-muted text-sm">Your response has been recorded. Check out the results below.</p>
         </div>
       )}
@@ -273,7 +273,7 @@ export default function SurveyDetailPage() {
         <div className="glass-card-teal p-4 rounded-xl flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-cosmic-teal shrink-0" />
           <div>
-            <p className="text-sm text-white font-medium">You&apos;ve already responded</p>
+            <p className="text-sm text-foreground font-medium">You&apos;ve already responded</p>
             <p className="text-xs text-cosmic-muted">View the current results below.</p>
           </div>
         </div>
@@ -290,7 +290,7 @@ export default function SurveyDetailPage() {
               </span>
               <span className="text-xs text-cosmic-teal font-medium">{progressPercent}%</span>
             </div>
-            <Progress value={progressPercent} className="h-2 bg-white/5" />
+            <Progress value={progressPercent} className="h-2 bg-foreground/5" />
           </div>
 
           {/* Questions */}
@@ -306,7 +306,7 @@ export default function SurveyDetailPage() {
                       {idx + 1}
                     </span>
                     <div className="flex-grow">
-                      <h3 className="text-sm sm:text-base font-semibold text-white">
+                      <h3 className="text-sm sm:text-base font-semibold text-foreground">
                         {question.text}
                         {question.required && <span className="text-cosmic-rose ml-1">*</span>}
                       </h3>
@@ -326,11 +326,11 @@ export default function SurveyDetailPage() {
                           key={opt.id}
                           className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                             currentAnswer?.value === opt.id
-                              ? 'bg-cosmic-accent/10 border-cosmic-accent/30 text-white'
-                              : 'bg-white/[0.02] border-white/5 text-cosmic-muted hover:bg-white/5 hover:text-white'
+                              ? 'bg-cosmic-accent/10 border-cosmic-accent/30 text-foreground'
+                              : 'bg-foreground/[0.02] border-border text-cosmic-muted hover:bg-foreground/5 hover:text-foreground'
                           }`}
                         >
-                          <RadioGroupItem value={opt.id} id={`${question.id}-${opt.id}`} className="border-white/30 text-cosmic-accent" />
+                          <RadioGroupItem value={opt.id} id={`${question.id}-${opt.id}`} className="border-border text-cosmic-accent" />
                           <span className="text-sm">{opt.label}</span>
                         </label>
                       ))}
@@ -339,17 +339,17 @@ export default function SurveyDetailPage() {
                           <label
                             className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                               currentAnswer?.value === '__other__'
-                                ? 'bg-cosmic-accent/10 border-cosmic-accent/30 text-white'
-                                : 'bg-white/[0.02] border-white/5 text-cosmic-muted hover:bg-white/5 hover:text-white'
+                                ? 'bg-cosmic-accent/10 border-cosmic-accent/30 text-foreground'
+                                : 'bg-foreground/[0.02] border-border text-cosmic-muted hover:bg-foreground/5 hover:text-foreground'
                             }`}
                           >
-                            <RadioGroupItem value="__other__" id={`${question.id}-other`} className="border-white/30 text-cosmic-accent" />
+                            <RadioGroupItem value="__other__" id={`${question.id}-other`} className="border-border text-cosmic-accent" />
                             <span className="text-sm">Other</span>
                           </label>
                           {currentAnswer?.value === '__other__' && (
                             <Textarea
                               placeholder="Please specify..."
-                              className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 ml-9 min-h-[60px]"
+                              className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 ml-9 min-h-[60px]"
                               value={currentAnswer.otherText || ''}
                               onChange={(e) => setAnswer(question.id, '__other__', e.target.value)}
                             />
@@ -370,8 +370,8 @@ export default function SurveyDetailPage() {
                             key={opt.id}
                             className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                               isChecked
-                                ? 'bg-cosmic-violet/10 border-cosmic-violet/30 text-white'
-                                : 'bg-white/[0.02] border-white/5 text-cosmic-muted hover:bg-white/5 hover:text-white'
+                                ? 'bg-cosmic-violet/10 border-cosmic-violet/30 text-foreground'
+                                : 'bg-foreground/[0.02] border-border text-cosmic-muted hover:bg-foreground/5 hover:text-foreground'
                             }`}
                           >
                             <Checkbox
@@ -383,7 +383,7 @@ export default function SurveyDetailPage() {
                                   : current.filter((v: string) => v !== opt.id);
                                 setAnswer(question.id, newValues);
                               }}
-                              className="border-white/30 data-[state=checked]:bg-cosmic-violet data-[state=checked]:border-cosmic-violet"
+                              className="border-border data-[state=checked]:bg-cosmic-violet data-[state=checked]:border-cosmic-violet"
                             />
                             <span className="text-sm">{opt.label}</span>
                           </label>
@@ -394,8 +394,8 @@ export default function SurveyDetailPage() {
                           <label
                             className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                               ((currentAnswer?.value as string[]) || []).includes('__other__')
-                                ? 'bg-cosmic-violet/10 border-cosmic-violet/30 text-white'
-                                : 'bg-white/[0.02] border-white/5 text-cosmic-muted hover:bg-white/5 hover:text-white'
+                                ? 'bg-cosmic-violet/10 border-cosmic-violet/30 text-foreground'
+                                : 'bg-foreground/[0.02] border-border text-cosmic-muted hover:bg-foreground/5 hover:text-foreground'
                             }`}
                           >
                             <Checkbox
@@ -407,14 +407,14 @@ export default function SurveyDetailPage() {
                                   : current.filter((v: string) => v !== '__other__');
                                 setAnswer(question.id, newValues);
                               }}
-                              className="border-white/30 data-[state=checked]:bg-cosmic-violet data-[state=checked]:border-cosmic-violet"
+                              className="border-border data-[state=checked]:bg-cosmic-violet data-[state=checked]:border-cosmic-violet"
                             />
                             <span className="text-sm">Other</span>
                           </label>
                           {((currentAnswer?.value as string[]) || []).includes('__other__') && (
                             <Textarea
                               placeholder="Please specify..."
-                              className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 ml-9 min-h-[60px]"
+                              className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 ml-9 min-h-[60px]"
                               value={currentAnswer?.otherText || ''}
                               onChange={(e) => setAnswer(question.id, (currentAnswer?.value as string[]) || [], e.target.value)}
                             />
@@ -428,7 +428,7 @@ export default function SurveyDetailPage() {
                   {question.type === 'text' && (
                     <Textarea
                       placeholder="Type your response..."
-                      className="bg-white/5 border-white/10 text-white placeholder:text-cosmic-muted/50 min-h-[100px]"
+                      className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 min-h-[100px]"
                       value={(currentAnswer?.value as string) || ''}
                       onChange={(e) => setAnswer(question.id, e.target.value)}
                     />
@@ -453,7 +453,7 @@ export default function SurveyDetailPage() {
                                   className={`w-8 h-8 sm:w-10 sm:h-10 ${
                                     isFilled
                                       ? 'text-cosmic-amber fill-cosmic-amber'
-                                      : 'text-white/10 hover:text-cosmic-amber/50'
+                                      : 'text-foreground/10 hover:text-cosmic-amber/50'
                                   }`}
                                 />
                               </button>
@@ -481,7 +481,7 @@ export default function SurveyDetailPage() {
                         className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border transition-all text-sm font-medium ${
                           currentAnswer?.value === 'yes'
                             ? 'bg-cosmic-teal/15 border-cosmic-teal/40 text-cosmic-teal'
-                            : 'bg-white/[0.02] border-white/5 text-cosmic-muted hover:bg-cosmic-teal/5 hover:border-cosmic-teal/20 hover:text-cosmic-teal'
+                            : 'bg-foreground/[0.02] border-border text-cosmic-muted hover:bg-cosmic-teal/5 hover:border-cosmic-teal/20 hover:text-cosmic-teal'
                         }`}
                       >
                         <CheckCircle2 className="w-5 h-5" /> Yes
@@ -491,7 +491,7 @@ export default function SurveyDetailPage() {
                         className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl border transition-all text-sm font-medium ${
                           currentAnswer?.value === 'no'
                             ? 'bg-cosmic-rose/15 border-cosmic-rose/40 text-cosmic-rose'
-                            : 'bg-white/[0.02] border-white/5 text-cosmic-muted hover:bg-cosmic-rose/5 hover:border-cosmic-rose/20 hover:text-cosmic-rose'
+                            : 'bg-foreground/[0.02] border-border text-cosmic-muted hover:bg-cosmic-rose/5 hover:border-cosmic-rose/20 hover:text-cosmic-rose'
                         }`}
                       >
                         <span className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center">
@@ -534,7 +534,7 @@ export default function SurveyDetailPage() {
             </div>
           )}
           <Button
-            className="w-full bg-cosmic-teal text-[#0B1022] hover:bg-cosmic-teal/90 text-sm font-semibold py-5"
+            className="w-full bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90 text-sm font-semibold py-5"
             onClick={handleSubmit}
             disabled={submitting}
           >
@@ -576,7 +576,7 @@ export default function SurveyDetailPage() {
             <div className="glass-card-violet p-4 sm:p-6 rounded-xl">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-5 h-5 text-cosmic-violet" />
-                <h3 className="font-heading text-sm font-semibold text-white">AI Summary</h3>
+                <h3 className="font-heading text-sm font-semibold text-foreground">AI Summary</h3>
               </div>
               <p className="text-sm text-cosmic-muted leading-relaxed">{survey.aiSummary}</p>
             </div>
@@ -597,7 +597,7 @@ export default function SurveyDetailPage() {
                       {idx + 1}
                     </span>
                     <div className="flex-grow">
-                      <h3 className="text-sm sm:text-base font-semibold text-white">{question.text}</h3>
+                      <h3 className="text-sm sm:text-base font-semibold text-foreground">{question.text}</h3>
                       <p className="text-[11px] text-cosmic-muted mt-0.5">{stat.totalResponses} responses</p>
                     </div>
                   </div>
@@ -613,7 +613,7 @@ export default function SurveyDetailPage() {
                         return (
                           <div key={result.id} className="space-y-1">
                             <div className="flex items-center justify-between">
-                              <span className={`text-xs ${isTop ? 'text-white font-medium' : 'text-cosmic-muted'}`}>
+                              <span className={`text-xs ${isTop ? 'text-foreground font-medium' : 'text-cosmic-muted'}`}>
                                 {result.label}
                               </span>
                               <div className="flex items-center gap-2">
@@ -623,7 +623,7 @@ export default function SurveyDetailPage() {
                                 </span>
                               </div>
                             </div>
-                            <div className="relative h-2.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="relative h-2.5 bg-foreground/5 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full transition-all duration-1000 ease-out ${
                                   isTop
@@ -650,7 +650,7 @@ export default function SurveyDetailPage() {
                               className={`w-5 h-5 ${
                                 star <= Math.round(stat.averageRating!)
                                   ? 'text-cosmic-amber fill-cosmic-amber'
-                                  : 'text-white/10'
+                                  : 'text-foreground/10'
                               }`}
                             />
                           ))}
@@ -669,7 +669,7 @@ export default function SurveyDetailPage() {
                               return (
                                 <div key={rating} className="flex items-center gap-2">
                                   <span className="text-[11px] text-cosmic-muted w-6 text-right">{rating}</span>
-                                  <div className="flex-grow relative h-2 bg-white/5 rounded-full overflow-hidden">
+                                  <div className="flex-grow relative h-2 bg-foreground/5 rounded-full overflow-hidden">
                                     <div
                                       className="h-full rounded-full bg-cosmic-amber/60 tally-bar"
                                       style={{ width: `${barWidth}%` }}
@@ -691,7 +691,7 @@ export default function SurveyDetailPage() {
                         <span className="text-xs text-cosmic-muted">Average Value</span>
                         <span className="text-lg font-bold text-cosmic-accent font-heading">{stat.averageValue}</span>
                       </div>
-                      <div className="relative h-3 bg-white/5 rounded-full overflow-hidden">
+                      <div className="relative h-3 bg-foreground/5 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-cosmic-accent to-cosmic-violet tally-bar"
                           style={{
@@ -747,7 +747,7 @@ export default function SurveyDetailPage() {
           {survey._count.responses === 0 && (
             <div className="glass-card p-8 rounded-2xl text-center">
               <BarChart3 className="w-10 h-10 text-cosmic-muted/20 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-white mb-1">No Responses Yet</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-1">No Responses Yet</h3>
               <p className="text-xs text-cosmic-muted">Results will appear here once people start responding.</p>
             </div>
           )}

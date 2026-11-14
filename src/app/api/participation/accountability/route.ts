@@ -1,260 +1,273 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getSession } from '@/lib/auth';
-
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { apiUser, apiFailure, ApiError } from "@/lib/api-server";
+import { safeSourceUrl } from "@/lib/missions/validation";
+const evidenceSchema = z
+  .array(
+    z.object({
+      type: z.string().max(40).default("note"),
+      url: z
+        .string()
+        .max(2000)
+        .default("")
+        .refine((value) => !value || safeSourceUrl(value)),
+      description: z.string().trim().min(1).max(2000),
+      date: z.string().max(100).optional(),
+    }),
+  )
+  .max(20);
+const include = {
+  creator: { select: { id: true, name: true, avatarUrl: true } },
+  process: { select: { id: true, title: true, currentPhase: true } },
+  proposal: { select: { id: true, title: true } },
+  project: { select: { id: true, title: true, budgetRequested: true } },
+};
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const processId = searchParams.get('processId');
-    const status = searchParams.get('status');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const skip = (page - 1) * limit;
-
-    const where: Record<string, unknown> = {};
-    if (processId) where.processId = processId;
-    if (status) where.status = status;
-
-    const [milestones, total] = await Promise.all([
+    const user = await apiUser();
+    const params = req.nextUrl.searchParams;
+    const page = Math.max(1, Math.min(1000, Number(params.get("page")) || 1)),
+      limit = Math.max(1, Math.min(100, Number(params.get("limit")) || 20));
+    const where = {
+      process: {
+        OR: [
+          { isPublic: true },
+          { createdBy: user.id },
+          { organization: { memberships: { some: { userId: user.id } } } },
+        ],
+      },
+      ...(params.get("processId")
+        ? { processId: params.get("processId")! }
+        : {}),
+      ...(params.get("status") ? { status: params.get("status")! } : {}),
+    };
+    const [milestones, total, summary] = await Promise.all([
       db.implementationMilestone.findMany({
         where,
-        include: {
-          creator: { select: { id: true, name: true, avatarUrl: true } },
-          process: { select: { id: true, title: true, currentPhase: true } },
-          proposal: { select: { id: true, title: true } },
-          project: { select: { id: true, title: true, budgetRequested: true } },
-        },
-        orderBy: { dueDate: 'asc' },
-        skip,
+        include,
+        orderBy: { dueDate: "asc" },
+        skip: (page - 1) * limit,
         take: limit,
       }),
       db.implementationMilestone.count({ where }),
+      db.implementationMilestone.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 1000,
+      }),
     ]);
-
-    // Compute transparency and on-time stats
-    const allMilestones = await db.implementationMilestone.findMany({
-      where: processId ? { processId } : {},
-      select: {
-        id: true,
-        status: true,
-        progress: true,
-        evidence: true,
-        dueDate: true,
-        completedAt: true,
-      },
-    });
-
-    const totalMilestones = allMilestones.length;
-    const completedMilestones = allMilestones.filter((m) => m.status === 'completed').length;
-    const delayedMilestones = allMilestones.filter((m) => m.status === 'delayed').length;
-    const withEvidence = allMilestones.filter((m) => {
+    const completed = summary.filter((item) => item.status === "completed");
+    const withEvidence = summary.filter((item) => {
       try {
-        const ev = JSON.parse(m.evidence);
-        return Array.isArray(ev) && ev.length > 0;
+        const evidence = JSON.parse(item.evidence);
+        return Array.isArray(evidence) && evidence.length;
       } catch {
         return false;
       }
-    }).length;
-
-    const onTimeCompleted = allMilestones.filter((m) => {
-      if (m.status !== 'completed' || !m.dueDate || !m.completedAt) return false;
-      return new Date(m.completedAt) <= new Date(m.dueDate);
-    }).length;
-
-    const transparencyScore = totalMilestones > 0 ? Math.round((withEvidence / totalMilestones) * 100) : 0;
-    const onTimeRate = completedMilestones > 0 ? Math.round((onTimeCompleted / completedMilestones) * 100) : 0;
-    const overallProgress = totalMilestones > 0
-      ? Math.round(allMilestones.reduce((sum, m) => sum + m.progress, 0) / totalMilestones)
-      : 0;
-
-    // Group by parent entity (proposal/project)
-    const entities = new Map<string, {
-      id: string;
-      title: string;
-      type: 'proposal' | 'project';
-      milestones: typeof milestones;
-      overallProgress: number;
-      status: string;
-    }>();
-
-    // Fetch related proposals and projects with milestones
-    const proposalsWithMilestones = await db.processProposal.findMany({
-      where: processId ? { processId, status: { in: ['accepted', 'implemented'] } } : { status: { in: ['accepted', 'implemented'] } },
-      include: {
-        milestones: {
-          orderBy: { dueDate: 'asc' },
-          include: {
-            creator: { select: { id: true, name: true } },
-          },
-        },
-      },
     });
-
-    const budgetProjectsWithMilestones = await db.budgetProject.findMany({
-      where: processId ? { processId, status: { in: ['approved', 'implementing', 'completed'] } } : { status: { in: ['approved', 'implementing', 'completed'] } },
-      include: {
-        milestones: {
-          orderBy: { dueDate: 'asc' },
-          include: {
-            creator: { select: { id: true, name: true } },
-          },
-        },
-      },
-    });
-
-    proposalsWithMilestones.forEach((p) => {
-      const avgProgress = p.milestones.length > 0
-        ? Math.round(p.milestones.reduce((s, m) => s + m.progress, 0) / p.milestones.length)
-        : 0;
-      const hasDelayed = p.milestones.some((m) => m.status === 'delayed');
-      const allCompleted = p.milestones.length > 0 && p.milestones.every((m) => m.status === 'completed');
-      entities.set(`proposal-${p.id}`, {
-        id: p.id,
-        title: p.title,
-        type: 'proposal',
-        milestones: p.milestones as unknown as typeof milestones,
-        overallProgress: avgProgress,
-        status: allCompleted ? 'completed' : hasDelayed ? 'delayed' : 'on_track',
-      });
-    });
-
-    budgetProjectsWithMilestones.forEach((p) => {
-      const avgProgress = p.milestones.length > 0
-        ? Math.round(p.milestones.reduce((s, m) => s + m.progress, 0) / p.milestones.length)
-        : 0;
-      const hasDelayed = p.milestones.some((m) => m.status === 'delayed');
-      const allCompleted = p.milestones.length > 0 && p.milestones.every((m) => m.status === 'completed');
-      entities.set(`project-${p.id}`, {
-        id: p.id,
-        title: p.title,
-        type: 'project',
-        milestones: p.milestones as unknown as typeof milestones,
-        overallProgress: avgProgress,
-        status: allCompleted ? 'completed' : hasDelayed ? 'delayed' : 'on_track',
-      });
-    });
-
+    const entities = new Map<
+      string,
+      {
+        id: string;
+        title: string;
+        type: string;
+        milestones: typeof milestones;
+        overallProgress: number;
+        status: string;
+      }
+    >();
+    for (const item of milestones) {
+      const entity = item.project || item.proposal || item.process;
+      const type = item.project
+        ? "project"
+        : item.proposal
+          ? "proposal"
+          : "process";
+      const key = `${type}-${entity.id}`;
+      if (!entities.has(key))
+        entities.set(key, {
+          id: entity.id,
+          title: entity.title,
+          type,
+          milestones: [],
+          overallProgress: 0,
+          status: "on_track",
+        });
+      entities.get(key)!.milestones.push(item);
+    }
+    for (const entity of entities.values()) {
+      entity.overallProgress = Math.round(
+        entity.milestones.reduce((sum, item) => sum + item.progress, 0) /
+          entity.milestones.length,
+      );
+      entity.status = entity.milestones.every(
+        (item) => item.status === "completed",
+      )
+        ? "completed"
+        : entity.milestones.some(
+              (item) =>
+                item.status === "delayed" ||
+                (item.dueDate &&
+                  item.dueDate < new Date() &&
+                  item.status !== "completed"),
+            )
+          ? "delayed"
+          : "on_track";
+    }
     return NextResponse.json({
       milestones,
-      entities: Array.from(entities.values()),
-      stats: {
-        totalMilestones,
-        completedMilestones,
-        delayedMilestones,
-        transparencyScore,
-        onTimeRate,
-        overallProgress,
-      },
+      entities: [...entities.values()],
       total,
       page,
       totalPages: Math.ceil(total / limit),
+      statsScope: "Latest 1,000 milestones you can access",
+      stats: {
+        totalMilestones: summary.length,
+        completedMilestones: completed.length,
+        delayedMilestones: summary.filter((item) => item.status === "delayed")
+          .length,
+        transparencyScore: summary.length
+          ? Math.round((withEvidence.length / summary.length) * 100)
+          : 0,
+        onTimeRate: completed.length
+          ? Math.round(
+              (completed.filter(
+                (item) =>
+                  item.dueDate &&
+                  item.completedAt &&
+                  item.completedAt <= item.dueDate,
+              ).length /
+                completed.length) *
+                100,
+            )
+          : 0,
+        overallProgress: summary.length
+          ? Math.round(
+              summary.reduce((sum, item) => sum + item.progress, 0) /
+                summary.length,
+            )
+          : 0,
+      },
     });
   } catch (error) {
-    console.error('Error fetching accountability data:', error);
-    return NextResponse.json({ error: 'Failed to fetch accountability data' }, { status: 500 });
+    return apiFailure(error);
   }
 }
-
+async function processManager(
+  processId: string,
+  user: { id: string; role: string },
+) {
+  const process = await db.participatoryProcess.findUnique({
+    where: { id: processId },
+  });
+  if (!process) throw new ApiError(404, "Process not found.");
+  if (
+    process.createdBy !== user.id &&
+    !["admin", "super_admin"].includes(user.role)
+  )
+    throw new ApiError(
+      403,
+      "Only the process creator or an administrator can manage milestones.",
+    );
+}
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const { processId, proposalId, projectId, title, description, dueDate } = body;
-
-    if (!processId || !title) {
-      return NextResponse.json({ error: 'Process ID and title are required' }, { status: 400 });
-    }
-
-    // Verify authorization
-    const process = await db.participatoryProcess.findUnique({
-      where: { id: processId },
-      select: { createdBy: true },
-    });
-
-    if (!process) {
-      return NextResponse.json({ error: 'Process not found' }, { status: 404 });
-    }
-
-    const isAdmin = session.role === 'admin' || session.role === 'super_admin';
-    if (process.createdBy !== session.id && !isAdmin) {
-      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
-    }
-
-    const milestone = await db.implementationMilestone.create({
-      data: {
-        processId,
-        proposalId: proposalId || null,
-        projectId: projectId || null,
-        title,
-        description: description || null,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        createdBy: session.id,
+    const user = await apiUser();
+    const data = z
+      .object({
+        processId: z.string().max(100),
+        proposalId: z.string().max(100).nullish(),
+        projectId: z.string().max(100).nullish(),
+        title: z.string().trim().min(1).max(200),
+        description: z.string().max(5000).nullish(),
+        dueDate: z.string().datetime().nullish(),
+      })
+      .parse(await req.json());
+    await processManager(data.processId, user);
+    if (
+      data.proposalId &&
+      !(await db.processProposal.findFirst({
+        where: { id: data.proposalId, processId: data.processId },
+      }))
+    )
+      throw new ApiError(400, "The proposal must belong to this process.");
+    if (
+      data.projectId &&
+      !(await db.budgetProject.findFirst({
+        where: { id: data.projectId, processId: data.processId },
+      }))
+    )
+      throw new ApiError(400, "The project must belong to this process.");
+    return NextResponse.json(
+      {
+        milestone: await db.implementationMilestone.create({
+          data: {
+            ...data,
+            dueDate: data.dueDate ? new Date(data.dueDate) : null,
+            createdBy: user.id,
+          },
+          include,
+        }),
       },
-      include: {
-        creator: { select: { id: true, name: true } },
-      },
-    });
-
-    return NextResponse.json({ milestone }, { status: 201 });
+      { status: 201 },
+    );
   } catch (error) {
-    console.error('Error creating milestone:', error);
-    return NextResponse.json({ error: 'Failed to create milestone' }, { status: 500 });
+    return apiFailure(error);
   }
 }
-
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const { id, status, progress, evidence, completedAt } = body;
-
-    if (!id) {
-      return NextResponse.json({ error: 'Milestone ID is required' }, { status: 400 });
-    }
-
+    const user = await apiUser();
+    const { id, evidence, completedAt, ...data } = z
+      .object({
+        id: z.string().max(100),
+        status: z
+          .enum(["pending", "in_progress", "completed", "delayed", "cancelled"])
+          .optional(),
+        progress: z.number().int().min(0).max(100).optional(),
+        evidence: evidenceSchema.optional(),
+        completedAt: z.string().datetime().optional(),
+      })
+      .strict()
+      .parse(await req.json());
     const milestone = await db.implementationMilestone.findUnique({
       where: { id },
-      include: { process: { select: { createdBy: true } } },
     });
-
-    if (!milestone) {
-      return NextResponse.json({ error: 'Milestone not found' }, { status: 404 });
+    if (!milestone) throw new ApiError(404, "Milestone not found.");
+    await processManager(milestone.processId, user);
+    let previousEvidence: unknown;
+    try {
+      previousEvidence = JSON.parse(milestone.evidence);
+    } catch {
+      previousEvidence = [];
     }
-
-    const isAdmin = session.role === 'admin' || session.role === 'super_admin';
-    if (milestone.process.createdBy !== session.id && !isAdmin) {
-      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
-    }
-
-    const data: Record<string, unknown> = {};
-    if (status) data.status = status;
-    if (progress !== undefined) data.progress = Math.min(100, Math.max(0, progress));
-    if (evidence) data.evidence = JSON.stringify(evidence);
-    if (completedAt) data.completedAt = new Date(completedAt);
-    if (status === 'completed') {
-      data.progress = 100;
-      data.completedAt = new Date();
-    }
-
-    const updated = await db.implementationMilestone.update({
-      where: { id },
-      data,
-      include: {
-        creator: { select: { id: true, name: true } },
-      },
+    const finalEvidence =
+      evidence || (Array.isArray(previousEvidence) ? previousEvidence : []);
+    if (
+      (data.status || milestone.status) === "completed" &&
+      !finalEvidence.length
+    )
+      throw new ApiError(
+        400,
+        "Add evidence before marking this milestone complete.",
+      );
+    return NextResponse.json({
+      milestone: await db.implementationMilestone.update({
+        where: { id },
+        data: {
+          ...data,
+          ...(evidence ? { evidence: JSON.stringify(evidence) } : {}),
+          ...(data.status === "completed"
+            ? { completedAt: new Date(), progress: 100 }
+            : completedAt
+              ? { completedAt: new Date(completedAt) }
+              : {}),
+        },
+        include,
+      }),
     });
-
-    return NextResponse.json({ milestone: updated });
   } catch (error) {
-    console.error('Error updating milestone:', error);
-    return NextResponse.json({ error: 'Failed to update milestone' }, { status: 500 });
+    return apiFailure(error);
   }
 }

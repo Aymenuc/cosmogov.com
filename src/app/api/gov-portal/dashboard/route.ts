@@ -33,7 +33,7 @@ export async function GET() {
     });
 
     const respondedWithDates = await db.bindingProposal.findMany({
-      where: { governmentResponse: { not: null }, responseDate: { not: null }, createdAt: { not: null } },
+      where: { governmentResponse: { not: null }, responseDate: { not: null } },
       select: { createdAt: true, responseDate: true },
       take: 50,
     });

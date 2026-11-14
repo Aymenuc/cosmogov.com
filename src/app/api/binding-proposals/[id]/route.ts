@@ -1,86 +1,119 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getSession } from '@/lib/auth';
-
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import {
+  apiUser,
+  apiAdmin,
+  apiFailure,
+  ApiError,
+  canReadProcess,
+} from "@/lib/api-server";
 export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const user = await apiUser();
     const { id } = await params;
     const proposal = await db.bindingProposal.findUnique({
       where: { id },
       include: {
-        creator: { select: { id: true, name: true, avatarUrl: true, role: true } },
+        process: true,
+        creator: {
+          select: { id: true, name: true, avatarUrl: true, role: true },
+        },
         signatures: {
-          include: {
+          where: { userId: user.id },
+          select: {
+            id: true,
+            comment: true,
+            verified: true,
+            verifiedAt: true,
+            createdAt: true,
+            userId: true,
             user: { select: { id: true, name: true, avatarUrl: true } },
           },
-          orderBy: { createdAt: 'desc' },
         },
         _count: { select: { signatures: true } },
       },
     });
-
-    if (!proposal) {
-      return NextResponse.json({ error: 'Binding proposal not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ proposal });
-  } catch (error) {
-    console.error('Error fetching binding proposal:', error);
-    return NextResponse.json({ error: 'Failed to fetch binding proposal' }, { status: 500 });
-  }
-}
-
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-
-    // Admin only for updates
-    if (session.role !== 'admin' && session.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
-    const { id } = await params;
-    const body = await request.json();
-    const { status, governmentResponse, voteDate, enactmentDate } = body;
-
-    const existing = await db.bindingProposal.findUnique({ where: { id } });
-    if (!existing) {
-      return NextResponse.json({ error: 'Binding proposal not found' }, { status: 404 });
-    }
-
-    const data: Record<string, unknown> = {};
-    if (status) data.status = status;
-    if (governmentResponse) {
-      data.governmentResponse = governmentResponse;
-      data.responseDate = new Date();
-    }
-    if (voteDate) data.voteDate = new Date(voteDate);
-    if (enactmentDate) data.enactmentDate = new Date(enactmentDate);
-
-    const proposal = await db.bindingProposal.update({
-      where: { id },
-      data,
-      include: {
-        creator: { select: { id: true, name: true, avatarUrl: true } },
-        signatures: {
-          include: {
-            user: { select: { id: true, name: true, avatarUrl: true } },
-          },
-          orderBy: { createdAt: 'desc' },
-        },
+    if (
+      !proposal ||
+      (proposal.process && !(await canReadProcess(proposal.process, user.id)))
+    )
+      throw new ApiError(404, "Proposal not found.");
+    return NextResponse.json({
+      proposal: {
+        ...proposal,
+        process: undefined,
+        signatureCount: await db.bindingProposalSignature.count({
+          where: { proposalId: id, verified: true },
+        }),
+        isBinding: false,
+        legalStatus: "not_verified",
       },
     });
-
-    return NextResponse.json({ proposal });
   } catch (error) {
-    console.error('Error updating binding proposal:', error);
-    return NextResponse.json({ error: 'Failed to update binding proposal' }, { status: 500 });
+    return apiFailure(error);
+  }
+}
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    await apiAdmin();
+    const { id } = await params;
+    const data = z
+      .object({
+        status: z
+          .enum([
+            "collecting",
+            "threshold_reached",
+            "government_review",
+            "government_response",
+            "scheduled_vote",
+            "passed",
+            "rejected",
+            "enacted",
+          ])
+          .optional(),
+        governmentResponse: z.string().max(20000).optional(),
+        voteDate: z.string().datetime().nullish(),
+        enactmentDate: z.string().datetime().nullish(),
+      })
+      .strict()
+      .parse(await req.json());
+    const current = await db.bindingProposal.findUnique({ where: { id } });
+    if (!current) throw new ApiError(404, "Proposal not found.");
+    if (
+      data.status &&
+      ["threshold_reached", "government_review"].includes(data.status) &&
+      (await db.bindingProposalSignature.count({
+        where: { proposalId: id, verified: true },
+      })) < current.signatureGoal
+    )
+      throw new ApiError(
+        409,
+        "The reviewed signature threshold has not been reached.",
+      );
+    const { voteDate, enactmentDate, ...fields } = data;
+    return NextResponse.json({
+      proposal: await db.bindingProposal.update({
+        where: { id },
+        data: {
+          ...fields,
+          ...(data.governmentResponse ? { responseDate: new Date() } : {}),
+          ...(voteDate !== undefined
+            ? { voteDate: voteDate ? new Date(voteDate) : null }
+            : {}),
+          ...(enactmentDate !== undefined
+            ? { enactmentDate: enactmentDate ? new Date(enactmentDate) : null }
+            : {}),
+        },
+      }),
+    });
+  } catch (error) {
+    return apiFailure(error);
   }
 }

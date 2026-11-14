@@ -101,13 +101,13 @@ function ConstellationGlobe() {
   return (
     <div className="relative w-40 h-40 mx-auto sm:w-56 sm:h-56 lg:w-80 lg:h-80">
       {/* Outer rings */}
-      <div className="absolute inset-0 rounded-full border border-white/5 orbit-ring" style={{ animation: 'orbitSpin 40s linear infinite' }} />
-      <div className="absolute inset-4 rounded-full border border-white/8 orbit-ring" style={{ animation: 'orbitSpin 28s linear infinite reverse' }} />
+      <div className="absolute inset-0 rounded-full border border-border orbit-ring" style={{ animation: 'orbitSpin 40s linear infinite' }} />
+      <div className="absolute inset-4 rounded-full border border-border orbit-ring" style={{ animation: 'orbitSpin 28s linear infinite reverse' }} />
       <div className="absolute inset-8 rounded-full border border-cosmic-teal/10 orbit-ring" style={{ animation: 'orbitSpin 20s linear infinite' }} />
       <div className="absolute inset-12 rounded-full border border-cosmic-violet/10 orbit-ring" style={{ animation: 'orbitSpin 15s linear infinite reverse' }} />
 
       {/* Center globe */}
-      <div className="absolute inset-16 rounded-full bg-gradient-to-br from-cosmic-teal/10 via-cosmic-accent/5 to-cosmic-violet/10 border border-white/10 planet-glow" />
+      <div className="absolute inset-16 rounded-full bg-gradient-to-br from-cosmic-teal/10 via-cosmic-accent/5 to-cosmic-violet/10 border border-border planet-glow" />
 
       {/* Glowing dots on orbits */}
       {Array.from({ length: 20 }).map((_, i) => {
@@ -141,7 +141,7 @@ function ConstellationGlobe() {
 
       {/* Center icon */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cosmic-teal/20 to-cosmic-violet/20 border border-white/10 flex items-center justify-center backdrop-blur-sm">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cosmic-teal/20 to-cosmic-violet/20 border border-border flex items-center justify-center backdrop-blur-sm">
           <Globe className="w-7 h-7 text-cosmic-teal" />
         </div>
       </div>
@@ -474,24 +474,24 @@ export default function ExplorePage() {
               Discover governance activities in every country, region, and city on Earth
             </p>
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-4 text-xs sm:text-sm">
-              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-foreground/5 border border-border">
                 <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cosmic-teal" />
-                <span className="text-white font-semibold">{allCountries.length}</span>
+                <span className="text-foreground font-semibold">{allCountries.length}</span>
                 <span className="text-cosmic-muted">Countries</span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-foreground/5 border border-border">
                 <Mountain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cosmic-violet" />
-                <span className="text-white font-semibold">4,874</span>
+                <span className="text-foreground font-semibold">4,874</span>
                 <span className="text-cosmic-muted">Regions</span>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-foreground/5 border border-border">
                 <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cosmic-amber" />
-                <span className="text-white font-semibold">146,156</span>
+                <span className="text-foreground font-semibold">146,156</span>
                 <span className="text-cosmic-muted">Cities</span>
               </div>
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-cosmic-teal/20 to-cosmic-violet/20 text-white hover:from-cosmic-teal/30 hover:to-cosmic-violet/30 border border-white/10"
+                className="bg-gradient-to-r from-cosmic-teal/20 to-cosmic-violet/20 text-foreground hover:from-cosmic-teal/30 hover:to-cosmic-violet/30 border border-border"
                 onClick={() => router.push('/dashboard/cosmic-map')}
               >
                 <MapIcon className="w-4 h-4 mr-1.5" /> Open Cosmic Map
@@ -523,7 +523,7 @@ export default function ExplorePage() {
               onChange={e => { setSearchQuery(e.target.value); handleSearch(e.target.value); }}
               onFocus={() => { if (searchResults && (searchResults.countries.length || searchResults.states.length || searchResults.cities.length)) setSearchOpen(true); }}
               onKeyDown={handleSearchKeyDown}
-              className="w-full bg-transparent pl-12 pr-12 py-4 text-white placeholder:text-cosmic-muted/60 text-base outline-none"
+              className="w-full bg-transparent pl-12 pr-12 py-4 text-foreground placeholder:text-cosmic-muted/60 text-base outline-none"
             />
             {searchLoading && (
               <Loader2 className="absolute right-4 w-5 h-5 text-cosmic-teal animate-spin" />
@@ -531,7 +531,7 @@ export default function ExplorePage() {
             {searchQuery && !searchLoading && (
               <button
                 onClick={() => { setSearchQuery(''); setSearchResults(null); setSearchOpen(false); }}
-                className="absolute right-4 p-1 rounded-lg hover:bg-white/10 transition-colors"
+                className="absolute right-4 p-1 rounded-lg hover:bg-foreground/10 transition-colors"
               >
                 <X className="w-4 h-4 text-cosmic-muted" />
               </button>
@@ -552,7 +552,7 @@ export default function ExplorePage() {
               {/* Countries */}
               {searchResults.countries.length > 0 && (
                 <div>
-                  <div className="px-4 py-2 border-b border-white/5 bg-white/[0.02]">
+                  <div className="px-4 py-2 border-b border-border bg-foreground/[0.02]">
                     <span className="text-xs font-semibold text-cosmic-teal uppercase tracking-wider">Countries</span>
                   </div>
                   {searchResults.countries.map((c, i) => {
@@ -561,10 +561,10 @@ export default function ExplorePage() {
                       <button
                         key={`country-${c.id}`}
                         onClick={() => handleSearchSelect('country', c)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left ${searchIndex === idx ? 'bg-white/5' : ''}`}
+                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-foreground/5 transition-colors text-left ${searchIndex === idx ? 'bg-foreground/5' : ''}`}
                       >
                         <span className="text-xl">{c.emoji}</span>
-                        <span className="flex-1 text-sm text-white">{c.name}</span>
+                        <span className="flex-1 text-sm text-foreground">{c.name}</span>
                         <Badge variant="outline" className="text-[10px] border-cosmic-teal/20 text-cosmic-teal hidden sm:inline-flex">Country</Badge>
                         <ChevronRight className="w-4 h-4 text-cosmic-muted" />
                       </button>
@@ -575,7 +575,7 @@ export default function ExplorePage() {
               {/* States */}
               {searchResults.states.length > 0 && (
                 <div>
-                  <div className="px-4 py-2 border-b border-white/5 bg-white/[0.02]">
+                  <div className="px-4 py-2 border-b border-border bg-foreground/[0.02]">
                     <span className="text-xs font-semibold text-cosmic-violet uppercase tracking-wider">States / Regions</span>
                   </div>
                   {searchResults.states.map((s, i) => {
@@ -584,10 +584,10 @@ export default function ExplorePage() {
                       <button
                         key={`state-${s.id}`}
                         onClick={() => handleSearchSelect('state', s)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left ${searchIndex === idx ? 'bg-white/5' : ''}`}
+                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-foreground/5 transition-colors text-left ${searchIndex === idx ? 'bg-foreground/5' : ''}`}
                       >
                         <span className="text-xl">{s.countryEmoji}</span>
-                        <span className="flex-1 text-sm text-white">{s.name}</span>
+                        <span className="flex-1 text-sm text-foreground">{s.name}</span>
                         <span className="text-xs text-cosmic-muted hidden sm:inline">{s.countryName}</span>
                         <Badge variant="outline" className="text-[10px] border-cosmic-violet/20 text-cosmic-violet hidden sm:inline-flex">State</Badge>
                         <ChevronRight className="w-4 h-4 text-cosmic-muted" />
@@ -599,7 +599,7 @@ export default function ExplorePage() {
               {/* Cities */}
               {searchResults.cities.length > 0 && (
                 <div>
-                  <div className="px-4 py-2 border-b border-white/5 bg-white/[0.02]">
+                  <div className="px-4 py-2 border-b border-border bg-foreground/[0.02]">
                     <span className="text-xs font-semibold text-cosmic-amber uppercase tracking-wider">Cities</span>
                   </div>
                   {searchResults.cities.map((c, i) => {
@@ -608,11 +608,11 @@ export default function ExplorePage() {
                       <button
                         key={`city-${c.id}`}
                         onClick={() => handleSearchSelect('city', c)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left ${searchIndex === idx ? 'bg-white/5' : ''}`}
+                        className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-foreground/5 transition-colors text-left ${searchIndex === idx ? 'bg-foreground/5' : ''}`}
                       >
                         <span className="text-xl">{c.countryEmoji}</span>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm text-white">{c.name}</span>
+                          <span className="text-sm text-foreground">{c.name}</span>
                           <span className="text-xs text-cosmic-muted ml-2 hidden sm:inline">{c.stateName}, {c.countryName}</span>
                         </div>
                         <Badge variant="outline" className="text-[10px] border-cosmic-amber/20 text-cosmic-amber flex-shrink-0 hidden sm:inline-flex">City</Badge>
@@ -652,7 +652,7 @@ export default function ExplorePage() {
                     {bc.label}
                   </button>
                 ) : (
-                  <span className="text-white font-medium">{bc.label}</span>
+                  <span className="text-foreground font-medium">{bc.label}</span>
                 )}
               </div>
             ))}
@@ -680,7 +680,7 @@ export default function ExplorePage() {
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                       selectedRegion === tab.key
                         ? 'bg-cosmic-accent/15 text-cosmic-accent border border-cosmic-accent/20 shadow-[0_0_20px_rgba(45,107,255,0.1)]'
-                        : 'bg-white/[0.03] text-cosmic-muted border border-white/5 hover:bg-white/[0.06] hover:text-white'
+                        : 'bg-foreground/[0.03] text-cosmic-muted border border-border hover:bg-foreground/[0.06] hover:text-foreground'
                     }`}
                   >
                     <span>{tab.emoji}</span>
@@ -705,12 +705,12 @@ export default function ExplorePage() {
                   <div className="flex items-start gap-3 mb-3">
                     <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{country.emoji}</span>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm text-white truncate group-hover:text-cosmic-teal transition-colors">{country.name}</h3>
+                      <h3 className="font-semibold text-sm text-foreground truncate group-hover:text-cosmic-teal transition-colors">{country.name}</h3>
                       <p className="text-xs text-cosmic-muted truncate">{country.capital || '—'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className="text-[10px] border-white/10 text-cosmic-muted">
+                    <Badge variant="outline" className="text-[10px] border-border text-cosmic-muted">
                       {country.subregion || country.region}
                     </Badge>
                     {country.currency && (
@@ -719,7 +719,7 @@ export default function ExplorePage() {
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                     <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                       <MapPin className="w-3 h-3" />
                       <span>{country.iso2}</span>
@@ -758,7 +758,7 @@ export default function ExplorePage() {
                     className="glass-card-amber rounded-lg sm:rounded-xl p-3 sm:p-4 hover:shadow-[0_0_30px_rgba(255,181,71,0.08)] transition-all duration-300 cursor-pointer group"
                   >
                     <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">{loc.emoji}</span>
-                    <h4 className="font-semibold text-sm text-white group-hover:text-cosmic-amber transition-colors">{loc.name}</h4>
+                    <h4 className="font-semibold text-sm text-foreground group-hover:text-cosmic-amber transition-colors">{loc.name}</h4>
                     <p className="text-[11px] text-cosmic-muted mt-0.5">{loc.country}</p>
                     <p className="text-[10px] text-cosmic-muted/60 mt-1.5 line-clamp-2">{loc.desc}</p>
                   </motion.div>
@@ -781,7 +781,7 @@ export default function ExplorePage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-cosmic-muted hover:text-white mb-2"
+                  className="text-cosmic-muted hover:text-foreground mb-2"
                   onClick={() => { setView('grid'); setSelectedCountry(null); setSelectedState(null); setCities([]); setStates([]); }}
                 >
                   <ArrowLeft className="w-4 h-4 mr-1" /> Back to Explorer
@@ -868,7 +868,7 @@ export default function ExplorePage() {
                           className={`flex items-center gap-3 p-3 rounded-xl transition-all text-left ${
                             selectedState?.id === state.id
                               ? 'glass-card-violet border-cosmic-violet/30'
-                              : 'bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-white/10'
+                              : 'bg-foreground/[0.02] border border-border hover:bg-foreground/[0.04] hover:border-border'
                           }`}
                         >
                           <div className="w-8 h-8 rounded-lg bg-cosmic-violet/10 flex items-center justify-center flex-shrink-0">
@@ -916,7 +916,7 @@ export default function ExplorePage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-cosmic-muted hover:text-white"
+                            className="text-cosmic-muted hover:text-foreground"
                             onClick={() => { setSelectedState(null); setCities([]); setCitySearch(''); }}
                           >
                             <X className="w-4 h-4" />
@@ -931,7 +931,7 @@ export default function ExplorePage() {
                             placeholder="Search cities in this state..."
                             value={citySearch}
                             onChange={e => setCitySearch(e.target.value)}
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-cosmic-muted/50 outline-none focus:border-cosmic-teal/30 transition-colors"
+                            className="w-full bg-foreground/[0.03] border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-cosmic-muted/50 outline-none focus:border-cosmic-teal/30 transition-colors"
                           />
                         </div>
 
@@ -945,7 +945,7 @@ export default function ExplorePage() {
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.01 }}
-                                className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-cosmic-teal/15 transition-all group cursor-pointer"
+                                className="flex items-center gap-3 p-3 rounded-lg bg-foreground/[0.02] border border-border hover:bg-foreground/[0.04] hover:border-cosmic-teal/15 transition-all group cursor-pointer"
                               >
                                 <div className="w-7 h-7 rounded-lg bg-cosmic-teal/10 flex items-center justify-center flex-shrink-0">
                                   <Building2 className="w-3 h-3 text-cosmic-teal" />
