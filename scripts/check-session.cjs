@@ -30,6 +30,15 @@ test('rejects wrong keys, changed payloads and future-issued sessions', () => {
 test('rejects unsigned, oversized and malformed sessions', () => {
   for (const token of ['', 'v1.a.b', 'v1.a.b.extra', Buffer.from('user:123:nonce').toString('base64'), 'a'.repeat(2001)]) assert.equal(verifySession(token, secret, now), null);
 });
+test('accepts only the canonical signature encoding so alternate spellings cannot bypass revocation', () => {
+  const token = signSession('member-1', secret, now);
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  for (const last of alphabet) {
+    const variant = token.slice(0, -1) + last;
+    assert.equal(verifySession(variant, secret, now), variant === token ? 'member-1' : null);
+  }
+  for (const suffix of ['=', '==', '\n', ' ']) assert.equal(verifySession(token + suffix, secret, now), null);
+});
 test('production requires a configured secret and development fallback is stable', () => {
   assert.throws(() => load({ NODE_ENV: 'production' }).sessionSecret(), /SESSION_SECRET/);
   assert.throws(() => load({ SESSION_SECRET: 'short' }).sessionSecret(), /SESSION_SECRET/);
