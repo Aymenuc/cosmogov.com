@@ -9,7 +9,7 @@ datasource db {
   provider  = "postgresql"
   // Pooled connection (Supabase "Transaction" pooler, port 6543) for serverless on Vercel
   url       = env("DATABASE_URL")
-  // Direct connection for `prisma migrate` / CLI (Supabase "Session" / port 5432)
+  // Migration/CLI connection: direct endpoint or IPv4-compatible session pooler (5432).
   directUrl = env("DIRECT_URL")
 }
 
