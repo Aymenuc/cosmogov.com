@@ -23,7 +23,7 @@ export default function ProposalCard({
   const open = isOpen(p);
   const isSaved = saved.includes(p.id);
   return (
-    <article className="proposal-card">
+    <article className="proposal-card" data-topic={category.id}>
       <div className="proposal-card-top">
         <span className="proposal-category">
           <Icon size={13} />

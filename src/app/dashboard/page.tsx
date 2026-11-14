@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useWorkspace } from "@/components/WorkspaceContext";
 import ProposalCard from "@/components/ProposalCard";
+import CommonsArt from "@/components/CommonsArt";
 import { type CivicProposal, isOpen } from "@/lib/civic";
 interface Community {
   id: string;
@@ -98,13 +99,15 @@ export default function OverviewPage() {
       <div className="app-page-heading">
         <div>
           <div className="eyebrow">
-            <span className="status-dot" /> YOUR EVERYDAY DEMOCRACY
+            <span className="status-dot" /> YOUR LITTLE CORNER OF CHANGE
           </div>
           <h1>
-            Your voice belongs here
-            {user?.name ? `, ${user.name.split(" ")[0]}` : ""}.
+            Hey{user?.name ? `, ${user.name.split(" ")[0]}` : " there"}. Let’s
+            make a little change.
           </h1>
-          <p>A small contribution today. A stronger community tomorrow.</p>
+          <p>
+            Fresh ideas, familiar faces, and a few things only you can bring.
+          </p>
         </div>
         <Link href="/dashboard/proposals/new" className="civic-button">
           <Plus size={15} />
@@ -113,11 +116,11 @@ export default function OverviewPage() {
       </div>
       <section className="desk-welcome">
         <div className="desk-welcome-copy">
-          <div className="eyebrow">FROM CONVERSATION TO CHANGE</div>
+          <div className="eyebrow">GOOD THINGS START WITH “WHAT IF?”</div>
           <h2>
             {needsVoice.length > 0
-              ? "The next chapter needs your perspective."
-              : "Good communities start with a conversation."}
+              ? "Got five minutes? Something good starts with you."
+              : "Your next good idea belongs here."}
           </h2>
           <p>
             {needsVoice.length > 0
@@ -133,27 +136,16 @@ export default function OverviewPage() {
             className="text-link"
           >
             {needsVoice.length > 0
-              ? "Find a decision that matters to you"
+              ? "Let’s take a look"
               : "Find your community"}
             <ArrowUpRight size={16} />
           </Link>
         </div>
         <div className="desk-welcome-art" aria-hidden="true">
-          <div className="welcome-orbit orbit-one" />
-          <div className="welcome-orbit orbit-two" />
-          <span className="art-circle art-people">
-            <Users />
+          <CommonsArt />
+          <span className="desk-art-label">
+            More voices. More possibility. <Sparkles size={15} />
           </span>
-          <span className="art-circle art-leaf">
-            <Leaf />
-          </span>
-          <span className="art-circle art-vote">
-            <Vote />
-          </span>
-          <span className="art-center">
-            us<span>together, forward.</span>
-          </span>
-          <span className="art-spark">✳</span>
         </div>
       </section>
       <section
@@ -200,7 +192,7 @@ export default function OverviewPage() {
         <section className="desk-agenda">
           <div className="app-section-heading">
             <div>
-              <h2>Your participation, in focus.</h2>
+              <h2>A few things worth your voice.</h2>
               <p>Take part. Stay curious. Keep the thread.</p>
             </div>
             <Link className="text-link" href="/dashboard/proposals">

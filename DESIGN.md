@@ -4,7 +4,9 @@
 
 Cosmogov connects a citizen's contribution with a visible decision process: discover → understand → deliberate → decide → follow through. The civic desk is the starting point, rather than a dashboard of game scores. AI supports thought; people make decisions.
 
-The redesign replaces the space-themed interface with an identity based on connected people: a hexagonal mark, forest green, warm paper, a restrained earth-tone palette, Manrope and Inter. The shared theme covers existing app surfaces; primary pages have new layouts and interaction patterns.
+The visual identity invites people into community life: an original spark mark, bold Manrope typography, warm cream, vivid violet, coral, sunshine yellow, mint, and sky blue. An original geometric illustration of neighbors appears on the homepage, civic desk, and account entry. Topic colors help people scan proposals; voting choices keep neutral, equally weighted presentation. Decorative entrance motion runs once and respects reduced-motion preferences. The shared theme covers existing app surfaces; primary pages have new layouts and interaction patterns.
+
+The homepage leads with “Big ideas. Local magic.” and conversational language. The civic desk uses a friendly personal greeting, a colorful invitation to contribute, and distinct participation cards. Decision rooms retain quiet reading surfaces, visible rules, and clear labels.
 
 ## New behavior
 
@@ -19,7 +21,7 @@ The redesign replaces the space-themed interface with an identity based on conne
 
 ## Scope and data
 
-Existing routes, backend integrations, and PostgreSQL schema are retained. The landing page's Riverside preview is explicitly illustrative. Screenshots under `artifacts/ui-checks` use isolated test fixtures, not customer records. Stock photographs are downloaded locally from Unsplash; the city image depicts a street rather than a claimed customer location.
+Existing routes, backend integrations, and PostgreSQL schema are retained. The landing page's Riverside preview is explicitly illustrative. Screenshots under `artifacts/colorful` use isolated test fixtures, not customer records. The remaining city photograph is downloaded locally from Unsplash and depicts a street rather than a claimed customer location; the community artwork and spark mark are original SVGs in the source.
 
 ## Verification
 

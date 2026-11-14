@@ -8,16 +8,12 @@ export function BrandMark({ className = "" }: { className?: string }) {
       className={className}
     >
       <path
-        d="M20 3.5 36.5 13v14L20 36.5 3.5 27V13L20 3.5Z"
+        d="M20 5v8m0 14v8M7 12l7 4m12 8 7 4M7 28l7-4m12-8 7-4"
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="7"
+        strokeLinecap="round"
       />
-      <path d="m20 11 9 5.2v7.6L20 29l-9-5.2v-7.6L20 11Z" fill="currentColor" />
-      <path
-        d="M20 3.5V11M36.5 13 29 17M36.5 27 29 23M20 36.5V29M3.5 27l7.5-4M3.5 13l7.5 4"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
+      <circle cx="20" cy="20" r="4" fill="#FF785F" />
     </svg>
   );
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cosmogov-civic-v2';
+const CACHE_NAME = 'cosmogov-community-v3';
 const STATIC_ASSETS = [
   '/',
   '/auth/login',

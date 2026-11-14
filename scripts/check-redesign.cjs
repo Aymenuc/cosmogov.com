@@ -24,7 +24,7 @@ const makeProposal = (id, title, extra = {}) => ({
   description:
     "A community-led proposal to make our shared spaces more welcoming. Help consider the priorities, share a perspective, and decide together.",
   status: "active",
-  category: "environmental",
+  category: "environment",
   votingType: "yes_no",
   createdAt: date(-3),
   closesAt: date(5),
@@ -102,7 +102,7 @@ async function capture(page, path) {
     document.activeElement?.blur();
     window.scrollTo({ top: 0, behavior: "instant" });
   });
-  await page.screenshot({ path, fullPage: true });
+  await page.screenshot({ path, fullPage: true, animations: "disabled" });
 }
 async function noOverflow(page, name) {
   const info = await page.evaluate(() => ({
@@ -224,7 +224,7 @@ async function fixtures(context) {
   page.on("pageerror", (e) => pageErrors.push(e.message));
   await check("Homepage, feature tabs, pricing and FAQ", async () => {
     await page.goto(base, { waitUntil: "networkidle", timeout: 120000 });
-    await page.getByRole("heading", { name: /Better decisions/ }).waitFor();
+    await page.getByRole("heading", { name: /Big ideas/ }).waitFor();
     await page.getByRole("tab", { name: "Participatory budgets" }).click();
     await page
       .getByRole("heading", { name: "Decide where the budget goes." })
@@ -293,7 +293,7 @@ async function fixtures(context) {
         timeout: 120000,
       });
       await app
-        .getByRole("heading", { name: /Your voice belongs here/ })
+        .getByRole("heading", { name: /Let’s make a little change/ })
         .waitFor();
       await app.locator(".proposal-card").first().waitFor();
       assert.equal(await app.locator(".proposal-card").count(), 2);
@@ -412,7 +412,10 @@ async function fixtures(context) {
     await app.getByRole("button", { name: "Search for “safer”" }).click();
     await app.waitForURL("**/dashboard/search?q=safer");
     await app.waitForFunction(
-      () => document.querySelector('input[placeholder="Search proposals and your communities..."]')?.value === "safer",
+      () =>
+        document.querySelector(
+          'input[placeholder="Search proposals and your communities..."]',
+        )?.value === "safer",
     );
   });
   await check(
@@ -465,6 +468,7 @@ async function fixtures(context) {
           await app
             .getByRole("button", { name: "Close navigation", exact: true })
             .click();
+          await app.locator('[data-slot="dialog-overlay"]').waitFor({ state: "hidden" });
           await capture(app, `${output}/civic-desk-mobile.png`);
         }
       }

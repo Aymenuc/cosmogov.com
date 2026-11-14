@@ -22,6 +22,7 @@ import {
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { BrandMark } from "@/components/Brand";
+import CommonsArt from "@/components/CommonsArt";
 const tools = [
   {
     label: "Propose & vote",
@@ -62,10 +63,7 @@ function CommunityPreview({ selected = 0 }: { selected?: number }) {
         <span className="preview-example">Illustrative preview</span>
       </div>
       <div className="preview-photo">
-        <img
-          src="/images/park.jpg"
-          alt="A green public park with a path and mature trees"
-        />
+        <CommonsArt />
         <span className="photo-label">
           <Leaf size={12} /> A place to grow, together
         </span>
@@ -137,21 +135,21 @@ export default function HomePage() {
         <section className="landing-hero site-container">
           <div className="hero-copy">
             <div className="eyebrow">
-              <span className="status-dot" /> THE FUTURE IS PARTICIPATORY
+              <Sparkles size={14} /> A LITTLE YOU. A LOT OF POSSIBILITY.
             </div>
             <h1>
-              Better decisions.
+              Big ideas.
               <br />
-              Made <em>together.</em>
+              <em>Local magic.</em>
             </h1>
             <p>
-              Your community has a voice. Give it a place to shape what comes
-              next. Propose ideas, make shared decisions, and turn participation
-              into progress.
+              That “what if” you keep thinking about? Bring it here. Find your
+              people, put ideas in motion, and help your corner of the world
+              become a little more you.
             </p>
             <div className="hero-actions">
               <Link href="/auth/signup" className="civic-button">
-                Build your community <ArrowUpRight size={18} />
+                Find your people <ArrowUpRight size={18} />
               </Link>
               <a href="#platform" className="text-link">
                 Explore the platform <ArrowRight size={17} />
@@ -170,9 +168,9 @@ export default function HomePage() {
             <div className="orbit-label">
               <BrandMark />
               <span>
-                Small ideas.
+                A good idea is
                 <br />
-                <strong>Shared possibilities.</strong>
+                <strong>just the beginning.</strong>
               </span>
             </div>
             <CommunityPreview />
@@ -181,14 +179,16 @@ export default function HomePage() {
                 <CheckCheck size={20} />
               </div>
               <span>
-                A voice. A vote.
+                Your people. Your place.
                 <br />
-                <strong>A visible difference.</strong>
+                <strong>Your next big “what if”.</strong>
               </span>
-              <span className="tiny-star">✳</span>
+              <span className="tiny-star">
+                <Sparkles size={28} />
+              </span>
             </div>
             <span className="visual-coordinate">
-              PEOPLE → PARTICIPATION → PROGRESS
+              A LITTLE SPARK GOES A LONG WAY
             </span>
           </div>
         </section>

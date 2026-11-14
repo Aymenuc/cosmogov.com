@@ -16,7 +16,8 @@ import {
   Users,
   Vote,
 } from "lucide-react";
-import Brand, { BrandMark } from "./Brand";
+import Brand from "./Brand";
+import CommonsArt from "./CommonsArt";
 export default function AuthExperience({
   signup = false,
 }: {
@@ -92,20 +93,7 @@ export default function AuthExperience({
             It’s the people who choose to shape it.
           </p>
           <div className="auth-art" aria-hidden="true">
-            <div className="auth-art-orbit" />
-            <div className="auth-art-orbit second" />
-            <span className="auth-art-center">
-              <BrandMark />
-            </span>
-            <span className="auth-art-node first">
-              <Users />
-            </span>
-            <span className="auth-art-node second">
-              <Leaf />
-            </span>
-            <span className="auth-art-node third">
-              <Vote />
-            </span>
+            <CommonsArt />
           </div>
           <div className="auth-promise">
             <Check size={15} />

@@ -42,52 +42,52 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-cosmic-accent: #27634b;
-  --color-cosmic-violet: #78618f;
-  --color-cosmic-teal: #39765b;
-  --color-cosmic-amber: #9a671f;
-  --color-cosmic-rose: #b44950;
-  --color-cosmic-success: #367452;
-  --color-cosmic-bg: #f7f8f3;
-  --color-cosmic-bg2: #eef1e9;
+  --color-cosmic-accent: #6741d9;
+  --color-cosmic-violet: #8b47c9;
+  --color-cosmic-teal: #167b83;
+  --color-cosmic-amber: #916500;
+  --color-cosmic-rose: #bf4054;
+  --color-cosmic-success: #28745b;
+  --color-cosmic-bg: #fffdf7;
+  --color-cosmic-bg2: #f2edfb;
   --color-cosmic-bg3: #ffffff;
-  --color-cosmic-text: #1b3028;
-  --color-cosmic-muted: #67756d;
+  --color-cosmic-text: #29223d;
+  --color-cosmic-muted: #706779;
 }
 
 :root {
   --radius: 0.875rem;
-  --background: #f7f8f3;
-  --foreground: #1b3028;
+  --background: #fffdf7;
+  --foreground: #29223d;
   --card: #ffffff;
-  --card-foreground: #1b3028;
+  --card-foreground: #29223d;
   --popover: #ffffff;
-  --popover-foreground: #1b3028;
-  --primary: #27634b;
+  --popover-foreground: #29223d;
+  --primary: #6741d9;
   --primary-foreground: #ffffff;
-  --secondary: #eef1e9;
-  --secondary-foreground: #1b3028;
-  --muted: #eef1e9;
-  --muted-foreground: #67756d;
-  --accent: #e8eee4;
-  --accent-foreground: #1b3028;
-  --destructive: #b44950;
-  --border: rgba(33, 60, 46, 0.14);
-  --input: rgba(33, 60, 46, 0.14);
-  --ring: #27634b;
-  --chart-1: #27634b;
-  --chart-2: #39765b;
-  --chart-3: #78618f;
-  --chart-4: #9a671f;
-  --chart-5: #b44950;
+  --secondary: #f2edfb;
+  --secondary-foreground: #29223d;
+  --muted: #f2edfb;
+  --muted-foreground: #706779;
+  --accent: #eee6ff;
+  --accent-foreground: #29223d;
+  --destructive: #bf4054;
+  --border: rgba(63, 42, 92, 0.14);
+  --input: rgba(63, 42, 92, 0.14);
+  --ring: #6741d9;
+  --chart-1: #6741d9;
+  --chart-2: #167b83;
+  --chart-3: #8b47c9;
+  --chart-4: #916500;
+  --chart-5: #bf4054;
   --sidebar: #ffffff;
-  --sidebar-foreground: #1b3028;
-  --sidebar-primary: #27634b;
-  --sidebar-primary-foreground: #1b3028;
-  --sidebar-accent: #e8eee4;
-  --sidebar-accent-foreground: #1b3028;
-  --sidebar-border: rgba(33, 60, 46, 0.12);
-  --sidebar-ring: #27634b;
+  --sidebar-foreground: #29223d;
+  --sidebar-primary: #6741d9;
+  --sidebar-primary-foreground: #29223d;
+  --sidebar-accent: #eee6ff;
+  --sidebar-accent-foreground: #29223d;
+  --sidebar-border: rgba(63, 42, 92, 0.12);
+  --sidebar-ring: #6741d9;
 }
 
 @layer base {
@@ -96,10 +96,10 @@
   }
   html {
     scroll-behavior: smooth;
-    background: #f7f8f3;
+    background: #fffdf7;
   }
   body {
-    @apply bg-[#f7f8f3] text-[#1b3028] antialiased;
+    @apply bg-[#fffdf7] text-[#29223d] antialiased;
     font-family: 'Inter', system-ui, sans-serif;
     background: var(--background);
   }
@@ -280,7 +280,7 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #eef1e9;
+  background: #f2edfb;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(45, 107, 255, 0.3);
@@ -292,7 +292,7 @@
 
 ::selection {
   background: rgba(45, 107, 255, 0.3);
-  color: #1b3028;
+  color: #29223d;
 }
 
 /* ─── Cosmic Map Markers ─── */
@@ -351,7 +351,7 @@
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(10, 14, 26, 0.92), rgba(5, 8, 19, 0.85));
   border: 2px solid rgba(46, 230, 199, 0.4);
-  color: #39765b;
+  color: #167b83;
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -378,7 +378,7 @@
   border-radius: 16px !important;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(46, 230, 199, 0.08), inset 0 1px 0 rgba(255,255,255,0.08) !important;
   backdrop-filter: blur(20px);
-  color: #1b3028 !important;
+  color: #29223d !important;
   padding: 0 !important;
 }
 .cosmic-popup .leaflet-popup-content {
@@ -397,19 +397,19 @@
   right: 8px !important;
 }
 .cosmic-popup .leaflet-popup-close-button:hover {
-  color: #39765b !important;
+  color: #167b83 !important;
 }
 
 /* Leaflet control overrides for dark theme */
 .leaflet-control-zoom a {
   background: rgba(12, 16, 32, 0.9) !important;
-  color: #1b3028 !important;
-  border-color: rgba(33, 60, 46, 0.14) !important;
+  color: #29223d !important;
+  border-color: rgba(63, 42, 92, 0.14) !important;
   backdrop-filter: blur(10px);
 }
 .leaflet-control-zoom a:hover {
   background: rgba(20, 25, 51, 0.95) !important;
-  color: #39765b !important;
+  color: #167b83 !important;
 }
 .leaflet-control-attribution {
   background: rgba(4, 5, 11, 0.7) !important;
