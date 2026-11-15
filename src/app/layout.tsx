@@ -7,17 +7,38 @@ import { Toaster } from "@/components/ui/toaster";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
-  title: "Cosmogov — Your community, with an AI team",
+  metadataBase: new URL("https://www.cosmogov.com"),
+  title: {
+    default: "Cosmogov — Your community, with an AI team",
+    template: "%s",
+  },
   description:
-    "A shared workspace for people and AI. Research community goals, turn input into plans, build useful tools, and make decisions together.",
+    "A shared workspace for communities. Research a goal, turn ideas into plans and simple forms, and decide together. AI helps with the legwork; people make every decision.",
+  applicationName: "Cosmogov",
   keywords: [
-    "governance",
-    "voting",
-    "AI",
-    "gamification",
+    "community participation",
     "civic tech",
-    "decision making",
+    "participatory budgeting",
+    "community decisions",
+    "public consultation",
   ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Cosmogov",
+    url: "https://www.cosmogov.com",
+    title: "Cosmogov — Your community, with an AI team",
+    description:
+      "A shared workspace for communities to research goals, make plans and decide together. AI helps; people decide.",
+    images: [{ url: "/images/park.jpg", alt: "A sunny tree-lined path through a public park" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cosmogov — Your community, with an AI team",
+    description:
+      "A shared workspace for communities to research goals, make plans and decide together. AI helps; people decide.",
+    images: ["/images/park.jpg"],
+  },
   icons: {
     icon: "/logo.svg",
   },
@@ -25,7 +46,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "CosmoGov",
+    title: "Cosmogov",
   },
   formatDetection: {
     telephone: false,

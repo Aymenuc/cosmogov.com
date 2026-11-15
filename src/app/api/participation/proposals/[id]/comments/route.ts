@@ -6,6 +6,10 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Signed-in members only: these lists include names and community activity.
+  const viewer = await getSession();
+  if (!viewer) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
+
   try {
     const { id } = await params;
     const { searchParams } = new URL(req.url);

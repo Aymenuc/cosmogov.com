@@ -1726,8 +1726,8 @@ export default function AssemblyHallPage() {
           </h1>
 
           <p className="text-cosmic-muted text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-4 sm:mb-8">
-            Enter the cosmic debate space where six AI agents orbit the discourse — moderating, facilitating,
-            synthesizing, building consensus, translating, and ensuring every voice is heard.
+            A shared space to talk an issue through. AI helpers can step in to summarise, translate,
+            simplify or keep things civil, and people make every decision.
           </p>
 
           <div className="flex items-center justify-center gap-4 flex-wrap">
@@ -1929,7 +1929,7 @@ export default function AssemblyHallPage() {
             {
               step: '01',
               title: 'Launch or Join',
-              desc: 'Start a new assembly or join a live debate. All 6 AI agents activate automatically.',
+              desc: 'Start a debate or join one. AI helpers step in only when they can help: to summarise, translate, simplify or calm things down.',
               icon: Rocket,
               color: '#2D6BFF',
             },

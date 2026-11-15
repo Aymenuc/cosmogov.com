@@ -3,6 +3,10 @@ import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
+  // Signed-in members only: these lists include names and community activity.
+  const viewer = await getSession();
+  if (!viewer) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
+
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');

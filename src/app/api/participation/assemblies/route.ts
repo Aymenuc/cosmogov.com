@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { assemblyVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
+  // Signed-in members only: these lists include names and community activity.
+  const viewer = await getSession();
+  if (!viewer) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
+
   try {
     const { searchParams } = new URL(request.url);
     const purpose = searchParams.get('purpose');
     const scope = searchParams.get('scope');
     const search = searchParams.get('search');
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { AND: [assemblyVisibility(viewer.id)] };
     if (purpose && purpose !== 'all') where.purpose = purpose;
     if (scope && scope !== 'all') where.scope = scope;
     if (search) {

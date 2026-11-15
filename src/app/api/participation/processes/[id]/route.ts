@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -6,10 +7,14 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Signed-in members only: these lists include names and community activity.
+  const viewer = await getSession();
+  if (!viewer) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
+
   try {
     const { id } = await params;
-    const process = await db.participatoryProcess.findUnique({
-      where: { id },
+    const process = await db.participatoryProcess.findFirst({
+      where: { id, ...processVisibility(viewer.id) },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         organization: { select: { id: true, name: true, slug: true, avatarUrl: true } },

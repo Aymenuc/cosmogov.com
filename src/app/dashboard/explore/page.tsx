@@ -494,7 +494,7 @@ export default function ExplorePage() {
                 className="bg-gradient-to-r from-cosmic-teal/20 to-cosmic-violet/20 text-foreground hover:from-cosmic-teal/30 hover:to-cosmic-violet/30 border border-border"
                 onClick={() => router.push('/dashboard/cosmic-map')}
               >
-                <MapIcon className="w-4 h-4 mr-1.5" /> Open Cosmic Map
+                <MapIcon className="w-4 h-4 mr-1.5" /> Open the community map
               </Button>
             </div>
           </div>
@@ -835,7 +835,7 @@ export default function ExplorePage() {
                           {locationSet ? 'Location Set!' : 'Set as My Location'}
                         </Button>
                         <Button size="sm" className="bg-cosmic-accent/10 text-cosmic-accent hover:bg-cosmic-accent/20 border border-cosmic-accent/20" variant="outline" onClick={() => router.push(`/dashboard/cosmic-map?countryId=${selectedCountry.id}`)}>
-                          <MapIcon className="w-3.5 h-3.5 mr-1.5" /> See on Cosmic Map
+                          <MapIcon className="w-3.5 h-3.5 mr-1.5" /> See on the community map
                         </Button>
                       </div>
                     </div>
@@ -966,7 +966,7 @@ export default function ExplorePage() {
                                   </button>
                                   <button
                                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-cosmic-accent/10"
-                                    title="See on Cosmic Map"
+                                    title="See on the community map"
                                     onClick={e => { e.stopPropagation(); router.push(`/dashboard/cosmic-map?lat=${city.latitude}&lng=${city.longitude}`); }}
                                   >
                                     <MapIcon className="w-3 h-3 text-cosmic-accent" />

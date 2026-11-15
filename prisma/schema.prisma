@@ -1,4 +1,4 @@
-// CosmoGov - Interstellar Civic OS
+// Cosmogov - community participation workspace
 // Full database schema for governance platform
 
 generator client {

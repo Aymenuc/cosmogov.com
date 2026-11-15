@@ -11,6 +11,10 @@ import {
   canReadProcess,
 } from "@/lib/api-server";
 export async function GET(req: NextRequest) {
+  // Signed-in members only.
+  const viewer = await getSession();
+  if (!viewer) return NextResponse.json({ error: "Please sign in." }, { status: 401 });
+
   try {
     const user = await getSession();
     const params = req.nextUrl.searchParams;

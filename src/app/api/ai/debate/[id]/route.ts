@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { debateVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -12,8 +13,8 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const debate = await db.debateSession.findUnique({
-      where: { id },
+    const debate = await db.debateSession.findFirst({
+      where: { id, ...debateVisibility(session.id) },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         assembly: { select: { id: true, name: true, slug: true } },

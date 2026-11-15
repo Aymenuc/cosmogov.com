@@ -65,6 +65,7 @@ export default function Footer() {
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Cosmogov</span>
           <div>
+            <Link href="/trust">Security, privacy and AI</Link>
             <Link href="/privacy">Privacy policy</Link>
             <Link href="/terms">Terms of use</Link>
             <a href="#main-content">Back to top <ArrowUp size={14} aria-hidden="true" /></a>

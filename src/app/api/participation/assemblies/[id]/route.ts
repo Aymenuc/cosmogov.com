@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { assemblyVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -6,9 +7,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id } = await params;
     const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
 
-    const assembly = await db.assembly.findUnique({
-      where: { id },
+    const assembly = await db.assembly.findFirst({
+      where: { id, ...assemblyVisibility(session.id) },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         members: {

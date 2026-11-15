@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
+  // Signed-in members only: these lists include names and community activity.
+  const viewer = await getSession();
+  if (!viewer) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
+
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
@@ -13,7 +18,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12');
     const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { AND: [processVisibility(viewer.id)] };
     if (category) where.category = category;
     if (phase) where.currentPhase = phase;
     if (scope) where.scope = scope;

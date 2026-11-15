@@ -41,7 +41,7 @@ export default function PrivacyPage() {
             <h2>Your choices and requests</h2>
             <p>You can review account details in <Link href="/dashboard/settings">Settings</Link>. Use the <Link href="/contact?topic=privacy">privacy request form</Link> to ask about accessing, correcting, deleting, or receiving a copy of your personal data.</p>
             <p>Where applicable, you can also ask to restrict processing, object to it, withdraw consent for consent-based processing, or complain to your data protection authority. The <a href="https://commission.europa.eu/law/law-topic/data-protection/information-individuals_en">European Commission’s guide</a> explains these rights under the GDPR.</p>
-            <p>For an account or data security concern, use the <Link href="/contact?topic=security">security report form</Link>.</p>
+            <p>For an account or data security concern, use the <Link href="/contact?topic=security">security report form</Link>. <Link href="/trust">Security, privacy and AI</Link> explains where data is kept and how the AI helpers work.</p>
           </section>
         </div>
       </div>

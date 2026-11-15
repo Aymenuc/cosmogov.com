@@ -14,15 +14,15 @@ import {
 interface Message { role: 'user' | 'assistant'; content: string; timestamp: number; }
 
 const modes = [
-  { id: 'chat', name: 'Chat', icon: MessageSquare, desc: 'General governance Q&A', color: 'cosmic-accent' },
-  { id: 'proposal_draft', name: 'Proposal Draft', icon: FileText, desc: 'Generate governance proposals', color: 'cosmic-teal' },
-  { id: 'analysis', name: 'Analysis', icon: BarChart3, desc: 'Analyze voting patterns & outcomes', color: 'cosmic-violet' },
-  { id: 'coaching', name: 'Coaching', icon: Target, desc: 'Decision-making & leadership tips', color: 'cosmic-amber' },
+  { id: 'chat', name: 'Chat', icon: MessageSquare, desc: 'Questions about taking part', color: 'cosmic-accent' },
+  { id: 'proposal_draft', name: 'Proposal Draft', icon: FileText, desc: 'Help drafting a proposal', color: 'cosmic-teal' },
+  { id: 'analysis', name: 'Analysis', icon: BarChart3, desc: 'Think through options you describe', color: 'cosmic-violet' },
+  { id: 'coaching', name: 'Coaching', icon: Target, desc: 'Tips for fair meetings and decisions', color: 'cosmic-amber' },
 ];
 
 const suggestions = [
   'Draft a proposal for implementing quadratic voting in our organization',
-  'Analyze the potential biases in our recent budget allocation vote',
+  'What should we check before putting a budget idea to a vote?',
   'What are the best practices for running effective governance meetings?',
   'Help me identify cognitive biases that could affect our upcoming decision',
   'Generate a risk assessment for our new policy proposal',
@@ -61,7 +61,7 @@ export default function AssistantPage() {
       if (data.content) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.content, timestamp: Date.now() }]);
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: 'I apologize, I couldn\'t generate a response. Please try again.', timestamp: Date.now() }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: data.error || 'I couldn\'t generate a response. Please try again.', timestamp: Date.now() }]);
       }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Network error. Please check your connection and try again.', timestamp: Date.now() }]);
@@ -91,7 +91,7 @@ export default function AssistantPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold font-heading">AI Assistant</h1>
-            <p className="text-xs text-cosmic-teal">Powered by CosmoGov AI</p>
+            <p className="text-xs text-cosmic-teal">An AI helper. It can be wrong, and people decide.</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -130,8 +130,9 @@ export default function AssistantPage() {
               <div className="w-16 h-16 rounded-2xl bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-8 h-8 text-cosmic-teal opacity-70" />
               </div>
-              <h3 className="text-lg font-semibold font-heading mb-1">CosmoGov AI Assistant</h3>
-              <p className="text-sm text-cosmic-muted mb-6">Mode: <span className="text-cosmic-teal">{currentMode.desc}</span></p>
+              <h3 className="text-lg font-semibold font-heading mb-1">Your AI helper</h3>
+              <p className="text-sm text-cosmic-muted mb-2">Mode: <span className="text-cosmic-teal">{currentMode.desc}</span></p>
+              <p className="text-xs text-cosmic-muted mb-6">Answers come from an AI. It can’t see votes or private data, and it can be wrong, so check facts before you rely on them.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg mx-auto">
                 {suggestions.map(q => (
                   <button key={q} onClick={() => setInput(q)}
@@ -148,7 +149,7 @@ export default function AssistantPage() {
                 {msg.role === 'assistant' && (
                   <div className="flex items-center gap-1.5 mb-2">
                     <Brain className="w-3 h-3 text-cosmic-teal" />
-                    <span className="text-[10px] text-cosmic-teal font-medium">CosmoGov AI</span>
+                    <span className="text-[10px] text-cosmic-teal font-medium">AI helper</span>
                   </div>
                 )}
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>

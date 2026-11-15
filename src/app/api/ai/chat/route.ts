@@ -1,33 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { z } from 'zod';
 import { chatCompletionsCreate } from '@/lib/ai-completions';
+import { apiFailure, apiUser, rateLimit } from '@/lib/api-server';
+import { AI_GROUND_RULES, AI_UNAVAILABLE } from '@/lib/ai-rules';
+
+// Only the person's own turns and earlier replies are accepted: a browser
+// can't smuggle in "system" instructions, and the size is bounded so one
+// request can't run up the AI bill.
+const chatSchema = z.object({
+  mode: z.enum(['chat', 'proposal_draft', 'analysis', 'coaching']).default('chat'),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().trim().min(1).max(4000),
+      }),
+    )
+    .min(1)
+    .max(12),
+});
+
+const modePrompts: Record<z.infer<typeof chatSchema>['mode'], string> = {
+  chat: 'You help people in a community take part well: understand an issue, prepare a question, run a fair discussion, and follow up on decisions.',
+  proposal_draft:
+    'You help a person draft a proposal for their community. Structure it as: Title, What we propose, Why, How it would work, Costs and risks, What we would check afterwards. Mark anything that needs local facts as [to check].',
+  analysis:
+    'You help a person think through options they describe: who is affected, trade-offs, and what evidence would settle open questions. You cannot see votes, ballots or community data; work only from what the person tells you.',
+  coaching:
+    'You give practical tips on facilitating meetings, including quieter voices, and making decisions together fairly.',
+};
 
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
   try {
-    const { messages, mode } = await req.json();
+    const user = await apiUser();
+    await rateLimit('ai-chat', user.id, 30, 3600);
+    const { mode, messages } = chatSchema.parse(await req.json());
 
-    let systemPrompt = `You are the CosmoGov AI Assistant — an expert governance advisor embedded in an interstellar civic operating system. You help users draft proposals, analyze voting patterns, identify cognitive biases, and make better collective decisions. You speak with clarity, precision, and a touch of cosmic wonder. Keep responses concise but insightful.`;
-
-    if (mode === 'proposal_draft') {
-      systemPrompt = `You are the CosmoGov AI Proposal Generator. Generate a well-structured governance proposal based on the user's description. Include: Title, Summary, Key Benefits (3-5 bullet points), Implementation Steps, Risk Assessment, and Expected Outcomes. Be specific, actionable, and compelling.`;
+    let completion;
+    try {
+      completion = await chatCompletionsCreate({
+        messages: [
+          { role: 'system', content: `${modePrompts[mode]}\n\n${AI_GROUND_RULES}` },
+          ...messages,
+        ],
+        max_tokens: 1200,
+      });
+    } catch (error) {
+      console.error('AI provider error:', error instanceof Error ? error.name : 'unknown');
+      return NextResponse.json({ error: AI_UNAVAILABLE }, { status: 503 });
     }
 
-    const completion = await chatCompletionsCreate({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages,
-      ],
-      max_tokens: 4096,
-    });
-
-    const content = completion.choices[0]?.message?.content || 'I apologize, I was unable to generate a response. Please try again.';
-
-    return NextResponse.json({ content });
+    const content = completion.choices[0]?.message?.content?.trim();
+    if (!content) return NextResponse.json({ error: AI_UNAVAILABLE }, { status: 503 });
+    return NextResponse.json({ content, generatedBy: 'ai' });
   } catch (error) {
-    console.error('AI chat error:', error);
-    return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
+    return apiFailure(error);
   }
 }

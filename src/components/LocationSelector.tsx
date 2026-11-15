@@ -398,7 +398,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
               {value.latitude.toFixed(4)}°, {value.longitude.toFixed(4)}°
             </p>
             <p className="text-[10px] text-cosmic-muted/60 mt-0.5">
-              Map preview — see Cosmic Map for full view
+              Map preview — see the community map for the full view
             </p>
           </div>
         </div>

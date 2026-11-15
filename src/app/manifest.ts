@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Cosmogov — Big ideas. Local magic.",
-    short_name: "CosmoGov",
+    short_name: "Cosmogov",
     description:
       "A shared space for civic participation, community decisions, and visible progress",
     start_url: "/",

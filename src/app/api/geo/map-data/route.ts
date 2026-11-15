@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { apiUser, apiFailure } from '@/lib/api-server';
+import { proposalVisibility } from '@/lib/proposals-server';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -125,6 +127,18 @@ function filterToTypes(filter: FilterType): ActivityType[] {
 
 export async function GET(request: NextRequest) {
   try {
+    // Signed-in only, and only what this person may see: organization
+    // proposals and processes stay inside their communities, private
+    // assemblies and debates stay with their creators.
+    const user = await apiUser();
+    const ownOrPublic = { OR: [{ isPublic: true }, { createdBy: user.id }] };
+    const processVisible = {
+      OR: [
+        { isPublic: true },
+        { createdBy: user.id },
+        { organization: { memberships: { some: { userId: user.id } } } },
+      ],
+    };
     const { searchParams } = new URL(request.url);
 
     // Parse query parameters
@@ -179,7 +193,7 @@ export async function GET(request: NextRequest) {
 
     // ─── Proposals ──────────────────────────────────────────────────────────
     if (requestedTypes.includes('proposal')) {
-      const where: Record<string, unknown> = {};
+      const where: Record<string, unknown> = { ...proposalVisibility(user.id) };
       if (countryId) where.countryId = countryId;
 
       const proposals = await db.proposal.findMany({
@@ -239,6 +253,7 @@ export async function GET(request: NextRequest) {
       const where: Record<string, unknown> = {
         latitude: { not: null },
         longitude: { not: null },
+        ...processVisible,
       };
       if (countryId) where.countryId = countryId;
 
@@ -289,6 +304,7 @@ export async function GET(request: NextRequest) {
       const where: Record<string, unknown> = {
         latitude: { not: null },
         longitude: { not: null },
+        ...ownOrPublic,
       };
       if (countryId) where.countryId = countryId;
 
@@ -424,6 +440,7 @@ export async function GET(request: NextRequest) {
       const where: Record<string, unknown> = {
         latitude: { not: null },
         longitude: { not: null },
+        ...ownOrPublic,
       };
       if (countryId) where.countryId = countryId;
 
@@ -478,10 +495,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('[GEO_MAP_DATA_ERROR]', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch map data' },
-      { status: 500 }
-    );
+    return apiFailure(error);
   }
 }

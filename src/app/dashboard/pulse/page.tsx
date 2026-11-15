@@ -16,10 +16,8 @@ interface PulseData {
   sentiment: { score: number; mood: string };
   metrics: {
     activeProposals: number;
-    totalVotes: number;
-    votesPerHour: number;
-    participationRate: number;
-    totalUsers: number;
+    ballotsLast24h: number;
+    votersLast7d: number;
   };
   proposals: { id: string; title: string; voteCount: number; status: string }[];
   activityFeed: {
@@ -337,7 +335,7 @@ export default function PulsePage() {
               </div>
             </div>
             <p className="text-lg font-bold font-heading" style={{ color: moodColor }}>{data.sentiment.mood}</p>
-            <p className="text-xs text-cosmic-muted">Community Mood</p>
+            <p className="text-xs text-cosmic-muted">Leaning on open proposals</p>
           </CardContent>
         </Card>
 
@@ -347,7 +345,7 @@ export default function PulsePage() {
               <FileText className="w-4 h-4 text-cosmic-violet" />
             </div>
             <p className="text-2xl font-bold font-heading">{data.metrics.activeProposals}</p>
-            <p className="text-xs text-cosmic-muted">Active Proposals</p>
+            <p className="text-xs text-cosmic-muted">Open proposals</p>
           </CardContent>
         </Card>
 
@@ -356,8 +354,8 @@ export default function PulsePage() {
             <div className="w-8 h-8 rounded-lg bg-cosmic-amber/10 flex items-center justify-center mb-2">
               <Zap className="w-4 h-4 text-cosmic-amber" />
             </div>
-            <p className="text-2xl font-bold font-heading">{data.metrics.votesPerHour}</p>
-            <p className="text-xs text-cosmic-muted">Votes / Hour</p>
+            <p className="text-2xl font-bold font-heading">{data.metrics.ballotsLast24h}</p>
+            <p className="text-xs text-cosmic-muted">Ballots in the last 24 h</p>
           </CardContent>
         </Card>
 
@@ -366,8 +364,8 @@ export default function PulsePage() {
             <div className="w-8 h-8 rounded-lg bg-cosmic-teal/10 flex items-center justify-center mb-2">
               <Users className="w-4 h-4 text-cosmic-teal" />
             </div>
-            <p className="text-2xl font-bold font-heading">{data.metrics.participationRate}%</p>
-            <p className="text-xs text-cosmic-muted">Participation Rate</p>
+            <p className="text-2xl font-bold font-heading">{data.metrics.votersLast7d}</p>
+            <p className="text-xs text-cosmic-muted">People who voted this week</p>
           </CardContent>
         </Card>
       </div>

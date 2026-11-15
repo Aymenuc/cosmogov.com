@@ -1,110 +1,123 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { apiFailure, apiUser } from '@/lib/api-server';
+import { proposalVisibility } from '@/lib/proposals-server';
 
+const DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * The community's pulse, counted from real records the person may see.
+ * Totals only: no individual ballot choice leaves the server, and nothing
+ * here is simulated.
+ */
 export async function GET() {
-  const session = await getSession();
-  // Auth optional for pulse data, but we check if logged in
-
   try {
-    // Get real proposals data
-    const [activeProposals, recentVotes, totalVotes, totalUsers] = await Promise.all([
-      db.proposal.findMany({
-        where: { status: 'active' },
-        select: { id: true, title: true, status: true, votes: { select: { option: true } }, createdAt: true },
-        take: 10,
-        orderBy: { createdAt: 'desc' },
-      }),
-      db.vote.findMany({
-        take: 20,
-        orderBy: { createdAt: 'desc' },
-        select: { id: true, option: true, createdAt: true, proposal: { select: { title: true } } },
-      }),
-      db.vote.count(),
-      db.user.count(),
-    ]);
+    const user = await apiUser();
+    const visible = proposalVisibility(user.id);
+    const now = Date.now();
+    const since24h = new Date(now - DAY);
+    const since7d = new Date(now - 7 * DAY);
 
-    // Calculate sentiment based on active proposals
-    let positiveVotes = 0;
-    let negativeVotes = 0;
-    let neutralVotes = 0;
+    const [activeCount, activeProposals, ballotsLast24h, leaning, voters, recentBallots, recentlyClosed] =
+      await Promise.all([
+        db.proposal.count({ where: { ...visible, status: 'active' } }),
+        db.proposal.findMany({
+          where: { ...visible, status: 'active' },
+          select: { id: true, title: true, status: true, createdAt: true, _count: { select: { votes: true } } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        }),
+        db.vote.count({ where: { createdAt: { gte: since24h }, proposal: visible } }),
+        db.vote.groupBy({
+          by: ['option'],
+          where: { proposal: { ...visible, status: 'active' } },
+          _count: { _all: true },
+        }),
+        db.vote.findMany({
+          where: { createdAt: { gte: since7d }, proposal: visible },
+          distinct: ['voterId'],
+          select: { voterId: true },
+        }),
+        db.vote.groupBy({
+          by: ['proposalId'],
+          where: { createdAt: { gte: since24h }, proposal: visible },
+          _count: { _all: true },
+          _max: { createdAt: true },
+          orderBy: { _max: { createdAt: 'desc' } },
+          take: 8,
+        }),
+        db.proposal.findMany({
+          where: { ...visible, status: 'closed', updatedAt: { gte: since7d } },
+          select: { id: true, title: true, updatedAt: true },
+          orderBy: { updatedAt: 'desc' },
+          take: 4,
+        }),
+      ]);
 
-    for (const proposal of activeProposals) {
-      for (const vote of proposal.votes) {
-        if (vote.option === 'yes' || vote.option === 'for') positiveVotes++;
-        else if (vote.option === 'no' || vote.option === 'against') negativeVotes++;
-        else neutralVotes++;
-      }
+    // Leaning on open proposals: share of "for" among their ballots.
+    let forVotes = 0;
+    let againstVotes = 0;
+    let otherVotes = 0;
+    for (const row of leaning) {
+      const n = row._count._all;
+      if (row.option === 'yes' || row.option === 'for') forVotes += n;
+      else if (row.option === 'no' || row.option === 'against') againstVotes += n;
+      else otherVotes += n;
     }
+    const totalOpen = forVotes + againstVotes + otherVotes;
+    const score = totalOpen > 0 ? Math.round((forVotes / totalOpen) * 100) : 50;
+    const mood =
+      totalOpen === 0 ? 'No ballots yet' : score >= 60 ? 'Mostly for' : score <= 40 ? 'Mostly against' : 'Split';
 
-    const totalProposalVotes = positiveVotes + negativeVotes + neutralVotes;
-    const sentimentScore = totalProposalVotes > 0
-      ? Math.round((positiveVotes / totalProposalVotes) * 100)
-      : 50;
+    const titles = new Map(
+      (
+        await db.proposal.findMany({
+          where: { id: { in: recentBallots.map((r) => r.proposalId) } },
+          select: { id: true, title: true },
+        })
+      ).map((p) => [p.id, p.title]),
+    );
 
-    // Determine mood
-    let mood = 'Neutral';
-    let moodColor = '#9B5CFF';
-    if (sentimentScore >= 70) { mood = 'Optimistic'; moodColor = '#2EE6C7'; }
-    else if (sentimentScore >= 55) { mood = 'Cautiously Positive'; moodColor = '#FFB547'; }
-    else if (sentimentScore >= 45) { mood = 'Divided'; moodColor = '#9B5CFF'; }
-    else if (sentimentScore >= 30) { mood = 'Cautious'; moodColor = '#FFB547'; }
-    else { mood = 'Pessimistic'; moodColor = '#FF5E8A'; }
-
-    // Voting velocity (votes in last hour - synthetic for demo)
-    const votesPerHour = Math.max(1, Math.round(totalVotes / Math.max(1, totalUsers) * 2.5));
-
-    // Participation rate
-    const participationRate = totalUsers > 0 ? Math.min(100, Math.round((totalVotes / totalUsers) * 15)) : 0;
-
-    // Generate mock activity feed
     const activityFeed = [
-      ...(recentVotes.slice(0, 8).map((v, i) => ({
-        id: `vote-${v.id}`,
+      ...recentBallots.map((r) => ({
+        id: `ballots-${r.proposalId}`,
         type: 'vote' as const,
-        description: `Vote cast on "${v.proposal.title}"`,
-        detail: v.option,
-        timestamp: new Date(v.createdAt).toISOString(),
-      }))),
-      ...(activeProposals.slice(0, 4).map((p, i) => ({
+        description: `${r._count._all} ${r._count._all === 1 ? 'ballot' : 'ballots'} cast on "${titles.get(r.proposalId) ?? 'a proposal'}" today`,
+        detail: `+${r._count._all}`,
+        timestamp: (r._max.createdAt ?? new Date()).toISOString(),
+      })),
+      ...activeProposals.slice(0, 4).map((p) => ({
         id: `proposal-${p.id}`,
         type: 'proposal' as const,
-        description: `"${p.title}" is now active`,
-        detail: `${p.votes.length} votes`,
-        timestamp: new Date(p.createdAt).toISOString(),
-      }))),
+        description: `"${p.title}" is open for votes`,
+        detail: `${p._count.votes} ${p._count.votes === 1 ? 'ballot' : 'ballots'}`,
+        timestamp: p.createdAt.toISOString(),
+      })),
+      ...recentlyClosed.map((p) => ({
+        id: `closed-${p.id}`,
+        type: 'pass' as const,
+        description: `"${p.title}" closed`,
+        detail: 'Closed',
+        timestamp: p.updatedAt.toISOString(),
+      })),
     ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    // Add synthetic events for demo
-    const syntheticEvents = [
-      { id: 'synth-1', type: 'pass' as const, description: 'Proposal "Budget Allocation Q2" passed with 87% approval', detail: '87%', timestamp: new Date(Date.now() - 300000).toISOString() },
-      { id: 'synth-2', type: 'streak' as const, description: 'New 7-day voting streak achieved!', detail: '🔥', timestamp: new Date(Date.now() - 600000).toISOString() },
-      { id: 'synth-3', type: 'vote' as const, description: '5 new votes cast in the last hour', detail: '+5', timestamp: new Date(Date.now() - 900000).toISOString() },
-    ];
-
     return NextResponse.json({
-      sentiment: {
-        score: sentimentScore,
-        mood,
-        moodColor,
-      },
+      sentiment: { score, mood },
       metrics: {
-        activeProposals: activeProposals.length,
-        totalVotes,
-        votesPerHour,
-        participationRate,
-        totalUsers,
+        activeProposals: activeCount,
+        ballotsLast24h,
+        votersLast7d: voters.length,
       },
-      proposals: activeProposals.map(p => ({
+      proposals: activeProposals.map((p) => ({
         id: p.id,
         title: p.title,
-        voteCount: p.votes.length,
+        voteCount: p._count.votes,
         status: p.status,
       })),
-      activityFeed: [...syntheticEvents, ...activityFeed],
+      activityFeed,
     });
   } catch (error) {
-    console.error('Pulse error:', error);
-    return NextResponse.json({ error: 'Failed to load pulse data' }, { status: 500 });
+    return apiFailure(error);
   }
 }

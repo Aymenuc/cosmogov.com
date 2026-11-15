@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { debateVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { AND: [debateVisibility(session.id)] };
     if (status) where.status = status;
 
     const debates = await db.debateSession.findMany({

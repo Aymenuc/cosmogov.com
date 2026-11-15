@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { apiUser, apiFailure } from '@/lib/api-server';
+import { proposalVisibility } from '@/lib/proposals-server';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -133,6 +135,18 @@ function resolveLocationNames(
 
 export async function GET(request: NextRequest) {
   try {
+    // Signed-in only, and only what this person may see: organization
+    // proposals and processes stay inside their communities, private
+    // assemblies and debates stay with their creators.
+    const user = await apiUser();
+    const ownOrPublic = { OR: [{ isPublic: true }, { createdBy: user.id }] };
+    const processVisible = {
+      OR: [
+        { isPublic: true },
+        { createdBy: user.id },
+        { organization: { memberships: { some: { userId: user.id } } } },
+      ],
+    };
     const { searchParams } = new URL(request.url);
 
     // Required parameter
@@ -180,7 +194,7 @@ export async function GET(request: NextRequest) {
     // ─── Proposals ────────────────────────────────────────────────────────
     if (requestedTypes.includes('proposal')) {
       const proposals = await db.proposal.findMany({
-        where: locationFilter,
+        where: { ...locationFilter, ...proposalVisibility(user.id) },
         include: {
           _count: { select: { votes: true } },
           creator: { select: { name: true, avatarUrl: true } },
@@ -189,7 +203,7 @@ export async function GET(request: NextRequest) {
       });
 
       activeProposalCount = await db.proposal.count({
-        where: { ...locationFilter, status: 'active' },
+        where: { ...locationFilter, ...proposalVisibility(user.id), status: 'active' },
       });
 
       for (const p of proposals) {
@@ -212,7 +226,7 @@ export async function GET(request: NextRequest) {
     // ─── Participatory Processes ──────────────────────────────────────────
     if (requestedTypes.includes('process')) {
       const processes = await db.participatoryProcess.findMany({
-        where: locationFilter,
+        where: { ...locationFilter, ...processVisible },
         include: {
           _count: { select: { processProposals: true } },
           creator: { select: { name: true, avatarUrl: true } },
@@ -221,7 +235,7 @@ export async function GET(request: NextRequest) {
       });
 
       activeProcessCount = await db.participatoryProcess.count({
-        where: { ...locationFilter, currentPhase: { notIn: ['closed', 'evaluation'] } },
+        where: { ...locationFilter, ...processVisible, currentPhase: { notIn: ['closed', 'evaluation'] } },
       });
 
       for (const proc of processes) {
@@ -244,7 +258,7 @@ export async function GET(request: NextRequest) {
     // ─── Assemblies ───────────────────────────────────────────────────────
     if (requestedTypes.includes('assembly')) {
       const assemblies = await db.assembly.findMany({
-        where: locationFilter,
+        where: { ...locationFilter, ...ownOrPublic },
         include: {
           creator: { select: { name: true, avatarUrl: true } },
         },
@@ -329,7 +343,7 @@ export async function GET(request: NextRequest) {
     // ─── Debate Sessions ──────────────────────────────────────────────────
     if (requestedTypes.includes('debate')) {
       const debates = await db.debateSession.findMany({
-        where: locationFilter,
+        where: { ...locationFilter, ...ownOrPublic },
         include: {
           creator: { select: { name: true, avatarUrl: true } },
         },
@@ -383,10 +397,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('[GEO_LOCATION_ACTIVITIES_ERROR]', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch location activities' },
-      { status: 500 }
-    );
+    return apiFailure(error);
   }
 }
