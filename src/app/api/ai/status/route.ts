@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chatCompletionsCreate, aiProviderHost } from '@/lib/ai-completions';
 import { apiFailure, rateLimit, requestClient } from '@/lib/api-server';
+import { spendAi } from '@/lib/ai-budget';
 
 // Public health check: is the AI helper actually answering? It returns only
 // on/off, never content. The check is a one-word completion, cached for ten
@@ -16,9 +17,16 @@ export async function GET(req: NextRequest) {
     if (cached && Date.now() - cached.at < TTL_MS) return NextResponse.json(cached.body);
 
     const configured = Boolean(process.env.Z_AI_BASE_URL?.trim() && process.env.Z_AI_API_KEY?.trim());
-    let status: 'on' | 'off' | 'error' = 'off';
+    let status: 'on' | 'off' | 'error' | 'paused' = 'off';
     let model: string | null = null;
     if (configured) {
+      try {
+        await spendAi('status', null);
+      } catch {
+        status = 'paused';
+      }
+    }
+    if (configured && status !== 'paused') {
       try {
         const reply = await chatCompletionsCreate({
           messages: [{ role: 'user', content: 'Reply with the single word OK.' }],

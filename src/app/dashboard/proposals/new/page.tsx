@@ -35,6 +35,7 @@ export default function CreateProposalPage() {
       });
       const data = await res.json();
       if (data.content) setDescription(data.content);
+      else if (data.error) window.alert(data.error);
     } catch {}
     setAiLoading(false);
   };

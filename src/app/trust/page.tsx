@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PublicPage, { PublicContents } from "@/components/PublicPage";
+import { AI_LIMITS, AI_SITE_DAILY_LIMIT } from "@/lib/ai-limits";
 
 export const metadata: Metadata = {
   title: "Security, privacy and AI | Cosmogov",
@@ -154,10 +155,19 @@ export default function TrustPage() {
               <li>On contested choices the helpers lay out options and trade-offs, without taking sides.</li>
               <li>The AI can't see ballots or private spaces. In missions it works only from the sources members add.</li>
               <li>
-                Each person has hourly limits: 30 assistant messages, 12 mission AI runs
-                and 40 debate posts. Mission runs record which provider, model and
-                instructions produced each draft.
+                The assistant only helps with community matters. It turns down general
+                chat, code, homework and similar requests, remembers only the last few
+                turns, and keeps answers short.
               </li>
+              <li>
+                Each person has AI allowances: {AI_LIMITS.assistant.hour} assistant
+                questions an hour and {AI_LIMITS.assistant.day} a day,{" "}
+                {AI_LIMITS.mission.hour} mission AI runs an hour and {AI_LIMITS.mission.day} a
+                day, and {AI_LIMITS.debate.hour} debate helper replies an hour and{" "}
+                {AI_LIMITS.debate.day} a day. The whole site stops using AI for the day after{" "}
+                {AI_SITE_DAILY_LIMIT} requests. Debate posts are capped at 40 an hour.
+              </li>
+              <li>Mission runs record which provider, model and instructions produced each draft.</li>
             </ul>
           </section>
 

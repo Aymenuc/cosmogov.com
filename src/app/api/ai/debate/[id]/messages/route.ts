@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { chatCompletionsCreate } from '@/lib/ai-completions';
-import { apiFailure, rateLimit } from '@/lib/api-server';
+import { ApiError, apiFailure, rateLimit } from '@/lib/api-server';
+import { spendAi } from '@/lib/ai-budget';
 import { debateVisibility } from '@/lib/visibility';
 import { AI_GROUND_RULES } from '@/lib/ai-rules';
 import { ensureAiAgents } from '@/lib/ai-agents';
@@ -272,6 +273,15 @@ export async function POST(
 
     // Generate responses from each triggered agent
     for (const agent of respondingAgents) {
+      // Each helper reply spends from the poster's AI budget and the site's.
+      // When it runs out, the person's message still goes through; the
+      // helpers just stay quiet.
+      try {
+        await spendAi('debate', session.id);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 429) break;
+        throw error;
+      }
       const agentResponse = await getAgentResponse(
         agent.systemPrompt,
         contextForDecision,

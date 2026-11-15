@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { spendAi } from "@/lib/ai-budget";
 import { aiModelMetadata } from "@/lib/ai-completions";
 import { MISSION_PROMPT_VERSION } from "@/lib/missions/ai";
 import { Prisma } from "@prisma/client";
@@ -47,6 +48,8 @@ export async function POST(
     const { canManage } = await accessMission(id, user.id);
     requireManager(canManage);
     const { stage, webSearch } = runSchema.parse(await req.json());
+    // Daily and site-wide AI allowance (the hourly 12-run limit is below).
+    await spendAi("mission", user.id);
     const now = new Date();
     lease = new Date(now.getTime() + 110_000);
     const reserved = await db.$transaction(

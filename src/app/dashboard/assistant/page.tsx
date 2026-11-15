@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { AI_LIMITS } from '@/lib/ai-limits';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +12,9 @@ import {
   Zap, Trash2
 } from 'lucide-react';
 
-interface Message { role: 'user' | 'assistant'; content: string; timestamp: number; }
+interface Message { role: 'user' | 'assistant'; content: string; timestamp: number; isError?: boolean; }
+
+const DAILY_QUESTIONS = AI_LIMITS.assistant.day;
 
 const modes = [
   { id: 'chat', name: 'Chat', icon: MessageSquare, desc: 'Questions about taking part', color: 'cosmic-accent' },
@@ -35,6 +38,7 @@ export default function AssistantPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,17 +58,19 @@ export default function AssistantPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode,
-          messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
+          // Only recent turns: the helper has a short memory on purpose.
+          messages: [...messages, userMsg].filter(m => !m.isError).slice(-6).map(m => ({ role: m.role, content: m.content })),
         }),
       });
       const data = await res.json();
       if (data.content) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.content, timestamp: Date.now() }]);
+        if (typeof data.remainingToday === 'number') setRemaining(data.remainingToday);
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.error || 'I couldn\'t generate a response. Please try again.', timestamp: Date.now() }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: data.error || 'I couldn\'t generate a response. Please try again.', timestamp: Date.now(), isError: true }]);
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Network error. Please check your connection and try again.', timestamp: Date.now() }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Network error. Please check your connection and try again.', timestamp: Date.now(), isError: true }]);
     }
     setLoading(false);
   };
@@ -187,7 +193,8 @@ export default function AssistantPage() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            placeholder={mode === 'chat' ? 'Ask about governance...' : mode === 'proposal_draft' ? 'Describe the proposal you want to create...' : mode === 'analysis' ? 'Ask me to analyze voting data...' : 'Ask for governance coaching...'}
+            placeholder={mode === 'chat' ? 'Ask about a community matter...' : mode === 'proposal_draft' ? 'Describe the proposal you want to create...' : mode === 'analysis' ? 'Describe the options your community is weighing...' : 'Ask about running a fair meeting...'}
+            maxLength={1500}
             className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 resize-none pr-10"
             rows={2}
           />
@@ -197,6 +204,10 @@ export default function AssistantPage() {
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </Button>
       </div>
+      <p className="mt-2 text-[11px] text-cosmic-muted">
+        For community matters only, up to {DAILY_QUESTIONS} questions a day
+        {remaining !== null ? ` · ${remaining} left today` : ''}.
+      </p>
     </div>
   );
 }
