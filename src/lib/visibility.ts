@@ -34,3 +34,12 @@ export const debateVisibility = (
     { participants: { some: { userId } } },
   ],
 });
+
+/**
+ * Items that may sit inside a process (surveys, legislation, meetings,
+ * initiatives, assemblies): standalone ones follow their own rules; ones
+ * inside a private process are visible only to people who can see it.
+ */
+export const inVisibleProcess = (userId: string) => ({
+  OR: [{ processId: null }, { process: processVisibility(userId) }],
+});

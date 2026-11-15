@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess, processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { process: processVisibility(viewer.id) };
     if (processId) where.processId = processId;
     if (status) where.status = status;
     if (category) where.category = category;

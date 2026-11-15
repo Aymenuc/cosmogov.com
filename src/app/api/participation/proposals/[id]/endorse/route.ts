@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -21,8 +22,8 @@ export async function POST(
     }
 
     // Check proposal exists
-    const proposal = await db.processProposal.findUnique({
-      where: { id },
+    const proposal = await db.processProposal.findFirst({
+      where: { id, process: processVisibility(session.id) },
       select: { id: true, processId: true, status: true },
     });
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess, processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     const assemblyId = searchParams.get('assemblyId');
     const processId = searchParams.get('processId');
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { AND: [inVisibleProcess(viewer.id)] };
 
     if (type && type !== 'all') where.type = type;
     if (assemblyId) where.assemblyId = assemblyId;

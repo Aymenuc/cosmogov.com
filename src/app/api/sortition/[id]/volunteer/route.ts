@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -14,7 +15,7 @@ export async function POST(
     const body = await request.json();
     const { demographics, motivation } = body;
 
-    const pool = await db.sortitionPool.findUnique({ where: { id } });
+    const pool = await db.sortitionPool.findFirst({ where: { id, ...inVisibleProcess(session.id) } });
     if (!pool) {
       return NextResponse.json({ error: 'Sortition pool not found' }, { status: 404 });
     }

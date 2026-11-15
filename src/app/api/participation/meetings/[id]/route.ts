@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess, processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -11,8 +12,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
     const session = await getSession();
 
-    const meeting = await db.meeting.findUnique({
-      where: { id },
+    const meeting = await db.meeting.findFirst({
+      where: { id, ...inVisibleProcess(viewer.id) },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         assembly: { select: { id: true, name: true, slug: true } },

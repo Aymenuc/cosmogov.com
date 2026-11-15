@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -15,8 +16,15 @@ export async function POST(
       return NextResponse.json({ error: 'Answers are required' }, { status: 400 });
     }
 
-    const survey = await db.survey.findUnique({
-      where: { id },
+    // Surveys inside a private process only accept answers from people who can see it.
+    const viewer = await getSession();
+    const survey = await db.survey.findFirst({
+      where: {
+        id,
+        ...(viewer
+          ? inVisibleProcess(viewer.id)
+          : { OR: [{ processId: null }, { process: { isPublic: true } }] }),
+      },
       include: { questions: { orderBy: { sortOrder: 'asc' } } },
     });
 

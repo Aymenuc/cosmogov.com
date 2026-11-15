@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess, processVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get('search');
     const sort = searchParams.get('sort') || 'newest';
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { AND: [inVisibleProcess(viewer.id)] };
 
     if (status && status !== 'all') {
       if (status === 'active') {

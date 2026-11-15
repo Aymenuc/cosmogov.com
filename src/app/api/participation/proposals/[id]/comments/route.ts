@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { processVisibility } from '@/lib/visibility';
 
 export async function GET(
   req: NextRequest,
@@ -16,6 +17,13 @@ export async function GET(
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
+
+    // Only comments on proposals in processes this person may see.
+    const visible = await db.processProposal.findFirst({
+      where: { id, process: processVisibility(viewer.id) },
+      select: { id: true },
+    });
+    if (!visible) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     const [comments, total] = await Promise.all([
       db.processComment.findMany({
@@ -56,7 +64,7 @@ export async function POST(
     }
 
     // Check proposal exists
-    const proposal = await db.processProposal.findUnique({ where: { id } });
+    const proposal = await db.processProposal.findFirst({ where: { id, process: processVisibility(session.id) } });
     if (!proposal) {
       return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
     }

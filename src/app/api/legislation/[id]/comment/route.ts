@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     // Verify legislation exists
-    const legislation = await db.legislation.findUnique({ where: { id } });
+    const legislation = await db.legislation.findFirst({ where: { id, ...inVisibleProcess(session.id) } });
     if (!legislation) return NextResponse.json({ error: 'Legislation not found' }, { status: 404 });
 
     const comment = await db.legislationComment.create({

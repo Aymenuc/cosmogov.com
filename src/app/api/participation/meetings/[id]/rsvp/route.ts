@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const body = await request.json();
     const { role } = body;
 
-    const meeting = await db.meeting.findUnique({ where: { id } });
+    const meeting = await db.meeting.findFirst({ where: { id, ...inVisibleProcess(session.id) } });
     if (!meeting) return NextResponse.json({ error: 'Meeting not found' }, { status: 404 });
 
     if (meeting.status === 'completed' || meeting.status === 'cancelled') {
