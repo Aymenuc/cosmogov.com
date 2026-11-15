@@ -515,7 +515,7 @@ export default function AccountabilityPage() {
                                       Due{" "}
                                       {new Date(
                                         milestone.dueDate,
-                                      ).toLocaleDateString()}
+                                      ).toLocaleDateString('en-GB')}
                                     </span>
                                   )}
                                   {milestone.completedAt && (
@@ -523,7 +523,7 @@ export default function AccountabilityPage() {
                                       <CheckCircle2 className="w-2.5 h-2.5" />
                                       {new Date(
                                         milestone.completedAt,
-                                      ).toLocaleDateString()}
+                                      ).toLocaleDateString('en-GB')}
                                     </span>
                                   )}
                                 </div>

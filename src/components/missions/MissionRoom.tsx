@@ -1202,7 +1202,7 @@ export default function MissionRoom({
                               )}
                               <small>
                                 {item.actor} ·{" "}
-                                {new Date(item.at).toLocaleDateString()}
+                                {new Date(item.at).toLocaleDateString('en-GB')}
                               </small>
                             </div>
                           ))}

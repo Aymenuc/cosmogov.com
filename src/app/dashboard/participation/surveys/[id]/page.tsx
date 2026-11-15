@@ -249,7 +249,7 @@ export default function SurveyDetailPage() {
               <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                 <Clock className="w-3.5 h-3.5" />
                 {new Date(survey.closesAt) > new Date()
-                  ? `Closes ${new Date(survey.closesAt).toLocaleDateString()}`
+                  ? `Closes ${new Date(survey.closesAt).toLocaleDateString('en-GB')}`
                   : 'Closed'}
               </div>
             )}

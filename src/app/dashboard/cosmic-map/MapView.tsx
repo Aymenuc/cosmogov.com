@@ -14,6 +14,7 @@ import {
   createClusterIcon,
   createPopupContent,
   createHomeIcon,
+  createHomeLabelIcon,
   createBloomIcon,
   createBloomPopup,
   clusterMarkers,
@@ -85,6 +86,7 @@ export default function MapView({
   const clusterLayerRef = useRef<L.LayerGroup | null>(null);
   const bloomsLayerRef = useRef<L.LayerGroup | null>(null);
   const homeMarkerRef = useRef<L.Marker | null>(null);
+  const homeLabelRef = useRef<L.Marker | null>(null);
   const myLocationMarkerRef = useRef<L.Marker | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Pins pop in the first time they appear, not on every pan. */
@@ -249,6 +251,8 @@ export default function MapView({
     if (!mapRef.current) return;
     homeMarkerRef.current?.remove();
     homeMarkerRef.current = null;
+    homeLabelRef.current?.remove();
+    homeLabelRef.current = null;
     if (!home) return;
     homeMarkerRef.current = L.marker([home.lat, home.lng], {
       icon: createHomeIcon(home.homeId, home.cityName),
@@ -256,6 +260,13 @@ export default function MapView({
       // Under the activity pins: the house is the backdrop, activities stay clickable.
       zIndexOffset: -1000,
       keyboard: false,
+    }).addTo(mapRef.current);
+    // The name tag rides above everything so pins never cover it.
+    homeLabelRef.current = L.marker([home.lat, home.lng], {
+      icon: createHomeLabelIcon(home.cityName),
+      interactive: false,
+      keyboard: false,
+      zIndexOffset: 2000,
     }).addTo(mapRef.current);
   }, [home?.lat, home?.lng, home?.homeId, home?.cityName]);
 

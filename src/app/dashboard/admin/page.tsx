@@ -393,7 +393,7 @@ export default function AdminPortalPage() {
                           <span className="text-cosmic-muted text-xs ml-1">Lv.{u.level}</span>
                         </td>
                         <td className="py-3 px-2 text-xs text-cosmic-muted">
-                          {new Date(u.createdAt).toLocaleDateString()}
+                          {new Date(u.createdAt).toLocaleDateString('en-GB')}
                         </td>
                         <td className="py-3 px-2">
                           <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground h-7 text-xs">
@@ -428,7 +428,7 @@ export default function AdminPortalPage() {
                       <div className="grid grid-cols-3 gap-2 text-center text-xs mb-3">
                         <div><span className="text-cosmic-amber font-bold">{u.totalXp} XP</span><br/><span className="text-cosmic-muted">XP</span></div>
                         <div><span className="font-bold">Lv.{u.level}</span><br/><span className="text-cosmic-muted">Level</span></div>
-                        <div><span className="font-bold">{new Date(u.createdAt).toLocaleDateString()}</span><br/><span className="text-cosmic-muted">Joined</span></div>
+                        <div><span className="font-bold">{new Date(u.createdAt).toLocaleDateString('en-GB')}</span><br/><span className="text-cosmic-muted">Joined</span></div>
                       </div>
                       <div className="flex items-center justify-between">
                         <select
@@ -491,7 +491,7 @@ export default function AdminPortalPage() {
                         </div>
                         <p className="text-sm font-medium">{m.subject}</p>
                       </div>
-                      <span className="text-xs text-cosmic-muted">{new Date(m.createdAt).toLocaleDateString()}</span>
+                      <span className="text-xs text-cosmic-muted">{new Date(m.createdAt).toLocaleDateString('en-GB')}</span>
                     </div>
                     <p className="text-sm text-cosmic-muted mb-3">{m.message}</p>
                     {m.reply && (
@@ -600,7 +600,7 @@ export default function AdminPortalPage() {
                           </Badge>
                         </td>
                         <td className="py-3 px-2 text-xs text-cosmic-muted">
-                          {new Date(r.periodStart).toLocaleDateString()} - {new Date(r.periodEnd).toLocaleDateString()}
+                          {new Date(r.periodStart).toLocaleDateString('en-GB')} - {new Date(r.periodEnd).toLocaleDateString('en-GB')}
                         </td>
                       </tr>
                     ))}
@@ -623,7 +623,7 @@ export default function AdminPortalPage() {
                         <span className="text-sm font-medium text-cosmic-amber">${(r.amount / 100).toFixed(2)}</span>
                       </div>
                       <p className="text-xs text-cosmic-muted">
-                        {new Date(r.periodStart).toLocaleDateString()} - {new Date(r.periodEnd).toLocaleDateString()}
+                        {new Date(r.periodStart).toLocaleDateString('en-GB')} - {new Date(r.periodEnd).toLocaleDateString('en-GB')}
                       </p>
                     </CardContent>
                   </Card>

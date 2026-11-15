@@ -57,7 +57,7 @@ export default function MissionOutcomes() {
                 <p>{evidence.note}</p>
                 <small>
                   {evidence.actor} ·{" "}
-                  {new Date(evidence.at).toLocaleDateString()}
+                  {new Date(evidence.at).toLocaleDateString('en-GB')}
                 </small>
               </div>
             ))}
@@ -89,7 +89,7 @@ export default function MissionOutcomes() {
               <strong>{request.title}</strong>
               <span className={request.overdue ? "mission-overdue" : ""}>
                 {request.responseDeadline
-                  ? `${request.overdue ? "Overdue since" : "Requested by"} ${new Date(request.responseDeadline).toLocaleDateString()}`
+                  ? `${request.overdue ? "Overdue since" : "Requested by"} ${new Date(request.responseDeadline).toLocaleDateString('en-GB')}`
                   : "No response deadline recorded"}
               </span>
               <ArrowUpRight size={15} />

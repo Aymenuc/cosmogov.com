@@ -134,6 +134,7 @@ const allLabels = [
     group.items.map(([label, href]) => [href, label]),
   ),
   ["/dashboard/settings", "Settings"],
+  ["/dashboard/search", "Search"],
   ["/dashboard/assistant", "AI assistant"],
   ["/dashboard/admin", "Administration"],
   ["/dashboard/gov-portal", "Government portal"],

@@ -26,7 +26,7 @@ type CivicRecord = {
 };
 
 const day = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  new Date(iso).toLocaleDateString('en-GB', { year: "numeric", month: "long", day: "numeric" });
 
 function hours(minutes: number): string {
   if (minutes <= 0) return "—";

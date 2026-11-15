@@ -59,15 +59,19 @@ export default function TemplateGallery({
           </article>
         ))}
       </div>
-      {!templates.length && !error && (
+      {!templates.length && !error ? (
+        <div className="template-empty">
+          <strong>No saved templates yet</strong>
+          <p>
+            When a plan or form works well, save it from its mission so other
+            groups can start from it. Responses and source excerpts are never copied.
+          </p>
+        </div>
+      ) : (
         <p className="mission-small">
-          When you have a reviewed plan or form worth reusing, save a template
-          from its mission. Responses and source excerpts are never copied.
+          Showing up to 50 templates you can access.
         </p>
       )}
-      <p className="mission-small">
-        Showing up to 50 templates you can access.
-      </p>
     </section>
   );
 }

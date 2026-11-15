@@ -2555,3 +2555,21 @@
   border-radius: 6px;
   padding: 3px 6px;
 }
+
+/* Empty template shelf: a dashed space waiting to be filled, not loose text. */
+.template-empty {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 2px dashed #d8d2e6;
+  border-radius: 18px;
+  background: #fffdf7;
+}
+.template-empty strong {
+  font-size: 15px;
+}
+.template-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: #69637c;
+}

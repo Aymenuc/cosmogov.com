@@ -307,7 +307,7 @@ export default function ProcessDetailPage() {
               {process.totalBudget > 0 && (
                 <div className="flex items-center gap-1 text-cosmic-amber"><Wallet className="w-3.5 h-3.5" /> {formatCurrency(process.totalBudget, process.currency)} budget</div>
               )}
-              <div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Started {new Date(process.createdAt).toLocaleDateString()}</div>
+              <div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Started {new Date(process.createdAt).toLocaleDateString('en-GB')}</div>
             </div>
           </div>
 
@@ -622,7 +622,7 @@ export default function ProcessDetailPage() {
                         <div className="flex items-center gap-3 mt-1 text-xs text-cosmic-muted">
                           <span className="capitalize">{milestone.status.replace('_', ' ')}</span>
                           {milestone.dueDate && (
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due {new Date(milestone.dueDate).toLocaleDateString()}</span>
+                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due {new Date(milestone.dueDate).toLocaleDateString('en-GB')}</span>
                           )}
                         </div>
                       </div>
@@ -651,7 +651,7 @@ export default function ProcessDetailPage() {
                   <div className="flex justify-between"><span className="text-cosmic-muted">Scope</span><span className="text-foreground capitalize">{process.scope}</span></div>
                   <div className="flex justify-between"><span className="text-cosmic-muted">Category</span><span className="text-foreground capitalize">{(process.category || 'General').replace('_', ' ')}</span></div>
                   <div className="flex justify-between"><span className="text-cosmic-muted">Current Phase</span><span className={PHASE_COLORS[process.currentPhase]}>{PHASE_LABELS[process.currentPhase]}</span></div>
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Created</span><span className="text-foreground">{new Date(process.createdAt).toLocaleDateString()}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Created</span><span className="text-foreground">{new Date(process.createdAt).toLocaleDateString('en-GB')}</span></div>
                   <div className="flex justify-between"><span className="text-cosmic-muted">Organizer</span><span className="text-foreground">{process.creator.name || 'Unknown'}</span></div>
                 </div>
               </CardContent>

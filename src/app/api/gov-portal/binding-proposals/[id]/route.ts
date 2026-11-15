@@ -69,7 +69,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const responderName = session.name || 'Government Official';
     const proposalLink = `/dashboard/participation/binding-proposals/${id}`;
-    const voteDateStr = voteDate ? new Date(voteDate).toLocaleDateString() : undefined;
+    const voteDateStr = voteDate ? new Date(voteDate).toLocaleDateString('en-GB') : undefined;
 
     // Create in-app notifications for all affected users
     for (const userId of notifiedUserIds) {

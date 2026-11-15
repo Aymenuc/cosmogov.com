@@ -309,7 +309,7 @@ export default function SortitionPage() {
                   {pool.selectionDate && (
                     <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
                       <Clock className="w-3 h-3" />
-                      Selected: {new Date(pool.selectionDate).toLocaleDateString()}
+                      Selected: {new Date(pool.selectionDate).toLocaleDateString('en-GB')}
                     </div>
                   )}
 

@@ -678,3 +678,38 @@ a.sticker-state:hover {
     width: 100%;
   }
 }
+
+/* Space between a section header and the "why" line / sticker card below it. */
+.workspace-shell .tool-hero-why {
+  margin-top: 6px;
+}
+
+/* Settings: the sign-out-everywhere block sits in its own card. */
+.settings-sessions .mission-panel {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.settings-sessions .mission-panel h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+.settings-sessions .mission-panel p {
+  margin: 0;
+  font-size: 13px;
+  color: #69637c;
+}
+
+.workspace-shell .leaderboard-grid {
+  margin-top: 20px;
+}
+
+.settings-sessions {
+  margin-bottom: 20px;
+}

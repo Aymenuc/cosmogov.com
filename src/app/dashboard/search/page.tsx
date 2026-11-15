@@ -100,9 +100,22 @@ function SearchResults({ initialQuery }: { initialQuery: string }) {
         <p className="text-sm text-cosmic-muted text-center">Searching...</p>
       )}
       {!loading && results.length === 0 && query && (
-        <p className="text-sm text-cosmic-muted text-center">
-          No results found
-        </p>
+        <div className="empty-state">
+          <span className="empty-icon">
+            <Search aria-hidden="true" />
+          </span>
+          <h3>Nothing matches “{query}”</h3>
+          <p>Try a shorter word, or look through proposals and your communities directly.</p>
+        </div>
+      )}
+      {!query.trim() && (
+        <div className="empty-state">
+          <span className="empty-icon">
+            <Search aria-hidden="true" />
+          </span>
+          <h3>Find a proposal or a community</h3>
+          <p>Type a few words, such as a street, a topic or a group&apos;s name.</p>
+        </div>
       )}
       <div className="space-y-2">
         {results.map((r, i) => {

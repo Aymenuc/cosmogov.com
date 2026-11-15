@@ -994,6 +994,9 @@ h2 em {
 .workspace-nav {
   overflow-y: auto;
   flex: 1;
+  /* Fade the list out above the bottom box instead of cutting items in half. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
   padding: 0 14px 18px;
   scrollbar-width: thin;
   scrollbar-color: #c5c2d0 transparent;

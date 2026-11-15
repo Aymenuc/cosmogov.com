@@ -302,7 +302,7 @@ export default function BindingProposalDetailPage() {
               Government Response
               {proposal.responseDate && (
                 <span className="text-xs text-cosmic-muted font-normal ml-2">
-                  {new Date(proposal.responseDate).toLocaleDateString()}
+                  {new Date(proposal.responseDate).toLocaleDateString('en-GB')}
                 </span>
               )}
             </h2>
@@ -410,7 +410,7 @@ export default function BindingProposalDetailPage() {
                       <p className="text-xs text-cosmic-muted mt-1">{sig.comment}</p>
                     )}
                     <span className="text-[10px] text-cosmic-muted/50 mt-1 block">
-                      {new Date(sig.createdAt).toLocaleDateString()}
+                      {new Date(sig.createdAt).toLocaleDateString('en-GB')}
                     </span>
                   </div>
                 </div>
@@ -430,7 +430,7 @@ export default function BindingProposalDetailPage() {
             <div>
               <h3 className="text-sm font-bold text-foreground">Government Response Deadline</h3>
               <p className="text-xs text-cosmic-muted mt-0.5">
-                The government must respond by {new Date(proposal.responseDeadline).toLocaleDateString()}.
+                The government must respond by {new Date(proposal.responseDeadline).toLocaleDateString('en-GB')}.
                 {new Date(proposal.responseDeadline) > new Date()
                   ? ` ${Math.ceil((new Date(proposal.responseDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days remaining.`
                   : ' The deadline has passed!'}
@@ -451,7 +451,7 @@ export default function BindingProposalDetailPage() {
               <div>
                 <h3 className="text-sm font-bold text-foreground">Scheduled Vote</h3>
                 <p className="text-xs text-cosmic-muted mt-0.5">
-                  This proposal will be put to vote on {new Date(proposal.voteDate).toLocaleDateString()}.
+                  This proposal will be put to vote on {new Date(proposal.voteDate).toLocaleDateString('en-GB')}.
                 </p>
               </div>
             </div>
@@ -470,7 +470,7 @@ export default function BindingProposalDetailPage() {
               <div>
                 <h3 className="text-sm font-bold text-foreground">Enacted into Law/Policy</h3>
                 <p className="text-xs text-cosmic-muted mt-0.5">
-                  This proposal was enacted on {new Date(proposal.enactmentDate).toLocaleDateString()}.
+                  This proposal was enacted on {new Date(proposal.enactmentDate).toLocaleDateString('en-GB')}.
                 </p>
               </div>
             </div>

@@ -1362,3 +1362,14 @@
     transform: none;
   }
 }
+
+/* Home name tag as its own marker, centred under the house. */
+.map-home-label-host {
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.map-home-label-host .map-home-label {
+  margin-top: 0;
+  white-space: nowrap;
+}

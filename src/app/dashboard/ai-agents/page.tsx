@@ -429,9 +429,6 @@ export default function AIAgentsPage() {
   const activeAgents = agents.filter(a => a.isActive).length;
   const activeDebates = debates.filter(d => d.status === 'active').length;
   const totalMessages = debates.reduce((sum, d) => sum + (d._count?.messages || 0), 0);
-  const avgConsensus = debates.length > 0
-    ? Math.round(debates.reduce((sum, d) => sum + (d.consensusLevel || 0), 0) / debates.length * 100)
-    : 0;
 
   /* ── Loading state ── */
   if (loading) {
@@ -475,10 +472,10 @@ export default function AIAgentsPage() {
       {/* ── Stats Bar ── */}
       <div className="workspace-tool-stats">
         {[
-          { label: 'Total Agents', value: agents.length || 6, icon: Bot, color: 'text-cosmic-accent', bg: 'bg-cosmic-accent/10', sub: `${activeAgents} active` },
-          { label: 'Active Debates', value: activeDebates, icon: MessageSquare, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10', sub: 'live now' },
-          { label: 'Messages Facilitated', value: totalMessages, icon: Zap, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10', sub: 'by AI agents' },
-          { label: 'Consensus Reached', value: avgConsensus, icon: CheckCircle2, color: 'text-cosmic-success', bg: 'bg-cosmic-success/10', sub: 'avg. level %' },
+          { label: 'AI helpers', value: agents.length, icon: Bot, color: 'text-cosmic-accent', bg: 'bg-cosmic-accent/10', sub: `${activeAgents} switched on` },
+          { label: 'Live debates', value: activeDebates, icon: MessageSquare, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10', sub: 'right now' },
+          { label: 'Debates held', value: debates.length, icon: CheckCircle2, color: 'text-cosmic-success', bg: 'bg-cosmic-success/10', sub: 'that you can see' },
+          { label: 'Messages', value: totalMessages, icon: Zap, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10', sub: 'from people and helpers' },
         ].map((stat) => (
           <motion.div
             key={stat.label}
@@ -501,8 +498,8 @@ export default function AIAgentsPage() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold font-heading">Meet the Agents</h2>
-            <p className="text-sm text-cosmic-muted mt-1">Each agent has a unique cosmic form and specialized capabilities</p>
+            <h2 className="text-xl font-bold font-heading">Meet the helpers</h2>
+            <p className="text-sm text-cosmic-muted mt-1">Each one has a single job, and none of them can vote or decide.</p>
           </div>
         </div>
 
@@ -562,7 +559,7 @@ export default function AIAgentsPage() {
                           key={cap}
                           className="text-[10px] px-2 py-0.5 rounded-full bg-foreground/5 border border-border text-cosmic-muted"
                         >
-                          {cap.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {(cap.replace(/_/g, ' ').charAt(0).toUpperCase() + cap.replace(/_/g, ' ').slice(1))}
                         </span>
                       ))}
                     </div>
@@ -589,30 +586,30 @@ export default function AIAgentsPage() {
       {/* ── How It Works Section ── */}
       <div id="how-it-works" className="scroll-mt-24">
         <div className="mb-6">
-          <h2 className="text-xl font-bold font-heading">How It Works</h2>
-          <p className="text-sm text-cosmic-muted mt-1">AI agents seamlessly integrate into your democratic process</p>
+          <h2 className="text-xl font-bold font-heading">How it works</h2>
+          <p className="text-sm text-cosmic-muted mt-1">People talk, the helpers support, people decide.</p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-3 sm:gap-6">
           {[
             {
               step: '01',
-              title: 'Join Assembly',
-              description: 'Enter an assembly hall and join a live debate session. AI agents are automatically activated to support the discussion.',
+              title: 'Join a debate',
+              description: 'Open the Assembly hall and start or join a debate. The helpers step in only when they can help.',
               icon: Users,
               color: '#2D6BFF',
             },
             {
               step: '02',
-              title: 'AI Agents Monitor & Facilitate',
+              title: 'Helpers support',
               description: 'Nexus keeps order, Lumen helps newcomers, Synthesis summarizes, Concord finds common ground, Babel translates, and Aegis ensures accessibility.',
               icon: Bot,
               color: '#2EE6C7',
             },
             {
               step: '03',
-              title: 'Reach Consensus Together',
-              description: 'With AI-guided deliberation, your assembly moves toward genuine agreement — measured in real-time by Concord\'s consensus visualization.',
+              title: 'People decide',
+              description: 'Read the summaries and options, then decide together. The helpers never vote, and nothing is decided for you.',
               icon: CheckCircle2,
               color: '#10b981',
             },

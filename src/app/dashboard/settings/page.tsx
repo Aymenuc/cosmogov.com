@@ -178,7 +178,11 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <SessionControls />
+          <Card className="bg-card border-border settings-sessions">
+            <CardContent className="p-6">
+              <SessionControls />
+            </CardContent>
+          </Card>
           <Card className="bg-card border-cosmic-rose/10">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-2 flex items-center gap-2 text-cosmic-rose">

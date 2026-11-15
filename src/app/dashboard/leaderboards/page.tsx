@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { tierName } from "@/lib/tiers";
 import WorkspaceHeading from "@/components/WorkspaceHeading";
 type Leader = { userId: string; name: string; score: number; tier: string };
 export default function LeaderboardsPage() {
@@ -42,11 +43,11 @@ export default function LeaderboardsPage() {
       ) : loading ? (
         <p role="status">Loading recorded activity…</p>
       ) : leaders.length ? (
-        <div className="mission-list-grid">
+        <div className="mission-list-grid leaderboard-grid">
           {leaders.map((leader, index) => (
             <article className="mission-template-card" key={leader.userId}>
               <span>
-                #{index + 1} · {leader.tier}
+                #{index + 1} · {tierName(leader.tier)}
               </span>
               <h2>{leader.name || "Community member"}</h2>
               <p>{leader.score.toLocaleString()} activity score</p>

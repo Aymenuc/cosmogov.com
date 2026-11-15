@@ -1,24 +1,14 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { tierFor, tierColor } from '@/lib/tiers';
 
 function getTier(score: number): string {
-  if (score <= 200) return 'Stardust';
-  if (score <= 400) return 'Nova';
-  if (score <= 600) return 'Pulsar';
-  if (score <= 800) return 'Quasar';
-  return 'Nebula';
+  return tierFor(score).name;
 }
 
 function getTierColor(tier: string): string {
-  switch (tier) {
-    case 'Stardust': return '#A7B3D6';
-    case 'Nova': return '#2EE6C7';
-    case 'Pulsar': return '#9B5CFF';
-    case 'Quasar': return '#FFB547';
-    case 'Nebula': return '#FF5E8A';
-    default: return '#A7B3D6';
-  }
+  return tierColor(tier);
 }
 
 export async function GET() {
@@ -107,7 +97,7 @@ export async function GET() {
       { id: 'community_host', name: 'Community Host', description: 'Start a community of your own', icon: 'users', earned: communitiesStarted >= 1 },
       { id: 'strategic_mind', name: 'Strategic Mind', description: 'High scores in Strategic Command', icon: 'shield', earned: gameResults.filter(g => g.gameSlug === 'strategic-command' && g.score >= 80).length >= 3 },
       { id: 'bias_hunter', name: 'Bias Hunter', description: 'Cognitive Warfare mastery', icon: 'alert-triangle', earned: gameResults.filter(g => g.gameSlug === 'cognitive-warfare' && g.score >= 80).length >= 3 },
-      { id: 'governance_guru', name: 'Governance Guru', description: 'Reach the highest reputation tier (Nebula)', icon: 'crown', earned: tier === 'Nebula' },
+      { id: 'governance_guru', name: 'Governance Guru', description: 'Reach the highest reputation tier (Cornerstone)', icon: 'crown', earned: tier === 'Cornerstone' },
     ];
 
     // --- Calculate percentile ---

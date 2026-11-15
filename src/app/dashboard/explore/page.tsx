@@ -9,6 +9,7 @@ import {
   Mountain, Eye, Activity, Map as MapIcon, Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import { Badge } from '@/components/ui/badge';
 
 /* ─── Types ─── */
@@ -444,65 +445,15 @@ export default function ExplorePage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 pb-8 overflow-x-hidden">
-      {/* ═══════════ HERO SECTION ═══════════ */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative overflow-hidden rounded-2xl sm:rounded-3xl glass-card p-4 sm:p-6 lg:p-8"
+      <WorkspaceHeading
+        look="explore"
+        title="Global explorer"
+        description={`Find community activity in any of ${allCountries.length} countries, 4,874 regions and 146,156 cities. Search a place, or browse by region below.`}
       >
-        {/* Background constellation */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-          <ConstellationGlobe />
-        </div>
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-center gap-4 sm:gap-8">
-          <div className="flex-1 text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Badge className="cosmic-badge rounded-full px-3 py-1 text-xs font-medium mb-4 inline-flex items-center gap-1.5">
-                <Compass className="w-3 h-3" /> COSMIC ATLAS
-              </Badge>
-            </motion.div>
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-heading mb-3 sm:mb-4">
-              <span className="text-gradient">Global Explorer</span>
-            </h1>
-            <p className="text-cosmic-muted text-sm sm:text-lg max-w-xl mb-4 sm:mb-6">
-              Discover governance activities in every country, region, and city on Earth
-            </p>
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-4 text-xs sm:text-sm">
-              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-foreground/5 border border-border">
-                <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cosmic-teal" />
-                <span className="text-foreground font-semibold">{allCountries.length}</span>
-                <span className="text-cosmic-muted">Countries</span>
-              </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-foreground/5 border border-border">
-                <Mountain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cosmic-violet" />
-                <span className="text-foreground font-semibold">4,874</span>
-                <span className="text-cosmic-muted">Regions</span>
-              </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-foreground/5 border border-border">
-                <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cosmic-amber" />
-                <span className="text-foreground font-semibold">146,156</span>
-                <span className="text-cosmic-muted">Cities</span>
-              </div>
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-cosmic-teal/20 to-cosmic-violet/20 text-foreground hover:from-cosmic-teal/30 hover:to-cosmic-violet/30 border border-border"
-                onClick={() => router.push('/dashboard/cosmic-map')}
-              >
-                <MapIcon className="w-4 h-4 mr-1.5" /> Open the community map
-              </Button>
-            </div>
-          </div>
-          <div className="hidden lg:block">
-            <ConstellationGlobe />
-          </div>
-        </div>
-      </motion.section>
+        <Button className="civic-button" onClick={() => router.push('/dashboard/cosmic-map')}>
+          <MapIcon className="w-4 h-4 mr-1.5" aria-hidden="true" /> Open the community map
+        </Button>
+      </WorkspaceHeading>
 
       {/* ═══════════ SEARCH BAR ═══════════ */}
       <motion.section

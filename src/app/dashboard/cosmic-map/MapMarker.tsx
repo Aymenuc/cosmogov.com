@@ -122,9 +122,8 @@ export function createClusterIcon(count: number, animate = false): L.DivIcon {
 export function createHomeIcon(homeId: HomeId, cityName: string | null): L.DivIcon {
   const label = cityName ? `Home · ${escapeHtml(cityName)}` : 'Home';
   const html = `
-    <div class="map-home map-pop">
+    <div class="map-home map-pop" title="${label}">
       ${homeSvg(homeId, 76)}
-      <span class="map-home-label">${label}</span>
     </div>`;
   return L.divIcon({
     html,
@@ -132,6 +131,17 @@ export function createHomeIcon(homeId: HomeId, cityName: string | null): L.DivIc
     iconSize: [120, 100],
     iconAnchor: [60, 78],
     popupAnchor: [0, -70],
+  });
+}
+
+/** The home's name tag, drawn as its own marker on top so pins can't hide it. */
+export function createHomeLabelIcon(cityName: string | null): L.DivIcon {
+  const label = cityName ? `Home · ${escapeHtml(cityName)}` : 'Home';
+  return L.divIcon({
+    html: `<span class="map-home-label">${label}</span>`,
+    className: 'map-pin-host map-home-label-host',
+    iconSize: [140, 24],
+    iconAnchor: [70, -2],
   });
 }
 

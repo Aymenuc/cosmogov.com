@@ -46,10 +46,13 @@ function PulseCanvas({ sentiment }: { sentiment: PulseData["sentiment"] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const sentimentRef = useRef(sentiment.score);
+  const hasBallots = sentiment.mood !== 'No ballots yet';
+  const hasBallotsRef = useRef(hasBallots);
 
   useEffect(() => {
     sentimentRef.current = sentiment.score;
-  }, [sentiment.score]);
+    hasBallotsRef.current = hasBallots;
+  }, [sentiment.score, hasBallots]);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -99,7 +102,9 @@ function PulseCanvas({ sentiment }: { sentiment: PulseData["sentiment"] }) {
       const sent = sentimentRef.current;
       let type: Particle['type'] = 'neutral';
       const rand = Math.random() * 100;
-      if (rand < sent) type = 'positive';
+      // With no ballots there is nothing to show: every dot stays neutral.
+      if (!hasBallotsRef.current) type = 'neutral';
+      else if (rand < sent) type = 'positive';
       else if (rand < sent + (100 - sent) / 2) type = 'negative';
       else type = 'neutral';
 
@@ -238,12 +243,19 @@ function PulseCanvas({ sentiment }: { sentiment: PulseData["sentiment"] }) {
     <figure className="workspace-pulse-panel">
       <canvas ref={canvasRef} className="w-full" style={{ height: '260px' }} aria-hidden="true" />
       <figcaption className="flex flex-wrap items-center gap-3 px-4 pb-4 text-xs text-cosmic-muted">
-        {Object.entries(pulseColors).map(([label, color]) => (
-          <span key={label} className="inline-flex items-center gap-1.5 capitalize">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
-            {label}
-          </span>
-        ))}
+        {hasBallots ? (
+          <>
+            {([['positive', 'For'], ['negative', 'Against'], ['neutral', 'Other choices']] as const).map(([key, label]) => (
+              <span key={key} className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: pulseColors[key] }} aria-hidden="true" />
+                {label}
+              </span>
+            ))}
+            <span>· The mix of ballots on open proposals</span>
+          </>
+        ) : (
+          <span>No ballots yet. The dots take colour as people vote on open proposals.</span>
+        )}
       </figcaption>
     </figure>
   );
@@ -372,7 +384,7 @@ export default function PulsePage() {
 
       <div className="grid lg:grid-cols-3 gap-3 sm:gap-6">
         {/* Live Activity Feed */}
-        <Card className="bg-card border-border lg:col-span-2">
+        <Card className="bg-card border-border lg:col-span-2 min-w-0">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold font-heading mb-4 flex items-center gap-2">
               <Activity className="w-5 h-5 text-cosmic-teal" /> Live Activity Feed
@@ -391,7 +403,7 @@ export default function PulsePage() {
                       <EventIcon className="w-4 h-4" style={{ color }} />
                     </div>
                     <div className="min-w-0 flex-grow">
-                      <p className="text-sm text-foreground">{event.description}</p>
+                      <p className="text-sm text-foreground [overflow-wrap:anywhere]">{event.description}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-[10px] border-border" style={{ color }}>
                           {event.detail}

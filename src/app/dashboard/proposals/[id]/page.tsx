@@ -235,7 +235,7 @@ export default function ProposalDetailPage() {
           <span>
             <Clock size={12} />
             Started{" "}
-            {new Date(proposal.createdAt).toLocaleDateString(undefined, {
+            {new Date(proposal.createdAt).toLocaleDateString('en-GB', {
               month: "short",
               day: "numeric",
               year: "numeric",
@@ -467,7 +467,7 @@ export default function ProposalDetailPage() {
                       <div>
                         <strong>{c.author.name || "Community member"}</strong>
                         <time dateTime={c.createdAt}>
-                          {new Date(c.createdAt).toLocaleDateString(undefined, {
+                          {new Date(c.createdAt).toLocaleDateString('en-GB', {
                             month: "short",
                             day: "numeric",
                           })}

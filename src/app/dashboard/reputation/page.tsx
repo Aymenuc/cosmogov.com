@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { tierColor, tierName } from '@/lib/tiers';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -105,7 +106,7 @@ function ScoreRing({ score, tierColor, tier }: { score: number; tierColor: strin
       // Background ring
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.strokeStyle = 'rgba(41,34,61,0.12)';
       ctx.lineWidth = lineWidth;
       ctx.stroke();
 
@@ -260,7 +261,7 @@ export default function ReputationPage() {
 
   const handleShare = () => {
     if (!data) return;
-    const text = `🌌 My Cosmic Reputation on CosmoGov:\n\n✨ Score: ${data.score}/1000\n🏆 Tier: ${data.tier}\n📊 Top ${100 - data.percentile}% of governance participants\n\nEarn your own cosmic score at www.cosmogov.com`;
+    const text = `My reputation on Cosmogov: ${data.score}/1000 (${tierName(data.tier)}). It grows when you help out in your community, never when you vote. www.cosmogov.com`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -316,14 +317,14 @@ export default function ReputationPage() {
       <Card className="bg-card border-border mb-8 overflow-hidden">
         <CardContent className="p-4 sm:p-8 flex flex-col items-center">
           <div className="mb-6" style={{ animation: 'scaleIn 0.6s ease-out' }}>
-            <ScoreRing score={data.score} tierColor={data.tierColor} tier={data.tier} />
+            <ScoreRing score={data.score} tierColor={data.tierColor} tier={tierName(data.tier)} />
           </div>
           <p className="text-cosmic-muted text-sm mb-6 text-center max-w-md">
             Your reputation grows when you open proposals, comment, help with mission tasks, join communities, keep showing up and play civic games. Votes and signatures are never counted.
           </p>
           <div className="flex items-center gap-3">
             <Button onClick={handleShare} className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-primary-foreground rounded-xl">
-              {copied ? <><CheckCircle className="w-4 h-4 mr-2" /> Copied!</> : <><Copy className="w-4 h-4 mr-2" /> Share Your Cosmic Score</>}
+              {copied ? <><CheckCircle className="w-4 h-4 mr-2" /> Copied!</> : <><Copy className="w-4 h-4 mr-2" /> Copy my score to share</>}
             </Button>
           </div>
         </CardContent>
@@ -348,17 +349,28 @@ export default function ReputationPage() {
         <Card className="bg-card border-border">
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold font-heading mb-4 flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-cosmic-amber" /> Your Ranking
+              <Trophy className="w-5 h-5 text-cosmic-amber" /> Where you stand
             </h3>
             <div className="text-center mb-4">
-              <p className="text-3xl font-bold font-heading" style={{ color: data.tierColor }}>
-                Top {100 - data.percentile}%
-              </p>
-              <p className="text-cosmic-muted text-sm mt-1">of governance participants</p>
+              {leaderboard.length >= 10 ? (
+                <>
+                  <p className="text-3xl font-bold font-heading" style={{ color: data.tierColor }}>
+                    Top {Math.max(1, 100 - data.percentile)}%
+                  </p>
+                  <p className="text-cosmic-muted text-sm mt-1">of people taking part</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl font-bold font-heading" style={{ color: data.tierColor }}>
+                    {tierName(data.tier)}
+                  </p>
+                  <p className="text-cosmic-muted text-sm mt-1">Rankings appear once more people take part.</p>
+                </>
+              )}
             </div>
             <div className="space-y-2">
               <div className="h-px bg-foreground/5 my-3" />
-              <p className="text-xs text-cosmic-muted uppercase tracking-wider mb-2">Top 5 Leaders</p>
+              <p className="text-xs text-cosmic-muted uppercase tracking-wider mb-2">Most active</p>
               {topLeaderboard.map((entry) => (
                 <div key={entry.rank} className="flex items-center gap-3 p-2 rounded-lg hover:bg-foreground/[0.02] transition-colors">
                   <span className={`text-sm font-bold w-6 text-center ${entry.rank === 1 ? 'text-cosmic-amber' : entry.rank === 2 ? 'text-cosmic-muted' : entry.rank === 3 ? 'text-cosmic-amber/60' : 'text-cosmic-muted/50'}`}>
@@ -397,7 +409,7 @@ export default function ReputationPage() {
                   className={`relative p-4 rounded-xl text-center transition-all duration-300 ${
                     badge.earned
                       ? 'bg-gradient-to-b from-cosmic-accent/10 to-transparent border border-cosmic-accent/20 hover:scale-105'
-                      : 'bg-foreground/[0.02] border border-border opacity-40'
+                      : 'bg-foreground/[0.02] border border-dashed border-border'
                   }`}
                 >
                   {badge.earned && (
@@ -406,10 +418,10 @@ export default function ReputationPage() {
                     </div>
                   )}
                   <div className={`w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center ${badge.earned ? 'bg-cosmic-accent/20' : 'bg-foreground/5'}`}>
-                    <BadgeIcon className={`w-5 h-5 ${badge.earned ? 'text-cosmic-accent' : 'text-cosmic-muted/30'}`} />
+                    <BadgeIcon className={`w-5 h-5 ${badge.earned ? 'text-cosmic-accent' : 'text-cosmic-muted'}`} />
                   </div>
-                  <p className={`text-xs font-semibold ${badge.earned ? 'text-foreground' : 'text-cosmic-muted/40'}`}>{badge.name}</p>
-                  <p className={`text-[10px] mt-1 ${badge.earned ? 'text-cosmic-muted' : 'text-cosmic-muted/30'}`}>{badge.description}</p>
+                  <p className={`text-xs font-semibold ${badge.earned ? 'text-foreground' : 'text-cosmic-muted'}`}>{badge.name}</p>
+                  <p className={`text-[10px] mt-1 ${badge.earned ? 'text-cosmic-muted' : 'text-cosmic-muted/80'}`}>{badge.description}</p>
                 </div>
               );
             })}
@@ -421,12 +433,5 @@ export default function ReputationPage() {
 }
 
 function getTierColorLocal(tier: string): string {
-  switch (tier) {
-    case 'Stardust': return '#A7B3D6';
-    case 'Nova': return '#2EE6C7';
-    case 'Pulsar': return '#9B5CFF';
-    case 'Quasar': return '#FFB547';
-    case 'Nebula': return '#FF5E8A';
-    default: return '#A7B3D6';
-  }
+  return tierColor(tier);
 }

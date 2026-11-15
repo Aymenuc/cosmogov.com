@@ -21,7 +21,8 @@ export type ToolArtName =
   | "agents"
   | "games"
   | "reputation"
-  | "activity";
+  | "activity"
+  | "explore";
 
 const INK = "#302248";
 const VIOLET = "#6741D9";
@@ -378,6 +379,27 @@ const art: Record<ToolArtName, () => ReactNode> = {
         <rect x="58" y="112" width="8" height="5" rx="1" fill={MINT} transform="rotate(-15 62 114)" />
         <rect x="140" y="114" width="8" height="5" rx="1" fill={SKY} transform="rotate(40 144 116)" />
       </g>
+    </>
+  ),
+  explore: () => (
+    <>
+      {/* A small desk globe with two places pinned and a dotted route between them. */}
+      <circle cx="100" cy="78" r="44" fill={SKY} stroke={INK} strokeWidth="3" />
+      <path d="M68 62c8-7 19-5 23 2s-2 13-10 12-15 3-17-4 0-7 4-10Z" fill={MINT} stroke={INK} strokeWidth="2" {...line} />
+      <path d="M108 50c10-3 22 2 26 11s-4 14-12 12-9 8-17 5-7-12-4-18 2-8 7-10Z" fill={MINT} stroke={INK} strokeWidth="2" {...line} />
+      <path d="M84 100c6-4 14-3 17 3s-3 12-10 11-12-8-7-14Z" fill={MINT} stroke={INK} strokeWidth="2" {...line} />
+      <ellipse cx="100" cy="78" rx="18" ry="44" stroke={INK} strokeWidth="1.5" opacity="0.3" />
+      <path d="M56 78h88" stroke={INK} strokeWidth="1.5" opacity="0.3" />
+      <path d="M80 50c8-16 30-20 44-12" stroke={VIOLET} strokeWidth="2.5" strokeDasharray="3 6" fill="none" {...line} />
+      <g className="tool-art-pop">
+        <path d="M78 62c-7-9-10-13-10-18a10 10 0 0 1 20 0c0 5-3 9-10 18Z" fill={CORAL} stroke={INK} strokeWidth="2.5" {...line} />
+        <circle cx="78" cy="44" r="3.5" fill={PAPER} />
+      </g>
+      <g className="tool-art-pop">
+        <path d="M128 54c-7-9-10-13-10-18a10 10 0 0 1 20 0c0 5-3 9-10 18Z" fill={VIOLET} stroke={INK} strokeWidth="2.5" {...line} />
+        <circle cx="128" cy="36" r="3.5" fill={PAPER} />
+      </g>
+      <path d="M100 122v7M74 130h52" stroke={INK} strokeWidth="3" {...line} />
     </>
   ),
 };

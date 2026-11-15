@@ -394,7 +394,7 @@ export default function ChatPage() {
               <div className="w-8 h-8 rounded-lg bg-cosmic-teal/10 flex items-center justify-center">
                 <MessageSquare className="w-4 h-4 text-cosmic-teal" />
               </div>
-              <h2 className="font-heading font-bold text-lg">Chat Rooms</h2>
+              <h2 className="font-heading font-bold text-lg">Rooms</h2>
             </div>
             <Dialog open={showCreateRoom} onOpenChange={setShowCreateRoom}>
               <DialogTrigger asChild>
@@ -468,7 +468,7 @@ export default function ChatPage() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex gap-1 p-3 overflow-x-auto border-b border-border">
+        <div className="flex flex-wrap gap-1 p-3 border-b border-border">
           <button
             onClick={() => setCategoryFilter('all')}
             className={`px-2.5 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap transition-all ${
@@ -506,8 +506,8 @@ export default function ChatPage() {
             {filteredRooms.length === 0 ? (
               <div className="text-center py-8 text-sm text-cosmic-muted">
                 <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p>No rooms found</p>
-                <p className="text-xs mt-1">Create one to get started!</p>
+                <p>No rooms yet</p>
+                <p className="text-xs mt-1">Start the first one with the + button.</p>
               </div>
             ) : (
               filteredRooms.map(room => {
@@ -745,9 +745,9 @@ export default function ChatPage() {
               <div className="w-20 h-20 rounded-2xl bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="w-10 h-10 text-cosmic-teal/50" />
               </div>
-              <h3 className="font-heading font-bold text-xl mb-2">Select a Chat Room</h3>
+              <h3 className="font-heading font-bold text-xl mb-2">Pick a room</h3>
               <p className="text-sm text-cosmic-muted mb-4 max-w-sm">
-                Choose a room from the sidebar to start chatting with the community
+                Choose a room to talk with your community, or start a new one.
               </p>
               {/* Mobile room selector */}
               <MobileRoomList
@@ -874,7 +874,7 @@ function MobileRoomList({
       {open && (
         <div className="fixed inset-0 z-50 bg-card/95 backdrop-blur-xl p-4 pt-16 overflow-y-auto" style={{ animation: 'fadeIn 0.2s ease-out' }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-heading font-bold text-lg">Chat Rooms</h2>
+            <h2 className="font-heading font-bold text-lg">Rooms</h2>
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)} className="text-cosmic-muted">
               <X className="w-5 h-5" />
             </Button>

@@ -132,6 +132,16 @@ const AGENT_ICONS: Record<string, typeof Shield> = {
   accessibility: Accessibility,
 };
 
+// What each helper does, shown under its name.
+const AGENT_ROLES: Record<string, string> = {
+  moderator: 'Keeps it civil',
+  facilitator: 'Welcomes newcomers',
+  summarizer: 'Sums up',
+  consensus: 'Finds common ground',
+  translator: 'Translates',
+  accessibility: 'Plain language',
+};
+
 const AGENT_LABELS: Record<string, string> = {
   moderator: 'Nexus',
   facilitator: 'Lumen',
@@ -825,7 +835,7 @@ function CosmicDebateCanvas({
 function AgentPreviewCard({ agent }: { agent: Agent }) {
   const config = parseAgentConfig(agent);
   const Icon = AGENT_ICONS[agent.type] || Shield;
-  const label = AGENT_LABELS[agent.type] || agent.type;
+  const label = AGENT_ROLES[agent.type] || agent.type;
 
   return (
     <motion.div
@@ -1008,7 +1018,7 @@ function CreateDebateModal({
               </div>
               <div>
                 <h3 className="font-heading font-bold text-base">Launch New Assembly</h3>
-                <p className="text-[11px] text-cosmic-muted">Start a cosmic debate session</p>
+                <p className="text-[11px] text-cosmic-muted">Start a debate about a question your community faces</p>
               </div>
             </div>
             <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-foreground/5 transition-colors">
@@ -1096,7 +1106,7 @@ function CreateDebateModal({
               ) : (
                 <Rocket className="w-4 h-4 mr-2" />
               )}
-              {creating ? 'Launching...' : 'Launch Assembly'}
+              {creating ? 'Launching...' : 'Start a debate'}
             </Button>
           </div>
         </motion.div>
@@ -1716,7 +1726,7 @@ export default function AssemblyHallPage() {
             <div className="cosmic-badge rounded-full px-3 py-1 flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5 text-cosmic-accent" />
               <span className="text-xs font-medium text-cosmic-accent">
-                {activeDebates.length} Live {activeDebates.length === 1 ? 'Assembly' : 'Assemblies'}
+                {activeDebates.length} live {activeDebates.length === 1 ? 'debate' : 'debates'}
               </span>
             </div>
           </div>
@@ -1736,7 +1746,7 @@ export default function AssemblyHallPage() {
               className="bg-cosmic-accent text-primary-foreground rounded-xl px-6 h-11 text-sm font-medium"
             >
               <Rocket className="w-4 h-4 mr-2" />
-              Launch Assembly
+              Start a debate
             </Button>
             {activeDebates.length > 0 && (
               <Button
@@ -1747,7 +1757,7 @@ export default function AssemblyHallPage() {
                   el?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                Join Live Debate <ArrowUpRight className="w-4 h-4 ml-2" />
+                Join a live debate <ArrowUpRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>
@@ -1784,9 +1794,9 @@ export default function AssemblyHallPage() {
           <div>
             <h2 className="text-xl font-bold font-heading flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-cosmic-violet" />
-              AI Assembly Agents
+              The AI helpers
             </h2>
-            <p className="text-sm text-cosmic-muted mt-1">Six cosmic entities ready to guide your assembly</p>
+            <p className="text-sm text-cosmic-muted mt-1">Six helpers, each with one job. They support the conversation; people decide.</p>
           </div>
         </div>
 
@@ -1827,7 +1837,7 @@ export default function AssemblyHallPage() {
           <div>
             <h2 className="text-xl font-bold font-heading flex items-center gap-2">
               <Activity className="w-5 h-5 text-cosmic-teal" />
-              Live Assemblies
+              Live debates
             </h2>
             <p className="text-sm text-cosmic-muted mt-1">Join an active debate or start your own</p>
           </div>
@@ -1839,13 +1849,13 @@ export default function AssemblyHallPage() {
               <div className="w-14 h-14 rounded-2xl bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-4">
                 <Waves className="w-7 h-7 text-cosmic-teal/40" />
               </div>
-              <h3 className="text-base font-semibold font-heading mb-1">No Active Assemblies</h3>
-              <p className="text-sm text-cosmic-muted mb-4">Launch a new assembly to see AI agents in action.</p>
+              <h3 className="text-base font-semibold font-heading mb-1">No live debates yet</h3>
+              <p className="text-sm text-cosmic-muted mb-4">Start one about a question your community faces. The helpers join in when they can help.</p>
               <Button
                 onClick={() => setShowCreateModal(true)}
                 className="bg-cosmic-accent text-primary-foreground rounded-xl"
               >
-                <Plus className="w-4 h-4 mr-2" /> Launch Assembly
+                <Plus className="w-4 h-4 mr-2" /> Start a debate
               </Button>
             </CardContent>
           </Card>
@@ -1920,30 +1930,30 @@ export default function AssemblyHallPage() {
       {/* ── How It Works ── */}
       <div>
         <div className="mb-6">
-          <h2 className="text-xl font-bold font-heading">How the Assembly Works</h2>
-          <p className="text-sm text-cosmic-muted mt-1">AI agents seamlessly guide your democratic process</p>
+          <h2 className="text-xl font-bold font-heading">How it works</h2>
+          <p className="text-sm text-cosmic-muted mt-1">People talk, the helpers support, people decide.</p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-3 sm:gap-6">
           {[
             {
               step: '01',
-              title: 'Launch or Join',
+              title: 'Start or join',
               desc: 'Start a debate or join one. AI helpers step in only when they can help: to summarise, translate, simplify or calm things down.',
               icon: Rocket,
               color: '#2D6BFF',
             },
             {
               step: '02',
-              title: 'AI Agents Orchestrate',
-              desc: 'Nexus moderates, Lumen facilitates, Synthesis summarizes, Concord builds consensus, Babel translates, Aegis ensures access.',
+              title: 'Helpers support',
+              desc: 'Nexus keeps it civil, Lumen welcomes newcomers, Synthesis sums up, Concord looks for common ground, Babel translates and Aegis simplifies.',
               icon: Sparkles,
               color: '#9B5CFF',
             },
             {
               step: '03',
-              title: 'Reach Consensus',
-              desc: 'Watch the consensus constellation grow in real-time as common ground emerges between participants.',
+              title: 'People decide',
+              desc: 'Read the summaries and options, then decide together. The helpers never vote.',
               icon: Handshake,
               color: '#10b981',
             },

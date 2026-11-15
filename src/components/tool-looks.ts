@@ -131,6 +131,12 @@ export const toolLooks: Record<ToolArtName, ToolLook> = {
     cheer: "It grows when you help out, never when you vote.",
     nudge: "any",
   },
+  explore: {
+    tint: "sky",
+    headline: "See what's happening, anywhere",
+    cheer: "Good ideas travel. See what other places are trying, and borrow what works.",
+    nudge: ["on-the-map"],
+  },
   activity: {
     tint: "sun",
     headline: "Celebrate the regulars",

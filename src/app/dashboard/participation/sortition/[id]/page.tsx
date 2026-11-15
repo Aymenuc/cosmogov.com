@@ -254,7 +254,7 @@ export default function SortitionDetailPage() {
             {pool.selectionDate && (
               <span className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4" />
-                Selected: {new Date(pool.selectionDate).toLocaleDateString()}
+                Selected: {new Date(pool.selectionDate).toLocaleDateString('en-GB')}
               </span>
             )}
           </div>

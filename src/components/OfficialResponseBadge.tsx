@@ -76,7 +76,7 @@ export default function OfficialResponseBadge({
         )}
         {responseDate && (
           <span className="text-[10px] text-cosmic-muted/60">
-            {new Date(responseDate).toLocaleDateString()}
+            {new Date(responseDate).toLocaleDateString('en-GB')}
           </span>
         )}
       </div>
@@ -115,7 +115,7 @@ export function OfficialResponseCard({
               {respondedBy && <span>Responded by {respondedBy}</span>}
               {responseDate && (
                 <span>
-                  {respondedBy && '·'} {new Date(responseDate).toLocaleDateString()}
+                  {respondedBy && '·'} {new Date(responseDate).toLocaleDateString('en-GB')}
                 </span>
               )}
             </div>
