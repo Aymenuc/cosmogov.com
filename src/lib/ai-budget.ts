@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { db } from "@/lib/db";
 import { ApiError } from "@/lib/api-server";
-import { AI_LIMITS, AI_SITE_DAILY_LIMIT } from "@/lib/ai-limits";
+import { AI_SITE_DAILY_LIMIT, AI_SITE_DAILY_LIMIT_PAID } from "@/lib/ai-limits";
+import { planFor } from "@/lib/plans";
 
 /**
  * One budget for every AI call, so the helpers stay a civic tool and can't be
@@ -12,7 +13,7 @@ import { AI_LIMITS, AI_SITE_DAILY_LIMIT } from "@/lib/ai-limits";
  *   can't run up the bill either.
  *
  * Counters live in the same RateLimitBucket table as the other rate limits,
- * so they hold across server instances. The numbers live in lib/ai-limits.ts.
+ * so they hold across server instances. The numbers live in lib/plans.ts.
  */
 export type AiUse = "assistant" | "debate" | "mission" | "status";
 
@@ -39,10 +40,18 @@ const FALLBACK = "Everything else in Cosmogov works without it.";
  * Records one AI call and throws a friendly 429 when an allowance is used up.
  * Returns how many calls of this kind the person has left today.
  */
-export async function spendAi(use: AiUse, userId: string | null): Promise<{ remainingToday: number | null }> {
+export async function spendAi(
+  use: AiUse,
+  userId: string | null,
+  plan?: string | null,
+): Promise<{ remainingToday: number | null; dailyLimit: number | null }> {
   let remainingToday: number | null = null;
+  let dailyLimit: number | null = null;
+  const tier = planFor(plan);
+  const paid = tier.id !== "community";
   if (use !== "status" && userId) {
-    const limits = AI_LIMITS[use];
+    const limits = tier.ai[use];
+    dailyLimit = limits.day;
     const hour = await bump(`ai-${use}-hour`, userId, HOUR);
     if (hour.count > limits.hour)
       throw new ApiError(
@@ -59,12 +68,12 @@ export async function spendAi(use: AiUse, userId: string | null): Promise<{ rema
       );
     remainingToday = Math.max(0, limits.day - day.count);
   }
-  const site = await bump("ai-site-day", "all", DAY);
-  if (site.count > AI_SITE_DAILY_LIMIT)
+  const site = await bump(paid ? "ai-site-day-paid" : "ai-site-day", "all", DAY);
+  if (site.count > (paid ? AI_SITE_DAILY_LIMIT_PAID : AI_SITE_DAILY_LIMIT))
     throw new ApiError(
       429,
       `The AI helpers have reached today's limit for the whole site. They'll be back tomorrow. ${FALLBACK}`,
       site.retryAfter,
     );
-  return { remainingToday };
+  return { remainingToday, dailyLimit };
 }

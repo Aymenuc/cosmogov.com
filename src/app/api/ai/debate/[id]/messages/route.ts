@@ -277,7 +277,7 @@ export async function POST(
       // When it runs out, the person's message still goes through; the
       // helpers just stay quiet.
       try {
-        await spendAi('debate', session.id);
+        await spendAi('debate', session.id, session.plan);
       } catch (error) {
         if (error instanceof ApiError && error.status === 429) break;
         throw error;

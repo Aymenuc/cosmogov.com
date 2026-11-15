@@ -1,12 +1,9 @@
 /**
- * AI allowances, shared by the server budget (lib/ai-budget.ts), the
- * assistant page and /trust, so the numbers people see are the ones enforced.
+ * AI allowances. The per-plan numbers live in lib/plans.ts; these are the
+ * free (Community) allowances, used where no plan is known and on /trust.
  */
-export const AI_LIMITS = {
-  assistant: { hour: 10, day: 25 },
-  debate: { hour: 20, day: 60 },
-  mission: { hour: 12, day: 30 },
-} as const;
+import { PLANS, AI_SITE_DAILY_LIMIT as SITE } from "@/lib/plans";
 
-/** Ceiling on AI requests across the whole site, per day. */
-export const AI_SITE_DAILY_LIMIT = 400;
+export const AI_LIMITS = PLANS.community.ai;
+export const AI_SITE_DAILY_LIMIT = SITE.free;
+export const AI_SITE_DAILY_LIMIT_PAID = SITE.paid;

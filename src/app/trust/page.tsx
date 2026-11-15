@@ -165,7 +165,7 @@ export default function TrustPage() {
                 {AI_LIMITS.mission.hour} mission AI runs an hour and {AI_LIMITS.mission.day} a
                 day, and {AI_LIMITS.debate.hour} debate helper replies an hour and{" "}
                 {AI_LIMITS.debate.day} a day. The whole site stops using AI for the day after{" "}
-                {AI_SITE_DAILY_LIMIT} requests. Debate posts are capped at 40 an hour.
+                {AI_SITE_DAILY_LIMIT} requests. Pro and Government plans have higher allowances, listed in Settings. Debate posts are capped at 40 an hour.
               </li>
               <li>Mission runs record which provider, model and instructions produced each draft.</li>
             </ul>

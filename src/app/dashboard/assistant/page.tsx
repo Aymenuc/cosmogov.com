@@ -39,6 +39,7 @@ export default function AssistantPage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [dailyLimit, setDailyLimit] = useState<number>(DAILY_QUESTIONS);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function AssistantPage() {
       if (data.content) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.content, timestamp: Date.now() }]);
         if (typeof data.remainingToday === 'number') setRemaining(data.remainingToday);
+        if (typeof data.dailyLimit === 'number') setDailyLimit(data.dailyLimit);
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: data.error || 'I couldn\'t generate a response. Please try again.', timestamp: Date.now(), isError: true }]);
       }
@@ -205,7 +207,7 @@ export default function AssistantPage() {
         </Button>
       </div>
       <p className="mt-2 text-[11px] text-cosmic-muted">
-        For community matters only, up to {DAILY_QUESTIONS} questions a day
+        For community matters only, up to {dailyLimit} questions a day
         {remaining !== null ? ` · ${remaining} left today` : ''}.
       </p>
     </div>

@@ -1,5 +1,7 @@
 'use client';
 import SessionControls from '@/components/SessionControls';
+import { planFor } from '@/lib/plans';
+import PlanUpgrade from '@/components/PlanUpgrade';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -29,12 +31,6 @@ interface UserData {
   interests: string;
 }
 
-const planDetails: Record<string, { features: string[]; color: string }> = {
-  community: { color: 'text-cosmic-muted', features: ['5 proposals/month', '1 organization', '3 governance games', 'Basic AI assistant', 'Community support'] },
-  team: { color: 'text-cosmic-accent', features: ['Unlimited proposals', '5 organizations', 'All 6 games', 'Full AI assistant', 'Analytics dashboard', 'Custom game rounds', 'Priority support'] },
-  guild: { color: 'text-cosmic-violet', features: ['Everything in Team', 'Unlimited organizations', 'Decision quality metrics', 'Advanced analytics', 'API access', 'Dedicated account manager', 'Custom integrations'] },
-  enterprise: { color: 'text-cosmic-amber', features: ['Everything in Guild', 'SSO & SAML', '99.99% SLA', 'Dedicated infrastructure', 'Custom AI models', 'On-premise option', '24/7 dedicated support'] },
-};
 
 const interestTags = ['Governance', 'Democracy', 'Data Science', 'Psychology', 'Strategy', 'Leadership', 'Ethics', 'Finance', 'Community', 'Technology', 'Policy', 'Logic'];
 
@@ -49,6 +45,18 @@ export default function SettingsPage() {
   const [notifSettings, setNotifSettings] = useState({
     votes: true, proposals: true, games: true, system: true, mentions: true,
   });
+
+  // Open a tab from the link (e.g. ?tab=plan after checkout). The tabs only
+  // render after the account loads in the browser, so reading the URL here
+  // can't cause a server/browser mismatch.
+  const [tab, setTab] = useState(() => {
+    if (typeof window === 'undefined') return 'profile';
+    const wanted = new URLSearchParams(window.location.search).get('tab');
+    return wanted && ['profile', 'plan', 'notifications', 'preferences'].includes(wanted) ? wanted : 'profile';
+  });
+  const [upgraded] = useState(
+    () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('upgraded') === '1',
+  );
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -95,13 +103,13 @@ export default function SettingsPage() {
     </div>
   );
 
-  const currentPlan = planDetails[user.plan] || planDetails.community;
+  const currentPlan = planFor(user.plan);
 
   return (
     <div className="max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold font-heading mb-6">Settings</h1>
 
-      <Tabs defaultValue="profile">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="workspace-tabs" aria-label="Settings sections">
           <TabsTrigger value="profile" className="data-[state=active]:bg-cosmic-accent/10 data-[state=active]:text-cosmic-accent">
             <User className="w-4 h-4 mr-1.5" /> Profile
@@ -133,7 +141,7 @@ export default function SettingsPage() {
                     <p className="font-medium">{name || 'Unnamed User'}</p>
                     <p className="text-sm text-cosmic-muted">{user.email}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className={`text-[10px] capitalize ${currentPlan.color}`}>{user.plan}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{currentPlan.name}</Badge>
                       {user.role === 'admin' && <Badge className="text-[10px] bg-cosmic-rose/20 text-cosmic-rose border-0">Admin</Badge>}
                       <Badge variant="outline" className="text-[10px] border-border">Lv.{user.level}</Badge>
                     </div>
@@ -203,7 +211,7 @@ export default function SettingsPage() {
               </h2>
               <div className="flex items-center justify-between p-4 rounded-xl bg-cosmic-violet/5 border border-cosmic-violet/10 mb-4">
                 <div>
-                  <p className="text-lg font-bold font-heading capitalize">{user.plan} Plan</p>
+                  <p className="text-lg font-bold font-heading">{currentPlan.name} plan</p>
                 </div>
                 <Badge className="bg-cosmic-teal/20 text-cosmic-teal border-0">Active</Badge>
               </div>
@@ -218,19 +226,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
-            <CardContent className="p-6">
-              <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-cosmic-accent" /> Billing and payments
-              </h2>
-              <p className="text-sm text-cosmic-muted mb-4">Contact us for invoices, payment questions or plan changes.</p>
-              <Button asChild variant="outline">
-                <Link href="/contact?topic=sales">
-                  Contact us about billing <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <PlanUpgrade current={planFor(user.plan).id} upgraded={upgraded} />
         </TabsContent>
 
         {/* NOTIFICATIONS TAB */}

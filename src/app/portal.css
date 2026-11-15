@@ -713,3 +713,30 @@ a.sticker-state:hover {
 .settings-sessions {
   margin-bottom: 20px;
 }
+
+/* Settings → Plans and billing */
+.plan-upgrade { display: grid; gap: 16px; }
+.plan-upgrade-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.plan-upgrade-head h2 { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; }
+.plan-upgrade .billing-switch { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid #e6e0ee; border-radius: 999px; background: #fffdf7; }
+.plan-upgrade .billing-switch button { border: 0; background: none; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #5d586d; cursor: pointer; }
+.plan-upgrade .billing-switch button.active { background: #29223d; color: #fffdf7; }
+.plan-upgrade .billing-switch span { font-size: 11px; opacity: 0.8; }
+.plan-upgrade-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.plan-card { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 2px solid #e6e0ee; border-radius: 20px; background: #fffdf7; }
+.plan-card.featured { border-color: #29223d; box-shadow: 4px 5px 0 #29223d; background: #f3eeff; }
+.plan-card.current { outline: 3px solid #6741d9; outline-offset: 2px; }
+.plan-card header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.plan-card h3 { margin: 0; font-size: 17px; font-weight: 800; }
+.plan-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #6741d9; color: #fff; }
+.plan-desc { margin: 0; font-size: 13px; color: #69637c; }
+.plan-price { margin: 4px 0 0; font-size: 28px; font-weight: 800; }
+.plan-price small { font-size: 13px; font-weight: 600; color: #69637c; }
+.plan-card ul { display: grid; gap: 6px; margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.plan-card li { display: flex; gap: 6px; align-items: flex-start; }
+.plan-card li svg { flex: none; margin-top: 3px; color: #28745b; }
+.plan-action { margin-top: auto; padding-top: 10px; }
+.plan-action .civic-button { width: 100%; justify-content: center; }
+.plan-small { margin: 0; font-size: 12px; color: #69637c; }
+.plan-upgrade-note { margin: 0; padding: 10px 14px; border-radius: 12px; background: #e3f6ea; color: #1f5a46; font-size: 13px; font-weight: 600; }
+@media (max-width: 860px) { .plan-upgrade-grid { grid-template-columns: 1fr; } }

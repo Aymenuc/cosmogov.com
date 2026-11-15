@@ -49,7 +49,7 @@ export async function POST(
     requireManager(canManage);
     const { stage, webSearch } = runSchema.parse(await req.json());
     // Daily and site-wide AI allowance (the hourly 12-run limit is below).
-    await spendAi("mission", user.id);
+    await spendAi("mission", user.id, user.plan);
     const now = new Date();
     lease = new Date(now.getTime() + 110_000);
     const reserved = await db.$transaction(

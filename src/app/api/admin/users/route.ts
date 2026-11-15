@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PLANS } from '@/lib/plans';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -44,9 +45,16 @@ export async function PATCH(req: NextRequest) {
   const { userId, plan, role } = await req.json();
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
 
-  const data: any = {};
-  if (plan) data.plan = plan;
-  if (role) data.role = role;
+  const data: { plan?: string; role?: string } = {};
+  if (plan) {
+    if (!(plan in PLANS)) return NextResponse.json({ error: 'Unknown plan' }, { status: 400 });
+    data.plan = plan;
+  }
+  if (role) {
+    if (!['user', 'gov_official', 'admin', 'super_admin'].includes(role))
+      return NextResponse.json({ error: 'Unknown role' }, { status: 400 });
+    data.role = role;
+  }
 
   const user = await db.user.update({ where: { id: userId }, data });
   return NextResponse.json({ success: true, user });

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     if (question.content.length > MAX_QUESTION)
       throw new ApiError(400, `Please keep questions under ${MAX_QUESTION.toLocaleString('en')} characters.`);
 
-    const { remainingToday } = await spendAi('assistant', user.id);
+    const { remainingToday, dailyLimit } = await spendAi('assistant', user.id, user.plan);
 
     // Short memory: the last few turns, earlier replies trimmed.
     const recent = messages.slice(-KEEP_TURNS).map((m) => ({
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     const content = completion.choices[0]?.message?.content?.trim();
     if (!content) return NextResponse.json({ error: AI_UNAVAILABLE }, { status: 503 });
-    return NextResponse.json({ content, generatedBy: 'ai', remainingToday });
+    return NextResponse.json({ content, generatedBy: 'ai', remainingToday, dailyLimit });
   } catch (error) {
     return apiFailure(error);
   }

@@ -1,5 +1,6 @@
 "use client";
 import "../portal.css";
+import { planFor } from "@/lib/plans";
 import "../rewards.css";
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -312,7 +313,7 @@ export default function DashboardLayout({
           </span>
           <span>
             <strong>{user?.name || "Your account"}</strong>
-            <small>{user?.plan || "Community"} plan</small>
+            <small>{planFor(user?.plan).name} plan</small>
           </span>
           <Settings size={16} />
         </Link>

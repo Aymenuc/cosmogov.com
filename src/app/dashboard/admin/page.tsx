@@ -25,7 +25,7 @@ interface Stats {
   totalGamesPlayed: number;
   unreadMessages: number;
   totalRevenue: number;
-  planDistribution: { community: number; team: number; guild: number; enterprise: number };
+  planDistribution: { community: number; pro: number; government: number };
   recentUsers: any[];
   recentMessages: any[];
 }
@@ -247,9 +247,8 @@ export default function AdminPortalPage() {
                   <div className="space-y-3">
                     {[
                       { label: 'Community', count: planDistribution.community, color: 'bg-foreground/20', pct: stats ? (planDistribution.community / stats.totalUsers * 100) : 0 },
-                      { label: 'Team', count: planDistribution.team, color: 'bg-cosmic-accent', pct: stats ? (planDistribution.team / stats.totalUsers * 100) : 0 },
-                      { label: 'Guild', count: planDistribution.guild, color: 'bg-cosmic-violet', pct: stats ? (planDistribution.guild / stats.totalUsers * 100) : 0 },
-                      { label: 'Enterprise', count: planDistribution.enterprise, color: 'bg-cosmic-amber', pct: stats ? (planDistribution.enterprise / stats.totalUsers * 100) : 0 },
+                      { label: 'Pro', count: planDistribution.pro, color: 'bg-cosmic-accent', pct: stats ? (planDistribution.pro / stats.totalUsers * 100) : 0 },
+                      { label: 'Government', count: planDistribution.government, color: 'bg-cosmic-amber', pct: stats ? (planDistribution.government / stats.totalUsers * 100) : 0 },
                     ].map(p => (
                       <div key={p.label}>
                         <div className="flex items-center justify-between text-sm mb-1">
@@ -378,9 +377,8 @@ export default function AdminPortalPage() {
                             onChange={(e) => handleUserPlanChange(u.id, e.target.value)}
                           >
                             <option value="community">Community</option>
-                            <option value="team">Team</option>
-                            <option value="guild">Guild</option>
-                            <option value="enterprise">Enterprise</option>
+                            <option value="pro">Pro</option>
+                            <option value="government">Government</option>
                           </select>
                         </td>
                         <td className="py-3 px-2">
@@ -437,9 +435,8 @@ export default function AdminPortalPage() {
                           onChange={(e) => handleUserPlanChange(u.id, e.target.value)}
                         >
                           <option value="community">Community</option>
-                          <option value="team">Team</option>
-                          <option value="guild">Guild</option>
-                          <option value="enterprise">Enterprise</option>
+                          <option value="pro">Pro</option>
+                          <option value="government">Government</option>
                         </select>
                         <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground h-7 text-xs">
                           <Eye className="w-3 h-3 mr-1" /> View

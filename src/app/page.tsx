@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { PLANS, PLAN_ORDER } from "@/lib/plans";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -415,7 +416,7 @@ export default function HomePage() {
                 Big possibilities.
                 <br />A simple place to start.
               </h2>
-              <p>Contact us about any plan, upgrade, or payment.</p>
+              <p>Start free. Upgrade when your community wants more AI help. Councils are set up with a person and invoiced.</p>
               <div className="billing-switch" aria-label="Billing period">
                 <button
                   className={!annual ? "active" : ""}
@@ -434,42 +435,16 @@ export default function HomePage() {
               </div>
             </div>
             <div className="pricing-grid">
-              {[
-                {
-                  name: "Community",
-                  desc: "For people coming together.",
-                  price: 0,
-                  features: [
-                    "Create and join communities",
-                    "Proposals and community voting",
-                    "Discussion and participation tools",
-                    "Community support",
-                  ],
-                },
-                {
-                  name: "Pro",
-                  desc: "For communities ready to do more.",
-                  price: annual ? 39 : 49,
-                  features: [
-                    "Everything in Community",
-                    "Advanced governance tools",
-                    "AI-powered assistance",
-                    "Analytics and participation insights",
-                  ],
-                  featured: true,
-                },
-                {
-                  name: "Government",
-                  desc: "For public participation at scale.",
-                  price: annual ? 159 : 199,
-                  features: [
-                    "Everything in Pro",
-                    "Government response portal",
-                    "Official verification tools",
-                    "Onboarding and migration support",
-                  ],
-                },
-              ].map((plan) => (
+              {PLAN_ORDER.map((id) => {
+                const p = PLANS[id];
+                return {
+                  name: p.name,
+                  desc: p.desc,
+                  price: annual ? p.yearlyPerMonth : p.monthly,
+                  features: p.features,
+                  featured: id === "pro",
+                };
+              }).map((plan) => (
                 <div
                   key={plan.name}
                   className={`pricing-card ${plan.featured ? "featured" : ""}`}
@@ -491,13 +466,16 @@ export default function HomePage() {
                         : "Billed monthly"}
                   </span>
                   <Link
-                    href={{
-                      pathname: "/contact",
-                      query: { topic: "sales", plan: plan.name },
-                    }}
+                    href={
+                      plan.name === "Community"
+                        ? "/auth/signup"
+                        : plan.name === "Pro"
+                          ? "/dashboard/settings?tab=plan"
+                          : { pathname: "/contact", query: { topic: "sales", plan: plan.name } }
+                    }
                     className={`civic-button ${plan.featured ? "" : "outline"}`}
                   >
-                    Ask about {plan.name}
+                    {plan.name === "Community" ? "Start free" : plan.name === "Pro" ? "Get Pro" : "Talk to us"}
                     <ArrowUpRight size={16} />
                   </Link>
                   <ul>

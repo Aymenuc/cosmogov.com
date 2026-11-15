@@ -1,3 +1,4 @@
+import { planId } from "@/lib/plans";
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
@@ -18,15 +19,15 @@ export async function GET() {
   const recentUsers = await db.user.findMany({ take: 5, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, email: true, plan: true, role: true, createdAt: true } });
   const recentMessages = await db.contactMessage.findMany({ take: 5, orderBy: { createdAt: 'desc' } });
 
-  const communityCount = await db.user.count({ where: { plan: 'community' } });
-  const teamCount = await db.user.count({ where: { plan: 'team' } });
-  const guildCount = await db.user.count({ where: { plan: 'guild' } });
-  const enterpriseCount = await db.user.count({ where: { plan: 'enterprise' } });
+  // Older plan names are counted under today's plans (see lib/plans.ts).
+  const byPlan = await db.user.groupBy({ by: ['plan'], _count: { _all: true } });
+  const planDistribution = { community: 0, pro: 0, government: 0 };
+  for (const row of byPlan) planDistribution[planId(row.plan)] += row._count._all;
 
   return NextResponse.json({
     totalUsers, totalOrgs, activeProposals, totalVotes, totalGamesPlayed, unreadMessages,
     totalRevenue: totalRevenue._sum.amount || 0,
-    planDistribution: { community: communityCount, team: teamCount, guild: guildCount, enterprise: enterpriseCount },
+    planDistribution,
     recentUsers, recentMessages,
   });
 }

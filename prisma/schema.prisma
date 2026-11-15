@@ -19,7 +19,9 @@ model User {
   name          String?
   avatarUrl     String?
   passwordHash  String?
-  plan          String   @default("community") // community, team, guild, enterprise
+  plan          String   @default("community") // community, pro, government (see src/lib/plans.ts)
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String?
   sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
@@ -311,7 +313,7 @@ model AdminLog {
 model BillingRecord {
   id          String   @id @default(cuid())
   userId      String
-  plan        String   // team, guild, enterprise
+  plan        String   // pro, government
   amount      Int      // in cents
   currency    String   @default("usd")
   status      String   @default("pending") // pending, paid, failed, refunded
