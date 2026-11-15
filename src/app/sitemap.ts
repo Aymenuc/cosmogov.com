@@ -8,6 +8,8 @@ const pages = [
   "/about",
   "/missions/demo",
   "/trust",
+  "/government",
+  "/accessibility",
   "/docs",
   "/blog",
   "/changelog",
