@@ -421,7 +421,7 @@ export default function ReputationPage() {
                     <BadgeIcon className={`w-5 h-5 ${badge.earned ? 'text-cosmic-accent' : 'text-cosmic-muted'}`} />
                   </div>
                   <p className={`text-xs font-semibold ${badge.earned ? 'text-foreground' : 'text-cosmic-muted'}`}>{badge.name}</p>
-                  <p className={`text-[10px] mt-1 ${badge.earned ? 'text-cosmic-muted' : 'text-cosmic-muted/80'}`}>{badge.description}</p>
+                  <p className={`text-[10px] mt-1 ${badge.earned ? 'text-cosmic-muted' : 'text-cosmic-muted'}`}>{badge.description}</p>
                 </div>
               );
             })}

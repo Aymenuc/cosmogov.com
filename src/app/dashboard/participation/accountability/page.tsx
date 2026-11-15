@@ -263,7 +263,7 @@ export default function AccountabilityPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex-grow">
-                <Progress value={stats.transparencyScore} className="h-2" />
+                <Progress value={stats.transparencyScore} className="h-2" aria-label="Transparency score" />
               </div>
               <span className="text-lg font-bold text-cosmic-amber font-heading">
                 {stats.transparencyScore}%
@@ -289,7 +289,7 @@ export default function AccountabilityPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex-grow">
-                <Progress value={stats.onTimeRate} className="h-2" />
+                <Progress value={stats.onTimeRate} className="h-2" aria-label="On-time rate" />
               </div>
               <span className="text-lg font-bold text-cosmic-teal font-heading">
                 {stats.onTimeRate}%
@@ -315,7 +315,7 @@ export default function AccountabilityPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex-grow">
-                <Progress value={stats.overallProgress} className="h-2" />
+                <Progress value={stats.overallProgress} className="h-2" aria-label="Overall progress" />
               </div>
               <span className="text-lg font-bold text-cosmic-violet font-heading">
                 {stats.overallProgress}%
@@ -328,7 +328,7 @@ export default function AccountabilityPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48 bg-foreground/5 border-border text-foreground">
+          <SelectTrigger aria-label="Status" className="w-full sm:w-48 bg-foreground/5 border-border text-foreground">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -399,6 +399,7 @@ export default function AccountabilityPage() {
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <Progress
+                            aria-label="Milestone progress"
                             value={entity.overallProgress}
                             className="w-16 h-1.5"
                           />
@@ -502,6 +503,7 @@ export default function AccountabilityPage() {
                                 <div className="flex items-center gap-3 ml-[18px]">
                                   <div className="flex items-center gap-1.5 flex-grow">
                                     <Progress
+                                      aria-label="Milestone progress"
                                       value={milestone.progress}
                                       className="h-1 w-16"
                                     />

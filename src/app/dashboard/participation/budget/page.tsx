@@ -200,7 +200,7 @@ export default function BudgetPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-48 bg-foreground/5 border-border text-foreground">
+          <SelectTrigger aria-label="Category" className="w-full sm:w-48 bg-foreground/5 border-border text-foreground">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -215,7 +215,7 @@ export default function BudgetPage() {
         </Select>
         {availableProcesses.length > 0 && (
           <Select value={selectedProcess} onValueChange={setSelectedProcess}>
-            <SelectTrigger className="w-full sm:w-64 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Process" className="w-full sm:w-64 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Process" />
             </SelectTrigger>
             <SelectContent>
@@ -272,7 +272,7 @@ export default function BudgetPage() {
                           <span className="text-cosmic-muted">Funded</span>
                           <span className="text-cosmic-amber font-medium">{fundingPct}%</span>
                         </div>
-                        <Progress value={fundingPct} className="h-2" />
+                        <Progress value={fundingPct} className="h-2" aria-label="Share of the budget allocated" />
                         <div className="flex items-center justify-between text-[10px] text-cosmic-muted mt-1">
                           <span>{formatCurrency(project.totalAllocated, project.process?.currency)}</span>
                           <span>of {formatCurrency(project.budgetRequested, project.process?.currency)}</span>
@@ -362,6 +362,7 @@ export default function BudgetPage() {
                   <span className="text-foreground font-bold">{formatCurrency(Math.max(0, userBudgetRemaining))}</span>
                 </div>
                 <Progress
+                  aria-label="Progress"
                   value={budgetPool && budgetPool.total > 0 ? (totalUserAllocated / budgetPool.total) * 100 : 0}
                   className="h-2"
                 />

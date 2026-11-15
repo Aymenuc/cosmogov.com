@@ -397,7 +397,7 @@ export default function LegislationPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Category</label>
                 <Select value={createForm.category} onValueChange={(v) => setCreateForm((f) => ({ ...f, category: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Select..." className="bg-foreground/5 border-border text-foreground">
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>

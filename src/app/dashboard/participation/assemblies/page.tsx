@@ -257,7 +257,7 @@ export default function AssembliesPage() {
             />
           </div>
           <Select value={filters.purpose} onValueChange={(v) => setFilters((f) => ({ ...f, purpose: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Purpose" className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Purpose" />
             </SelectTrigger>
             <SelectContent>
@@ -269,7 +269,7 @@ export default function AssembliesPage() {
             </SelectContent>
           </Select>
           <Select value={filters.scope} onValueChange={(v) => setFilters((f) => ({ ...f, scope: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Scope" className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Scope" />
             </SelectTrigger>
             <SelectContent>
@@ -605,7 +605,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Purpose</label>
                 <Select value={createForm.purpose} onValueChange={(v) => setCreateForm((f) => ({ ...f, purpose: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -619,7 +619,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Scope</label>
                 <Select value={createForm.scope} onValueChange={(v) => setCreateForm((f) => ({ ...f, scope: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -636,7 +636,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Meeting Cadence</label>
                 <Select value={createForm.meetingCadence} onValueChange={(v) => setCreateForm((f) => ({ ...f, meetingCadence: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -651,7 +651,7 @@ export default function AssembliesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Visibility</label>
                 <Select value={createForm.isPublic ? 'public' : 'private'} onValueChange={(v) => setCreateForm((f) => ({ ...f, isPublic: v === 'public' }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

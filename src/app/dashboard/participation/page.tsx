@@ -431,7 +431,7 @@ export default function ParticipationHub() {
             />
           </div>
           <Select value={filters.phase} onValueChange={(v) => setFilters((f) => ({ ...f, phase: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Phase" className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Phase" />
             </SelectTrigger>
             <SelectContent>
@@ -445,7 +445,7 @@ export default function ParticipationHub() {
             </SelectContent>
           </Select>
           <Select value={filters.scope} onValueChange={(v) => setFilters((f) => ({ ...f, scope: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Scope" className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Scope" />
             </SelectTrigger>
             <SelectContent>

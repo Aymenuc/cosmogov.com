@@ -398,7 +398,7 @@ export default function ChatPage() {
             </div>
             <Dialog open={showCreateRoom} onOpenChange={setShowCreateRoom}>
               <DialogTrigger asChild>
-                <Button size="sm" className="h-7 w-7 p-0 bg-cosmic-accent/20 text-cosmic-accent hover:bg-cosmic-accent/30 border-0">
+                <Button size="sm" aria-label="Create a room" className="h-7 w-7 p-0 bg-cosmic-accent/20 text-cosmic-accent hover:bg-cosmic-accent/30 border-0">
                   <Plus className="w-4 h-4" />
                 </Button>
               </DialogTrigger>
@@ -429,7 +429,7 @@ export default function ChatPage() {
                   <div>
                     <Label className="text-sm text-cosmic-muted">Category</Label>
                     <Select value={newRoomCategory} onValueChange={setNewRoomCategory}>
-                      <SelectTrigger className="bg-foreground/5 border-border text-foreground mt-1">
+                      <SelectTrigger aria-label="Category" className="bg-foreground/5 border-border text-foreground mt-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border">
@@ -596,6 +596,7 @@ export default function ChatPage() {
                 <Button
                   variant="ghost"
                   size="sm"
+                  aria-label="Show rooms"
                   className="md:hidden h-7 w-7 p-0 text-cosmic-muted"
                   onClick={() => setShowMobileMembers(!showMobileMembers)}
                 >
@@ -888,7 +889,7 @@ function MobileRoomList({
               <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Room name..." className="bg-foreground/5 border-border text-foreground" />
               <Textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Description..." className="bg-foreground/5 border-border text-foreground resize-none" rows={2} />
               <Select value={newCat} onValueChange={setNewCat}>
-                <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">

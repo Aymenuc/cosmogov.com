@@ -532,7 +532,7 @@ export default function SortitionDetailPage() {
                     <div>
                       <label className="text-xs text-cosmic-muted mb-1 block">Age Group</label>
                       <Select value={volunteerForm.ageGroup} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, ageGroup: v }))}>
-                        <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                        <SelectTrigger aria-label="Select" className="bg-foreground/5 border-border text-foreground">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
@@ -546,7 +546,7 @@ export default function SortitionDetailPage() {
                     <div>
                       <label className="text-xs text-cosmic-muted mb-1 block">Gender</label>
                       <Select value={volunteerForm.gender} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, gender: v }))}>
-                        <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                        <SelectTrigger aria-label="Select" className="bg-foreground/5 border-border text-foreground">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>

@@ -1617,7 +1617,7 @@ export default function AssemblyHallPage() {
               {/* Options row */}
               <div className="flex items-center gap-2 mb-2">
                 <Select value={targetLang} onValueChange={setTargetLang}>
-                  <SelectTrigger className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
+                  <SelectTrigger aria-label="Choose an option" className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
                     <Languages className="w-3 h-3 mr-1 text-cosmic-teal" />
                     <SelectValue />
                   </SelectTrigger>
@@ -1633,7 +1633,7 @@ export default function AssemblyHallPage() {
                 </Select>
 
                 <Select value={simplifyLevel} onValueChange={setSimplifyLevel}>
-                  <SelectTrigger className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
+                  <SelectTrigger aria-label="Simplify" className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
                     <BookOpen className="w-3 h-3 mr-1 text-pink-400" />
                     <SelectValue placeholder="Simplify" />
                   </SelectTrigger>
@@ -1971,7 +1971,7 @@ export default function AssemblyHallPage() {
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${item.color}12` }}>
                       <item.icon className="w-6 h-6" style={{ color: item.color }} />
                     </div>
-                    <span className="text-3xl font-bold font-heading text-foreground/10">{item.step}</span>
+                    <span aria-hidden="true" className="text-3xl font-bold font-heading text-[#8d879a]">{item.step}</span>
                   </div>
                   <h3 className="text-base font-semibold font-heading mb-2">{item.title}</h3>
                   <p className="text-sm text-cosmic-muted leading-relaxed">{item.desc}</p>

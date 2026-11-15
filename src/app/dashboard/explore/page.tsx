@@ -636,7 +636,7 @@ export default function ExplorePage() {
                   >
                     <span>{tab.emoji}</span>
                     <span>{tab.label}</span>
-                    <span className="text-xs opacity-60">({getRegionCount(tab.key)})</span>
+                    <span className="text-xs">({getRegionCount(tab.key)})</span>
                   </button>
                 ))}
               </div>
@@ -665,7 +665,7 @@ export default function ExplorePage() {
                       {country.subregion || country.region}
                     </Badge>
                     {country.currency && (
-                      <Badge variant="outline" className="text-[10px] border-cosmic-amber/10 text-cosmic-amber/70">
+                      <Badge variant="outline" className="text-[10px] border-cosmic-amber/10 text-cosmic-amber">
                         💰 {country.currency}
                       </Badge>
                     )}
@@ -711,7 +711,7 @@ export default function ExplorePage() {
                     <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">{loc.emoji}</span>
                     <h4 className="font-semibold text-sm text-foreground group-hover:text-cosmic-amber transition-colors">{loc.name}</h4>
                     <p className="text-[11px] text-cosmic-muted mt-0.5">{loc.country}</p>
-                    <p className="text-[10px] text-cosmic-muted/60 mt-1.5 line-clamp-2">{loc.desc}</p>
+                    <p className="text-[10px] text-cosmic-muted mt-1.5 line-clamp-2">{loc.desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -947,7 +947,7 @@ export default function ExplorePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="flex flex-wrap items-center justify-center gap-2 sm:gap-6 text-xs text-cosmic-muted/40 pt-4"
+        className="flex flex-wrap items-center justify-center gap-2 sm:gap-6 text-xs text-cosmic-muted pt-4"
       >
         <span>Data from countries-states-cities</span>
         <span className="hidden sm:inline">·</span>

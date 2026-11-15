@@ -533,7 +533,8 @@ export default function AIAgentsPage() {
                           variant="outline"
                           className="text-[10px] px-2 py-0 rounded-full border-border"
                           style={{
-                            color: JSON.parse(agent.avatarConfig || '{}').primaryColor || '#6366f1',
+                            // Text in the ink colour mixed with the helper's colour, so it stays readable.
+                            color: `color-mix(in srgb, ${JSON.parse(agent.avatarConfig || '{}').primaryColor || '#6366f1'} 45%, #29223d)`,
                             borderColor: `${JSON.parse(agent.avatarConfig || '{}').primaryColor || '#6366f1'}40`,
                             background: `${JSON.parse(agent.avatarConfig || '{}').primaryColor || '#6366f1'}10`,
                           }}
@@ -629,7 +630,7 @@ export default function AIAgentsPage() {
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${item.color}12` }}>
                       <item.icon className="w-6 h-6" style={{ color: item.color }} />
                     </div>
-                    <span className="text-3xl font-bold font-heading text-foreground/10">{item.step}</span>
+                    <span aria-hidden="true" className="text-3xl font-bold font-heading text-[#8d879a]">{item.step}</span>
                   </div>
                   <h3 className="text-base font-semibold font-heading mb-2">{item.title}</h3>
                   <p className="text-sm text-cosmic-muted leading-relaxed">{item.description}</p>

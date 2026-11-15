@@ -332,7 +332,7 @@ export default function InitiativesPage() {
             />
           </div>
           <Select value={filters.type} onValueChange={(v) => setFilters((f) => ({ ...f, type: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Type" className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -344,7 +344,7 @@ export default function InitiativesPage() {
             </SelectContent>
           </Select>
           <Select value={filters.status} onValueChange={(v) => setFilters((f) => ({ ...f, status: v }))}>
-            <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Status" className="w-full sm:w-44 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -357,7 +357,7 @@ export default function InitiativesPage() {
             </SelectContent>
           </Select>
           <Select value={filters.sort} onValueChange={(v) => setFilters((f) => ({ ...f, sort: v }))}>
-            <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Sort" className="w-full sm:w-40 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
@@ -705,7 +705,7 @@ export default function InitiativesPage() {
             <div>
               <label className="text-sm text-cosmic-muted mb-1 block">Category</label>
               <Select value={createForm.category} onValueChange={(v) => setCreateForm((f) => ({ ...f, category: v }))}>
-                <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -728,7 +728,7 @@ export default function InitiativesPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Type</label>
                 <Select value={createForm.type} onValueChange={(v) => setCreateForm((f) => ({ ...f, type: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

@@ -836,7 +836,7 @@ export default function GovPortalPage() {
           <div className="glass-card rounded-2xl p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <Select value={initStatus} onValueChange={setInitStatus}>
-                <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
+                <SelectTrigger aria-label="Choose an option" className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -856,7 +856,7 @@ export default function GovPortalPage() {
                 />
               </div>
               <Select value={initSort} onValueChange={setInitSort}>
-                <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-sm">
+                <SelectTrigger aria-label="Choose an option" className="w-full sm:w-40 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -965,7 +965,7 @@ export default function GovPortalPage() {
           <div className="glass-card rounded-2xl p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <Select value={bpStatus} onValueChange={setBpStatus}>
-                <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
+                <SelectTrigger aria-label="Choose an option" className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -986,7 +986,7 @@ export default function GovPortalPage() {
                 />
               </div>
               <Select value={bpSort} onValueChange={setBpSort}>
-                <SelectTrigger className="w-full sm:w-40 bg-foreground/5 border-border text-sm">
+                <SelectTrigger aria-label="Choose an option" className="w-full sm:w-40 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1129,7 +1129,7 @@ export default function GovPortalPage() {
           <div className="glass-card rounded-2xl p-4 mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <Select value={legStatus} onValueChange={setLegStatus}>
-                <SelectTrigger className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
+                <SelectTrigger aria-label="Choose an option" className="w-full sm:w-44 bg-foreground/5 border-border text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1539,7 +1539,7 @@ export default function GovPortalPage() {
                       value={responseStatus}
                       onValueChange={setResponseStatus}
                     >
-                      <SelectTrigger className="bg-foreground/5 border-border">
+                      <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

@@ -385,7 +385,7 @@ export default function SortitionPage() {
                       <div>
                         <label className="text-xs text-cosmic-muted mb-1 block">Age Group</label>
                         <Select value={volunteerForm.ageGroup} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, ageGroup: v }))}>
-                          <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                          <SelectTrigger aria-label="Select" className="bg-foreground/5 border-border text-foreground">
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
@@ -399,7 +399,7 @@ export default function SortitionPage() {
                       <div>
                         <label className="text-xs text-cosmic-muted mb-1 block">Gender</label>
                         <Select value={volunteerForm.gender} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, gender: v }))}>
-                          <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                          <SelectTrigger aria-label="Select" className="bg-foreground/5 border-border text-foreground">
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
@@ -511,7 +511,7 @@ export default function SortitionPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Purpose</label>
                 <Select value={createForm.purpose} onValueChange={(v) => setCreateForm((f) => ({ ...f, purpose: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -540,7 +540,7 @@ export default function SortitionPage() {
             <div>
               <label className="text-sm text-cosmic-muted mb-1 block">Selection Method</label>
               <Select value={createForm.selectionMethod} onValueChange={(v) => setCreateForm((f) => ({ ...f, selectionMethod: v }))}>
-                <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

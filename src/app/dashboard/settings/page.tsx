@@ -148,17 +148,17 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm text-cosmic-muted mb-1.5 block">Display Name</label>
-                  <Input value={name} onChange={e => setName(e.target.value)} className="bg-foreground/5 border-border text-foreground" />
+                  <label htmlFor="settings-name" className="text-sm text-cosmic-muted mb-1.5 block">Display name</label>
+                  <Input id="settings-name" value={name} onChange={e => setName(e.target.value)} className="bg-foreground/5 border-border text-foreground" />
                 </div>
                 <div>
                   <label className="text-sm text-cosmic-muted mb-1.5 block">Email</label>
-                  <Input value={user.email} disabled className="bg-foreground/5 border-border text-cosmic-muted" />
+                  <Input aria-label="Email" value={user.email} disabled className="bg-foreground/5 border-border text-cosmic-muted" />
                   <p className="text-xs text-cosmic-muted mt-1">Email changes require verification</p>
                 </div>
                 <div>
-                  <label className="text-sm text-cosmic-muted mb-1.5 block">Age Group</label>
-                  <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)}
+                  <label htmlFor="settings-age" className="text-sm text-cosmic-muted mb-1.5 block">Age group</label>
+                  <select id="settings-age" value={ageGroup} onChange={e => setAgeGroup(e.target.value)}
                     className="w-full bg-foreground/5 border border-border rounded-lg px-3 py-2 text-sm text-foreground">
                     <option value="youth">Youth (13-17)</option>
                     <option value="young_adult">Young Adult (18-25)</option>

@@ -521,7 +521,7 @@ export default function SurveysPage() {
                 <div>
                   <Label className="text-sm text-cosmic-muted mb-1 block">Category</Label>
                   <Select value={createForm.category} onValueChange={(v) => setCreateForm((f) => ({ ...f, category: v }))}>
-                    <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                    <SelectTrigger aria-label="Category" className="bg-foreground/5 border-border text-foreground">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -594,7 +594,7 @@ export default function SurveysPage() {
                           onChange={(e) => updateQuestion(qIdx, 'text', e.target.value)}
                         />
                         <Select value={question.type} onValueChange={(v) => updateQuestion(qIdx, 'type', v)}>
-                          <SelectTrigger className="w-36 bg-foreground/5 border-border text-foreground shrink-0">
+                          <SelectTrigger aria-label="Choose an option" className="w-36 bg-foreground/5 border-border text-foreground shrink-0">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>

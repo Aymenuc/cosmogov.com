@@ -99,7 +99,7 @@ export default function CreateProposalPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1.5 block">Category</label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground"><SelectValue /></SelectTrigger>
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="governance">Governance</SelectItem>
                     <SelectItem value="technology">Technology</SelectItem>
@@ -112,7 +112,7 @@ export default function CreateProposalPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1.5 block">Voting Type</label>
                 <Select value={votingType} onValueChange={setVotingType}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground"><SelectValue /></SelectTrigger>
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="yes_no">Yes / No</SelectItem>
                     <SelectItem value="single_choice">Single Choice</SelectItem>

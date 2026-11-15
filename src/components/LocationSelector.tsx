@@ -200,7 +200,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
         </div>
         <div className="grid grid-cols-3 gap-2">
           <Select value={value?.countryId || ''} onValueChange={handleCountryChange}>
-            <SelectTrigger className={`${selectClasses} h-8 text-xs`}>
+            <SelectTrigger aria-label="Country" className={`${selectClasses} h-8 text-xs`}>
               <SelectValue placeholder="Country" className={placeholderClasses} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border max-h-60">
@@ -219,7 +219,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
           </Select>
 
           <Select value={value?.stateId || ''} onValueChange={handleStateChange} disabled={!value?.countryId || loadingStates}>
-            <SelectTrigger className={`${selectClasses} h-8 text-xs`}>
+            <SelectTrigger aria-label="State" className={`${selectClasses} h-8 text-xs`}>
               <SelectValue placeholder="State" className={placeholderClasses} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border max-h-60">
@@ -238,7 +238,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
           </Select>
 
           <Select value={value?.cityId || ''} onValueChange={handleCityChange} disabled={!value?.stateId || loadingCities}>
-            <SelectTrigger className={`${selectClasses} h-8 text-xs`}>
+            <SelectTrigger aria-label="City" className={`${selectClasses} h-8 text-xs`}>
               <SelectValue placeholder="City" className={placeholderClasses} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border max-h-60">
@@ -299,7 +299,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             Country
           </label>
           <Select value={value?.countryId || ''} onValueChange={handleCountryChange}>
-            <SelectTrigger className={`${selectClasses} w-full`}>
+            <SelectTrigger aria-label="Select a country" className={`${selectClasses} w-full`}>
               <SelectValue placeholder="Select a country" className={placeholderClasses} />
             </SelectTrigger>
             <SelectContent className="bg-card border-border max-h-64">
@@ -326,7 +326,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             State / Region
           </label>
           <Select value={value?.stateId || ''} onValueChange={handleStateChange} disabled={!value?.countryId || loadingStates}>
-            <SelectTrigger className={`${selectClasses} w-full`}>
+            <SelectTrigger aria-label="Choose an option" className={`${selectClasses} w-full`}>
               {loadingStates ? (
                 <div className="flex items-center">
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-cosmic-teal mr-2" />
@@ -353,7 +353,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
             City
           </label>
           <Select value={value?.cityId || ''} onValueChange={handleCityChange} disabled={!value?.stateId || loadingCities}>
-            <SelectTrigger className={`${selectClasses} w-full`}>
+            <SelectTrigger aria-label="Choose an option" className={`${selectClasses} w-full`}>
               {loadingCities ? (
                 <div className="flex items-center">
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-cosmic-teal mr-2" />

@@ -21,6 +21,17 @@ interface GameResult {
   accuracy: number;
 }
 
+// The bright brand accents are fine for fills but too light for text on
+// white; text uses a darker shade of the same colour.
+const READABLE: Record<string, string> = {
+  '#2EE6C7': '#13695b',
+  '#9B5CFF': '#5b34c9',
+  '#FFB547': '#8a5a00',
+  '#FF5E8A': '#b0284f',
+  '#2D6BFF': '#1f4fbf',
+};
+const readable = (hex: string) => READABLE[hex.toUpperCase()] ?? READABLE[hex] ?? hex;
+
 const categories = [
   { id: 'all', name: 'All Games', icon: Gamepad2, color: '#2D6BFF' },
   { id: 'cognitive', name: 'Cognitive Training', icon: Brain, color: '#2EE6C7', desc: 'Sharpen reasoning and analytical skills' },
@@ -191,7 +202,7 @@ export default function GamesPage() {
                   ? 'border-transparent text-foreground'
                   : 'border-border bg-transparent text-cosmic-muted hover:text-foreground hover:border-border'
               }`}
-              style={selectedCategory === cat.id ? { background: `${cat.color}20`, color: cat.color, borderColor: `${cat.color}30` } : {}}
+              style={selectedCategory === cat.id ? { background: `${cat.color}20`, color: readable(cat.color), borderColor: `${cat.color}30` } : {}}
             >
               <cat.icon className="w-4 h-4" />
               {cat.name}
@@ -274,10 +285,10 @@ export default function GamesPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
                       style={{ background: game.accentBg }}>
-                      <game.icon className="w-6 h-6" style={{ color: game.accent }} />
+                      <game.icon className="w-6 h-6" style={{ color: readable(game.accent) }} />
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <div className="flex items-center gap-1 text-xs" style={{ color: game.accent }}>
+                      <div className="flex items-center gap-1 text-xs" style={{ color: readable(game.accent) }}>
                         <Zap className="w-3 h-3" /> {game.xp}
                       </div>
                       {highScore !== null && (
@@ -289,7 +300,7 @@ export default function GamesPage() {
                   </div>
 
                   <h3 className="text-lg font-semibold font-heading mb-1">{game.name}</h3>
-                  <p className="text-xs mb-2" style={{ color: game.accent }}>{game.tagline}</p>
+                  <p className="text-xs mb-2" style={{ color: readable(game.accent) }}>{game.tagline}</p>
                   <p className="text-sm text-cosmic-muted leading-relaxed mb-3 line-clamp-2">{game.desc}</p>
 
                   {/* Tags */}
@@ -301,7 +312,7 @@ export default function GamesPage() {
                       Ages {game.minAge}+
                     </Badge>
                     {catInfo && (
-                      <Badge variant="outline" className="text-[10px]" style={{ borderColor: `${catInfo.color}30`, color: catInfo.color }}>
+                      <Badge variant="outline" className="text-[10px]" style={{ borderColor: `${catInfo.color}30`, color: readable(catInfo.color) }}>
                         {catInfo.name}
                       </Badge>
                     )}
@@ -318,7 +329,7 @@ export default function GamesPage() {
                     <span className="text-xs text-cosmic-muted">
                       {playCount > 0 ? `Played ${playCount}x` : 'Not yet played'}
                     </span>
-                    <span className="flex items-center gap-1 text-xs font-medium group-hover:gap-2 transition-all" style={{ color: game.accent }}>
+                    <span className="flex items-center gap-1 text-xs font-medium group-hover:gap-2 transition-all" style={{ color: readable(game.accent) }}>
                       Play <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>

@@ -629,7 +629,7 @@ h2 em {
   border-radius: 5px;
   font-size: 12px;
   padding: 9px 15px;
-  color: #6a647d;
+  color: #5e5871;
 }
 .billing-switch button.active {
   background: white;
@@ -726,7 +726,7 @@ h2 em {
 }
 .pricing-note {
   font-size: 12px;
-  color: #6a647d;
+  color: #5e5871;
   text-align: center;
   margin-top: 27px;
 }
@@ -1004,7 +1004,7 @@ h2 em {
 .nav-group-label {
   font-size: 12px;
   letter-spacing: 1.2px;
-  color: #6a647d;
+  color: #5e5871;
   font-weight: 600;
   padding: 0 12px 10px;
 }
@@ -1192,7 +1192,7 @@ h2 em {
   color: #6a657d;
 }
 .workspace-breadcrumb > svg {
-  color: #6a647d;
+  color: #5e5871;
   flex: none;
 }
 .workspace-breadcrumb strong {
@@ -1256,7 +1256,7 @@ h2 em {
   gap: 16px;
   padding: 20px 35px;
   font-size: 12px;
-  color: #6a647d;
+  color: #5e5871;
   border-top: 1px solid #e0ddeb;
 }
 .workspace-loading {
@@ -1317,7 +1317,7 @@ h2 em {
 }
 .app-page-heading p {
   font-size: 13px;
-  color: #6a647d;
+  color: #5e5871;
   line-height: 1.8;
 }
 .app-page-heading .eyebrow {
@@ -1566,7 +1566,7 @@ h2 em {
 }
 .desk-stats small {
   font-size: 12px;
-  color: #6a647d;
+  color: #5e5871;
   line-height: 1.6;
 }
 .desk-columns {
@@ -1674,7 +1674,7 @@ h2 em {
   font-size: 12px;
 }
 .save-proposal {
-  color: #6a647d;
+  color: #5e5871;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1751,7 +1751,7 @@ h2 em {
   align-items: center;
   gap: 5px;
   background: #ebe9f2;
-  color: #6a647d;
+  color: #5e5871;
   font-size: 12px;
   padding: 4px 6px;
   border-radius: 3px;
@@ -1804,7 +1804,7 @@ h2 em {
   animation: pulseGlow 2s infinite;
 }
 .feed-note {
-  color: #6a647d;
+  color: #5e5871;
   font-size: 12px;
   line-height: 1.8;
   margin-top: 18px;

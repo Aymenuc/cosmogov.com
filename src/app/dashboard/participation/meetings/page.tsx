@@ -319,7 +319,7 @@ export default function MeetingsPage() {
           </div>
 
           <Select value={filters.type} onValueChange={(v) => setFilters((f) => ({ ...f, type: v }))}>
-            <SelectTrigger className="w-full sm:w-36 bg-foreground/5 border-border text-foreground">
+            <SelectTrigger aria-label="Type" className="w-full sm:w-36 bg-foreground/5 border-border text-foreground">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
@@ -837,7 +837,7 @@ export default function MeetingsPage() {
               <div>
                 <label className="text-sm text-cosmic-muted mb-1 block">Type</label>
                 <Select value={createForm.type} onValueChange={(v) => setCreateForm((f) => ({ ...f, type: v }))}>
-                  <SelectTrigger className="bg-foreground/5 border-border text-foreground">
+                  <SelectTrigger aria-label="Choose an option" className="bg-foreground/5 border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

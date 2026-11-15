@@ -201,7 +201,7 @@ export default function AssistantPage() {
             rows={2}
           />
         </div>
-        <Button onClick={handleSend} disabled={!input.trim() || loading}
+        <Button onClick={handleSend} disabled={!input.trim() || loading} aria-label="Send"
           className="bg-cosmic-accent text-primary-foreground self-end rounded-xl h-10 w-10 p-0">
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </Button>
