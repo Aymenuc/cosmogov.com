@@ -83,10 +83,20 @@ export async function chatCompletionsCreate(options: {
   )) as CompletionResponse;
 }
 
+/** Host name of the configured AI service, e.g. "api.deepseek.com". */
+export function aiProviderHost(): string | null {
+  try {
+    return new URL(process.env.Z_AI_BASE_URL ?? "").host || null;
+  } catch {
+    return null;
+  }
+}
+
 export function aiModelMetadata() {
   const compatible = isOpenAICompatible();
   return {
-    provider: compatible ? "openai-compatible" : "z-ai",
+    // Record who actually ran the model (e.g. "api.deepseek.com").
+    provider: compatible ? aiProviderHost() || "openai-compatible" : "z-ai",
     model:
       process.env.Z_AI_MODEL?.trim() ||
       (compatible ? "deepseek-ai/deepseek-v4-pro" : "provider-default"),

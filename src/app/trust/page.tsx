@@ -11,7 +11,29 @@ export const metadata: Metadata = {
 
 // Every statement on this page is checked against the code and the live
 // configuration. When something changes, change it here in the same commit.
+// The AI status is read from the deployment's settings when the page is built,
+// so it can't drift from what is actually switched on.
+function aiStatus() {
+  const base = process.env.Z_AI_BASE_URL?.trim() ?? "";
+  const hasKey = Boolean(process.env.Z_AI_API_KEY?.trim());
+  const model = process.env.Z_AI_MODEL?.trim() || null;
+  let host = "";
+  try {
+    host = base ? new URL(base).host : "";
+  } catch {
+    host = "";
+  }
+  const deepseek = host.endsWith("deepseek.com");
+  return {
+    state: !host ? ("off" as const) : hasKey ? ("on" as const) : ("setup" as const),
+    provider: deepseek ? "DeepSeek" : host,
+    model,
+    deepseek,
+  };
+}
+
 export default function TrustPage() {
+  const ai = aiStatus();
   return (
     <PublicPage
       title="Security, privacy and AI"
@@ -79,6 +101,14 @@ export default function TrustPage() {
               <li>The app runs on Vercel, in Washington, D.C. (US East).</li>
               <li>The database is on Supabase, in the US East (North Virginia) region.</li>
               <li>Account and activity emails are sent through Resend.</li>
+              {ai.state !== "off" && (
+                <li>
+                  AI requests go to {ai.provider}
+                  {ai.deepseek
+                    ? ", a company based in China. Its privacy policy says it stores data on servers in China."
+                    : "."}
+                </li>
+              )}
               <li>The community map loads its map tiles from OpenFreeMap. Fonts load from Google Fonts.</li>
               <li>There are no advertising or analytics trackers on Cosmogov.</li>
               <li>We don't sell personal data. Read the <Link href="/privacy">privacy policy</Link> for your rights and how to make a request.</li>
@@ -87,11 +117,31 @@ export default function TrustPage() {
 
           <section id="ai">
             <h2>AI helpers</h2>
-            <p>
-              <strong>Right now the AI helpers are switched off on the live site.</strong>{" "}
-              Everything else works without them. Before they are switched on, this page
-              will name the AI provider and model.
-            </p>
+            {ai.state === "on" && (
+              <p>
+                <strong>
+                  The AI helpers use {ai.provider}
+                  {ai.model ? ` (model ${ai.model})` : ""}.
+                </strong>{" "}
+                {ai.deepseek &&
+                  "What you send to them, including text you paste into a mission or debate, is processed by DeepSeek in China. Don't paste personal details you wouldn't want to leave the EU. "}
+                Everything else in Cosmogov works without them.
+              </p>
+            )}
+            {ai.state === "setup" && (
+              <p>
+                <strong>The AI helpers are being switched on with {ai.provider}</strong>
+                {ai.deepseek ? ", which processes requests in China" : ""}. Until then they
+                are off, and everything else works without them.
+              </p>
+            )}
+            {ai.state === "off" && (
+              <p>
+                <strong>Right now the AI helpers are switched off on the live site.</strong>{" "}
+                Everything else works without them. Before they are switched on, this page
+                will name the AI provider and model.
+              </p>
+            )}
             <p>When they are on, these rules are built in, not just promised:</p>
             <ul>
               <li>AI never votes, signs or decides. A person reviews and adopts every plan, form or draft before it counts.</li>
@@ -125,7 +175,11 @@ export default function TrustPage() {
             <h2>Not done yet</h2>
             <ul>
               <li>No independent security audit or penetration test has been done yet, and Cosmogov holds no security certification.</li>
-              <li>Data is kept in the United States. Hosting in the EU isn't available yet.</li>
+              <li>
+                Data is kept in the United States
+                {ai.state !== "off" && ai.deepseek ? ", and AI requests are processed in China" : ""}.
+                Hosting and AI processing in the EU aren't available yet.
+              </li>
               <li>
                 Ballots are linked to accounts, and real-world identity isn't verified.
                 Cosmogov is not suitable for secret-ballot or legally binding elections.

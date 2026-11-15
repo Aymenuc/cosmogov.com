@@ -5,6 +5,7 @@ import { chatCompletionsCreate } from '@/lib/ai-completions';
 import { apiFailure, rateLimit } from '@/lib/api-server';
 import { debateVisibility } from '@/lib/visibility';
 import { AI_GROUND_RULES } from '@/lib/ai-rules';
+import { ensureAiAgents } from '@/lib/ai-agents';
 
 // ─── Agent Response Decision Logic ───
 
@@ -213,9 +214,13 @@ export async function POST(
     const contextLength = recentMessages.length;
 
     // Fetch all active AI agents for their system prompts
-    const aiAgents = await db.aiAgent.findMany({
+    let aiAgents = await db.aiAgent.findMany({
       where: { isActive: true },
     });
+    if (aiAgents.length === 0) {
+      await ensureAiAgents();
+      aiAgents = await db.aiAgent.findMany({ where: { isActive: true } });
+    }
 
     const agentMap = new Map(aiAgents.map(a => [a.type, a]));
 
