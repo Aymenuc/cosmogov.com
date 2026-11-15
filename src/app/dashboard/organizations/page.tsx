@@ -57,8 +57,8 @@ export default function OrganizationsPage() {
           <div className="eyebrow">
             <Users size={13} /> YOUR PEOPLE, YOUR POSSIBILITIES
           </div>
-          <h1>Find a sense of together.</h1>
-          <p>The places where your ideas meet people who care.</p>
+          <h1>My communities</h1>
+          <p>Open a community you belong to, find its proposals, or create a new space for your group.</p>
         </div>
         <Link href="/dashboard/organizations/new" className="civic-button">
           <Plus size={15} />
@@ -77,7 +77,7 @@ export default function OrganizationsPage() {
         </div>
         <Link href="/dashboard/explore" className="following-filter">
           <Globe2 size={15} />
-          Explore more
+          Explore participation
         </Link>
       </div>
       {loading ? (
@@ -143,21 +143,21 @@ export default function OrganizationsPage() {
           </span>
           <h3>
             {query
-              ? "Your people might use a different name."
-              : "A shared future needs a shared space."}
+              ? "No communities found"
+              : "You’re not in a community yet"}
           </h3>
           <p>
             {query
-              ? "Try another search to find one of your communities."
-              : "Create a community for your neighborhood, organization, or group. Bring people in and start with one good question."}
+              ? "Try searching by community name or description."
+              : "Create a space for your neighborhood, organization, or group to work together."}
           </p>
           <Link
             href={query ? "/dashboard/explore" : "/dashboard/organizations/new"}
             className="civic-button outline"
           >
             {query
-              ? "Explore the wider community"
-              : "Create your first community"}
+              ? "Explore participation"
+              : "Create a community"}
             <ArrowUpRight size={14} />
           </Link>
         </div>

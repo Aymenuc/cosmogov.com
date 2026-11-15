@@ -20,7 +20,7 @@ export default function Footer() {
                 ["Participation", "/#platform"],
                 ["How it works", "/#how-it-works"],
                 ["Pricing", "/#pricing"],
-                ["Explore communities", "/dashboard/organizations"],
+                ["My communities", "/dashboard/organizations"],
               ],
             },
             {
@@ -59,7 +59,7 @@ export default function Footer() {
           <div>
             <Link href="/privacy">Privacy policy</Link>
             <Link href="/terms">Terms of use</Link>
-            <Link href="/#main-content">Back to top ↑</Link>
+            <a href="#main-content">Back to top ↑</a>
           </div>
         </div>
       </div>

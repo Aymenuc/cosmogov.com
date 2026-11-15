@@ -1,117 +1,42 @@
-'use client';
+import type { Metadata } from "next";
+import Link from "next/link";
+import PublicPage from "@/components/PublicPage";
 
-import SiteHeader from '@/components/SiteHeader';
-
-import Link from 'next/link';
-import { Rocket, Eye, Heart, Lightbulb, Shield, Users } from 'lucide-react';
-import Footer from '@/components/Footer';
-
-function Starfield() {
-  return <div className="fixed inset-0 starfield opacity-20 pointer-events-none" />;
-}
-
-const values = [
-  {
-    icon: Eye,
-    title: 'Transparency',
-    description: 'Every decision, every vote, every outcome — fully visible and auditable. We believe that sunlight is the best disinfectant, and that citizens deserve to see exactly how their governance works. No back rooms, no hidden agendas, just clear and open processes.',
-  },
-  {
-    icon: Users,
-    title: 'Inclusivity',
-    description: 'Governance belongs to everyone, not just the loudest voices or the most privileged. CosmoGov is designed to lower barriers to participation, accommodate diverse needs, and ensure that every community member can meaningfully contribute to the decisions that shape their lives.',
-  },
-  {
-    icon: Lightbulb,
-    title: 'Innovation',
-    description: 'We push the boundaries of what civic technology can be. From AI-assisted deliberation to gamified engagement, we continuously explore new frontiers in how communities govern themselves. Stagnation is the enemy of progress — we embrace bold ideas and creative solutions.',
-  },
-  {
-    icon: Heart,
-    title: 'Empowerment',
-    description: 'Our platform exists to give people real power over the decisions that affect them. Not token participation, not performative consultation, but genuine agency. Every feature we build is measured against one question: does this make citizens more powerful?',
-  },
-  {
-    icon: Shield,
-    title: 'Accountability',
-    description: 'Promises must be tracked, progress must be measured, and leaders must answer to their communities. CosmoGov provides the tools to follow through from vote to implementation, ensuring that governance is not just a moment but a continuous commitment to results.',
-  },
-];
+export const metadata: Metadata = {
+  title: "Our mission | Cosmogov",
+  description: "Why Cosmogov helps communities turn shared questions into plans, decisions, and visible action.",
+};
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-card">
-
-      <SiteHeader />
-
-      <main id="main-content" className="relative z-10 flex-grow max-w-4xl mx-auto px-6 py-12">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 cosmic-badge rounded-full px-4 py-1.5 mb-6">
-            <Rocket className="w-3.5 h-3.5 text-cosmic-teal" />
-            <span className="text-xs font-medium text-cosmic-teal">Our Story</span>
-          </div>
-          <h1 className="text-4xl sm:text-6xl font-bold mb-6 font-heading">
-            About <span className="text-gradient">CosmoGov</span>
-          </h1>
-          <p className="text-cosmic-muted text-lg max-w-2xl mx-auto leading-relaxed">
-            Giving communities a clearer way to participate, decide, and move forward together.
-          </p>
+    <PublicPage
+      title="Our mission"
+      intro="Cosmogov helps communities turn a shared question into a decision people can understand and an outcome they can follow."
+    >
+      <div className="public-stack">
+        <section className="public-card public-feature">
+          <h2>Make it easier for people to take part</h2>
+          <p>A neighborhood group planning a repair café and a local government collecting budget proposals face a similar problem. They need to hear from people, explain what was decided, and keep everyone informed as the work moves forward. We build tools for those steps.</p>
+        </section>
+        <div className="public-grid">
+          <section className="public-card">
+            <h2>Start with the community</h2>
+            <p>Use proposals, assemblies, budgets, or forms to fit the decision at hand. Give people a clear question and explain what their participation can change.</p>
+          </section>
+          <section className="public-card">
+            <h2>Keep decisions with people</h2>
+            <p>Mission Studio can help research an issue and draft a summary, plan, or form. Organizers review the work and decide what to adopt and share.</p>
+          </section>
+          <section className="public-card">
+            <h2>Show the follow-through</h2>
+            <p>Record who owns the next task, when a response is due, and what evidence is available to the people following the work.</p>
+          </section>
         </div>
-
-        <section className="mb-12">
-          <div className="glass-card p-8">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-cosmic-teal/10 flex items-center justify-center">
-                <Rocket className="w-5 h-5 text-cosmic-teal" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground font-heading">Our Mission</h2>
-            </div>
-            <p className="text-cosmic-muted leading-relaxed">
-              CosmoGov is a civic participation platform designed to connect everyday ideas with shared decisions. We believe that every citizen deserves a voice, every community deserves transparency, and every decision deserves informed participation. Our platform combines AI-powered deliberation tools, gamified engagement, and participatory democracy frameworks to create a governance experience that is accessible, engaging, and impactful. We exist to bridge the gap between the promise of democracy and its practice — making it possible for communities of any size to deliberate, decide, and hold power accountable with confidence and clarity.
-            </p>
-          </div>
+        <section className="public-card">
+          <h2>See it in practice</h2>
+          <p>Walk through an <Link href="/missions/demo">example mission</Link> or <Link href="/contact?topic=partnership">tell us about your community</Link>.</p>
         </section>
-
-        <section className="mb-12">
-          <div className="glass-card-violet p-8">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-cosmic-violet/10 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-cosmic-violet" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground font-heading">Our Vision</h2>
-            </div>
-            <p className="text-cosmic-muted leading-relaxed">
-              We envision a world where civic participation is as natural as social interaction — where citizens are empowered with the tools, knowledge, and community support to shape the decisions that affect their lives. From neighborhood budgets to global policy, CosmoGov makes every voice count. We see a future where the friction between intention and action in governance is eliminated, where AI augments human judgment rather than replacing it, and where the act of participating in democracy is not just a duty but a genuinely rewarding experience. Our vision is nothing less than a renaissance in how humans govern themselves together.
-            </p>
-          </div>
-        </section>
-
-        <section>
-          <div className="glass-card p-8">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-cosmic-amber/10 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-cosmic-amber" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground font-heading">Our Values</h2>
-            </div>
-            <div className="space-y-6">
-              {values.map((value) => (
-                <div key={value.title} className="flex gap-4 group">
-                  <div className="w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center flex-shrink-0 group-hover:bg-foreground/10 transition-colors">
-                    <value.icon className="w-5 h-5 text-cosmic-teal" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2 font-heading">{value.title}</h3>
-                    <p className="text-cosmic-muted text-sm leading-relaxed">{value.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </PublicPage>
   );
 }

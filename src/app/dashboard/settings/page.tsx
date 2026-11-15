@@ -2,6 +2,7 @@
 import SessionControls from '@/components/SessionControls';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,11 +29,11 @@ interface UserData {
   interests: string;
 }
 
-const planDetails: Record<string, { price: string; features: string[]; color: string }> = {
-  community: { price: 'Free', color: 'text-cosmic-muted', features: ['5 proposals/month', '1 organization', '3 governance games', 'Basic AI assistant', 'Community support'] },
-  team: { price: '$39/org/mo', color: 'text-cosmic-accent', features: ['Unlimited proposals', '5 organizations', 'All 6 games', 'Full AI assistant', 'Analytics dashboard', 'Custom game rounds', 'Priority support'] },
-  guild: { price: '$149/org/mo', color: 'text-cosmic-violet', features: ['Everything in Team', 'Unlimited organizations', 'Decision quality metrics', 'Advanced analytics', 'API access', 'Dedicated account manager', 'Custom integrations'] },
-  enterprise: { price: 'Custom', color: 'text-cosmic-amber', features: ['Everything in Guild', 'SSO & SAML', '99.99% SLA', 'Dedicated infrastructure', 'Custom AI models', 'On-premise option', '24/7 dedicated support'] },
+const planDetails: Record<string, { features: string[]; color: string }> = {
+  community: { color: 'text-cosmic-muted', features: ['5 proposals/month', '1 organization', '3 governance games', 'Basic AI assistant', 'Community support'] },
+  team: { color: 'text-cosmic-accent', features: ['Unlimited proposals', '5 organizations', 'All 6 games', 'Full AI assistant', 'Analytics dashboard', 'Custom game rounds', 'Priority support'] },
+  guild: { color: 'text-cosmic-violet', features: ['Everything in Team', 'Unlimited organizations', 'Decision quality metrics', 'Advanced analytics', 'API access', 'Dedicated account manager', 'Custom integrations'] },
+  enterprise: { color: 'text-cosmic-amber', features: ['Everything in Guild', 'SSO & SAML', '99.99% SLA', 'Dedicated infrastructure', 'Custom AI models', 'On-premise option', '24/7 dedicated support'] },
 };
 
 const interestTags = ['Governance', 'Democracy', 'Data Science', 'Psychology', 'Strategy', 'Leadership', 'Ethics', 'Finance', 'Community', 'Technology', 'Policy', 'Logic'];
@@ -199,7 +200,6 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between p-4 rounded-xl bg-cosmic-violet/5 border border-cosmic-violet/10 mb-4">
                 <div>
                   <p className="text-lg font-bold font-heading capitalize">{user.plan} Plan</p>
-                  <p className="text-sm text-cosmic-muted">{currentPlan.price}</p>
                 </div>
                 <Badge className="bg-cosmic-teal/20 text-cosmic-teal border-0">Active</Badge>
               </div>
@@ -211,20 +211,20 @@ export default function SettingsPage() {
                   </div>
                 ))}
               </div>
-              {user.plan !== 'guild' && user.plan !== 'enterprise' && (
-                <Button className="bg-cosmic-violet text-foreground rounded-xl">
-                  <ArrowUpRight className="w-4 h-4 mr-1" /> Upgrade Plan
-                </Button>
-              )}
             </CardContent>
           </Card>
 
           <Card className="bg-card border-border">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-cosmic-accent" /> Billing History
+                <CreditCard className="w-4 h-4 text-cosmic-accent" /> Billing and payments
               </h2>
-              <p className="text-xs text-cosmic-muted">No billing records found for your account.</p>
+              <p className="text-sm text-cosmic-muted mb-4">Contact us for invoices, payment questions or plan changes.</p>
+              <Button asChild variant="outline">
+                <Link href="/contact?topic=sales">
+                  Contact us about billing <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

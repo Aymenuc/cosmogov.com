@@ -236,9 +236,10 @@ export default function HomePage() {
                 <em>Your call.</em>
               </h2>
               <p>
-                Scout, Bridge, Maker and Studio are four AI steps you ask for,
-                one at a time. They draft. They show their references. They
-                say what they don’t know. Then they wait for you.
+                Start with a question your community wants to answer. Ask
+                Scout to research it, Bridge to connect what people tell you,
+                Maker to draft an action plan, and Studio to help build a form.
+                Review each draft before moving on.
               </p>
             </div>
             <MissionPath />
@@ -266,9 +267,8 @@ export default function HomePage() {
               </h2>
             </div>
             <p>
-              From the first conversation to the final decision.
-              <br />
-              Everything your community needs to move forward.
+              Gather input, agree on a decision, and give people a way to
+              follow what happens next.
             </p>
           </div>
           <div
@@ -343,7 +343,7 @@ export default function HomePage() {
               <ShieldCheck />
               <div>
                 <h3>Trust, built in.</h3>
-                <p>Follow official responses and see where decisions lead.</p>
+                <p>Track response deadlines and see progress and evidence for work you can access.</p>
               </div>
               <ArrowUpRight />
             </Link>
@@ -415,7 +415,7 @@ export default function HomePage() {
                 Big possibilities.
                 <br />A simple place to start.
               </h2>
-              <p>Start with your community. Grow at your own pace.</p>
+              <p>Contact us about any plan, upgrade, or payment.</p>
               <div className="billing-switch" aria-label="Billing period">
                 <button
                   className={!annual ? "active" : ""}
@@ -445,8 +445,6 @@ export default function HomePage() {
                     "Discussion and participation tools",
                     "Community support",
                   ],
-                  action: "Start for free",
-                  href: "/auth/signup",
                 },
                 {
                   name: "Pro",
@@ -458,8 +456,6 @@ export default function HomePage() {
                     "AI-powered assistance",
                     "Analytics and participation insights",
                   ],
-                  action: "Get started with Pro",
-                  href: "/auth/signup",
                   featured: true,
                 },
                 {
@@ -472,8 +468,6 @@ export default function HomePage() {
                     "Official verification tools",
                     "Onboarding and migration support",
                   ],
-                  action: "Talk to us",
-                  href: "/contact",
                 },
               ].map((plan) => (
                 <div
@@ -487,7 +481,7 @@ export default function HomePage() {
                   <p>{plan.desc}</p>
                   <div className="price">
                     ${plan.price}
-                    <span>{plan.price === 0 ? "/ forever" : "/ month"}</span>
+                    <span>{plan.price === 0 ? "" : "/ month"}</span>
                   </div>
                   <span className="billing-note">
                     {plan.price === 0
@@ -497,10 +491,13 @@ export default function HomePage() {
                         : "Billed monthly"}
                   </span>
                   <Link
-                    href={plan.href}
+                    href={{
+                      pathname: "/contact",
+                      query: { topic: "sales", plan: plan.name },
+                    }}
                     className={`civic-button ${plan.featured ? "" : "outline"}`}
                   >
-                    {plan.action}
+                    Ask about {plan.name}
                     <ArrowUpRight size={16} />
                   </Link>
                   <ul>
@@ -516,7 +513,7 @@ export default function HomePage() {
             </div>
             <p className="pricing-note">
               Need a tailored setup?{" "}
-              <Link href="/contact">
+              <Link href="/contact?topic=sales">
                 Let’s find the right fit <ArrowUpRight size={13} />
               </Link>
             </p>
