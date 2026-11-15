@@ -276,6 +276,8 @@ export async function POST(
       // Each helper reply spends from the poster's AI budget and the site's.
       // When it runs out, the person's message still goes through; the
       // helpers just stay quiet.
+      // Helpers only answer people with a confirmed email.
+      if (!session.emailVerifiedAt) break;
       try {
         await spendAi('debate', session.id, session.plan);
       } catch (error) {

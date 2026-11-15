@@ -475,3 +475,27 @@ export function welcomeEmail(params: { recipientName: string; role: string }): O
       textFooter(footnote),
   };
 }
+
+export function verifyEmail(params: { recipientName: string; link: string }): Omit<EmailPayload, "to"> {
+  const first = firstName(params.recipientName);
+  const hey = first ? `Hi ${escapeHtml(first)}.` : 'Hi there.';
+  return {
+    subject: 'Confirm your email for Cosmogov',
+    html: layout({
+      preheader: 'One click and you can vote, sign and use AI help.',
+      eyebrow: 'Welcome to Cosmogov',
+      dot: C.coral,
+      heading: `${hey} Please confirm it's you.`,
+      body: `
+      <p style="${P}">Confirming your email keeps every vote and signature to one real person. It takes one click.</p>
+      <p style="${P}">Until then you can look around, read proposals and join communities. Voting, signing and AI help unlock once you confirm.</p>`,
+      button: { label: 'Confirm my email', href: params.link },
+      footnote: 'This link works for 48 hours. If you didn’t create a Cosmogov account, you can ignore this email.',
+      tone: 'sticker',
+    }),
+    text:
+      `${first ? `Hi ${first}.` : 'Hi there.'} Please confirm it's you.\n\n` +
+      'Confirming your email keeps every vote and signature to one real person.\n\n' +
+      `Confirm: ${params.link}\n\nThis link works for 48 hours. If you didn't create a Cosmogov account, ignore this email.`,
+  };
+}

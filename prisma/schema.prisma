@@ -22,6 +22,8 @@ model User {
   plan          String   @default("community") // community, pro, government (see src/lib/plans.ts)
   stripeCustomerId     String? @unique
   stripeSubscriptionId String?
+  emailVerifiedAt      DateTime?
+  emailVerifications   EmailVerification[]
   sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
@@ -1270,4 +1272,18 @@ model MissionTemplate {
   sourceMission Mission? @relation("TemplateSource", fields: [sourceMissionId], references: [id], onDelete: Cascade)
   uses Mission[] @relation("TemplateUses")
   @@index([organizationId, createdAt])
+}
+
+/// One-time links that confirm an account's email address.
+model EmailVerification {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

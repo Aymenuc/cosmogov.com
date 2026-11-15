@@ -73,6 +73,7 @@ export default function TrustPage() {
                 <Link href="/dashboard/settings">Settings</Link> can sign you out on every device.
               </li>
               <li>Repeated sign-in attempts, sign-ups, posts and form messages are rate-limited.</li>
+              <li>Voting, signing and AI help need a confirmed email address, so throwaway accounts can't add ballots or signatures.</li>
               <li>
                 Official access is granted only through single-use, expiring invitations
                 from an administrator, tied to one email address.
@@ -191,7 +192,8 @@ export default function TrustPage() {
                 Hosting and AI processing in the EU aren't available yet.
               </li>
               <li>
-                Ballots are linked to accounts, and real-world identity isn't verified.
+                Ballots are linked to accounts, and accounts are confirmed by email only:
+                real-world identity isn't verified.
                 Cosmogov is not suitable for secret-ballot or legally binding elections.
               </li>
               <li>Formal proposals check signatures before they count, but this is not an official identity check.</li>

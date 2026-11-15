@@ -15,6 +15,7 @@ export interface WorkspaceUser {
   totalXp: number;
   level: number;
   streak: number;
+  emailVerifiedAt?: string | null;
 }
 const WorkspaceContext = createContext<{
   user: WorkspaceUser | null;

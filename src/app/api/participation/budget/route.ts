@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireVerified } from '@/lib/email-verification';
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -109,6 +110,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const user = await apiUser();
+    requireVerified(user);
     await rateLimit("budget-vote", user.id, 120, 3600);
     const { projectId, amount } = z
       .object({

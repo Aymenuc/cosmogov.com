@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireVerified } from '@/lib/email-verification';
 import { z } from 'zod';
 import { chatCompletionsCreate } from '@/lib/ai-completions';
 import { ApiError, apiFailure, apiUser } from '@/lib/api-server';
@@ -38,6 +39,7 @@ const modePrompts: Record<z.infer<typeof chatSchema>['mode'], string> = {
 export async function POST(req: NextRequest) {
   try {
     const user = await apiUser();
+    requireVerified(user);
     const { mode, messages } = chatSchema.parse(await req.json());
     const question = messages[messages.length - 1];
     if (question.role !== 'user') throw new ApiError(400, 'Please ask a question.');

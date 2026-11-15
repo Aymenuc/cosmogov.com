@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireVerified } from '@/lib/email-verification';
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -15,6 +16,7 @@ export async function POST(
 ) {
   try {
     const user = await apiUser();
+    requireVerified(user);
     await rateLimit("binding-signature", user.id, 30, 3600);
     const { id } = await params;
     const { comment } = z

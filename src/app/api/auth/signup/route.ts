@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse, after } from "next/server";
+import { issueVerification } from "@/lib/email-verification";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -62,6 +63,8 @@ export async function POST(req: NextRequest) {
             passwordHash,
             name: data.name || data.email.split("@")[0],
             role: data.role,
+            // Official invitations are emailed to this address, so it is already proven.
+            emailVerifiedAt: inviteId ? new Date() : null,
           },
         });
         if (inviteId) {
@@ -85,11 +88,9 @@ export async function POST(req: NextRequest) {
     );
     await createSession(user.id);
     after(async () => {
-      const result = await sendEmail({
-        ...welcomeEmail({ recipientName: user.name || "there", role: user.role }),
-        to: user.email,
-      });
-      if (!result.success) console.error("[EMAIL] Welcome email not sent:", result.error);
+      // One email: welcome plus the link that confirms the address.
+      const result = await issueVerification(user);
+      if (!result.success) console.error("[EMAIL] Confirmation email not sent:", result.error);
     });
     return NextResponse.json(
       {

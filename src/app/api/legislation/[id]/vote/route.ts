@@ -7,6 +7,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    if (!session.emailVerifiedAt) return NextResponse.json({ error: 'Please confirm your email first. We sent you a link, and you can send a new one from your civic desk.' }, { status: 403 });
     const { id } = await params;
 
     const body = await req.json();

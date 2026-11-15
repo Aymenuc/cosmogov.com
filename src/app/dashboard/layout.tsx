@@ -1,5 +1,6 @@
 "use client";
 import "../portal.css";
+import VerifyEmailBanner from "@/components/VerifyEmailBanner";
 import { planFor } from "@/lib/plans";
 import "../rewards.css";
 import { useEffect, useState } from "react";
@@ -380,6 +381,7 @@ export default function DashboardLayout({
           </header>
           <main className="workspace-main" id="main-content">
             <div className="workspace-content">
+              {user && !user.emailVerifiedAt && <VerifyEmailBanner email={user.email} />}
               {error && (
                 <p className="form-error" role="alert">
                   {error}

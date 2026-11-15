@@ -49,6 +49,7 @@ export async function getSession(): Promise<{
   totalXp: number;
   level: number;
   streak: number;
+  emailVerifiedAt: Date | null;
 } | null> {
   try {
     const cookieStore = await cookies();
@@ -77,6 +78,7 @@ export async function getSession(): Promise<{
         totalXp: true,
         level: true,
         streak: true,
+        emailVerifiedAt: true,
       },
     });
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireVerified } from '@/lib/email-verification';
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -10,6 +11,7 @@ export async function POST(
 ) {
   try {
     const user = await apiUser();
+    requireVerified(user);
     await rateLimit("proposal-vote", user.id, 120, 3600);
     const { id } = await params;
     await accessProposal(id, user.id);

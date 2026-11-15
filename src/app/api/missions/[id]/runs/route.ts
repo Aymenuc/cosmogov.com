@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireVerified } from '@/lib/email-verification';
 import { spendAi } from "@/lib/ai-budget";
 import { aiModelMetadata } from "@/lib/ai-completions";
 import { MISSION_PROMPT_VERSION } from "@/lib/missions/ai";
@@ -43,6 +44,7 @@ export async function POST(
   let lease: Date | undefined;
   try {
     const user = await missionUser();
+    requireVerified(user);
     const { id } = await params;
     missionId = id;
     const { canManage } = await accessMission(id, user.id);
