@@ -219,6 +219,31 @@ export default function DashboardLayout({
         Start a mission
       </Link>
       <nav aria-label="Workspace navigation" className="workspace-nav">
+        {isOfficial && (
+          <div className="workspace-staff-group">
+            <div className="nav-group-label">
+              {isAdmin ? "RUNNING COSMOGOV" : "FOR OFFICIALS"}
+            </div>
+            {isAdmin && (
+              <Link
+                href="/dashboard/admin"
+                aria-current={activeHref === "/dashboard/admin" ? "page" : undefined}
+                className={`workspace-nav-link ${activeHref === "/dashboard/admin" ? "active" : ""}`}
+              >
+                <Shield size={17} strokeWidth={1.6} />
+                <span>Administration</span>
+              </Link>
+            )}
+            <Link
+              href="/dashboard/gov-portal"
+              aria-current={activeHref === "/dashboard/gov-portal" ? "page" : undefined}
+              className={`workspace-nav-link ${activeHref === "/dashboard/gov-portal" ? "active" : ""}`}
+            >
+              <Landmark size={17} strokeWidth={1.6} />
+              <span>Government portal</span>
+            </Link>
+          </div>
+        )}
         <div className="nav-group-label">YOUR COMMUNITY</div>
         {mainLinks.map((item) => (
           <Link
@@ -268,24 +293,6 @@ export default function DashboardLayout({
             </details>
           ))}
         </div>
-        {isOfficial && (
-          <Link
-            href="/dashboard/gov-portal"
-            className={`workspace-nav-link ${activeHref === "/dashboard/gov-portal" ? "active" : ""}`}
-          >
-            <Landmark size={17} />
-            Government portal
-          </Link>
-        )}
-        {isAdmin && (
-          <Link
-            href="/dashboard/admin"
-            className={`workspace-nav-link ${activeHref === "/dashboard/admin" ? "active" : ""}`}
-          >
-            <Shield size={17} />
-            Administration
-          </Link>
-        )}
       </nav>
       <div className="sidebar-bottom">
         <Link href="/dashboard/assistant" className="assistant-link">

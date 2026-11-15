@@ -1005,6 +1005,18 @@ h2 em {
   font-weight: 600;
   padding: 0 12px 10px;
 }
+.workspace-staff-group {
+  margin: 0 0 18px;
+  padding: 12px 6px 8px;
+  border: 2px solid #29223d;
+  border-radius: 14px;
+  background: #fff4cc;
+  box-shadow: 3px 3px 0 #29223d;
+}
+.workspace-staff-group .nav-group-label {
+  color: #29223d;
+  padding-bottom: 6px;
+}
 .workspace-nav-link {
   display: flex;
   align-items: center;
