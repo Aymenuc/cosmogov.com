@@ -317,9 +317,6 @@ h2 em,
   opacity: 0.16;
   color: var(--civic-sun);
 }
-.site-footer {
-  background: #fffdf7;
-}
 /* The app is bright at the edges, with neutral reading surfaces at its center. */
 .workspace-shell {
   background: #faf8fe;
@@ -807,19 +804,11 @@ h2 em,
   color: #6e614b;
 }
 
-/* Shared header and footer: readable sizes on every public page. */
+/* Shared header: readable sizes on every public page. */
 .site-nav a,
 .header-login {
   font-size: 15px;
 }
 .header-actions .civic-button.small {
   font-size: 14px;
-}
-.footer-main > div:first-child > p,
-.footer-main > div > a:not(.brand) {
-  font-size: 14px;
-}
-.footer-main h3,
-.footer-bottom {
-  font-size: 13px;
 }

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import PublicPage from "@/components/PublicPage";
+import PublicPage, { PublicContents } from "@/components/PublicPage";
+import StepArt from "@/components/landing/StepArt";
 
 export const metadata: Metadata = {
   title: "Documentation | Cosmogov",
@@ -51,32 +52,41 @@ export default function DocsPage() {
     <PublicPage
       title="Documentation"
       intro="Start a community, work on a shared goal in Mission Studio, and follow the decisions that come out of it."
+      theme="guide"
+      art={<span className="public-sticker"><StepArt name="scout" /></span>}
     >
-      <div className="public-stack">
-        <section className="public-card public-feature">
-          <h2>Start here</h2>
-          <ol>
-            <li><Link href="/auth/signup">Create an account</Link> or <Link href="/auth/login">sign in</Link>.</li>
-            <li>Open <Link href="/dashboard/organizations">My communities</Link> to find a group you belong to or create a workspace for your group.</li>
-            <li>Try the <Link href="/missions/demo">public example mission</Link> to see a research brief, a plan, and a participation form.</li>
-          </ol>
-        </section>
-        {guides.map((guide) => (
-          <section className="public-card" id={guide.id} key={guide.id}>
-            <h2>{guide.title}</h2>
-            <p>{guide.description}</p>
-            <ul>
-              {guide.steps.map((step) => <li key={step}>{step}</li>)}
-            </ul>
-            <Link href={guide.href} className="public-link">
-              {guide.action} <ArrowUpRight size={16} aria-hidden="true" />
-            </Link>
+      <div className="public-reading-layout">
+        <PublicContents sections={[
+          { id: "start-here", title: "Start here" },
+          ...guides,
+          { id: "support", title: "Developers and support" },
+        ]} />
+        <div className="public-reading">
+          <section id="start-here">
+            <h2>Start here</h2>
+            <ol>
+              <li><Link href="/auth/signup">Create an account</Link> or <Link href="/auth/login">sign in</Link>.</li>
+              <li>Open <Link href="/dashboard/organizations">My communities</Link> to find a group you belong to or create a workspace for your group.</li>
+              <li>Try the <Link href="/missions/demo">public example mission</Link> to see a research brief, a plan, and a participation form.</li>
+            </ol>
           </section>
-        ))}
-        <section className="public-card">
-          <h2>Developers and support</h2>
-          <p>Read the <Link href="/docs/api">API reference</Link> for session-based request examples, see what changed in the <Link href="/changelog">changelog</Link>, or <Link href="/contact">get in touch</Link> if you need help.</p>
-        </section>
+          {guides.map((guide) => (
+            <section id={guide.id} key={guide.id}>
+              <h2>{guide.title}</h2>
+              <p>{guide.description}</p>
+              <ul>
+                {guide.steps.map((step) => <li key={step}>{step}</li>)}
+              </ul>
+              <Link href={guide.href} className="public-link">
+                {guide.action} <ArrowUpRight size={16} aria-hidden="true" />
+              </Link>
+            </section>
+          ))}
+          <section id="support">
+            <h2>Developers and support</h2>
+            <p>Read the <Link href="/docs/api">API reference</Link> for session-based request examples, see what changed in the <Link href="/changelog">changelog</Link>, or <Link href="/contact">get in touch</Link> if you need help.</p>
+          </section>
+        </div>
       </div>
     </PublicPage>
   );

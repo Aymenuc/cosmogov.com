@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PublicPage from "@/components/PublicPage";
+import StepArt from "@/components/landing/StepArt";
 import ContactForm from "./ContactForm";
 import { topics } from "./topics";
 
 export const metadata: Metadata = {
   title: "Contact | Cosmogov",
-  description: "Contact Cosmogov about support, plans, billing, partnerships, careers, privacy, or security.",
+  description: "Contact Cosmogov about support, plans, billing, partnerships, privacy, or security.",
 };
 
 export default async function ContactPage({
@@ -27,6 +28,8 @@ export default async function ContactPage({
     <PublicPage
       title="Get in touch"
       intro="Ask for help, tell us what your community is working on, or talk to us about bringing Cosmogov to your organization."
+      theme="contact"
+      art={<span className="public-sticker"><StepArt name="bridge" /></span>}
     >
       <div className="public-columns">
         <section className="public-card">

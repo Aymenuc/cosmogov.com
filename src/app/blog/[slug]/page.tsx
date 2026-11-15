@@ -37,9 +37,9 @@ export default async function ArticlePage({ params }: ArticleProps) {
         </>
       }
     >
-      <article className="public-stack">
+      <article className="public-reading public-article">
         {post.sections.map((section) => (
-          <section className="public-card" key={section.heading}>
+          <section key={section.heading}>
             <h2>{section.heading}</h2>
             {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
           </section>
