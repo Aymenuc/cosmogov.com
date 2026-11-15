@@ -6,8 +6,9 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import {
-  Bot, Sparkles, ArrowRight, Users, MessageSquare,
+  Bot, ArrowRight, Users, MessageSquare,
   CheckCircle2, Radio, Shield, Star, Zap, Eye,
   Globe, Accessibility, Brain, Handshake, Loader2,
   ChevronRight, Activity, Circle, ArrowUpRight,
@@ -456,45 +457,22 @@ export default function AIAgentsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8">
-      {/* ── Hero Section ── */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card p-4 sm:p-6 md:p-8 lg:p-10">
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-72 h-72 rounded-full" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%)' }} />
-          <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full" style={{ background: 'radial-gradient(circle, rgba(46,230,199,0.08), transparent 70%)' }} />
+      <WorkspaceHeading
+        title="AI agents"
+        description="Six AI helpers support your assemblies: they moderate, facilitate, summarise positions, look for common ground, translate and make discussions accessible. People still make every decision."
+      >
+        <div className="flex flex-wrap gap-2">
+          <Link href="#how-it-works" className="civic-button outline">
+            How it works
+          </Link>
+          <Link href="/dashboard/assembly-hall" className="civic-button">
+            <Users size={16} aria-hidden="true" /> Enter the Assembly hall
+          </Link>
         </div>
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="cosmic-badge rounded-full px-3 py-1 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-cosmic-accent" />
-              <span className="text-xs font-medium text-cosmic-accent">AI-Powered Governance</span>
-            </div>
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading mb-3">
-            <span className="text-gradient">AI Agents</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed">
-            Six specialized AI agents power your democratic assemblies — moderating debates, facilitating dialogue,
-            synthesizing positions, building consensus, breaking language barriers, and ensuring accessibility for all.
-          </p>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4 sm:mt-6">
-            <Link href="/dashboard/participation/assemblies">
-              <Button className="bg-cosmic-accent text-primary-foreground rounded-xl">
-                <Users className="w-4 h-4 mr-2" /> Enter Assembly Hall
-              </Button>
-            </Link>
-            <Link href="#how-it-works">
-              <Button variant="outline" className="border-border text-cosmic-muted hover:text-foreground hover:border-border rounded-xl">
-                How It Works <ArrowRight className="w-4 h-4 ml-1" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      </WorkspaceHeading>
 
       {/* ── Stats Bar ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <div className="workspace-tool-stats">
         {[
           { label: 'Total Agents', value: agents.length || 6, icon: Bot, color: 'text-cosmic-accent', bg: 'bg-cosmic-accent/10', sub: `${activeAgents} active` },
           { label: 'Active Debates', value: activeDebates, icon: MessageSquare, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10', sub: 'live now' },
@@ -503,20 +481,17 @@ export default function AIAgentsPage() {
         ].map((stat) => (
           <motion.div
             key={stat.label}
+            className="glass-card group"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <Card className="bg-card border-border hover:border-border transition-all group">
-              <CardContent className="p-4">
-                <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                </div>
-                <p className="text-2xl font-bold font-heading">{stat.value}</p>
-                <p className="text-xs text-cosmic-muted mt-0.5">{stat.label}</p>
-                <p className="text-[10px] text-cosmic-teal mt-1">{stat.sub}</p>
-              </CardContent>
-            </Card>
+            <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+              <stat.icon className={`w-4 h-4 ${stat.color}`} />
+            </div>
+            <p className="text-2xl font-bold font-heading">{stat.value}</p>
+            <p className="text-xs text-cosmic-muted mt-0.5">{stat.label}</p>
+            <p className="text-[10px] text-cosmic-muted mt-1">{stat.sub}</p>
           </motion.div>
         ))}
       </div>

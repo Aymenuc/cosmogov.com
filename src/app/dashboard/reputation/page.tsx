@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import {
   Shield, Vote, Users, Flame, Eye, AlertTriangle, Crown,
-  Star, Trophy, ArrowLeft, Copy, CheckCircle, Loader2,
+  Star, Trophy, Copy, CheckCircle, Loader2,
   BarChart3, Target, Zap, Brain
 } from 'lucide-react';
 
@@ -259,7 +260,7 @@ export default function ReputationPage() {
 
   const handleShare = () => {
     if (!data) return;
-    const text = `🌌 My Cosmic Reputation on CosmoGov:\n\n✨ Score: ${data.score}/1000\n🏆 Tier: ${data.tier}\n📊 Top ${100 - data.percentile}% of governance participants\n\nEarn your own cosmic score at cosmogov.io`;
+    const text = `🌌 My Cosmic Reputation on CosmoGov:\n\n✨ Score: ${data.score}/1000\n🏆 Tier: ${data.tier}\n📊 Top ${100 - data.percentile}% of governance participants\n\nEarn your own cosmic score at www.cosmogov.com`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -302,24 +303,12 @@ export default function ReputationPage() {
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
-            </Button>
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cosmic-amber/10 flex items-center justify-center">
-            <Star className="w-5 h-5 text-cosmic-amber" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold font-heading">Cosmic Reputation</h1>
-            <p className="text-cosmic-muted text-sm">Your portable governance credit score across the cosmos</p>
-          </div>
-        </div>
+        <WorkspaceHeading
+          title="My reputation"
+          description="A summary of how you take part across Cosmogov. It never changes the weight of your vote."
+          back={{ href: "/dashboard", label: "My civic desk" }}
+        />
       </div>
 
       {/* Score Hero */}

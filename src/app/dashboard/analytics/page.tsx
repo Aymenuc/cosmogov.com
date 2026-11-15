@@ -1,76 +1,167 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3, TrendingUp, Vote, Clock, Target } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Loader2, Plus, Sprout } from 'lucide-react';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
+
+interface Analytics {
+  proposals: { active: number; closed: number };
+  ballots: number;
+  voters: number;
+  comments: number;
+  lastSevenDays: { date: string; ballots: number }[];
+  closedProposals: {
+    count: number;
+    reachedQuorum: number;
+    medianHoursOpen: number | null;
+  };
+}
+
+function formatDuration(hours: number) {
+  if (hours < 1) return 'Under an hour';
+  if (hours < 48) return `${Math.round(hours)} h`;
+  return `${Math.round(hours / 24)} days`;
+}
+
+function dayLabel(date: string) {
+  const d = new Date(`${date}T00:00:00Z`);
+  return {
+    weekday: d.toLocaleDateString('en', { weekday: 'short', timeZone: 'UTC' }),
+    day: d.toLocaleDateString('en', { day: 'numeric', month: 'short', timeZone: 'UTC' }),
+  };
+}
 
 export default function AnalyticsPage() {
-  const [proposals, setProposals] = useState<any[]>([]);
+  const [data, setData] = useState<Analytics | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/proposals').then(r => r.json()).then(data => setProposals(Array.isArray(data) ? data : [])).catch(() => {});
+    fetch('/api/analytics')
+      .then(async (r) => {
+        if (!r.ok) throw new Error();
+        setData(await r.json());
+      })
+      .catch(() => setError('Analytics could not be loaded. Please refresh to try again.'));
   }, []);
 
-  const active = proposals.filter(p => p.status === 'active').length;
-  const closed = proposals.filter(p => p.status === 'closed').length;
-  const totalVotes = proposals.reduce((sum, p) => sum + (p._count?.votes || 0), 0);
-  const avgVotes = proposals.length > 0 ? (totalVotes / proposals.length).toFixed(1) : '0';
-
-  // Weekly data (simulated)
-  const weeklyData = [
-    { day: 'Mon', votes: 12 }, { day: 'Tue', votes: 18 }, { day: 'Wed', votes: 25 },
-    { day: 'Thu', votes: 22 }, { day: 'Fri', votes: 31 }, { day: 'Sat', votes: 15 }, { day: 'Sun', votes: 9 },
-  ];
-  const maxVotes = Math.max(...weeklyData.map(d => d.votes));
+  const week = data?.lastSevenDays ?? [];
+  const weekTotal = week.reduce((sum, d) => sum + d.ballots, 0);
+  const weekMax = Math.max(1, ...week.map((d) => d.ballots));
+  const closed = data?.closedProposals;
 
   return (
-    <div>
-      <div className="mb-4 sm:mb-6"><h1 className="text-xl sm:text-2xl font-bold font-heading">Analytics</h1><p className="text-cosmic-muted text-sm">Governance participation insights</p></div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        {[
-          { label: 'Active Proposals', value: active, icon: Vote, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10' },
-          { label: 'Closed Proposals', value: closed, icon: BarChart3, color: 'text-cosmic-accent', bg: 'bg-cosmic-accent/10' },
-          { label: 'Total Votes', value: totalVotes, icon: TrendingUp, color: 'text-cosmic-violet', bg: 'bg-cosmic-violet/10' },
-          { label: 'Avg Votes/Proposal', value: avgVotes, icon: Target, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10' },
-        ].map(s => (
-          <Card key={s.label} className="bg-card border-border"><CardContent className="p-4">
-            <div className={`w-9 h-9 rounded-lg ${s.bg} flex items-center justify-center mb-3`}><s.icon className={`w-4 h-4 ${s.color}`} /></div>
-            <p className="text-2xl font-bold font-heading">{s.value}</p><p className="text-xs text-cosmic-muted mt-0.5">{s.label}</p>
-          </CardContent></Card>
-        ))}
-      </div>
+    <div className="space-y-8">
+      <WorkspaceHeading
+        title="Analytics"
+        description="How your communities are taking part. Every figure is counted from the proposals you can see, and no one's ballot is shown."
+      >
+        <Link href="/dashboard/proposals/new" className="civic-button">
+          <Plus size={16} aria-hidden="true" /> New proposal
+        </Link>
+      </WorkspaceHeading>
 
-      {/* Chart */}
-      <Card className="bg-card border-border mb-6">
-        <CardContent className="p-6">
-          <h3 className="text-sm font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-cosmic-accent" /> Weekly Participation</h3>
-          <div className="flex items-end gap-1 sm:gap-3 h-36 sm:h-48">
-            {weeklyData.map(d => (
-              <div key={d.day} className="flex-grow flex flex-col items-center gap-1">
-                <div className="w-full rounded-t-lg bg-gradient-to-t from-cosmic-accent to-cosmic-teal transition-all" style={{ height: `${(d.votes / maxVotes) * 100}%`, minHeight: '4px' }} />
-                <span className="text-xs text-cosmic-muted">{d.day}</span>
-                <span className="text-xs text-cosmic-muted">{d.votes}</span>
+      {error && <p role="alert" className="form-error">{error}</p>}
+
+      {!data && !error ? (
+        <div className="flex items-center justify-center py-16 text-cosmic-muted">
+          <Loader2 className="h-6 w-6 animate-spin" aria-label="Loading analytics" />
+        </div>
+      ) : data ? (
+        <>
+          <div className="workspace-tool-stats">
+            {[
+              { label: 'Open proposals', value: data.proposals.active },
+              { label: 'Closed proposals', value: data.proposals.closed },
+              { label: 'Ballots cast', value: data.ballots },
+              { label: 'People who voted', value: data.voters },
+            ].map((s) => (
+              <div key={s.label} className="glass-card">
+                <span className="text-xs text-cosmic-muted">{s.label}</span>
+                <p className="font-heading text-2xl font-bold">{s.value}</p>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Metrics */}
-      <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
-        <Card className="bg-card border-border"><CardContent className="p-4">
-          <h4 className="text-xs text-cosmic-muted mb-2">Median Time to Decision</h4>
-          <p className="text-2xl font-bold font-heading">3.2 <span className="text-sm text-cosmic-muted font-normal">days</span></p>
-        </CardContent></Card>
-        <Card className="bg-card border-border"><CardContent className="p-4">
-          <h4 className="text-xs text-cosmic-muted mb-2">Quorum Hit Rate</h4>
-          <p className="text-2xl font-bold font-heading text-cosmic-teal">87%</p>
-        </CardContent></Card>
-        <Card className="bg-card border-border"><CardContent className="p-4">
-          <h4 className="text-xs text-cosmic-muted mb-2">Participation Rate</h4>
-          <p className="text-2xl font-bold font-heading text-cosmic-amber">72%</p>
-        </CardContent></Card>
-      </div>
+          <section className="glass-card rounded-2xl border border-border p-5 sm:p-6" aria-labelledby="week-heading">
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="week-heading" className="font-heading text-base font-semibold">
+                Ballots in the last 7 days
+              </h2>
+              <span className="text-sm text-cosmic-muted">{weekTotal} in total</span>
+            </div>
+
+            {weekTotal === 0 ? (
+              <div className="empty-state">
+                <span className="empty-icon">
+                  <Sprout aria-hidden="true" />
+                </span>
+                <h3>A quiet week so far</h3>
+                <p>
+                  Nobody has voted this week yet. A clear question gives neighbours a reason to show up,
+                  and every proposal you open is added to your civic record.
+                </p>
+                <Link href="/dashboard/proposals/new" className="civic-button">
+                  Ask your community something
+                </Link>
+              </div>
+            ) : (
+              <ol className="flex h-48 items-end gap-2 sm:gap-4" aria-label="Ballots per day">
+                {week.map((d) => {
+                  const label = dayLabel(d.date);
+                  return (
+                    <li key={d.date} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
+                      <span className="text-xs font-semibold">{d.ballots}</span>
+                      <div
+                        className="w-full max-w-14 rounded-t-lg bg-[#6741d9]"
+                        style={{
+                          height: `${(d.ballots / weekMax) * 100}%`,
+                          minHeight: d.ballots ? 6 : 2,
+                          opacity: d.ballots ? 1 : 0.25,
+                        }}
+                        aria-hidden="true"
+                      />
+                      <span className="text-xs text-cosmic-muted" title={label.day}>
+                        {label.weekday}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </section>
+
+          <div className="workspace-tool-stats">
+            <div className="glass-card">
+              <span className="text-xs text-cosmic-muted">Closed proposals that reached quorum</span>
+              <p className="font-heading text-2xl font-bold">
+                {closed && closed.count > 0
+                  ? `${Math.round((closed.reachedQuorum / closed.count) * 100)}%`
+                  : '—'}
+              </p>
+              <span className="text-xs text-cosmic-muted">
+                {closed && closed.count > 0
+                  ? `${closed.reachedQuorum} of ${closed.count}`
+                  : 'No closed proposals yet'}
+              </span>
+            </div>
+            <div className="glass-card">
+              <span className="text-xs text-cosmic-muted">Median time from posting to closing</span>
+              <p className="font-heading text-2xl font-bold">
+                {closed?.medianHoursOpen != null ? formatDuration(closed.medianHoursOpen) : '—'}
+              </p>
+              <span className="text-xs text-cosmic-muted">
+                {closed && closed.count > 0 ? `Across ${closed.count} closed` : 'No closed proposals yet'}
+              </span>
+            </div>
+            <div className="glass-card">
+              <span className="text-xs text-cosmic-muted">Comments on proposals</span>
+              <p className="font-heading text-2xl font-bold">{data.comments}</p>
+              <span className="text-xs text-cosmic-muted">Conversations that shape the vote</span>
+            </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

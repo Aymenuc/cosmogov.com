@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import {
   Brain, Eye, Search, AlertTriangle, Shield, Clock, Zap,
   ArrowRight, Gamepad2, Sparkles, Filter, Users, Baby,
@@ -133,10 +134,11 @@ export default function GamesPage() {
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold font-heading mb-1">Governance Games</h1>
-        <p className="text-cosmic-muted">Train your decision-making instincts, earn XP, and climb the leaderboards</p>
+        <WorkspaceHeading
+          title="Civic games"
+          description="Short games that sharpen how you weigh evidence, spot bias and plan together. Earn XP as you play. Games never change the weight of a vote."
+        />
       </div>
 
       {/* Stats Bar */}
