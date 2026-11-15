@@ -472,3 +472,209 @@ a.sticker-state:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Each section's own face ──────────────────────────────────────────── */
+/* WorkspaceHeading look="…": a tinted sticker panel with the section's own
+   headline and illustration, a reason to take part, and (where one fits) the
+   "almost there" sticker nudge. Tints come from the shared palette above. */
+.workspace-shell .tool-hero {
+  display: grid;
+  gap: 14px;
+}
+.workspace-shell .tool-hero-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 250px);
+  align-items: center;
+  gap: 18px 30px;
+  padding: 26px 30px;
+  background: var(--tint-bg);
+  border: 2px solid #29223d;
+  border-radius: 26px;
+  box-shadow: 5px 6px 0 #29223d;
+  overflow: hidden;
+}
+.workspace-shell .tool-hero-eyebrow {
+  display: inline-block;
+  padding: 4px 11px;
+  background: #fffdf7;
+  border-radius: 999px;
+  color: var(--tint-ink);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.workspace-shell .tool-hero-panel h1 {
+  margin: 12px 0 10px;
+  color: #29223d;
+  font-family: Manrope, sans-serif;
+  font-size: clamp(27px, 3.1vw, 38px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.2px;
+}
+.workspace-shell .tool-hero-panel p {
+  max-width: 58ch;
+  color: #463e5c;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.workspace-shell .tool-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+.workspace-shell .tool-hero-actions .civic-button {
+  min-height: 44px;
+}
+.workspace-shell .tool-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.workspace-shell .tool-hero-art {
+  max-height: 180px;
+}
+.workspace-shell .tool-hero-why {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+.workspace-shell .tool-hero-cheer {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: var(--tint-ink);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.workspace-shell .tool-hero-cheer svg {
+  flex: none;
+  margin-top: 3px;
+  fill: currentColor;
+}
+.workspace-shell .tool-hero-nudge {
+  flex: 0 1 auto;
+  margin-left: auto;
+  max-width: 420px;
+}
+
+/* Stat boxes take the section's tint instead of the same rainbow everywhere. */
+.workspace-shell:has(.tool-hero) .workspace-tool-stats > * {
+  background: #fffdf7;
+  border-color: #e6e0ee;
+}
+.workspace-shell:has(.tool-hero.tint-lilac) .workspace-tool-stats > :nth-child(odd) { background: #eee6ff; }
+.workspace-shell:has(.tool-hero.tint-mint) .workspace-tool-stats > :nth-child(odd) { background: #dff5e8; }
+.workspace-shell:has(.tool-hero.tint-sky) .workspace-tool-stats > :nth-child(odd) { background: #e1f3ff; }
+.workspace-shell:has(.tool-hero.tint-sun) .workspace-tool-stats > :nth-child(odd) { background: #fff0c3; }
+.workspace-shell:has(.tool-hero.tint-peach) .workspace-tool-stats > :nth-child(odd) { background: #ffe7df; }
+
+/* A section's own empty state. */
+.workspace-shell .tool-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 24px 32px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--tint-bg), #fffdf7 75%);
+  border: 2px dashed color-mix(in srgb, var(--tint-ink) 35%, transparent);
+  border-radius: 24px;
+}
+.workspace-shell .tool-empty-badge {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 6px;
+  background: var(--tint-bg);
+  color: var(--tint-ink);
+  border: 2px solid #29223d;
+  border-radius: 24px;
+  box-shadow: 4px 5px 0 #29223d;
+  transform: rotate(-6deg);
+}
+.workspace-shell .tool-empty h3 {
+  color: #29223d;
+  font-family: Manrope, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.workspace-shell .tool-empty p {
+  max-width: 46ch;
+  color: #5b5470;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.workspace-shell .tool-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Entrance motion runs once. */
+.workspace-shell .tool-art-pop {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: toolArtPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+.workspace-shell .tool-art-trace {
+  stroke-dasharray: 260;
+  animation: toolArtTrace 1.4s ease-out 0.2s both;
+}
+@keyframes toolArtPop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toolArtTrace {
+  from {
+    stroke-dashoffset: 260;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace-shell .tool-art-pop,
+  .workspace-shell .tool-art-trace {
+    animation: none;
+  }
+}
+@media (max-width: 720px) {
+  .workspace-shell .tool-hero-panel {
+    grid-template-columns: 1fr;
+    padding: 20px 20px 22px;
+    border-radius: 22px;
+    box-shadow: 4px 5px 0 #29223d;
+  }
+  .workspace-shell .tool-hero-art {
+    order: -1;
+    justify-self: center;
+    width: min(220px, 72%);
+    max-height: 140px;
+  }
+  .workspace-shell .tool-hero-actions .civic-button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .workspace-shell .tool-hero-nudge {
+    margin-left: 0;
+    max-width: none;
+    width: 100%;
+  }
+}

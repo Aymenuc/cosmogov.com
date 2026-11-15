@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -203,6 +203,7 @@ export default function SortitionPage() {
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <WorkspaceHeading
+        look="sortition"
         title="Sortition"
         description="Browse opportunities to volunteer or create a pool for a randomly selected citizens’ group."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -257,14 +258,11 @@ export default function SortitionPage() {
           <Loader2 className="w-8 h-8 text-cosmic-violet animate-spin" />
         </div>
       ) : pools.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <Dices className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No Sortition Pools Yet</h3>
-          <p className="text-cosmic-muted text-sm mb-4">Be the first to create a democratic lottery pool for fair representation.</p>
-          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+        <ToolEmpty look="sortition">
+          <Button className="civic-button" onClick={() => setCreateDialogOpen(true)}>
             <Plus size={16} aria-hidden="true" /> Create pool
           </Button>
-        </div>
+        </ToolEmpty>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {pools.map((pool) => {

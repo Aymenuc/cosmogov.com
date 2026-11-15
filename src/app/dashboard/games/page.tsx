@@ -136,8 +136,9 @@ export default function GamesPage() {
     <div>
       <div className="mb-8">
         <WorkspaceHeading
+          look="games"
           title="Civic games"
-          description="Short games that sharpen how you weigh evidence, spot bias and plan together. Earn XP as you play. Games never change the weight of a vote."
+          description="Short games that sharpen how you weigh evidence, spot bias and plan together. Earn XP as you play."
         />
       </div>
 

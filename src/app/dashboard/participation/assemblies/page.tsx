@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -215,6 +215,7 @@ export default function AssembliesPage() {
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <WorkspaceHeading
+        look="assemblies"
         title="Assemblies"
         description="Join or create a space where people can discuss an issue, offer advice, and make decisions together."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -288,14 +289,11 @@ export default function AssembliesPage() {
           <Loader2 className="w-8 h-8 text-cosmic-teal animate-spin" />
         </div>
       ) : assemblies.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <Users className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No Assemblies Yet</h3>
-          <p className="text-cosmic-muted text-sm mb-4">Create the first assembly and start deliberating with your community.</p>
-          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+        <ToolEmpty look="assemblies">
+          <Button className="civic-button" onClick={() => setCreateDialogOpen(true)}>
             <Plus size={16} aria-hidden="true" /> Create assembly
           </Button>
-        </div>
+        </ToolEmpty>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {assemblies.map((assembly) => {

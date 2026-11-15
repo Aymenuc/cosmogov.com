@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -151,6 +151,7 @@ export default function BudgetPage() {
     <div className="space-y-6 budget-workspace">
       {allocationError && <p role="alert" className="form-error">{allocationError}</p>}
       <WorkspaceHeading
+        look="budget"
         title="Budgets"
         description="Allocate a share of the process budget across its projects. Your allocation records your priorities without spending money or approving a project."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -235,11 +236,7 @@ export default function BudgetPage() {
               <Loader2 className="w-8 h-8 text-cosmic-amber animate-spin" />
             </div>
           ) : projects.length === 0 ? (
-            <div className="glass-card p-12 rounded-2xl text-center">
-              <Wallet className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">No Budget Projects Yet</h3>
-              <p className="text-cosmic-muted text-sm">Budget projects will appear here when they are proposed through participatory processes.</p>
-            </div>
+            <ToolEmpty look="budget" />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {projects.map((project) => {

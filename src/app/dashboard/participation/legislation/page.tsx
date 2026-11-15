@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -180,6 +180,7 @@ export default function LegislationPage() {
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <WorkspaceHeading
+        look="legislation"
         title="Legislation"
         description="Follow proposed legislation, discuss drafts, and contribute amendments or votes when those stages are open."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -285,18 +286,18 @@ export default function LegislationPage() {
           <Loader2 className="w-8 h-8 text-cosmic-amber animate-spin" />
         </div>
       ) : legislation.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <Scale className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No Legislation Found</h3>
-          <p className="text-cosmic-muted text-sm mb-4">
-            {statusFilter !== 'all' || categoryFilter !== 'all'
-              ? 'No bills match your current filters. Try adjusting your search criteria.'
-              : 'Be the first to propose legislation and shape the future of your community.'}
-          </p>
-          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
-            <Plus size={16} aria-hidden="true" /> Propose legislation
-          </Button>
-        </div>
+        statusFilter !== 'all' || categoryFilter !== 'all' ? (
+          <div className="glass-card p-12 rounded-2xl text-center">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Nothing matches these filters</h3>
+            <p className="text-cosmic-muted text-sm">Try another status or category.</p>
+          </div>
+        ) : (
+          <ToolEmpty look="legislation">
+            <Button className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+              <Plus size={16} aria-hidden="true" /> Propose legislation
+            </Button>
+          </ToolEmpty>
+        )
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
           {legislation.map((bill) => {

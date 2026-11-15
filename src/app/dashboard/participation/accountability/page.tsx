@@ -1,6 +1,6 @@
 "use client";
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect } from "react";
 import MissionOutcomes from "@/components/missions/MissionOutcomes";
 import { Button } from "@/components/ui/button";
@@ -192,6 +192,7 @@ export default function AccountabilityPage() {
   return (
     <div className="space-y-6">
       <WorkspaceHeading
+        look="accountability"
         title="Accountability"
         description="Track implementation of approved proposals and budget projects, and see the evidence and outcomes shared by your communities."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -346,16 +347,7 @@ export default function AccountabilityPage() {
           <Loader2 className="w-8 h-8 text-cosmic-violet animate-spin" />
         </div>
       ) : filteredEntities.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <Eye className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            No Implementation Data
-          </h3>
-          <p className="text-cosmic-muted text-sm">
-            Implementation tracking will appear once proposals are accepted and
-            milestones are created.
-          </p>
-        </div>
+        <ToolEmpty look="accountability" />
       ) : (
         <div className="space-y-4">
           {filteredEntities.map((entity) => {

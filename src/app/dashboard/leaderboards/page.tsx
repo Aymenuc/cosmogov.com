@@ -31,8 +31,9 @@ export default function LeaderboardsPage() {
   return (
     <div className="workspace-page">
       <WorkspaceHeading
+        look="activity"
         title="Community activity"
-        description="Activity scores never change the weight of a vote."
+        description="Reputation scores built from proposals, comments, mission tasks, communities and civic games. Votes are never counted."
       />
       {error ? (
         <p role="alert" className="form-error">

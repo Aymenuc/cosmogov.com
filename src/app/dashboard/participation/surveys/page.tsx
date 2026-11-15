@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -265,6 +265,7 @@ export default function SurveysPage() {
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <WorkspaceHeading
+        look="surveys"
         title="Surveys & polls"
         description="Create a survey or answer questions about the decisions your community is considering."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -371,18 +372,18 @@ export default function SurveysPage() {
           <Loader2 className="w-8 h-8 text-cosmic-accent animate-spin" />
         </div>
       ) : filteredSurveys.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <ClipboardList className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No Surveys Found</h3>
-          <p className="text-cosmic-muted text-sm mb-4">
-            {categoryFilter !== 'all' || statusFilter !== 'all'
-              ? 'Try adjusting your filters or search terms.'
-              : 'Be the first to create a survey and gather community insights.'}
-          </p>
-          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
-            <Plus size={16} aria-hidden="true" /> Create survey
-          </Button>
-        </div>
+        categoryFilter !== 'all' || statusFilter !== 'all' ? (
+          <div className="glass-card p-12 rounded-2xl text-center">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Nothing matches these filters</h3>
+            <p className="text-cosmic-muted text-sm">Try adjusting your filters or search terms.</p>
+          </div>
+        ) : (
+          <ToolEmpty look="surveys">
+            <Button className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+              <Plus size={16} aria-hidden="true" /> Create survey
+            </Button>
+          </ToolEmpty>
+        )
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {filteredSurveys.map((survey) => {

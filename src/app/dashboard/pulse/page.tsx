@@ -313,6 +313,7 @@ export default function PulsePage() {
     <div>
       <div className="mb-6">
         <WorkspaceHeading
+          look="pulse"
           title="Governance pulse"
           description="See community activity, active proposals, and the latest voting trends."
           back={{ href: "/dashboard", label: "My civic desk" }}

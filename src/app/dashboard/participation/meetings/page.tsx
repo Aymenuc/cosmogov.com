@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -256,6 +256,7 @@ export default function MeetingsPage() {
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <WorkspaceHeading
+        look="meetings"
         title="Meetings"
         description="Find or schedule in-person, virtual, or hybrid meetings for your community."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -360,20 +361,18 @@ export default function MeetingsPage() {
           <Loader2 className="w-8 h-8 text-cosmic-amber animate-spin" />
         </div>
       ) : meetings.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <Calendar className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            {timeframe === 'upcoming' ? 'No Upcoming Meetings' : 'No Past Meetings'}
-          </h3>
-          <p className="text-cosmic-muted text-sm mb-4">
-            {timeframe === 'upcoming' ? 'Schedule a meeting to bring your community together.' : 'Past meetings will appear here after they conclude.'}
-          </p>
-          {timeframe === 'upcoming' && (
-            <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+        timeframe === 'upcoming' ? (
+          <ToolEmpty look="meetings">
+            <Button className="civic-button" onClick={() => setCreateDialogOpen(true)}>
               <Plus size={16} aria-hidden="true" /> Create meeting
             </Button>
-          )}
-        </div>
+          </ToolEmpty>
+        ) : (
+          <div className="glass-card p-12 rounded-2xl text-center">
+            <h3 className="text-lg font-semibold text-foreground mb-2">No past meetings</h3>
+            <p className="text-cosmic-muted text-sm">Past meetings will appear here after they conclude.</p>
+          </div>
+        )
       ) : viewMode === 'list' ? (
         /* List / Timeline View */
         <div className="space-y-3">

@@ -1,6 +1,6 @@
 'use client';
 
-import WorkspaceHeading from "@/components/WorkspaceHeading";
+import WorkspaceHeading, { ToolEmpty } from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -250,6 +250,7 @@ export default function InitiativesPage() {
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <WorkspaceHeading
+        look="initiatives"
         title="Citizen initiatives"
         description="Start or sign an initiative, follow its progress toward the signature threshold, and see any official response."
         back={{ href: "/dashboard/participation", label: "Explore participation" }}
@@ -400,29 +401,23 @@ export default function InitiativesPage() {
           <Loader2 className="w-8 h-8 text-cosmic-violet animate-spin" />
         </div>
       ) : filteredInitiatives.length === 0 ? (
-        <div className="glass-card p-12 rounded-2xl text-center">
-          <FileSignature className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            {categoryFilter !== 'all' ? 'No Matching Initiatives' : 'No Initiatives Yet'}
-          </h3>
-          <p className="text-cosmic-muted text-sm mb-4">
-            {categoryFilter !== 'all'
-              ? `No initiatives found for the "${getCategory(categoryFilter).label}" category. Try another category or clear the filter.`
-              : 'Be the first to launch an initiative and rally your community.'}
-          </p>
-          {categoryFilter !== 'all' ? (
-            <Button
-              className="bg-foreground/10 text-foreground hover:bg-foreground/20"
-              onClick={() => setCategoryFilter('all')}
-            >
-              Clear Category Filter
+        categoryFilter !== 'all' ? (
+          <div className="glass-card p-12 rounded-2xl text-center">
+            <h3 className="text-lg font-semibold text-foreground mb-2">No matching initiatives</h3>
+            <p className="text-cosmic-muted text-sm mb-4">
+              {`No initiatives found for the "${getCategory(categoryFilter).label}" category. Try another category or clear the filter.`}
+            </p>
+            <Button className="civic-button outline" onClick={() => setCategoryFilter('all')}>
+              Clear category filter
             </Button>
-          ) : (
-            <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+          </div>
+        ) : (
+          <ToolEmpty look="initiatives">
+            <Button className="civic-button" onClick={() => setCreateDialogOpen(true)}>
               <Plus size={16} aria-hidden="true" /> Launch initiative
             </Button>
-          )}
-        </div>
+          </ToolEmpty>
+        )
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
           {filteredInitiatives.map((initiative) => {

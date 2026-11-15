@@ -458,6 +458,7 @@ export default function AIAgentsPage() {
   return (
     <div className="space-y-4 sm:space-y-8">
       <WorkspaceHeading
+        look="agents"
         title="AI agents"
         description="Six AI helpers support your assemblies: they moderate, facilitate, summarise positions, look for common ground, translate and make discussions accessible. People still make every decision."
       >

@@ -9,7 +9,7 @@ import WorkspaceHeading from '@/components/WorkspaceHeading';
 import {
   Shield, Vote, Users, Flame, Eye, AlertTriangle, Crown,
   Star, Trophy, Copy, CheckCircle, Loader2,
-  BarChart3, Target, Zap, Brain
+  BarChart3, Target, Zap, Brain, MessageSquare, HandHeart
 } from 'lucide-react';
 
 interface BadgeData {
@@ -291,11 +291,11 @@ export default function ReputationPage() {
   }
 
   const scoreBreakdown = [
-    { label: 'Participation', score: data.participationScore, icon: Vote, color: '#2EE6C7' },
-    { label: 'Vote Quality', score: data.qualityScore, icon: Target, color: '#2D6BFF' },
-    { label: 'Consistency', score: data.consistencyScore, icon: Flame, color: '#FFB547' },
-    { label: 'Influence', score: data.influenceScore, icon: Zap, color: '#9B5CFF' },
-    { label: 'Expertise', score: data.expertiseScore, icon: Brain, color: '#FF5E8A' },
+    { label: 'Contributing', score: data.participationScore, icon: MessageSquare, color: '#6741d9' },
+    { label: 'Helping', score: data.qualityScore, icon: HandHeart, color: '#28745b' },
+    { label: 'Showing up', score: data.consistencyScore, icon: Flame, color: '#916500' },
+    { label: 'Community', score: data.influenceScore, icon: Users, color: '#226784' },
+    { label: 'Game skill', score: data.expertiseScore, icon: Brain, color: '#a44231' },
   ];
 
   const topLeaderboard = leaderboard.slice(0, 5);
@@ -305,8 +305,9 @@ export default function ReputationPage() {
     <div>
       <div className="mb-8">
         <WorkspaceHeading
+          look="reputation"
           title="My reputation"
-          description="A summary of how you take part across Cosmogov. It never changes the weight of your vote."
+          description="A summary of how you take part across Cosmogov, from proposals and comments to mission tasks and communities."
           back={{ href: "/dashboard", label: "My civic desk" }}
         />
       </div>
@@ -318,7 +319,7 @@ export default function ReputationPage() {
             <ScoreRing score={data.score} tierColor={data.tierColor} tier={data.tier} />
           </div>
           <p className="text-cosmic-muted text-sm mb-6 text-center max-w-md">
-            Your Cosmic Reputation is a weighted blend of participation, vote quality, consistency, influence, and game expertise.
+            Your reputation grows when you open proposals, comment, help with mission tasks, join communities, keep showing up and play civic games. Votes and signatures are never counted.
           </p>
           <div className="flex items-center gap-3">
             <Button onClick={handleShare} className="bg-cosmic-accent hover:bg-cosmic-accent/90 text-primary-foreground rounded-xl">

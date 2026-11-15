@@ -53,6 +53,7 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-8">
       <WorkspaceHeading
+        look="analytics"
         title="Analytics"
         description="How your communities are taking part. Every figure is counted from the proposals you can see, and no one's ballot is shown."
       >
