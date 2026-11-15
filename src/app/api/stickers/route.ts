@@ -34,6 +34,8 @@ export async function GET() {
       commentsWritten,
       gardenTasksDone,
       gardenMissions,
+      home,
+      ownCityProposals,
     ] = await Promise.all([
       db.mission.count({ where: { createdBy: user.id } }),
       db.membership.count({ where: { userId: user.id } }),
@@ -56,7 +58,30 @@ export async function GET() {
         where: { status: "done", mission: visibleMissions },
       }),
       db.mission.count({ where: visibleMissions }),
+      db.user.findUnique({
+        where: { id: user.id },
+        select: { cityId: true, cityName: true, countryName: true, latitude: true, longitude: true },
+      }),
+      db.proposal.findMany({
+        where: { createdBy: user.id, cityId: { not: null } },
+        select: { cityId: true, createdAt: true },
+        orderBy: { createdAt: "asc" },
+        take: 50,
+      }),
     ]);
+
+    // A "local spark" is a proposal of yours that was the first in its city.
+    const firstCities = new Set<string>();
+    for (const proposal of ownCityProposals) {
+      const cityId = proposal.cityId as string;
+      if (firstCities.has(cityId)) continue;
+      const earlier = await db.proposal.count({
+        where: { cityId, createdAt: { lt: proposal.createdAt } },
+      });
+      if (earlier === 0) firstCities.add(cityId);
+    }
+
+    const hasHome = Boolean(home?.cityId && home.latitude !== null && home.longitude !== null);
     const counts: StickerCounts = {
       missionsStarted,
       communitiesJoined,
@@ -69,10 +94,20 @@ export async function GET() {
       draftsDecided,
       proposalsOpened,
       commentsWritten,
+      homeSet: hasHome ? 1 : 0,
+      localSparks: firstCities.size,
     };
     return NextResponse.json({
       counts,
       garden: { tasksDone: gardenTasksDone, missions: gardenMissions },
+      home: hasHome
+        ? {
+            cityName: home!.cityName,
+            countryName: home!.countryName,
+            latitude: home!.latitude,
+            longitude: home!.longitude,
+          }
+        : null,
     });
   } catch (error) {
     console.error(

@@ -3,9 +3,11 @@ import {
   CheckCheck,
   ClipboardCheck,
   Eye,
+  Flame,
   Hammer,
   Hand,
   Home,
+  MapPin,
   Megaphone,
   MessageCircle,
   Sparkles,
@@ -13,6 +15,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { useId } from "react";
 import type { StickerShape, StickerTint } from "@/lib/stickers";
 
 const icons: Record<string, LucideIcon> = {
@@ -28,6 +31,8 @@ const icons: Record<string, LucideIcon> = {
   stamp: Stamp,
   megaphone: Megaphone,
   comment: MessageCircle,
+  pin: MapPin,
+  flame: Flame,
 };
 
 /** A star with `points` tips, as an SVG path. */
@@ -86,6 +91,7 @@ export default function StickerBadge({
   size?: number;
 }) {
   const Icon = icons[icon] || Sparkles;
+  const foilId = `foil-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
     <span
       className={`sticker tint-${tint} ${earned ? "earned" : "empty"}`}
@@ -94,12 +100,26 @@ export default function StickerBadge({
     >
       <svg viewBox="-4 -4 112 112" fill="none" focusable="false">
         {earned && (
-          <path
-            className="sticker-shadow"
-            d={shapes[shape]}
-            transform="translate(4 5)"
-            strokeLinejoin="round"
-          />
+          <>
+            <defs>
+              {/* A holographic highlight, so a collected sticker looks collectible. */}
+              <linearGradient id={foilId} x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+                <stop offset="0.38" stopColor="#ffffff" stopOpacity="0" />
+                <stop offset="0.47" stopColor="#ffffff" stopOpacity="0.75" />
+                <stop offset="0.53" stopColor="#ffcf4d" stopOpacity="0.35" />
+                <stop offset="0.6" stopColor="#b9a3ff" stopOpacity="0.3" />
+                <stop offset="0.68" stopColor="#ffffff" stopOpacity="0" />
+                <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              className="sticker-shadow"
+              d={shapes[shape]}
+              transform="translate(4 5)"
+              strokeLinejoin="round"
+            />
+          </>
         )}
         <path
           className="sticker-shape"
@@ -107,6 +127,7 @@ export default function StickerBadge({
           strokeLinejoin="round"
         />
         {earned && <circle className="sticker-inner" cx="50" cy="50" r="26" />}
+        {earned && <path className="sticker-foil" d={shapes[shape]} fill={`url(#${foilId})`} />}
       </svg>
       <Icon size={Math.round(size * 0.34)} strokeWidth={2.2} />
     </span>

@@ -6,7 +6,9 @@
  * counts of that person's own records, so it can be checked and cannot drift.
  *
  * Deliberately absent: anything for voting or signing. A vote must never earn
- * a reward. Stickers do not rank people and do not unlock features.
+ * a reward. Stickers do not rank people. What they unlock is personal and
+ * visible (your home on the community map grows, your civic record fills in),
+ * never extra say in a decision or access to a civic feature.
  */
 export type StickerCounts = {
   missionsStarted: number;
@@ -20,6 +22,10 @@ export type StickerCounts = {
   draftsDecided: number;
   proposalsOpened: number;
   commentsWritten: number;
+  /** 1 when the person has chosen a home city on the community map. */
+  homeSet: number;
+  /** Proposals this person opened that were the first in their city. */
+  localSparks: number;
 };
 
 export const emptyCounts: StickerCounts = {
@@ -34,6 +40,8 @@ export const emptyCounts: StickerCounts = {
   draftsDecided: 0,
   proposalsOpened: 0,
   commentsWritten: 0,
+  homeSet: 0,
+  localSparks: 0,
 };
 
 export type StickerShape =
@@ -187,7 +195,115 @@ export const stickerRules: StickerRule[] = [
     tint: "peach",
     icon: "comment",
   },
+  {
+    id: "on-the-map",
+    name: "On the map",
+    how: "Plant your flag: choose your home city on the community map.",
+    href: "/dashboard/cosmic-map",
+    count: "homeSet",
+    need: 1,
+    shape: "circle",
+    tint: "sky",
+    icon: "pin",
+  },
+  {
+    id: "local-spark",
+    name: "Local spark",
+    how: "Open the first proposal in your city.",
+    href: "/dashboard/proposals/new",
+    count: "localSparks",
+    need: 1,
+    shape: "burst",
+    tint: "peach",
+    icon: "flame",
+  },
 ];
+
+/* ─── Your home on the community map ───
+ * The home grows with the number of stickers collected. It is cosmetic and
+ * personal: only you see it, at city level, and it changes no permission. */
+
+export type HomeId = "tent" | "cabin" | "house" | "tower" | "lighthouse";
+export type HomeLevel = {
+  id: HomeId;
+  name: string;
+  /** Stickers needed to live here. */
+  from: number;
+  /** One line about what it means, in the site's voice. */
+  line: string;
+};
+
+export const homeLevels: HomeLevel[] = [
+  { id: "tent", name: "Tent", from: 0, line: "Every neighborhood starts with someone who shows up." },
+  { id: "cabin", name: "Cabin", from: 2, line: "You’ve put down roots. People are starting to know your name." },
+  { id: "house", name: "House with a garden", from: 4, line: "Your door is open and your garden is growing." },
+  { id: "tower", name: "Clock tower", from: 7, line: "People set their plans by what you get done." },
+  { id: "lighthouse", name: "Lighthouse", from: 11, line: "You light the way for everyone around you." },
+];
+
+export function homeFor(earned: number): {
+  current: HomeLevel;
+  next: HomeLevel | null;
+  /** Stickers still needed for the next home, 0 at the top. */
+  toNext: number;
+} {
+  const count = Number.isFinite(earned) && earned > 0 ? Math.floor(earned) : 0;
+  let index = 0;
+  homeLevels.forEach((level, i) => {
+    if (count >= level.from) index = i;
+  });
+  const next = homeLevels[index + 1] ?? null;
+  return { current: homeLevels[index], next, toNext: next ? next.from - count : 0 };
+}
+
+/* ─── Impact: what an earned sticker stands for, in real numbers ─── */
+
+function times(n: number, one: string, many: string): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+export function stickerImpact(
+  id: string,
+  input: unknown,
+  garden?: { tasksDone: number },
+): string {
+  const c = cleanCounts(input);
+  switch (id) {
+    case "first-spark":
+      return `You’ve started ${times(c.missionsStarted, "mission", "missions")}. Big ideas begin like this.`;
+    case "good-neighbor":
+      return `You’re part of ${times(c.communitiesJoined, "community", "communities")}.`;
+    case "host":
+      return `You started ${times(c.communitiesStarted, "community", "communities")} for others to join.`;
+    case "source-spotter":
+      return `${times(c.sourcesAdded, "source", "sources")} you added help everyone check the facts.`;
+    case "fresh-eyes":
+      return `${times(c.viewsAdded, "point of view", "points of view")} from you shaped the drafts.`;
+    case "hands-on":
+      return `You’ve picked up ${times(c.tasksPicked, "task", "tasks")}.`;
+    case "done-and-dusted":
+    case "handy": {
+      const flowers = garden && garden.tasksDone > 0 ? ` Your missions’ garden has ${times(garden.tasksDone, "flower", "flowers")}.` : "";
+      return `${times(c.tasksDone, "task", "tasks")} finished by you, each one a flower in the shared garden.${flowers}`;
+    }
+    case "count-me-in":
+      return `You answered ${times(c.formsAnswered, "form", "forms")}, so organizers heard from you.`;
+    case "your-call":
+      return `You adopted or published ${times(c.draftsDecided, "draft", "drafts")}. People decided, not the AI.`;
+    case "conversation-starter":
+      return `You opened ${times(c.proposalsOpened, "proposal", "proposals")} for your community to discuss.`;
+    case "thinking-out-loud":
+      return `You added ${times(c.commentsWritten, "comment", "comments")} to the conversation.`;
+    case "on-the-map":
+      return "Your home is on the community map, and it grows with every sticker.";
+    case "local-spark":
+      return c.localSparks > 1
+        ? `You opened the very first proposal in ${c.localSparks} cities.`
+        : "You opened the very first proposal in your city.";
+    default:
+      return "";
+  }
+}
 
 export type StickerState = StickerRule & {
   earned: boolean;

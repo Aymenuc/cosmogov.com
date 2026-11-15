@@ -5,14 +5,18 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { maplibreGL } from '@maplibre/maplibre-gl-leaflet';
+import type { HomeId } from '@/lib/stickers';
 import {
   MapMarkerData,
+  MapBloom,
   ActivityType,
   createMarkerIcon,
   createClusterIcon,
   createPopupContent,
+  createHomeIcon,
+  createBloomIcon,
+  createBloomPopup,
   clusterMarkers,
-  ACTIVITY_COLORS,
 } from './MapMarker';
 
 /* ─── Fix Leaflet default icon issue ─── */
@@ -53,6 +57,10 @@ interface MapViewProps {
   flyTo: { lat: number; lng: number; zoom: number } | null;
   onFlyToComplete: () => void;
   myLocation: { lat: number; lng: number } | null;
+  /** Your home city and the home you have grown into (only you see it). */
+  home: { lat: number; lng: number; homeId: HomeId; cityName: string | null } | null;
+  /** Where the shared garden blooms, per community. */
+  blooms: MapBloom[];
   className?: string;
 }
 
@@ -67,14 +75,25 @@ export default function MapView({
   flyTo,
   onFlyToComplete,
   myLocation,
+  home,
+  blooms,
   className,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const clusterLayerRef = useRef<L.LayerGroup | null>(null);
+  const bloomsLayerRef = useRef<L.LayerGroup | null>(null);
+  const homeMarkerRef = useRef<L.Marker | null>(null);
   const myLocationMarkerRef = useRef<L.Marker | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Pins pop in the first time they appear, not on every pan. */
+  const seenRef = useRef<Set<string>>(new Set());
+  const firstTime = (key: string) => {
+    if (seenRef.current.has(key)) return false;
+    seenRef.current.add(key);
+    return true;
+  };
 
   /* ─── Initialize Map ─── */
   useEffect(() => {
@@ -98,7 +117,8 @@ export default function MapView({
     // Add zoom control to top-right
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // Create layers
+    // Create layers (blooms sit under the activity pins)
+    bloomsLayerRef.current = L.layerGroup().addTo(map);
     markersLayerRef.current = L.layerGroup().addTo(map);
     clusterLayerRef.current = L.layerGroup().addTo(map);
 
@@ -148,10 +168,36 @@ export default function MapView({
     // Cluster markers
     const { individual, clusters } = clusterMarkers(filtered, zoom);
 
+    // City-level activities share the city's exact point. Fan those out in a
+    // small ring (a fixed pixel radius at any zoom) so each one can be seen.
+    const sameSpot = new Map<string, MapMarkerData[]>();
+    individual.forEach((m) => {
+      const key = `${m.latitude.toFixed(5)},${m.longitude.toFixed(5)}`;
+      sameSpot.set(key, [...(sameSpot.get(key) ?? []), m]);
+    });
+    const position = new Map<MapMarkerData, L.LatLng>();
+    sameSpot.forEach((group) => {
+      group.forEach((m, i) => {
+        if (group.length === 1) {
+          position.set(m, L.latLng(m.latitude, m.longitude));
+          return;
+        }
+        const angle = (2 * Math.PI * i) / group.length - Math.PI / 2;
+        const radius = 30 + group.length * 3;
+        const centre = map.project([m.latitude, m.longitude], zoom);
+        position.set(m, map.unproject(centre.add([radius * Math.cos(angle), radius * Math.sin(angle)]), zoom));
+      });
+    });
+
     // Add individual markers
     individual.forEach(marker => {
-      const icon = createMarkerIcon(marker.type);
-      const leafletMarker = L.marker([marker.latitude, marker.longitude], { icon })
+      const icon = createMarkerIcon(marker.type, firstTime(`m:${marker.type}:${marker.id}`));
+      const leafletMarker = L.marker(position.get(marker) ?? [marker.latitude, marker.longitude], {
+        icon,
+        title: marker.title,
+        alt: marker.title,
+        riseOnHover: true,
+      })
         .bindPopup(createPopupContent(marker), {
           className: 'cosmic-popup',
           maxWidth: 300,
@@ -167,8 +213,12 @@ export default function MapView({
 
     // Add cluster markers
     clusters.forEach(cluster => {
-      const icon = createClusterIcon(cluster.count);
-      const leafletMarker = L.marker([cluster.centerLat, cluster.centerLng], { icon });
+      const key = `c:${cluster.count}:${cluster.centerLat.toFixed(2)}:${cluster.centerLng.toFixed(2)}`;
+      const icon = createClusterIcon(cluster.count, firstTime(key));
+      const leafletMarker = L.marker([cluster.centerLat, cluster.centerLng], {
+        icon,
+        title: `${cluster.count} activities here. Zoom in.`,
+      });
 
       leafletMarker.on('click', () => {
         onClusterClick({ centerLat: cluster.centerLat, centerLng: cluster.centerLng });
@@ -177,6 +227,37 @@ export default function MapView({
       clusterLayerRef.current!.addLayer(leafletMarker);
     });
   }, [markers, visibleTypes, onMarkerClick, onClusterClick]);
+
+  /* ─── Garden blooms ─── */
+  useEffect(() => {
+    const layer = bloomsLayerRef.current;
+    if (!mapRef.current || !layer) return;
+    layer.clearLayers();
+    blooms.forEach((bloom) => {
+      L.marker([bloom.latitude, bloom.longitude], {
+        icon: createBloomIcon(bloom.tasksDone, firstTime(`b:${bloom.id}:${bloom.tasksDone}`)),
+        title: `${bloom.name}: ${bloom.tasksDone} tasks finished`,
+        zIndexOffset: -500,
+      })
+        .bindPopup(createBloomPopup(bloom), { className: 'cosmic-popup', maxWidth: 280 })
+        .addTo(layer);
+    });
+  }, [blooms]);
+
+  /* ─── Your home ─── */
+  useEffect(() => {
+    if (!mapRef.current) return;
+    homeMarkerRef.current?.remove();
+    homeMarkerRef.current = null;
+    if (!home) return;
+    homeMarkerRef.current = L.marker([home.lat, home.lng], {
+      icon: createHomeIcon(home.homeId, home.cityName),
+      title: 'Your home',
+      // Under the activity pins: the house is the backdrop, activities stay clickable.
+      zIndexOffset: -1000,
+      keyboard: false,
+    }).addTo(mapRef.current);
+  }, [home?.lat, home?.lng, home?.homeId, home?.cityName]);
 
   /* ─── Fly To Location ─── */
   useEffect(() => {
@@ -205,26 +286,19 @@ export default function MapView({
 
     if (myLocation) {
       const pulseIcon = L.divIcon({
-        html: `
-          <div style="position:relative;width:20px;height:20px;">
-            <div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(46,230,199,0.2);animation:markerPulseRing 2s ease-out infinite;"></div>
-            <div style="position:absolute;inset:-4px;border-radius:50%;background:rgba(46,230,199,0.3);animation:markerPulseRing 2s ease-out infinite 0.3s;"></div>
-            <div style="width:20px;height:20px;border-radius:50%;background:#39765b;border:3px solid #f7f8f3;box-shadow:0 0 12px rgba(46,230,199,0.5);"></div>
-          </div>
-        `,
-        className: '',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
+        html: `<div class="map-you"><span></span></div>`,
+        className: 'map-pin-host',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
       });
 
       myLocationMarkerRef.current = L.marker([myLocation.lat, myLocation.lng], {
         icon: pulseIcon,
         zIndexOffset: 1000,
+        title: 'You are around here',
       })
         .bindPopup(
-          `<div style="padding:8px 12px;font-family:'Inter',system-ui,sans-serif;color:#203b2d;">
-            <div style="font-size:13px;font-weight:600;">📍 Your Location</div>
-          </div>`,
+          `<div class="map-card"><h3>You are around here</h3><p class="map-card-meta">From your browser, for this visit only. Nothing is saved.</p></div>`,
           { className: 'cosmic-popup', closeButton: false }
         )
         .addTo(mapRef.current);
@@ -235,7 +309,7 @@ export default function MapView({
     <div
       ref={containerRef}
       className={className || 'w-full h-full'}
-      style={{ background: '#eef1e9' }}
+      style={{ background: '#f2efe9' }}
     />
   );
 }

@@ -22,6 +22,7 @@ const destinations = [
   ["Community map", "/dashboard/cosmic-map"],
   ["My communities", "/dashboard/organizations"],
   ["Sticker book", "/dashboard/stickers"],
+  ["Civic record", "/dashboard/record"],
   ["AI assistant", "/dashboard/assistant"],
   ["Settings", "/dashboard/settings"],
 ];
