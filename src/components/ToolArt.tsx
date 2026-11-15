@@ -22,7 +22,8 @@ export type ToolArtName =
   | "games"
   | "reputation"
   | "activity"
-  | "explore";
+  | "explore"
+  | "government";
 
 const INK = "#302248";
 const VIOLET = "#6741D9";
@@ -400,6 +401,22 @@ const art: Record<ToolArtName, () => ReactNode> = {
         <circle cx="128" cy="36" r="3.5" fill={PAPER} />
       </g>
       <path d="M100 122v7M74 130h52" stroke={INK} strokeWidth="3" {...line} />
+    </>
+  ),
+  government: () => (
+    <>
+      {/* A town hall answering back: columns, steps and a reply bubble with a tick. */}
+      <path d="M48 62 100 34l52 28Z" fill={LILAC} stroke={INK} strokeWidth="3" {...line} />
+      <rect x="54" y="62" width="92" height="8" fill={PAPER} stroke={INK} strokeWidth="3" />
+      {[64, 84, 104, 124].map((x) => (
+        <rect key={x} x={x} y="70" width="12" height="40" fill={PAPER} stroke={INK} strokeWidth="2.5" />
+      ))}
+      <rect x="50" y="110" width="100" height="8" fill={PAPER} stroke={INK} strokeWidth="3" />
+      <rect x="42" y="118" width="116" height="8" fill={PAPER} stroke={INK} strokeWidth="3" />
+      <g className="tool-art-pop">
+        <path d="M128 22h44a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-26l-10 9v-9h-8a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8Z" fill={MINT} stroke={INK} strokeWidth="2.5" {...line} />
+        <path d="M140 40l7 7 13-14" stroke={GREEN} strokeWidth="3.5" fill="none" {...line} />
+      </g>
     </>
   ),
 };

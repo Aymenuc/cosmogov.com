@@ -25,6 +25,7 @@ interface Stats {
   totalGamesPlayed: number;
   unreadMessages: number;
   totalRevenue: number;
+  monthlyRevenue: number;
   planDistribution: { community: number; pro: number; government: number };
   recentUsers: any[];
   recentMessages: any[];
@@ -177,7 +178,7 @@ export default function AdminPortalPage() {
     { label: 'Games Played', value: stats.totalGamesPlayed, icon: Gamepad2, color: 'text-cosmic-rose', bg: 'bg-cosmic-rose/10' },
     { label: 'Unread Messages', value: stats.unreadMessages, icon: Inbox, color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10' },
     { label: 'Total Revenue', value: `$${((stats.totalRevenue || 0) / 100).toLocaleString()}`, icon: DollarSign, color: 'text-cosmic-success', bg: 'bg-cosmic-success/10' },
-    { label: 'Monthly Revenue', value: `$${((stats.totalRevenue || 0) / 100).toLocaleString()}`, icon: TrendingUp, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10' },
+    { label: 'Revenue, last 30 days', value: `$${((stats.monthlyRevenue || 0) / 100).toLocaleString()}`, icon: TrendingUp, color: 'text-cosmic-teal', bg: 'bg-cosmic-teal/10' },
   ] : [];
 
   const planDistribution = stats?.planDistribution;
@@ -298,6 +299,9 @@ export default function AdminPortalPage() {
                   <Mail className="w-5 h-5 text-cosmic-amber" /> Recent Contact Messages
                 </h3>
                 <div className="space-y-3">
+                  {stats && stats.recentMessages.length === 0 && (
+                    <p className="text-sm text-cosmic-muted">No messages yet. New contact form messages appear here and in the Inbox tab.</p>
+                  )}
                   {stats?.recentMessages.map((m: any) => (
                     <div key={m.id} className="flex items-start gap-3 p-3 rounded-lg bg-foreground/[0.02] border border-border">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${m.status === 'new' ? 'bg-cosmic-rose/20 text-cosmic-rose' : m.status === 'read' ? 'bg-cosmic-amber/20 text-cosmic-amber' : 'bg-cosmic-success/20 text-cosmic-success'}`}>

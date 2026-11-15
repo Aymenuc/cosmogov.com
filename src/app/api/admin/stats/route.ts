@@ -16,6 +16,10 @@ export async function GET() {
   const totalGamesPlayed = await db.gameResult.count();
   const unreadMessages = await db.contactMessage.count({ where: { status: 'new' } });
   const totalRevenue = await db.billingRecord.aggregate({ where: { status: 'paid' }, _sum: { amount: true } });
+  const monthlyRevenue = await db.billingRecord.aggregate({
+    where: { status: 'paid', createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+    _sum: { amount: true },
+  });
   const recentUsers = await db.user.findMany({ take: 5, orderBy: { createdAt: 'desc' }, select: { id: true, name: true, email: true, plan: true, role: true, createdAt: true } });
   const recentMessages = await db.contactMessage.findMany({ take: 5, orderBy: { createdAt: 'desc' } });
 
@@ -27,6 +31,7 @@ export async function GET() {
   return NextResponse.json({
     totalUsers, totalOrgs, activeProposals, totalVotes, totalGamesPlayed, unreadMessages,
     totalRevenue: totalRevenue._sum.amount || 0,
+    monthlyRevenue: monthlyRevenue._sum.amount || 0,
     planDistribution,
     recentUsers, recentMessages,
   });

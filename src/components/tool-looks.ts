@@ -137,6 +137,11 @@ export const toolLooks: Record<ToolArtName, ToolLook> = {
     cheer: "Good ideas travel. See what other places are trying, and borrow what works.",
     nudge: ["on-the-map"],
   },
+  government: {
+    tint: "lilac",
+    headline: "Answer your community on the record",
+    cheer: "Every reply carries your name, and the people who signed are told when you respond.",
+  },
   activity: {
     tint: "sun",
     headline: "Celebrate the regulars",

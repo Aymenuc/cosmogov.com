@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -583,28 +584,13 @@ export default function GovPortalPage() {
 
   return (
     <div className="animate-[fadeIn_0.5s_ease-out]">
-      {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
-            </Button>
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cosmic-teal/10 flex items-center justify-center">
-            <Landmark className="w-5 h-5 text-cosmic-teal" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold font-heading text-gradient">
-              Government Portal
-            </h1>
-            <p className="text-cosmic-muted text-sm">
-              Review, respond, and engage with citizen participation
-            </p>
-          </div>
-        </div>
+        <WorkspaceHeading
+          look="government"
+          title="Government portal"
+          description="Read what residents are asking for, reply on the record and keep track of what is still waiting for an answer."
+          back={{ href: "/dashboard", label: "My civic desk" }}
+        />
       </div>
 
       {/* Tabs */}

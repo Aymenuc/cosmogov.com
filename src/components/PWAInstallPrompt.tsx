@@ -48,8 +48,8 @@ export default function PWAInstallPrompt() {
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         toast({
-          title: '🚀 CosmoGov Installed!',
-          description: 'Welcome aboard, cosmic citizen. Launch from your home screen anytime.',
+          title: 'Cosmogov installed',
+          description: 'Welcome aboard. Open Cosmogov from your home screen anytime.',
         });
         setShowPrompt(false);
       }
@@ -97,8 +97,8 @@ export default function PWAInstallPrompt() {
             <Rocket className="w-5 h-5 text-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground">Install CosmoGov</p>
-            <p className="text-xs text-cosmic-muted mt-0.5">Add to home screen for the full cosmic experience</p>
+            <p className="text-sm font-semibold text-foreground">Install Cosmogov</p>
+            <p className="text-xs text-cosmic-muted mt-0.5">Add Cosmogov to your home screen for quick access</p>
           </div>
         </div>
 

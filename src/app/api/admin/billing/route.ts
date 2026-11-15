@@ -15,7 +15,8 @@ export async function GET() {
   });
 
   const monthlyRevenue = await db.billingRecord.aggregate({
-    where: { status: 'paid' },
+    // Paid in the last 30 days.
+    where: { status: 'paid', createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
     _sum: { amount: true },
     _count: true,
   });

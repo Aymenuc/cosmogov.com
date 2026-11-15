@@ -273,7 +273,7 @@ export default function ReputationPage() {
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full border-2 border-cosmic-accent/30 border-t-cosmic-accent animate-spin" />
-          <span className="text-cosmic-muted text-sm">Calculating your cosmic footprint...</span>
+          <span className="text-cosmic-muted text-sm">Adding up how you've taken part…</span>
         </div>
       </div>
     );

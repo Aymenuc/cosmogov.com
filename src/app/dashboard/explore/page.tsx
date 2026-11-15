@@ -951,7 +951,7 @@ export default function ExplorePage() {
       >
         <span>Data from countries-states-cities</span>
         <span className="hidden sm:inline">·</span>
-        <span>Powered by CosmoGov</span>
+        <span>Powered by Cosmogov</span>
         <span className="hidden sm:inline">·</span>
         <span className="flex items-center gap-1"><Globe className="w-3 h-3" /> Earth</span>
       </motion.div>
