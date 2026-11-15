@@ -1,7 +1,7 @@
 "use client";
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import MissionOutcomes from "@/components/missions/MissionOutcomes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import {
   Eye,
-  ArrowLeft,
+
   Loader2,
   CheckCircle2,
   Clock,
@@ -191,80 +191,55 @@ export default function AccountabilityPage() {
 
   return (
     <div className="space-y-6">
+      <WorkspaceHeading
+        title="Accountability"
+        description="Track implementation of approved proposals and budget projects, and see the evidence and outcomes shared by your communities."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      />
+
       <MissionOutcomes />
       <p className="mission-small">
-        The process statistics below describe the latest 1,000 milestones you
-        can access.
+        The process statistics below describe the latest 1,000 milestones you can access.
       </p>
-      {/* Back Navigation */}
-      <Link
-        href="/dashboard/participation"
-        className="inline-flex items-center gap-2 text-sm text-cosmic-muted hover:text-cosmic-teal transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Participation Hub
-      </Link>
 
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-2xl glass-card-violet p-8">
-        <div className="absolute inset-0 starfield opacity-20" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Eye className="w-5 h-5 text-cosmic-violet" />
-            <span className="text-cosmic-violet text-sm font-semibold tracking-wider uppercase">
-              Accountability Tracker
-            </span>
-          </div>
-          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">
-            Promises Made,{" "}
-            <span className="text-gradient-cool">Promises Kept</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm max-w-2xl mb-6">
-            Track implementation of approved proposals and budget projects. See
-            milestones, evidence, and progress — because democracy doesn&apos;t
-            end at the ballot box.
+      <div className="workspace-tool-stats">
+        <div className="glass-card p-3 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Overall</span>
+          <p className="text-lg font-bold text-cosmic-violet font-heading">
+            {stats.overallProgress}%
           </p>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-            <div className="glass-card p-3 rounded-xl">
-              <span className="text-[10px] text-cosmic-muted">Overall</span>
-              <p className="text-lg font-bold text-cosmic-violet font-heading">
-                {stats.overallProgress}%
-              </p>
-            </div>
-            <div className="glass-card p-3 rounded-xl">
-              <span className="text-[10px] text-cosmic-muted">Milestones</span>
-              <p className="text-lg font-bold text-foreground font-heading">
-                {stats.totalMilestones}
-              </p>
-            </div>
-            <div className="glass-card p-3 rounded-xl">
-              <span className="text-[10px] text-cosmic-muted">Completed</span>
-              <p className="text-lg font-bold text-cosmic-success font-heading">
-                {stats.completedMilestones}
-              </p>
-            </div>
-            <div className="glass-card p-3 rounded-xl">
-              <span className="text-[10px] text-cosmic-muted">Delayed</span>
-              <p className="text-lg font-bold text-cosmic-rose font-heading">
-                {stats.delayedMilestones}
-              </p>
-            </div>
-            <div className="glass-card p-3 rounded-xl">
-              <span className="text-[10px] text-cosmic-muted">
-                Transparency
-              </span>
-              <p className="text-lg font-bold text-cosmic-amber font-heading">
-                {stats.transparencyScore}%
-              </p>
-            </div>
-            <div className="glass-card p-3 rounded-xl">
-              <span className="text-[10px] text-cosmic-muted">On-Time</span>
-              <p className="text-lg font-bold text-cosmic-teal font-heading">
-                {stats.onTimeRate}%
-              </p>
-            </div>
-          </div>
+        </div>
+        <div className="glass-card p-3 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Milestones</span>
+          <p className="text-lg font-bold text-foreground font-heading">
+            {stats.totalMilestones}
+          </p>
+        </div>
+        <div className="glass-card p-3 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Completed</span>
+          <p className="text-lg font-bold text-cosmic-success font-heading">
+            {stats.completedMilestones}
+          </p>
+        </div>
+        <div className="glass-card p-3 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Delayed</span>
+          <p className="text-lg font-bold text-cosmic-rose font-heading">
+            {stats.delayedMilestones}
+          </p>
+        </div>
+        <div className="glass-card p-3 rounded-xl">
+          <span className="text-xs text-cosmic-muted">
+            Transparency
+          </span>
+          <p className="text-lg font-bold text-cosmic-amber font-heading">
+            {stats.transparencyScore}%
+          </p>
+        </div>
+        <div className="glass-card p-3 rounded-xl">
+          <span className="text-xs text-cosmic-muted">On-Time</span>
+          <p className="text-lg font-bold text-cosmic-teal font-heading">
+            {stats.onTimeRate}%
+          </p>
         </div>
       </div>
 

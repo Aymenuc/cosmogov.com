@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -40,7 +41,7 @@ import {
   Link2,
   ChevronRight,
   Mic,
-  Eye,
+
   FileText,
   Play,
   Trash2,
@@ -254,42 +255,33 @@ export default function MeetingsPage() {
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-2xl glass-card-amber p-8 lg:p-12">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-5 h-5 text-cosmic-amber" />
-            <span className="text-cosmic-amber text-sm font-semibold tracking-wider uppercase">Meetings</span>
-          </div>
-          <h1 className="font-heading text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Gather, Discuss,{' '}
-            <span className="text-gradient-warm">Decide</span>
-          </h1>
-          <p className="text-cosmic-muted max-w-2xl mb-8">
-            Attend in-person, virtual, or hybrid meetings. Every gathering is a chance to shape the future of your community.
-          </p>
+      <WorkspaceHeading
+        title="Meetings"
+        description="Find or schedule in-person, virtual, or hybrid meetings for your community."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      >
+        <button type="button" className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+          <Plus size={16} aria-hidden="true" /> Create meeting
+        </button>
+      </WorkspaceHeading>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: 'Upcoming', value: meetings.filter(m => isUpcoming(m.startsAt)).length, icon: Calendar, color: 'text-cosmic-amber' },
-              { label: 'In-Person', value: meetings.filter(m => m.type === 'in_person').length, icon: MapPin, color: 'text-cosmic-teal' },
-              { label: 'Virtual', value: meetings.filter(m => m.type === 'virtual').length, icon: Video, color: 'text-cosmic-violet' },
-              { label: 'Total Attendees', value: meetings.reduce((s, m) => s + m.attendeeCount, 0), icon: Users, color: 'text-cosmic-accent' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-4 rounded-xl">
-                <div className="flex items-center gap-2 mb-1">
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                  <span className="text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-xl font-bold font-heading ${stat.color}`}>
-                  {stat.value.toLocaleString()}
-                </p>
-              </div>
-            ))}
+      <div className="workspace-tool-stats">
+        {[
+          { label: 'Upcoming', value: meetings.filter(m => isUpcoming(m.startsAt)).length, icon: Calendar, color: 'text-cosmic-amber' },
+          { label: 'In-Person', value: meetings.filter(m => m.type === 'in_person').length, icon: MapPin, color: 'text-cosmic-teal' },
+          { label: 'Virtual', value: meetings.filter(m => m.type === 'virtual').length, icon: Video, color: 'text-cosmic-violet' },
+          { label: 'Total Attendees', value: meetings.reduce((s, m) => s + m.attendeeCount, 0), icon: Users, color: 'text-cosmic-accent' },
+        ].map((stat) => (
+          <div key={stat.label} className="glass-card p-4 rounded-xl">
+            <div className="flex items-center gap-2 mb-1">
+              <stat.icon className={`w-4 h-4 ${stat.color}`} />
+              <span className="text-xs text-cosmic-muted">{stat.label}</span>
+            </div>
+            <p className={`text-xl font-bold font-heading ${stat.color}`}>
+              {stat.value.toLocaleString()}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Toolbar */}
@@ -360,12 +352,6 @@ export default function MeetingsPage() {
           </div>
         </div>
 
-        <Button
-          className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 shrink-0"
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" /> Create Meeting
-        </Button>
       </div>
 
       {/* Meetings Content */}
@@ -383,8 +369,8 @@ export default function MeetingsPage() {
             {timeframe === 'upcoming' ? 'Schedule a meeting to bring your community together.' : 'Past meetings will appear here after they conclude.'}
           </p>
           {timeframe === 'upcoming' && (
-            <Button className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90" onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" /> Create Meeting
+            <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+              <Plus size={16} aria-hidden="true" /> Create meeting
             </Button>
           )}
         </div>
@@ -976,7 +962,7 @@ export default function MeetingsPage() {
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90"
+              className="civic-button"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.startsAt}
             >

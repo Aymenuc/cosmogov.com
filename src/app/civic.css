@@ -1316,6 +1316,88 @@ h2 em {
   gap: 9px;
   flex: none;
 }
+.workspace-heading .app-page-heading {
+  margin-bottom: 0;
+}
+.workspace-heading .app-page-heading > .civic-button {
+  min-height: 44px;
+}
+.workspace-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  color: #5932c4;
+  font-size: 13px;
+  font-weight: 650;
+}
+.workspace-back-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.workspace-tool-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 12px;
+}
+.workspace-tool-stats > .glass-card {
+  min-width: 0;
+  min-height: 80px;
+  padding: 14px 16px;
+  border: 1px solid var(--civic-line);
+  border-radius: 15px;
+  background: var(--civic-paper);
+}
+.workspace-tool-stats > :nth-child(4n + 1) {
+  background: var(--community-lilac);
+}
+.workspace-tool-stats > :nth-child(4n + 2) {
+  background: var(--community-mint);
+}
+.workspace-tool-stats > :nth-child(4n + 3) {
+  background: #fff0c3;
+}
+.workspace-tool-stats > :nth-child(4n + 4) {
+  background: var(--community-peach);
+}
+.workspace-tabs {
+  width: fit-content;
+  max-width: 100%;
+  height: auto;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 5px;
+  border: 1px solid var(--civic-line);
+  border-radius: 15px;
+  background: white;
+}
+.workspace-tabs [data-slot="tabs-trigger"] {
+  flex: 0 1 auto;
+  max-width: 100%;
+  min-height: 44px;
+  height: auto;
+  justify-content: flex-start;
+  padding: 8px 11px;
+  border-radius: 10px;
+  white-space: normal;
+  text-align: start;
+}
+.workspace-tabs [data-slot="tabs-trigger"][data-state="active"] {
+  background: #eee6ff;
+  color: #5932c4;
+  box-shadow: none;
+}
+.workspace-pulse-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--civic-line);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle, #b59ec348 1px, transparent 1.6px) 0 0 / 14px 14px,
+    var(--civic-paper);
+}
 .desk-welcome {
   display: grid;
   grid-template-columns: 1.45fr 1fr;

@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -248,42 +249,33 @@ export default function InitiativesPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-violet p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-5 h-5 text-cosmic-violet" />
-            <span className="text-cosmic-violet text-sm font-semibold tracking-wider uppercase">Citizen Initiatives</span>
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Power to the{' '}
-            <span className="text-gradient">People</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            When signatures reach the threshold, the government MUST respond. This is real democratic power — create or sign initiatives that force action.
-          </p>
+      <WorkspaceHeading
+        title="Citizen initiatives"
+        description="Start or sign an initiative, follow its progress toward the signature threshold, and see any official response."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      >
+        <button type="button" className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+          <Plus size={16} aria-hidden="true" /> Launch initiative
+        </button>
+      </WorkspaceHeading>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            {[
-              { label: 'Active Initiatives', value: stats.activeInitiatives, icon: FileSignature, color: 'text-cosmic-teal' },
-              { label: 'Total Signatures', value: stats.totalSignatures, icon: PenTool, color: 'text-cosmic-violet' },
-              { label: 'Thresholds Reached', value: stats.thresholdsReached, icon: Target, color: 'text-cosmic-amber' },
-              { label: 'Enacted Policies', value: stats.enactedPolicies, icon: CheckCircle2, color: 'text-cosmic-success' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {stat.value.toLocaleString()}
-                </p>
-              </div>
-            ))}
+      <div className="workspace-tool-stats">
+        {[
+          { label: 'Active Initiatives', value: stats.activeInitiatives, icon: FileSignature, color: 'text-cosmic-teal' },
+          { label: 'Total Signatures', value: stats.totalSignatures, icon: PenTool, color: 'text-cosmic-violet' },
+          { label: 'Thresholds Reached', value: stats.thresholdsReached, icon: Target, color: 'text-cosmic-amber' },
+          { label: 'Enacted Policies', value: stats.enactedPolicies, icon: CheckCircle2, color: 'text-cosmic-success' },
+        ].map((stat) => (
+          <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+              <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
+              <span className="text-xs text-cosmic-muted">{stat.label}</span>
+            </div>
+            <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
+              {stat.value.toLocaleString()}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Category Filter Chips */}
@@ -374,12 +366,6 @@ export default function InitiativesPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button
-          className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90 shrink-0"
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" /> Launch Initiative
-        </Button>
       </div>
 
       {/* Active Filter Indicator */}
@@ -432,8 +418,8 @@ export default function InitiativesPage() {
               Clear Category Filter
             </Button>
           ) : (
-            <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90" onClick={() => setCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" /> Launch Initiative
+            <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+              <Plus size={16} aria-hidden="true" /> Launch initiative
             </Button>
           )}
         </div>
@@ -792,7 +778,7 @@ export default function InitiativesPage() {
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90"
+              className="civic-button"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description}
             >

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Trophy } from "lucide-react";
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 type Leader = { userId: string; name: string; score: number; tier: string };
 export default function LeaderboardsPage() {
   const [leaders, setLeaders] = useState<Leader[]>([]);
@@ -30,15 +30,10 @@ export default function LeaderboardsPage() {
   }, []);
   return (
     <div className="workspace-page">
-      <header className="page-heading">
-        <div>
-          <div className="eyebrow">RECORDED APP ACTIVITY</div>
-          <h1>
-            <Trophy size={28} /> Community activity
-          </h1>
-          <p>Activity scores never change the weight of a vote.</p>
-        </div>
-      </header>
+      <WorkspaceHeading
+        title="Community activity"
+        description="Activity scores never change the weight of a vote."
+      />
       {error ? (
         <p role="alert" className="form-error">
           {error}

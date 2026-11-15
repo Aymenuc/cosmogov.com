@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -201,42 +202,33 @@ export default function SortitionPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section — cosmic-violet theme */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-violet p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Dices className="w-5 h-5 text-cosmic-violet" />
-            <span className="text-cosmic-violet text-sm font-semibold tracking-wider uppercase">Democratic Lottery</span>
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Sortition —{' '}
-            <span className="text-gradient-violet">Fair Representation</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            Fair representation through random selection — sortition ensures every citizen has an equal chance to participate in decision-making bodies.
-          </p>
+      <WorkspaceHeading
+        title="Sortition"
+        description="Browse opportunities to volunteer or create a pool for a randomly selected citizens’ group."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      >
+        <button type="button" className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+          <Plus size={16} aria-hidden="true" /> Create pool
+        </button>
+      </WorkspaceHeading>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            {[
-              { label: 'Active Pools', value: stats.activePools, icon: Dices, color: 'text-cosmic-violet' },
-              { label: 'Candidates', value: stats.totalCandidates, icon: Users, color: 'text-cosmic-teal' },
-              { label: 'Selected Citizens', value: stats.selectedCitizens, icon: UserCheck, color: 'text-cosmic-amber' },
-              { label: 'Active Assemblies', value: stats.activeAssemblies, icon: Building2, color: 'text-cosmic-success' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {stat.value.toLocaleString()}
-                </p>
-              </div>
-            ))}
+      <div className="workspace-tool-stats">
+        {[
+          { label: 'Active Pools', value: stats.activePools, icon: Dices, color: 'text-cosmic-violet' },
+          { label: 'Candidates', value: stats.totalCandidates, icon: Users, color: 'text-cosmic-teal' },
+          { label: 'Selected Citizens', value: stats.selectedCitizens, icon: UserCheck, color: 'text-cosmic-amber' },
+          { label: 'Active Assemblies', value: stats.activeAssemblies, icon: Building2, color: 'text-cosmic-success' },
+        ].map((stat) => (
+          <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+              <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
+              <span className="text-xs text-cosmic-muted">{stat.label}</span>
+            </div>
+            <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
+              {stat.value.toLocaleString()}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Action Bar — Purpose filter tabs + Create button */}
@@ -257,12 +249,6 @@ export default function SortitionPage() {
             </button>
           ))}
         </div>
-        <Button
-          className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90 shrink-0"
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" /> Create Pool
-        </Button>
       </div>
 
       {/* Pool Cards Grid */}
@@ -275,8 +261,8 @@ export default function SortitionPage() {
           <Dices className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">No Sortition Pools Yet</h3>
           <p className="text-cosmic-muted text-sm mb-4">Be the first to create a democratic lottery pool for fair representation.</p>
-          <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90" onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Create Pool
+          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+            <Plus size={16} aria-hidden="true" /> Create pool
           </Button>
         </div>
       ) : (
@@ -593,7 +579,7 @@ export default function SortitionPage() {
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90"
+              className="civic-button"
               onClick={handleCreate}
               disabled={creating || !createForm.name || !createForm.description}
             >

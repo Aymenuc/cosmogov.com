@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -178,42 +179,33 @@ export default function LegislationPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-amber p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Scale className="w-5 h-5 text-cosmic-amber" />
-            <span className="text-cosmic-amber text-sm font-semibold tracking-wider uppercase">Collaborative Legislation</span>
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Draft, Debate,{' '}
-            <span className="text-gradient-warm">Enact</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            Participate in the legislative process from draft to enactment. Comment on bills, propose amendments, and cast your vote on the laws that shape your community.
-          </p>
+      <WorkspaceHeading
+        title="Legislation"
+        description="Follow proposed legislation, discuss drafts, and contribute amendments or votes when those stages are open."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      >
+        <button type="button" className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+          <Plus size={16} aria-hidden="true" /> Propose legislation
+        </button>
+      </WorkspaceHeading>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            {[
-              { label: 'Total Bills', value: stats.totalBills, icon: FileText, color: 'text-cosmic-amber' },
-              { label: 'In Public Comment', value: stats.inPublicComment, icon: MessageSquare, color: 'text-cosmic-teal' },
-              { label: 'Amendments', value: stats.amendmentsSubmitted, icon: GitPullRequest, color: 'text-cosmic-violet' },
-              { label: 'Enacted', value: stats.enacted, icon: CheckCircle2, color: 'text-cosmic-success' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {stat.value.toLocaleString()}
-                </p>
-              </div>
-            ))}
+      <div className="workspace-tool-stats">
+        {[
+          { label: 'Total Bills', value: stats.totalBills, icon: FileText, color: 'text-cosmic-amber' },
+          { label: 'In Public Comment', value: stats.inPublicComment, icon: MessageSquare, color: 'text-cosmic-teal' },
+          { label: 'Amendments', value: stats.amendmentsSubmitted, icon: GitPullRequest, color: 'text-cosmic-violet' },
+          { label: 'Enacted', value: stats.enacted, icon: CheckCircle2, color: 'text-cosmic-success' },
+        ].map((stat) => (
+          <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+              <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
+              <span className="text-xs text-cosmic-muted">{stat.label}</span>
+            </div>
+            <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
+              {stat.value.toLocaleString()}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Status Tabs */}
@@ -251,12 +243,6 @@ export default function LegislationPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button
-            className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 shrink-0"
-            onClick={() => setCreateDialogOpen(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" /> Propose Legislation
-          </Button>
         </div>
 
         {/* Category Filter Chips */}
@@ -307,8 +293,8 @@ export default function LegislationPage() {
               ? 'No bills match your current filters. Try adjusting your search criteria.'
               : 'Be the first to propose legislation and shape the future of your community.'}
           </p>
-          <Button className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90" onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Propose Legislation
+          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+            <Plus size={16} aria-hidden="true" /> Propose legislation
           </Button>
         </div>
       ) : (
@@ -479,7 +465,7 @@ export default function LegislationPage() {
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90"
+              className="civic-button"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description}
             >

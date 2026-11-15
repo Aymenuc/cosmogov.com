@@ -609,7 +609,7 @@ export default function GovPortalPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-card border border-border p-1 mb-6 overflow-x-auto flex-nowrap min-w-max h-auto gap-1">
+        <TabsList className="workspace-tabs" aria-label="Government portal sections">
           <TabsTrigger
             value="overview"
             className="data-[state=active]:bg-cosmic-teal/10 data-[state=active]:text-cosmic-teal"

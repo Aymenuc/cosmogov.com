@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -217,42 +218,33 @@ export default function BindingProposalsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section — cosmic-rose theme */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-rose p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Gavel className="w-5 h-5 text-cosmic-rose" />
-            <span className="text-cosmic-rose text-sm font-semibold tracking-wider uppercase">Formal response proposals</span>
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Your Voice Has{' '}
-            <span className="text-gradient-rose">Real Power</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            Collect support for a formal response. Only signatures reviewed for eligibility count toward the threshold; legal duties depend on your local rules.
-          </p>
+      <WorkspaceHeading
+        title="Binding proposals"
+        description="Collect support for a formal response. Only signatures reviewed for eligibility count toward the threshold, and legal duties depend on local rules."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      >
+        <button type="button" className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+          <Plus size={16} aria-hidden="true" /> Create formal proposal
+        </button>
+      </WorkspaceHeading>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-            {[
-              { label: 'Active Proposals', value: stats.activeProposals, icon: FileSignature, color: 'text-cosmic-rose' },
-              { label: 'Total Signatures', value: stats.totalSignatures, icon: Users, color: 'text-cosmic-violet' },
-              { label: 'Gov. Responses', value: stats.governmentResponses, icon: Building2, color: 'text-cosmic-amber' },
-              { label: 'Enacted', value: stats.enacted, icon: CheckCircle2, color: 'text-cosmic-success' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {stat.value.toLocaleString()}
-                </p>
-              </div>
-            ))}
+      <div className="workspace-tool-stats">
+        {[
+          { label: 'Active Proposals', value: stats.activeProposals, icon: FileSignature, color: 'text-cosmic-rose' },
+          { label: 'Total Signatures', value: stats.totalSignatures, icon: Users, color: 'text-cosmic-violet' },
+          { label: 'Gov. Responses', value: stats.governmentResponses, icon: Building2, color: 'text-cosmic-amber' },
+          { label: 'Enacted', value: stats.enacted, icon: CheckCircle2, color: 'text-cosmic-success' },
+        ].map((stat) => (
+          <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+              <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
+              <span className="text-xs text-cosmic-muted">{stat.label}</span>
+            </div>
+            <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
+              {stat.value.toLocaleString()}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Binding Banner */}
@@ -310,14 +302,6 @@ export default function BindingProposalsPage() {
       </div>
 
       {/* Create Button */}
-      <div className="flex justify-end">
-        <Button
-          className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90"
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" /> Create formal proposal
-        </Button>
-      </div>
 
       {/* Proposals Grid */}
       {loading ? (
@@ -329,8 +313,8 @@ export default function BindingProposalsPage() {
           <Gavel className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">No Formal response proposals Yet</h3>
           <p className="text-cosmic-muted text-sm mb-4">Create a binding proposal and rally citizens to force government action.</p>
-          <Button className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90" onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Create formal proposal
+          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+            <Plus size={16} aria-hidden="true" /> Create formal proposal
           </Button>
         </div>
       ) : (
@@ -665,7 +649,7 @@ export default function BindingProposalsPage() {
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90"
+              className="civic-button"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description}
             >

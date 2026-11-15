@@ -1,5 +1,6 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -263,41 +264,32 @@ export default function SurveysPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-30" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <ClipboardList className="w-5 h-5 text-cosmic-accent" />
-            <span className="text-cosmic-accent text-sm font-semibold tracking-wider uppercase">Community Voice</span>
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Surveys &{' '}
-            <span className="text-gradient">Polls</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-2xl mb-4 sm:mb-8">
-            Share your opinion on community matters. Every response shapes decisions — from budget priorities to neighborhood improvements.
-          </p>
+      <WorkspaceHeading
+        title="Surveys & polls"
+        description="Create a survey or answer questions about the decisions your community is considering."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      >
+        <button type="button" className="civic-button" onClick={() => setCreateDialogOpen(true)}>
+          <Plus size={16} aria-hidden="true" /> Create survey
+        </button>
+      </WorkspaceHeading>
 
-          {/* Stats Bar */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4">
-            {[
-              { label: 'Active Surveys', value: stats.activeSurveys, icon: ClipboardList, color: 'text-cosmic-teal' },
-              { label: 'Total Responses', value: stats.totalResponses, icon: Users, color: 'text-cosmic-accent' },
-              { label: 'Avg. Completion', value: `${stats.avgCompletionRate}%`, icon: BarChart3, color: 'text-cosmic-violet' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
-                  <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
-                  <span className="text-[10px] sm:text-xs text-cosmic-muted">{stat.label}</span>
-                </div>
-                <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
-                  {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
-                </p>
-              </div>
-            ))}
+      <div className="workspace-tool-stats">
+        {[
+          { label: 'Active Surveys', value: stats.activeSurveys, icon: ClipboardList, color: 'text-cosmic-teal' },
+          { label: 'Total Responses', value: stats.totalResponses, icon: Users, color: 'text-cosmic-accent' },
+          { label: 'Avg. Completion', value: `${stats.avgCompletionRate}%`, icon: BarChart3, color: 'text-cosmic-violet' },
+        ].map((stat) => (
+          <div key={stat.label} className="glass-card p-3 sm:p-4 rounded-xl">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+              <stat.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${stat.color}`} />
+              <span className="text-xs text-cosmic-muted">{stat.label}</span>
+            </div>
+            <p className={`text-lg sm:text-xl font-bold font-heading ${stat.color}`}>
+              {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Status Filter Tabs */}
@@ -370,12 +362,6 @@ export default function SurveysPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button
-            className="bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90 shrink-0"
-            onClick={() => setCreateDialogOpen(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" /> Create Survey
-          </Button>
         </div>
       </div>
 
@@ -393,8 +379,8 @@ export default function SurveysPage() {
               ? 'Try adjusting your filters or search terms.'
               : 'Be the first to create a survey and gather community insights.'}
           </p>
-          <Button className="bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90" onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Create Survey
+          <Button className="civic-button outline" onClick={() => setCreateDialogOpen(true)}>
+            <Plus size={16} aria-hidden="true" /> Create survey
           </Button>
         </div>
       ) : (
@@ -767,7 +753,7 @@ export default function SurveysPage() {
               Cancel
             </Button>
             <Button
-              className="bg-cosmic-accent text-primary-foreground hover:bg-cosmic-accent/90"
+              className="civic-button"
               onClick={handleCreate}
               disabled={creating || !createForm.title || !createForm.description || questions.some((q) => !q.text.trim())}
             >

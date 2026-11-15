@@ -102,7 +102,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-bold font-heading mb-6">Settings</h1>
 
       <Tabs defaultValue="profile">
-        <TabsList className="bg-card border border-border p-1 mb-6 overflow-x-auto flex-nowrap min-w-max">
+        <TabsList className="workspace-tabs" aria-label="Settings sections">
           <TabsTrigger value="profile" className="data-[state=active]:bg-cosmic-accent/10 data-[state=active]:text-cosmic-accent">
             <User className="w-4 h-4 mr-1.5" /> Profile
           </TabsTrigger>

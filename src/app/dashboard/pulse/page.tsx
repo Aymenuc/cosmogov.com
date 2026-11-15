@@ -1,18 +1,19 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Activity, ArrowLeft, Vote, FileText, Users, Zap,
+  Activity, Vote, FileText, Users, Zap,
   Clock, TrendingUp, TrendingDown, Minus, Loader2,
   CheckCircle, XCircle, Flame, AlertCircle, MessageSquare
 } from 'lucide-react';
 
 interface PulseData {
-  sentiment: { score: number; mood: string; moodColor: string };
+  sentiment: { score: number; mood: string };
   metrics: {
     activeProposals: number;
     totalVotes: number;
@@ -30,8 +31,20 @@ interface PulseData {
   }[];
 }
 
-/* ─── Nebula Canvas ─── */
-function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; moodColor: string } }) {
+const pulseColors = {
+  positive: '#28745b',
+  negative: '#a44231',
+  neutral: '#6741d9',
+};
+
+function pulseColor(score: number) {
+  if (score > 60) return pulseColors.positive;
+  if (score < 40) return pulseColors.negative;
+  return pulseColors.neutral;
+}
+
+/* ─── Activity Canvas ─── */
+function PulseCanvas({ sentiment }: { sentiment: PulseData["sentiment"] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const sentimentRef = useRef(sentiment.score);
@@ -54,6 +67,7 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
     c.style.width = `${width}px`;
     c.style.height = `${height}px`;
     ctx.scale(dpr, dpr);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const resize = () => {
       width = c.parentElement?.clientWidth || 800;
@@ -83,12 +97,6 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
     const particles: Particle[] = [];
     const maxParticles = 120;
 
-    const getColor = (type: Particle['type']): string => {
-      if (type === 'positive') return '#2EE6C7';
-      if (type === 'negative') return '#FF5E8A';
-      return '#9B5CFF';
-    };
-
     const spawnParticle = (): Particle => {
       const sent = sentimentRef.current;
       let type: Particle['type'] = 'neutral';
@@ -109,7 +117,7 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
         vy: (Math.random() - 0.5) * 0.8,
         size: Math.random() * 3 + 1.5,
         baseSize: Math.random() * 3 + 1.5,
-        color: getColor(type),
+        color: pulseColors[type],
         alpha: 0,
         life: 0,
         maxLife: Math.random() * 300 + 150,
@@ -126,23 +134,16 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
       particles.push(p);
     }
 
-    let rotation = 0;
-
     const draw = () => {
-      ctx.fillStyle = 'rgba(4, 5, 11, 0.15)';
-      ctx.fillRect(0, 0, width, height);
-
-      rotation += 0.001;
+      ctx.clearRect(0, 0, width, height);
 
       const cx = width / 2;
       const cy = height / 2;
 
-      // Draw center nebula glow
-      const sent = sentimentRef.current;
-      const glowColor = sent > 60 ? 'rgba(46,230,199,' : sent > 40 ? 'rgba(155,92,255,' : 'rgba(255,94,138,';
+      const tone = pulseColor(sentimentRef.current);
       const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, 150);
-      gradient.addColorStop(0, `${glowColor}0.08)`);
-      gradient.addColorStop(0.5, `${glowColor}0.03)`);
+      gradient.addColorStop(0, tone + "24");
+      gradient.addColorStop(0.5, tone + "10");
       gradient.addColorStop(1, 'transparent');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
@@ -210,7 +211,7 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
         ctx.fill();
 
         // Glow
-        ctx.globalAlpha = p.alpha * 0.15;
+        ctx.globalAlpha = p.alpha * 0.08;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -218,40 +219,35 @@ function PulseNebula({ sentiment }: { sentiment: { score: number; mood: string; 
       }
 
       ctx.globalAlpha = 1;
-      animRef.current = requestAnimationFrame(draw);
+      if (!reducedMotion.matches) animRef.current = requestAnimationFrame(draw);
+    };
+
+    const restart = () => {
+      cancelAnimationFrame(animRef.current);
+      draw();
     };
 
     draw();
+    reducedMotion.addEventListener('change', restart);
     return () => {
       cancelAnimationFrame(animRef.current);
+      reducedMotion.removeEventListener('change', restart);
       window.removeEventListener('resize', resize);
     };
   }, []);
 
   return (
-    <div className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-border" style={{ background: '#04050b' }}>
-      <canvas ref={canvasRef} className="w-full" style={{ height: '260px' }} />
-      <div className="absolute bottom-4 left-4 flex flex-wrap items-center gap-2 sm:gap-3">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-[#2EE6C7]" />
-          <span className="text-[10px] text-cosmic-muted">Positive</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-[#FF5E8A]" />
-          <span className="text-[10px] text-cosmic-muted">Negative</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-[#9B5CFF]" />
-          <span className="text-[10px] text-cosmic-muted">Neutral</span>
-        </div>
-      </div>
-      <div className="absolute top-4 right-4">
-        <div className="cosmic-badge rounded-full px-3 py-1 flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-cosmic-teal animate-pulse" />
-          <span className="text-[10px] font-medium text-cosmic-teal">LIVE</span>
-        </div>
-      </div>
-    </div>
+    <figure className="workspace-pulse-panel">
+      <canvas ref={canvasRef} className="w-full" style={{ height: '260px' }} aria-hidden="true" />
+      <figcaption className="flex flex-wrap items-center gap-3 px-4 pb-4 text-xs text-cosmic-muted">
+        {Object.entries(pulseColors).map(([label, color]) => (
+          <span key={label} className="inline-flex items-center gap-1.5 capitalize">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
+            {label}
+          </span>
+        ))}
+      </figcaption>
+    </figure>
   );
 }
 
@@ -268,11 +264,11 @@ function getEventIcon(type: string) {
 
 function getEventColor(type: string): string {
   switch (type) {
-    case 'vote': return '#2D6BFF';
-    case 'proposal': return '#9B5CFF';
-    case 'pass': return '#2EE6C7';
-    case 'streak': return '#FFB547';
-    default: return '#A7B3D6';
+    case 'vote': return '#226784';
+    case 'proposal': return '#6741d9';
+    case 'pass': return '#28745b';
+    case 'streak': return '#916500';
+    default: return '#63566f';
   }
 }
 
@@ -311,31 +307,21 @@ export default function PulsePage() {
     );
   }
 
+  const moodColor = pulseColor(data.sentiment.score);
+
   return (
     <div>
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-foreground">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard
-            </Button>
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cosmic-violet/10 flex items-center justify-center">
-            <Activity className="w-5 h-5 text-cosmic-violet" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold font-heading">Governance Pulse</h1>
-            <p className="text-cosmic-muted text-sm">Real-time community sentiment and activity visualization</p>
-          </div>
-        </div>
+      <div className="mb-6">
+        <WorkspaceHeading
+          title="Governance pulse"
+          description="See community activity, active proposals, and the latest voting trends."
+          back={{ href: "/dashboard", label: "My civic desk" }}
+        />
       </div>
 
-      {/* Nebula Visualization */}
+      {/* Activity visualization */}
       <div className="mb-8">
-        <PulseNebula sentiment={data.sentiment} />
+        <PulseCanvas sentiment={data.sentiment} />
       </div>
 
       {/* Sentiment Indicator Cards */}
@@ -343,13 +329,13 @@ export default function PulsePage() {
         <Card className="bg-card border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${data.sentiment.moodColor}15` }}>
-                {data.sentiment.score > 60 ? <TrendingUp className="w-4 h-4" style={{ color: data.sentiment.moodColor }} /> :
-                 data.sentiment.score < 40 ? <TrendingDown className="w-4 h-4" style={{ color: data.sentiment.moodColor }} /> :
-                 <Minus className="w-4 h-4" style={{ color: data.sentiment.moodColor }} />}
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${moodColor}15` }}>
+                {data.sentiment.score > 60 ? <TrendingUp className="w-4 h-4" style={{ color: moodColor }} /> :
+                 data.sentiment.score < 40 ? <TrendingDown className="w-4 h-4" style={{ color: moodColor }} /> :
+                 <Minus className="w-4 h-4" style={{ color: moodColor }} />}
               </div>
             </div>
-            <p className="text-lg font-bold font-heading" style={{ color: data.sentiment.moodColor }}>{data.sentiment.mood}</p>
+            <p className="text-lg font-bold font-heading" style={{ color: moodColor }}>{data.sentiment.mood}</p>
             <p className="text-xs text-cosmic-muted">Community Mood</p>
           </CardContent>
         </Card>

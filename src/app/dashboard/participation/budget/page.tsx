@@ -1,7 +1,7 @@
 'use client';
 
+import WorkspaceHeading from "@/components/WorkspaceHeading";
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,9 +15,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Wallet, Users, ArrowLeft, Loader2, CheckCircle2, Clock,
+  Wallet, Users, Loader2, CheckCircle2, Clock,
   TreePine, Building2, GraduationCap, Heart, Zap, MapPin,
-  TrendingUp, Sparkles, Send, Map as MapIcon, Star, AlertCircle,
+  TrendingUp, Sparkles, Map as MapIcon, Star, AlertCircle,
 } from 'lucide-react';
 
 interface BudgetProject {
@@ -77,7 +77,6 @@ export default function BudgetPage() {
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [selectedProcess, setSelectedProcess] = useState<string>('all');
   const [availableProcesses, setAvailableProcesses] = useState<{ id: string; title: string; totalBudget: number }[]>([]);
-  const [showSubmitted, setShowSubmitted] = useState(false);
   const [allocationError, setAllocationError] = useState('');
 
   useEffect(() => {
@@ -137,8 +136,8 @@ export default function BudgetPage() {
         const data = await res.json();
         setAllocationError(data.error || 'This allocation could not be saved.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setAllocationError("This allocation could not be saved. Please try again.");
     } finally {
       setSubmitting(null);
     }
@@ -151,68 +150,51 @@ export default function BudgetPage() {
   return (
     <div className="space-y-6 budget-workspace">
       {allocationError && <p role="alert" className="form-error">{allocationError}</p>}
-      {/* Back Navigation */}
-      <Link href="/dashboard/participation" className="inline-flex items-center gap-2 text-sm text-cosmic-muted hover:text-cosmic-teal transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Participation Hub
-      </Link>
+      <WorkspaceHeading
+        title="Budgets"
+        description="Allocate a share of the process budget across its projects. Your allocation records your priorities without spending money or approving a project."
+        back={{ href: "/dashboard/participation", label: "Explore participation" }}
+      />
 
-      {/* Budget Pool Hero */}
-      <div className="relative overflow-hidden rounded-2xl glass-card-amber p-8">
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Wallet className="w-5 h-5 text-cosmic-amber" />
-            <span className="text-cosmic-amber text-sm font-semibold tracking-wider uppercase">Participatory Budgeting</span>
-          </div>
-          <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">
-            Allocate <span className="text-gradient-warm">Community Funds</span>
-          </h1>
-          <p className="text-cosmic-muted text-sm max-w-2xl mb-6">
-            Each participant can allocate up to the process budget across its projects. Allocations express priorities; they do not spend money or approve a project.
+      <div className="workspace-tool-stats">
+        <div className="glass-card p-4 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Available Budget</span>
+          <p className="text-xl font-bold text-cosmic-amber font-heading">
+            {budgetPool ? formatCurrency(budgetPool.total, budgetPool.currency) : '$0'}
           </p>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-4 rounded-xl">
-              <span className="text-xs text-cosmic-muted">Available Budget</span>
-              <p className="text-xl font-bold text-cosmic-amber font-heading">
-                {budgetPool ? formatCurrency(budgetPool.total, budgetPool.currency) : '$0'}
-              </p>
-            </div>
-            <div className="glass-card p-4 rounded-xl">
-              <span className="text-xs text-cosmic-muted">Your allocated allowance</span>
-              <p className="text-xl font-bold text-cosmic-teal font-heading">
-                {budgetPool ? formatCurrency(budgetPool.allocated, budgetPool.currency) : '$0'}
-              </p>
-            </div>
-            <div className="glass-card p-4 rounded-xl">
-              <span className="text-xs text-cosmic-muted">Your remaining allowance</span>
-              <p className="text-xl font-bold text-foreground font-heading">
-                {budgetPool ? formatCurrency(budgetPool.remaining, budgetPool.currency) : '$0'}
-              </p>
-            </div>
-            <div className="glass-card p-4 rounded-xl">
-              <span className="text-xs text-cosmic-muted">Projects</span>
-              <p className="text-xl font-bold text-cosmic-violet font-heading">{projects.length}</p>
-            </div>
-          </div>
-
-          {/* Budget progress bar */}
-          {budgetPool && budgetPool.total > 0 && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-xs text-cosmic-muted mb-1">
-                <span>Budget Allocation Progress</span>
-                <span>{Math.round((budgetPool.allocated / budgetPool.total) * 100)}%</span>
-              </div>
-              <div className="h-3 bg-foreground/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-cosmic-amber to-cosmic-teal rounded-full transition-all duration-1000 tally-bar"
-                  style={{ width: `${Math.min(100, (budgetPool.allocated / budgetPool.total) * 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
+        </div>
+        <div className="glass-card p-4 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Your allocated allowance</span>
+          <p className="text-xl font-bold text-cosmic-teal font-heading">
+            {budgetPool ? formatCurrency(budgetPool.allocated, budgetPool.currency) : '$0'}
+          </p>
+        </div>
+        <div className="glass-card p-4 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Your remaining allowance</span>
+          <p className="text-xl font-bold text-foreground font-heading">
+            {budgetPool ? formatCurrency(budgetPool.remaining, budgetPool.currency) : '$0'}
+          </p>
+        </div>
+        <div className="glass-card p-4 rounded-xl">
+          <span className="text-xs text-cosmic-muted">Projects</span>
+          <p className="text-xl font-bold text-cosmic-violet font-heading">{projects.length}</p>
         </div>
       </div>
+      {/* Budget progress bar */}
+      {budgetPool && budgetPool.total > 0 && (
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-xs text-cosmic-muted mb-1">
+            <span>Budget Allocation Progress</span>
+            <span>{Math.round((budgetPool.allocated / budgetPool.total) * 100)}%</span>
+          </div>
+          <div className="h-3 bg-foreground/5 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-cosmic-amber to-cosmic-teal rounded-full transition-all duration-1000 tally-bar"
+              style={{ width: `${Math.min(100, (budgetPool.allocated / budgetPool.total) * 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -307,28 +289,28 @@ export default function BudgetPage() {
 
                       {/* Allocate button */}
                       {project.status === 'proposed' || project.status === 'shortlisted' ? (
-                        <div className="flex gap-2 pt-2 border-t border-border">
-                          <div className="relative flex-grow">
+                        <div className="flex flex-col gap-2 border-t border-border pt-2 sm:flex-row">
+                          <div className="relative min-w-0 flex-1">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-cosmic-muted">$</span>
                             <Input
                               type="number"
                               placeholder="0"
-                              className="pl-7 bg-foreground/5 border-border text-foreground text-sm placeholder:text-cosmic-muted/50 h-9"
+                              aria-label={"Allocation for " + project.title}
+                              className="h-[50px] border-border bg-foreground/5 pl-7 text-sm text-foreground placeholder:text-cosmic-muted/50"
                               value={allocationInputs[project.id] || ''}
                               onChange={(e) => setAllocationInputs(prev => ({ ...prev, [project.id]: e.target.value }))}
                               onKeyDown={(e) => { if (e.key === 'Enter') handleAllocate(project.id); }}
                             />
                           </div>
                           <Button
-                            size="sm"
+                            className="civic-button shrink-0"
                             onClick={() => handleAllocate(project.id)}
                             disabled={submitting === project.id || !allocationInputs[project.id]}
-                            className="bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 h-9"
                           >
                             {submitting === project.id ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                              <><Zap className="w-3.5 h-3.5 mr-1" /> Fund</>
+                              "Save allocation"
                             )}
                           </Button>
                         </div>
@@ -407,24 +389,10 @@ export default function BudgetPage() {
                 </div>
               ) : (
                 <p className="text-xs text-cosmic-muted text-center py-4">
-                  You haven&apos;t allocated funds yet. Start by funding projects you believe in!
+                  Save an allocation on a project to record your priorities.
                 </p>
               )}
 
-              <Button
-                className="w-full bg-cosmic-amber text-primary-foreground hover:bg-cosmic-amber/90 font-semibold"
-                disabled={allocatedProjects.length === 0}
-                onClick={() => {
-                  setShowSubmitted(true);
-                  setTimeout(() => setShowSubmitted(false), 3000);
-                }}
-              >
-                {showSubmitted ? (
-                  <><CheckCircle2 className="w-4 h-4 mr-2" /> Submitted!</>
-                ) : (
-                  <><Send className="w-4 h-4 mr-2" /> Submit Allocation</>
-                )}
-              </Button>
             </CardContent>
           </Card>
 
