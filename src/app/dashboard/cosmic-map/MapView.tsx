@@ -3,6 +3,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { maplibreGL } from '@maplibre/maplibre-gl-leaflet';
 import {
   MapMarkerData,
   ActivityType,
@@ -15,6 +17,18 @@ import {
 
 /* ─── Fix Leaflet default icon issue ─── */
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
+
+/* ─── Basemap ───
+ * Open-source vector basemap: OpenFreeMap (OpenStreetMap data, OpenMapTiles
+ * schema), drawn with MapLibre inside Leaflet. No API key or account needed.
+ * Point NEXT_PUBLIC_MAP_STYLE_URL at another MapLibre style (for example a
+ * self-hosted OpenFreeMap or Protomaps style) to change providers. */
+const MAP_STYLE_URL =
+  process.env.NEXT_PUBLIC_MAP_STYLE_URL || 'https://tiles.openfreemap.org/styles/positron';
+const MAP_ATTRIBUTION =
+  '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> ' +
+  '&copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> ' +
+  'Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
 
 /* ─── Types ─── */
 
@@ -75,15 +89,11 @@ export default function MapView({
       attributionControl: true,
     });
 
-    // Neutral civic basemap
-    L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-      {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-        subdomains: 'abcd',
-        maxZoom: 19,
-      }
-    ).addTo(map);
+    // Neutral civic basemap (open source, no API key)
+    maplibreGL({
+      style: MAP_STYLE_URL,
+      attributionControl: { customAttribution: MAP_ATTRIBUTION },
+    }).addTo(map);
 
     // Add zoom control to top-right
     L.control.zoom({ position: 'topright' }).addTo(map);
