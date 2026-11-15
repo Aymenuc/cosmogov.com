@@ -33,12 +33,14 @@ export default function PublicPage({
 }: {
   title: string;
   intro?: string;
-  back?: { href: string; label: string };
+  back?: { href: string; label: string; documentNavigation?: boolean };
   meta?: ReactNode;
   art?: ReactNode;
   theme?: "guide" | "journal" | "community" | "contact";
   children?: ReactNode;
 }) {
+  const BackLink = back?.documentNavigation ? "a" : Link;
+
   return (
     <div className={theme ? `public-page public-page--${theme}` : "public-page"}>
       <SiteHeader />
@@ -46,10 +48,10 @@ export default function PublicPage({
         <header className={art ? "public-intro public-intro--illustrated" : "public-intro"}>
           <div className="public-intro-copy">
             {back && (
-              <Link href={back.href} className="public-back">
+              <BackLink href={back.href} className="public-back">
                 <ArrowLeft size={17} aria-hidden="true" />
                 {back.label}
-              </Link>
+              </BackLink>
             )}
             {meta && <div className="public-meta">{meta}</div>}
             <h1>{title}</h1>

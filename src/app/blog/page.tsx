@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PublicPage from "@/components/PublicPage";
 import CommonsStreet from "@/components/landing/CommonsStreet";
@@ -27,9 +26,9 @@ export default function BlogPage() {
             </div>
             <h2>{featured.title}</h2>
             <p>{featured.summary}</p>
-            <Link href={`/blog/${featured.slug}`} className="public-link">
+            <a href={`/blog/${featured.slug}`} className="public-link">
               Read the story <ArrowUpRight size={17} aria-hidden="true" />
-            </Link>
+            </a>
           </div>
           <CommonsStreet />
         </article>
@@ -44,9 +43,9 @@ export default function BlogPage() {
                 )}
               </div>
               <h2>
-                <Link href={`/blog/${post.slug}`} className="public-link">
+                <a href={`/blog/${post.slug}`} className="public-link">
                   {post.title} <ArrowUpRight size={16} aria-hidden="true" />
-                </Link>
+                </a>
               </h2>
               <p>{post.summary}</p>
             </article>

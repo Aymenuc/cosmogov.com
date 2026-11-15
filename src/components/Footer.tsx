@@ -45,14 +45,18 @@ export default function Footer() {
               <div className="footer-group" key={title}>
                 <h2>{title}</h2>
                 <ul>
-                  {links.map(([label, href]) => (
-                    <li key={href}>
-                      <Link href={href}>
-                        {label}
-                        <ArrowUpRight size={14} aria-hidden="true" />
-                      </Link>
-                    </li>
-                  ))}
+                  {links.map(([label, href]) => {
+                    const FooterLink = href === "/blog" ? "a" : Link;
+
+                    return (
+                      <li key={href}>
+                        <FooterLink href={href}>
+                          {label}
+                          <ArrowUpRight size={14} aria-hidden="true" />
+                        </FooterLink>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}

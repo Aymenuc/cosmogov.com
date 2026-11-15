@@ -27,7 +27,7 @@ export default async function ArticlePage({ params }: ArticleProps) {
     <PublicPage
       title={post.title}
       intro={post.summary}
-      back={{ href: "/blog", label: "Journal" }}
+      back={{ href: "/blog", label: "Journal", documentNavigation: true }}
       meta={
         <>
           <time dateTime={post.date}>{post.dateLabel}</time>
