@@ -53,8 +53,23 @@ export async function GET(request: NextRequest) {
     // Search cities — need to load from JSON directly since there's no getAllCities()
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const cities: any[] = require('countries-states-cities/dist/lib/cities.json');
+    // Exact names first, then names that start with the query, then the rest;
+    // shorter names before longer ones ("Paris" before "Parish").
+    const rank = (name: string) => {
+      const n = name.toLowerCase();
+      return n === q ? 0 : n.startsWith(q) ? 1 : 2;
+    };
+    // Among equal names, a country's capital comes first ("Paris, France").
+    const capitals = new Set(
+      countries.map((co: any) => `${co.id}:${String(co.capital || '').toLowerCase()}`),
+    );
+    const isCapital = (c: any) => (capitals.has(`${c.country_id}:${c.name.toLowerCase()}`) ? 0 : 1);
     const matchedCities = cities
       .filter((c: any) => c.name.toLowerCase().includes(q))
+      .sort(
+        (a: any, b: any) =>
+          rank(a.name) - rank(b.name) || isCapital(a) - isCapital(b) || a.name.length - b.name.length,
+      )
       .slice(0, 50)
       .map((c: any) => {
         const country = countries.find(

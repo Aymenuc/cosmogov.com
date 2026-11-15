@@ -21,7 +21,7 @@ The homepage leads with “Big ideas. Meet your team.” and conversational lang
 
 ## The portal: stickers, the shared garden and starters
 
-- **Stickers** are a small thanks for helping: starting a mission, joining or starting a community, adding a source or a point of view, picking up or finishing a task, answering a form, adopting a plan or publishing a form, opening a proposal, commenting. Twelve fixed rules in `src/lib/stickers.ts` decide them from counts of a person’s own records, served by `GET /api/stickers`. There is deliberately no sticker for voting or signing, stickers are not ranked, and they unlock nothing. A person’s book is only shown to them. The existing XP, levels and leaderboards are unchanged and separate.
+- **Stickers** are a small thanks for helping: starting a mission, joining or starting a community, adding a source or a point of view, picking up or finishing a task, answering a form, adopting a plan or publishing a form, opening a proposal, commenting. Fourteen fixed rules in `src/lib/stickers.ts` decide them from counts of a person’s own records, served by `GET /api/stickers`. There is deliberately no sticker for voting or signing, and stickers are not ranked. What they unlock is personal and visible (see "Rewards with real value" below), never extra say in a decision or access to a civic feature. A person’s book is only shown to them. The existing XP, levels and leaderboards are unchanged and separate.
 - **The shared garden** shows one flower for each task finished across the missions a person can see, by everyone in them, up to a bed of twelve.
 - **The civic desk** shows a sticker strip (collected, next within reach) and the garden. The full book is at `/dashboard/stickers`, in the main sidebar list and the command menu.
 - **Explore participation** starts from what people want to do: nine cards in plain words ("Decide something together", "Share out a budget", "Ask what people think"), each opening the tool made for it. The former hero, zero-value statistics and jargon labels are gone, category chips use dark text, and the empty state's button now opens the process dialog.
@@ -42,6 +42,18 @@ The broader redesign browser tests use fixtures. Mission Studio additionally has
 ### Recorded validation
 
 Earlier redesign validation passed 11 browser checks and 8 vote rule checks while retaining 16 pre-existing TypeScript diagnostics. The follow-up work fixes the application diagnostics and removes `ignoreBuildErrors`; production builds now enforce type checking. The standalone WebSocket example is outside the application typecheck because it has its own server dependencies. Current combined verification is recorded in `worklog.md`.
+
+## Rewards with real value and the community map
+
+Every screen keeps the playful identity, and every incentive shows its value where people act.
+
+- **Your home grows.** Stickers grow a personal home on the community map: tent (0), cabin (2), house with a garden (4), clock tower (7), lighthouse (11). Original SVGs in `src/components/stickers/home-svg.ts`. Only the owner sees it, at city level; it changes no permission. It appears on the map, the civic desk and the sticker book (with the full ladder and progress).
+- **The earning moment.** `StickerCelebration` (mounted in the dashboard layout) celebrates a newly earned sticker once, anywhere in the workspace: confetti, the sticker peeling on, an impact line in real numbers (`stickerImpact`), and what it unlocked ("Your home grew into a cabin"). "Already celebrated" is per-browser storage; on a first visit, existing stickers are marked seen quietly.
+- **Collectible look.** Earned stickers carry a static holographic foil highlight and tilt on hover. Motion respects reduced-motion preferences.
+- **"Almost there" nudges.** `StickerNudge` shows the closest sticker for the page and, when the next sticker grows the home, which home it becomes.
+- **Civic record.** `/dashboard/record` (`GET /api/record`) is a printable, save-as-PDF record of a person’s own contributions: tasks finished with mission and finish date, estimated time from each task plan, missions and communities started, proposals opened, stickers. Useful as proof of volunteering. Its footer states that times are plan estimates, votes and signatures are never listed, and Cosmogov does not verify identity.
+- **New stickers.** *On the map* (choose a home city) and *Local spark* (open the very first proposal in a city).
+- **Community map.** Open-source basemap (OpenFreeMap via MapLibre in Leaflet). Activities are sticker pins in topic tints that pop in once; pins sharing a city point fan out in a ring; clusters are sunshine stickers. "Plant your flag" saves a home city through `/api/geo/set-location` (browser geolocation is shown for the visit only and never saved). The shared garden blooms on the map: one flower per community, sized by tasks finished in missions the person can see (`GET /api/geo/blooms`). The side panel offers your home, "Near you" (within 100 km), the nudge, filters, and an inviting empty state with "Start a mission" and "Open a proposal". Popup text written by people is escaped. City search ranks exact names and capitals first.
 
 ## Mission workspace clarity
 

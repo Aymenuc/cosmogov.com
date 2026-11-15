@@ -1,5 +1,6 @@
 "use client";
 import "../portal.css";
+import "../rewards.css";
 import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import {
   FileText,
   Gamepad2,
   Sticker,
+  ScrollText,
   Globe2,
   Landmark,
   LayoutDashboard,
@@ -56,6 +58,7 @@ import {
   type WorkspaceUser,
 } from "@/components/WorkspaceContext";
 import CommandMenu from "@/components/CommandMenu";
+import StickerCelebration from "@/components/stickers/StickerCelebration";
 interface Notification {
   id: string;
   title: string;
@@ -67,6 +70,7 @@ const mainLinks = [
   { label: "Mission studio", href: "/dashboard/missions", icon: Sparkles },
   { label: "My civic desk", href: "/dashboard", icon: LayoutDashboard },
   { label: "Sticker book", href: "/dashboard/stickers", icon: Sticker },
+  { label: "Civic record", href: "/dashboard/record", icon: ScrollText },
   {
     label: "Explore participation",
     href: "/dashboard/participation",
@@ -374,6 +378,7 @@ export default function DashboardLayout({
               )}
               {children}
             </div>
+            <StickerCelebration />
           </main>
           <footer className="workspace-footer">
             <span>Small actions. Shared progress.</span>

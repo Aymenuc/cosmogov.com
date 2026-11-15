@@ -1,6 +1,8 @@
 'use client';
 
 import L from 'leaflet';
+import type { HomeId } from '@/lib/stickers';
+import { homeSvg } from '@/components/stickers/home-svg';
 
 /* ─── Types ─── */
 
@@ -21,15 +23,36 @@ export interface MapMarkerData {
   url: string;
 }
 
-/* ─── Constants ─── */
+export interface MapBloom {
+  id: string;
+  name: string;
+  cityName: string | null;
+  latitude: number;
+  longitude: number;
+  tasksDone: number;
+  missions: number;
+}
 
+/* ─── Palette (DESIGN.md topic tints: ink text on a light tint) ─── */
+
+/** Ink colour per type: readable on white, used for icons, labels and edges. */
 export const ACTIVITY_COLORS: Record<ActivityType, string> = {
-  proposal: '#2EE6C7',   // Teal
-  process: '#2D6BFF',    // Blue
-  assembly: '#9B5CFF',   // Purple
-  initiative: '#FFB547', // Amber
-  meeting: '#4ADE80',    // Green
-  debate: '#FF6B9D',     // Pink
+  proposal: '#5932c4',
+  process: '#226784',
+  assembly: '#28745b',
+  initiative: '#a44231',
+  meeting: '#7b570c',
+  debate: '#a3324f',
+};
+
+/** Light tint per type: sticker fill. */
+export const ACTIVITY_TINTS: Record<ActivityType, string> = {
+  proposal: '#eee6ff',
+  process: '#e1f3ff',
+  assembly: '#dff5e8',
+  initiative: '#ffe7df',
+  meeting: '#fff0c3',
+  debate: '#ffe3ea',
 };
 
 export const ACTIVITY_LABELS: Record<ActivityType, string> = {
@@ -41,138 +64,177 @@ export const ACTIVITY_LABELS: Record<ActivityType, string> = {
   debate: 'Debate',
 };
 
+const svg = (body: string, size = 16) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+
 export const ACTIVITY_ICONS: Record<ActivityType, string> = {
-  proposal: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-  process: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
-  assembly: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-  initiative: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-  meeting: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
-  debate: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>`,
+  proposal: svg('<path d="M3 11h3l9-5v12l-9-5H3z"/><path d="M6 13l1.5 6h2.5l-1-5"/><path d="M18.5 9a4 4 0 0 1 0 6"/>'),
+  process: svg('<path d="M4 6h10"/><path d="M4 12h16"/><path d="M4 18h7"/><circle cx="17" cy="6" r="2.5"/><circle cx="14" cy="18" r="2.5"/>'),
+  assembly: svg('<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0"/><path d="M10.5 20a5.5 5.5 0 0 1 11 0"/>'),
+  initiative: svg('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'),
+  meeting: svg('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/>'),
+  debate: svg('<path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4z"/><path d="M19 9h1a1 1 0 0 1 1 1v8l-3-2"/>'),
 };
 
-/* ─── Helper: Create Leaflet DivIcon ─── */
+/** Escape text written by people before it goes into map HTML. */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
-export function createMarkerIcon(type: ActivityType, size: number = 32): L.DivIcon {
-  const color = ACTIVITY_COLORS[type];
-  const iconSvg = ACTIVITY_ICONS[type];
+/* ─── Sticker pins ─── */
 
+/** A sticker pin: tinted disc, ink edge and solid shadow, with a little tail. */
+export function createMarkerIcon(type: ActivityType, animate = false, size = 38): L.DivIcon {
   const html = `
-    <div class="cosmic-marker" style="width:${size}px;height:${size}px;color:${color};">
-      <div class="marker-glow" style="color:${color};"></div>
-      <div class="marker-ring" style="color:${color};"></div>
-      <div class="marker-icon" style="border-color:${color};color:${color};">
-        ${iconSvg}
-      </div>
-    </div>
-  `;
-
+    <div class="map-pin${animate ? ' map-pop' : ''}" style="--pin-tint:${ACTIVITY_TINTS[type]};--pin-ink:${ACTIVITY_COLORS[type]};width:${size}px;height:${size}px;">
+      ${ACTIVITY_ICONS[type]}
+    </div>`;
   return L.divIcon({
     html,
-    className: '',
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2 - 4],
+    className: 'map-pin-host',
+    iconSize: [size, size + 10],
+    iconAnchor: [size / 2, size + 8],
+    popupAnchor: [0, -size - 4],
   });
 }
 
-export function createClusterIcon(count: number): L.DivIcon {
-  const size = Math.max(36, Math.min(56, 36 + Math.log2(count) * 6));
+export function createClusterIcon(count: number, animate = false): L.DivIcon {
+  const size = Math.round(Math.max(40, Math.min(64, 38 + Math.log2(count) * 7)));
   const html = `
-    <div class="cosmic-cluster-marker" style="width:${size}px;height:${size}px;">
-      <div class="cluster-ring"></div>
-      ${count}
-    </div>
-  `;
-
+    <div class="map-cluster${animate ? ' map-pop' : ''}" style="width:${size}px;height:${size}px;">
+      <span>${count}</span>
+    </div>`;
   return L.divIcon({
     html,
-    className: '',
+    className: 'map-pin-host',
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
 }
 
-/* ─── Popup HTML ─── */
+/* ─── Your home ─── */
+
+export function createHomeIcon(homeId: HomeId, cityName: string | null): L.DivIcon {
+  const label = cityName ? `Home · ${escapeHtml(cityName)}` : 'Home';
+  const html = `
+    <div class="map-home map-pop">
+      ${homeSvg(homeId, 76)}
+      <span class="map-home-label">${label}</span>
+    </div>`;
+  return L.divIcon({
+    html,
+    className: 'map-pin-host',
+    iconSize: [120, 100],
+    iconAnchor: [60, 78],
+    popupAnchor: [0, -70],
+  });
+}
+
+/* ─── Garden blooms: one flower per community, bigger as more gets done ─── */
+
+const PETALS = ['#FF785F', '#FFCF4D', '#6741D9', '#FF785F', '#FFCF4D'];
+
+export function createBloomIcon(tasksDone: number, animate = false): L.DivIcon {
+  const size = Math.round(Math.max(34, Math.min(62, 30 + Math.sqrt(tasksDone) * 7)));
+  const petal = PETALS[tasksDone % PETALS.length];
+  const centre = petal === '#FFCF4D' ? '#FF785F' : '#FFCF4D';
+  const petals = [0, 72, 144, 216, 288]
+    .map((a) => {
+      const x = (24 + 9 * Math.sin((a * Math.PI) / 180)).toFixed(1);
+      const y = (20 - 9 * Math.cos((a * Math.PI) / 180)).toFixed(1);
+      return `<circle cx="${x}" cy="${y}" r="7" fill="${petal}" stroke="#29223d" stroke-width="2"/>`;
+    })
+    .join('');
+  const html = `
+    <div class="map-bloom${animate ? ' map-pop' : ''}" style="width:${size}px;height:${size}px;">
+      <svg viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true">
+        <path d="M24 46V28" stroke="#28745B" stroke-width="4" stroke-linecap="round"/>
+        <path d="M24 38c-8 0-10-7-10-7 8-1 10 7 10 7Z" fill="#28745B"/>
+        ${petals}
+        <circle cx="24" cy="20" r="6" fill="${centre}" stroke="#29223d" stroke-width="2"/>
+      </svg>
+      ${tasksDone > 0 ? `<span class="map-bloom-count">${tasksDone}</span>` : ''}
+    </div>`;
+  return L.divIcon({
+    html,
+    className: 'map-pin-host',
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size - 2],
+    popupAnchor: [0, -size + 6],
+  });
+}
+
+export function createBloomPopup(bloom: MapBloom): string {
+  const where = bloom.cityName ? ` in ${escapeHtml(bloom.cityName)}` : '';
+  const done =
+    bloom.tasksDone === 0
+      ? 'No tasks finished yet. The first one plants a flower here.'
+      : `${bloom.tasksDone} ${bloom.tasksDone === 1 ? 'task' : 'tasks'} finished across ${bloom.missions} ${bloom.missions === 1 ? 'mission' : 'missions'}. Each one is a flower in the shared garden.`;
+  return `
+    <div class="map-card">
+      <span class="map-card-type" style="--pin-tint:#dff5e8;--pin-ink:#28745b;">🌼 Garden</span>
+      <h3>${escapeHtml(bloom.name)}${where}</h3>
+      <p class="map-card-meta">${done}</p>
+      <a class="map-card-link" href="/dashboard/missions">Help it grow →</a>
+    </div>`;
+}
+
+/* ─── Popup ─── */
 
 export function createPopupContent(marker: MapMarkerData): string {
-  const color = ACTIVITY_COLORS[marker.type];
   const label = ACTIVITY_LABELS[marker.type];
-  const location = [marker.cityName, marker.countryName].filter(Boolean).join(', ') || 'Unknown';
-  const timeAgo = getTimeAgo(marker.createdAt);
-
-  const statusColors: Record<string, string> = {
-    active: '#2EE6C7',
-    open: '#2EE6C7',
-    live: '#4ADE80',
-    collecting: '#FFB547',
-    voting: '#2D6BFF',
-    scheduled: '#A7B3D6',
-    closed: '#FF5E8A',
-    draft: '#A7B3D6',
-    information: '#2D6BFF',
-    proposal: '#2EE6C7',
-    deliberation: '#9B5CFF',
-    implementation: '#4ADE80',
-    evaluation: '#FFB547',
-  };
-  const statusColor = statusColors[marker.status] || '#A7B3D6';
-
+  const location = [marker.cityName, marker.countryName].filter(Boolean).join(', ') || 'Somewhere on the map';
+  const people =
+    marker.participantCount > 0
+      ? `${marker.participantCount} taking part`
+      : 'Be the first to join in';
   return `
-    <div style="padding:14px 16px;min-width:230px;font-family:'Inter',system-ui,sans-serif;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;background:${color}20;color:${color};font-size:11px;">
-          ${ACTIVITY_ICONS[marker.type]}
+    <div class="map-card">
+      <div class="map-card-top">
+        <span class="map-card-type" style="--pin-tint:${ACTIVITY_TINTS[marker.type]};--pin-ink:${ACTIVITY_COLORS[marker.type]};">
+          ${ACTIVITY_ICONS[marker.type]} ${label}
         </span>
-        <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:${color};">
-          ${label}
-        </span>
-        <span style="margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:10px;color:${statusColor};background:${statusColor}15;padding:2px 8px;border-radius:9999px;border:1px solid ${statusColor}25;">
-          <span style="width:5px;height:5px;border-radius:50%;background:${statusColor};"></span>
-          ${marker.status}
-        </span>
+        <span class="map-card-status">${escapeHtml(marker.status.replace(/_/g, ' '))}</span>
       </div>
-      <h3 style="font-size:14px;font-weight:600;color:#F2F5FF;margin:0 0 8px;line-height:1.3;font-family:'Space Grotesk',system-ui,sans-serif;">
-        ${marker.title}
-      </h3>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#A7B3D6;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${location}
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#A7B3D6;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          ${timeAgo}
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#A7B3D6;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-          ${marker.participantCount} participants
-        </div>
-      </div>
-      <a href="${marker.url}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:${color};text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
-        View Details
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-      </a>
-    </div>
-  `;
+      <h3>${escapeHtml(marker.title)}</h3>
+      <p class="map-card-meta">
+        ${escapeHtml(location)} · ${getTimeAgo(marker.createdAt)}<br>
+        ${people}
+      </p>
+      <a class="map-card-link" href="${escapeHtml(marker.url)}">Have a look →</a>
+    </div>`;
 }
 
 /* ─── Utility ─── */
 
-function getTimeAgo(dateStr: string): string {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diff = now - then;
-
+export function getTimeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins} min ago`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `${hours} h ago`;
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo ago`;
-  return `${Math.floor(months / 12)}y ago`;
+  if (months < 12) return `${months} mo ago`;
+  return `${Math.floor(months / 12)} y ago`;
+}
+
+/** Great-circle distance in km. */
+export function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 /* ─── Simple Clustering ─── */
@@ -188,39 +250,28 @@ export function clusterMarkers(
   markers: MapMarkerData[],
   zoom: number
 ): { individual: MapMarkerData[]; clusters: ClusterGroup[] } {
-  // At high zoom, show all individual markers
   if (zoom >= 8) {
     return { individual: markers, clusters: [] };
   }
-
-  // Pixel distance threshold depends on zoom
   const pixelThreshold = zoom >= 5 ? 40 : 60;
-
   const used = new Set<number>();
   const clusters: ClusterGroup[] = [];
   const individual: MapMarkerData[] = [];
 
   for (let i = 0; i < markers.length; i++) {
     if (used.has(i)) continue;
-
     const group: MapMarkerData[] = [markers[i]];
     used.add(i);
-
     for (let j = i + 1; j < markers.length; j++) {
       if (used.has(j)) continue;
-
-      // Simple distance: approximate pixel distance using lat/lng difference scaled by zoom
       const dLat = (markers[j].latitude - markers[i].latitude) * Math.pow(2, zoom);
       const dLng = (markers[j].longitude - markers[i].longitude) * Math.pow(2, zoom) *
         Math.cos((markers[i].latitude * Math.PI) / 180);
-      const dist = Math.sqrt(dLat * dLat + dLng * dLng);
-
-      if (dist < pixelThreshold) {
+      if (Math.sqrt(dLat * dLat + dLng * dLng) < pixelThreshold) {
         group.push(markers[j]);
         used.add(j);
       }
     }
-
     if (group.length === 1) {
       individual.push(group[0]);
     } else {
@@ -229,6 +280,5 @@ export function clusterMarkers(
       clusters.push({ markers: group, centerLat, centerLng, count: group.length });
     }
   }
-
   return { individual, clusters };
 }
