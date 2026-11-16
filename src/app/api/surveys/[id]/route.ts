@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { inVisibleProcess } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -9,9 +10,11 @@ export async function GET(
   try {
     const { id } = await params;
     const session = await getSession();
+    if (!session) return NextResponse.json({ error: 'Please sign in.' }, { status: 401 });
 
-    const survey = await db.survey.findUnique({
-      where: { id },
+    // Surveys inside a private process stay inside it.
+    const survey = await db.survey.findFirst({
+      where: { id, ...inVisibleProcess(session.id) },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         questions: { orderBy: { sortOrder: 'asc' } },
@@ -35,13 +38,9 @@ export async function GET(
     }
 
     // Check if the current user has already responded
-    let hasResponded = false;
-    if (session) {
-      const existingResponse = await db.surveyResponse.findFirst({
-        where: { surveyId: id, userId: session.id },
-      });
-      hasResponded = !!existingResponse;
-    }
+    const hasResponded = !!(await db.surveyResponse.findFirst({
+      where: { surveyId: id, userId: session.id },
+    }));
 
     // Compute per-question statistics
     const questionStats = survey.questions.map((question) => {
@@ -155,10 +154,17 @@ export async function GET(
       return { questionId: question.id, questionText: question.text, type: question.type, totalResponses: 0 };
     });
 
+    // Raw responses never leave the server: they carry who answered what,
+    // which would undo anonymous surveys. People get the totals above.
+    const { responses: _responses, ...publicSurvey } = survey;
+    void _responses;
+    const canManage =
+      survey.createdBy === session.id || session.role === 'admin' || session.role === 'super_admin';
     return NextResponse.json({
-      survey,
+      survey: publicSurvey,
       hasResponded,
       questionStats,
+      canManage,
     });
   } catch (error) {
     console.error('Error fetching survey:', error);
@@ -187,14 +193,17 @@ export async function PATCH(
     }
 
     const updateData: Record<string, unknown> = {};
-    if (body.status) updateData.status = body.status;
+    if (body.status !== undefined) {
+      if (!['draft', 'active', 'closed', 'analyzed'].includes(body.status))
+        return NextResponse.json({ error: 'Unknown survey status' }, { status: 400 });
+      updateData.status = body.status;
+    }
     if (body.title) updateData.title = body.title;
     if (body.description) updateData.description = body.description;
     if (body.category !== undefined) updateData.category = body.category;
     if (body.closesAt !== undefined) updateData.closesAt = body.closesAt ? new Date(body.closesAt) : null;
     if (body.anonymous !== undefined) updateData.anonymous = body.anonymous;
     if (body.allowMultiple !== undefined) updateData.allowMultiple = body.allowMultiple;
-    if (body.aiSummary !== undefined) updateData.aiSummary = body.aiSummary;
 
     // If activating, update questionCount from actual questions
     if (body.status === 'active') {

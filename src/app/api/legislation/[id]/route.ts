@@ -37,13 +37,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const abstainCount = legislation.votes.filter((v) => v.position === 'abstain').length;
 
     // Check if current user has voted
-    const session = await getSession();
-    const userVote = session
-      ? legislation.votes.find((v) => v.userId === session.id) || null
-      : null;
+    const mine = legislation.votes.find((v) => v.userId === viewer.id);
+    const userVote = mine ? { id: mine.id, position: mine.position } : null;
+    // Individual ballots stay on the server: only totals and your own vote go out.
+    const { votes: _votes, ...publicLegislation } = legislation;
+    void _votes;
 
     return NextResponse.json({
-      legislation,
+      legislation: publicLegislation,
       voteCounts: { support: supportCount, oppose: opposeCount, abstain: abstainCount, total: legislation.votes.length },
       userVote,
     });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import ToolArt from '@/components/ToolArt';
 import { io, Socket } from 'socket.io-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -377,14 +378,25 @@ export default function ChatPage() {
             <div className="w-2 h-2 rounded-full bg-cosmic-accent animate-bounce" style={{ animationDelay: '150ms' }} />
             <div className="w-2 h-2 rounded-full bg-cosmic-violet animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
-          <span className="text-cosmic-muted text-sm">Loading chat rooms...</span>
+          <span className="text-cosmic-muted text-sm" role="status">Loading the rooms…</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100dvh-8rem)] flex gap-4 -m-4 lg:-m-8 p-4 lg:p-8">
+    <div>
+    <header className="workspace-heading tool-hero compact-hero tint-mint" data-look="discussions">
+      <div className="tool-hero-panel">
+        <div className="tool-hero-text">
+          <span className="tool-hero-eyebrow">Community discussions</span>
+          <h1>Chat with your neighbours</h1>
+          <p>Small conversations are where most good ideas start. Pick a room, or open a new one for your street or topic.</p>
+        </div>
+        <ToolArt name="discussions" className="tool-hero-art" />
+      </div>
+    </header>
+    <div className="chat-panes flex gap-4">
       {/* ─── Left Sidebar: Room List ──────────────────────────────── */}
       <div className="w-72 flex-shrink-0 hidden md:flex flex-col glass-card overflow-hidden">
         {/* Header */}
@@ -404,11 +416,11 @@ export default function ChatPage() {
               </DialogTrigger>
               <DialogContent className="glass-card border-border">
                 <DialogHeader>
-                  <DialogTitle className="font-heading">Create New Room</DialogTitle>
+                  <DialogTitle className="font-heading">Create new room</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 mt-2">
                   <div>
-                    <Label className="text-sm text-cosmic-muted">Room Name</Label>
+                    <Label className="text-sm text-cosmic-muted">Room name</Label>
                     <Input
                       value={newRoomName}
                       onChange={e => setNewRoomName(e.target.value)}
@@ -444,7 +456,7 @@ export default function ChatPage() {
                     </Select>
                   </div>
                   <Button onClick={handleCreateRoom} disabled={!newRoomName.trim()} className="w-full bg-cosmic-accent text-primary-foreground">
-                    <Plus className="w-4 h-4 mr-2" /> Create Room
+                    <Plus className="w-4 h-4 mr-2" /> Create room
                   </Button>
                 </div>
               </DialogContent>
@@ -821,6 +833,7 @@ export default function ChatPage() {
         </ScrollArea>
       </div>
     </div>
+    </div>
   );
 }
 
@@ -882,7 +895,7 @@ function MobileRoomList({
           </div>
           <Button variant="outline" size="sm" className="w-full mb-4 border-dashed border-border text-cosmic-muted"
             onClick={() => setShowCreate(!showCreate)}>
-            <Plus className="w-4 h-4 mr-2" /> Create Room
+            <Plus className="w-4 h-4 mr-2" /> Create room
           </Button>
           {showCreate && (
             <div className="glass-card p-4 mb-4 space-y-3">

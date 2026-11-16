@@ -1,5 +1,6 @@
 'use client';
 import SessionControls from '@/components/SessionControls';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import { planFor } from '@/lib/plans';
 import PlanUpgrade from '@/components/PlanUpgrade';
 
@@ -107,7 +108,10 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold font-heading mb-6">Settings</h1>
+      <WorkspaceHeading
+        title="Settings"
+        description="Your profile, sign-in, plan and privacy choices, in one place."
+      />
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="workspace-tabs" aria-label="Settings sections">
@@ -115,7 +119,7 @@ export default function SettingsPage() {
             <User className="w-4 h-4 mr-1.5" /> Profile
           </TabsTrigger>
           <TabsTrigger value="plan" className="data-[state=active]:bg-cosmic-violet/10 data-[state=active]:text-cosmic-violet">
-            <CreditCard className="w-4 h-4 mr-1.5" /> Plan & Billing
+            <CreditCard className="w-4 h-4 mr-1.5" /> Plan & billing
           </TabsTrigger>
           <TabsTrigger value="notifications" className="data-[state=active]:bg-cosmic-amber/10 data-[state=active]:text-cosmic-amber">
             <Bell className="w-4 h-4 mr-1.5" /> Notifications
@@ -130,7 +134,7 @@ export default function SettingsPage() {
           <Card className="bg-card border-border mb-6">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <User className="w-4 h-4 text-cosmic-accent" /> Profile Information
+                <User className="w-4 h-4 text-cosmic-accent" /> Profile information
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-4 mb-4">
@@ -194,10 +198,10 @@ export default function SettingsPage() {
           <Card className="bg-card border-cosmic-rose/10">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-2 flex items-center gap-2 text-cosmic-rose">
-                <AlertTriangle className="w-4 h-4" /> Danger Zone
+                <AlertTriangle className="w-4 h-4" /> Danger zone
               </h2>
               <p className="text-xs text-cosmic-muted mb-3">Permanently delete your account and all associated data. This action cannot be undone.</p>
-              <Button variant="ghost" className="text-cosmic-rose hover:bg-cosmic-rose/10">Delete Account</Button>
+              <Button variant="ghost" className="text-cosmic-rose hover:bg-cosmic-rose/10">Delete account</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -207,7 +211,7 @@ export default function SettingsPage() {
           <Card className="bg-card border-border mb-6">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <Crown className="w-4 h-4 text-cosmic-violet" /> Current Plan
+                <Crown className="w-4 h-4 text-cosmic-violet" /> Current plan
               </h2>
               <div className="flex items-center justify-between p-4 rounded-xl bg-cosmic-violet/5 border border-cosmic-violet/10 mb-4">
                 <div>
@@ -234,14 +238,14 @@ export default function SettingsPage() {
           <Card className="bg-card border-border">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <Bell className="w-4 h-4 text-cosmic-amber" /> Notification Preferences
+                <Bell className="w-4 h-4 text-cosmic-amber" /> Notification preferences
               </h2>
               <div className="space-y-4">
                 {[
-                  { key: 'votes', label: 'Vote Notifications', desc: 'Get notified when someone votes on your proposals' },
-                  { key: 'proposals', label: 'Proposal Updates', desc: 'New proposals in your organizations' },
-                  { key: 'games', label: 'Game Results', desc: 'Leaderboard updates and game achievements' },
-                  { key: 'system', label: 'System Alerts', desc: 'Important platform updates and maintenance' },
+                  { key: 'votes', label: 'Vote notifications', desc: 'Get notified when someone votes on your proposals' },
+                  { key: 'proposals', label: 'Proposal updates', desc: 'New proposals in your organizations' },
+                  { key: 'games', label: 'Game results', desc: 'Leaderboard updates and game achievements' },
+                  { key: 'system', label: 'System alerts', desc: 'Important platform updates and maintenance' },
                   { key: 'mentions', label: 'Mentions', desc: 'When someone mentions you in a comment' },
                 ].map(s => (
                   <div key={s.key} className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
@@ -262,7 +266,7 @@ export default function SettingsPage() {
               {/* Push Notifications */}
               <div className="mt-6 pt-4 border-t border-border">
                 <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-cosmic-teal" /> Browser Push Notifications
+                  <Bell className="w-4 h-4 text-cosmic-teal" /> Browser push notifications
                 </h3>
                 <PushNotificationToggle />
               </div>
@@ -297,12 +301,12 @@ export default function SettingsPage() {
           <Card className="bg-card border-border">
             <CardContent className="p-6">
               <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <Gamepad2 className="w-4 h-4 text-cosmic-amber" /> Game Preferences
+                <Gamepad2 className="w-4 h-4 text-cosmic-amber" /> Game preferences
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                   <div>
-                    <p className="text-sm font-medium">Animated Game Effects</p>
+                    <p className="text-sm font-medium">Animated game effects</p>
                     <p className="text-xs text-cosmic-muted">Canvas animations and visual effects during games</p>
                   </div>
                   <div className="w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer bg-cosmic-teal">
@@ -311,7 +315,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                   <div>
-                    <p className="text-sm font-medium">Sound Effects</p>
+                    <p className="text-sm font-medium">Sound effects</p>
                     <p className="text-xs text-cosmic-muted">Audio feedback during game interactions</p>
                   </div>
                   <div className="w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer bg-foreground/10">
@@ -320,7 +324,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-foreground/[0.02] border border-border">
                   <div>
-                    <p className="text-sm font-medium">Difficulty Hint</p>
+                    <p className="text-sm font-medium">Difficulty hint</p>
                     <p className="text-xs text-cosmic-muted">Show recommended difficulty based on your level</p>
                   </div>
                   <div className="w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer bg-cosmic-teal">

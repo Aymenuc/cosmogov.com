@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -1017,7 +1018,7 @@ function CreateDebateModal({
                 <Sparkles className="w-5 h-5 text-cosmic-accent" />
               </div>
               <div>
-                <h3 className="font-heading font-bold text-base">Launch New Assembly</h3>
+                <h3 className="font-heading font-bold text-base">Launch new assembly</h3>
                 <p className="text-[11px] text-cosmic-muted">Start a debate about a question your community faces</p>
               </div>
             </div>
@@ -1061,7 +1062,7 @@ function CreateDebateModal({
 
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-xs text-cosmic-muted block">Public Assembly</Label>
+                <Label className="text-xs text-cosmic-muted block">Public assembly</Label>
                 <p className="text-[10px] text-cosmic-muted/60 mt-0.5">Anyone can discover and join</p>
               </div>
               <Switch checked={isPublic} onCheckedChange={setIsPublic} />
@@ -1069,7 +1070,7 @@ function CreateDebateModal({
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs text-cosmic-muted">Max Participants</Label>
+                <Label className="text-xs text-cosmic-muted">Max participants</Label>
                 <span className="text-xs font-mono text-cosmic-accent">{maxParticipants}</span>
               </div>
               <Slider
@@ -1118,53 +1119,6 @@ function CreateDebateModal({
 /* ═══════════════════════════════════════════
    Lobby Animated Stars Background
    ═══════════════════════════════════════════ */
-
-function LobbyStarsBackground() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Animated stars via CSS */}
-      {Array.from({ length: 50 }, (_, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            width: `${1 + Math.random() * 2}px`,
-            height: `${1 + Math.random() * 2}px`,
-            background: `rgba(200, 220, 255, ${0.2 + Math.random() * 0.6})`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `starPulse ${2 + Math.random() * 4}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 3}s`,
-          }}
-        />
-      ))}
-      {/* Shooting star */}
-      <div className="shooting-star" style={{ top: '15%', left: '10%', animationDelay: '0s' }} />
-      <div className="shooting-star" style={{ top: '40%', left: '60%', animationDelay: '4s' }} />
-      {/* Nebula blobs */}
-      <div
-        className="absolute w-80 h-80 rounded-full opacity-20"
-        style={{
-          background: 'radial-gradient(circle, rgba(99,102,241,0.3), transparent 70%)',
-          top: '10%',
-          right: '-5%',
-          animation: 'nebulaDrift 12s ease-in-out infinite alternate',
-          filter: 'blur(40px)',
-        }}
-      />
-      <div
-        className="absolute w-64 h-64 rounded-full opacity-15"
-        style={{
-          background: 'radial-gradient(circle, rgba(46,230,199,0.25), transparent 70%)',
-          bottom: '15%',
-          left: '-5%',
-          animation: 'nebulaDrift 10s ease-in-out infinite alternate-reverse',
-          filter: 'blur(35px)',
-        }}
-      />
-    </div>
-  );
-}
 
 /* ═══════════════════════════════════════════
    Main Page Component
@@ -1450,7 +1404,7 @@ export default function AssemblyHallPage() {
             <div className="w-2 h-2 rounded-full bg-cosmic-teal animate-bounce" style={{ animationDelay: '150ms' }} />
             <div className="w-2 h-2 rounded-full bg-cosmic-violet animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
-          <span className="text-cosmic-muted text-sm">Entering the Assembly Hall...</span>
+          <span className="text-cosmic-muted text-sm">Entering the assembly hall...</span>
         </div>
       </div>
     );
@@ -1560,7 +1514,7 @@ export default function AssemblyHallPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-cosmic-accent" />
-                  <span className="text-sm font-heading font-bold">Assembly Chat</span>
+                  <span className="text-sm font-heading font-bold">Assembly chat</span>
                 </div>
                 <Badge variant="outline" className="text-[9px] rounded-full border-border text-cosmic-muted">
                   {messages.length} messages
@@ -1570,7 +1524,7 @@ export default function AssemblyHallPage() {
               {/* Consensus bar */}
               <div className="mt-2">
                 <div className="flex items-center justify-between text-[10px] mb-1">
-                  <span className="text-cosmic-muted">Consensus Level</span>
+                  <span className="text-cosmic-muted">Consensus level</span>
                   <span className="text-cosmic-success font-mono font-bold">{consensusPct}%</span>
                 </div>
                 <Progress value={consensusPct} className="h-1.5" />
@@ -1585,7 +1539,7 @@ export default function AssemblyHallPage() {
                   <div key={`pinned-${m.id}`} className="bg-cosmic-amber/5 border border-cosmic-amber/15 rounded-lg p-2.5">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Eye className="w-3 h-3 text-cosmic-amber" />
-                      <span className="text-[9px] text-cosmic-amber font-medium">Pinned Summary</span>
+                      <span className="text-[9px] text-cosmic-amber font-medium">Pinned summary</span>
                     </div>
                     <p className="text-xs text-cosmic-muted">{m.content}</p>
                   </div>
@@ -1697,7 +1651,6 @@ export default function AssemblyHallPage() {
 
   return (
     <div className="space-y-8 relative">
-      <LobbyStarsBackground />
 
       {/* Error banner */}
       {error && (
@@ -1713,80 +1666,24 @@ export default function AssemblyHallPage() {
         </motion.div>
       )}
 
-      {/* ── Hero Section ── */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card p-4 sm:p-6 md:p-8 lg:p-10">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-72 h-72 rounded-full" style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%)' }} />
-          <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full" style={{ background: 'radial-gradient(circle, rgba(46,230,199,0.1), transparent 70%)' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full" style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.06), transparent 60%)' }} />
-        </div>
-
-        <div className="relative z-10 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="cosmic-badge rounded-full px-3 py-1 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-cosmic-accent" />
-              <span className="text-xs font-medium text-cosmic-accent">
-                {activeDebates.length} live {activeDebates.length === 1 ? 'debate' : 'debates'}
-              </span>
-            </div>
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-4">
-            <span className="text-gradient">AI Assembly Hall</span>
-          </h1>
-
-          <p className="text-cosmic-muted text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-4 sm:mb-8">
-            A shared space to talk an issue through. AI helpers can step in to summarise, translate,
-            simplify or keep things civil, and people make every decision.
-          </p>
-
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-cosmic-accent text-primary-foreground rounded-xl px-6 h-11 text-sm font-medium"
-            >
-              <Rocket className="w-4 h-4 mr-2" />
-              Start a debate
-            </Button>
-            {activeDebates.length > 0 && (
-              <Button
-                variant="outline"
-                className="border-border text-cosmic-muted hover:text-foreground hover:border-border rounded-xl px-6 h-11"
-                onClick={() => {
-                  const el = document.getElementById('active-debates');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                Join a live debate <ArrowUpRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
-          </div>
-
-          {/* Animated orbit preview */}
-          <div className="relative w-48 h-48 mx-auto mt-10">
-            <div className="absolute inset-0 rounded-full border border-border" style={{ animation: 'orbitSpin 20s linear infinite' }}>
-              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-indigo-500" style={{ boxShadow: '0 0 10px rgba(99,102,241,0.6)' }} />
-            </div>
-            <div className="absolute inset-4 rounded-full border border-border" style={{ animation: 'orbitSpin 14s linear infinite reverse' }}>
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-amber-500" style={{ boxShadow: '0 0 8px rgba(245,158,11,0.6)' }} />
-            </div>
-            <div className="absolute inset-8 rounded-full border border-border" style={{ animation: 'orbitSpin 10s linear infinite' }}>
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-violet-500" style={{ boxShadow: '0 0 8px rgba(139,92,246,0.6)' }} />
-            </div>
-            <div className="absolute inset-12 rounded-full border border-border" style={{ animation: 'orbitSpin 8s linear infinite reverse' }}>
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-emerald-500" style={{ boxShadow: '0 0 8px rgba(16,185,129,0.6)' }} />
-            </div>
-            {/* Center star */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full" style={{
-                background: 'radial-gradient(circle, rgba(255,255,255,0.9), rgba(45,107,255,0.4), transparent)',
-                boxShadow: '0 0 30px rgba(45,107,255,0.3)',
-                animation: 'pulseGlow 3s ease-in-out infinite',
-              }} />
-            </div>
-          </div>
-        </div>
-      </div>
+      <WorkspaceHeading
+        look="debates"
+        title="Assembly hall"
+        description="A shared space to talk an issue through. AI helpers can step in to summarise, translate, simplify or keep things civil, and people make every decision."
+      >
+        <button type="button" className="civic-button" onClick={() => setShowCreateModal(true)}>
+          <Rocket size={15} aria-hidden="true" /> Start a debate
+        </button>
+        {activeDebates.length > 0 && (
+          <button
+            type="button"
+            className="civic-button outline"
+            onClick={() => document.getElementById('active-debates')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            {activeDebates.length} live {activeDebates.length === 1 ? 'debate' : 'debates'} <ArrowUpRight size={14} aria-hidden="true" />
+          </button>
+        )}
+      </WorkspaceHeading>
 
       {/* ── AI Agents Preview ── */}
       <div>
@@ -1916,7 +1813,7 @@ export default function AssemblyHallPage() {
                       </div>
 
                       <Button size="sm" className="w-full bg-cosmic-accent/10 text-cosmic-accent hover:bg-cosmic-accent hover:text-primary-foreground rounded-xl h-8 text-xs transition-all">
-                        Enter Assembly <ArrowUpRight className="w-3 h-3 ml-1.5" />
+                        Enter assembly <ArrowUpRight className="w-3 h-3 ml-1.5" />
                       </Button>
                     </CardContent>
                   </Card>

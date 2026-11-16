@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,7 +86,10 @@ function SearchResults({ initialQuery }: { initialQuery: string }) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold font-heading mb-6">Search</h1>
+      <WorkspaceHeading
+        title="Search"
+        description="Find proposals, and the communities you belong to, by name or by words in their description."
+      />
       <div className="relative mb-6">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cosmic-muted" />
         <Input

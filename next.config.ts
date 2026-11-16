@@ -26,6 +26,14 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   reactStrictMode: true,
   poweredByHeader: false,
+  // Retired sections: Explorer's job (find and set your town) lives on the
+  // community map; Pulse's feed lives in Analytics under "This week".
+  async redirects() {
+    return [
+      { source: "/dashboard/explore", destination: "/dashboard/cosmic-map", permanent: false },
+      { source: "/dashboard/pulse", destination: "/dashboard/analytics#this-week", permanent: false },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

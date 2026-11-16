@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { DetailHeading } from '@/components/WorkspaceHeading';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -76,11 +77,11 @@ interface Pool {
 }
 
 const PURPOSE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  citizen_assembly: { label: 'Citizen Assembly', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Building2 },
+  citizen_assembly: { label: 'Citizen assembly', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Building2 },
   jury: { label: 'Jury', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: Shield },
-  advisory_panel: { label: 'Advisory Panel', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20', icon: Handshake },
-  working_group: { label: 'Working Group', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Users },
-  review_committee: { label: 'Review Committee', color: 'text-cosmic-accent bg-cosmic-accent/10 border-cosmic-accent/20', icon: Eye },
+  advisory_panel: { label: 'Advisory panel', color: 'text-cosmic-teal bg-cosmic-teal/10 border-cosmic-teal/20', icon: Handshake },
+  working_group: { label: 'Working group', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Users },
+  review_committee: { label: 'Review committee', color: 'text-cosmic-accent bg-cosmic-accent/10 border-cosmic-accent/20', icon: Eye },
 };
 
 const STATUS_STEPS = [
@@ -176,10 +177,10 @@ export default function SortitionDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <Dices className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">Pool Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Pool not found</h3>
         <Link href="/dashboard/participation/sortition">
           <Button className="bg-cosmic-violet text-foreground hover:bg-cosmic-violet/90">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sortition
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to sortition
           </Button>
         </Link>
       </div>
@@ -215,58 +216,29 @@ export default function SortitionDetailPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Back navigation */}
-      <Link href="/dashboard/participation/sortition" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Sortition
-      </Link>
-
-      {/* Pool Info Card */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-violet p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-20" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <PurposeIcon className="w-5 h-5 text-cosmic-violet" />
-            <Badge className={`${purposeConfig.color} text-[10px] border`}>
-              {purposeConfig.label}
-            </Badge>
-            <Badge className="text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20 text-[10px] border">
-              {pool.selectionMethod === 'stratified_random' ? 'Stratified Random' : 'Simple Random'}
-            </Badge>
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            {pool.name}
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-3xl">
-            {pool.description}
-          </p>
-
-          {/* Info row */}
-          <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-cosmic-muted">
-            <span className="flex items-center gap-1.5">
-              <UserCheck className="w-4 h-4" />
-              {pool.selectionSize} seats
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Users className="w-4 h-4" />
-              {pool.candidates?.length || pool.candidateCount} candidates
-            </span>
-            {pool.selectionDate && (
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4" />
-                Selected: {new Date(pool.selectionDate).toLocaleDateString('en-GB')}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+      <DetailHeading
+        look="sortition"
+        section="Panel picked by lottery"
+        title={pool.name}
+        description={pool.description}
+        back={{ href: '/dashboard/participation/sortition', label: 'All lottery pools' }}
+        meta={
+          <>
+            <span>{purposeConfig.label}</span>
+            <span>{pool.selectionMethod === 'stratified_random' ? 'Random, balanced by group' : 'Simple random draw'}</span>
+            <span>{pool.selectionSize} seats</span>
+            <span>{pool.candidates?.length || pool.candidateCount} volunteers</span>
+            {pool.selectionDate && <span>Drawn {new Date(pool.selectionDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+          </>
+        }
+      />
 
       {/* Status Timeline */}
       <Card className="glass-card rounded-2xl">
         <CardHeader className="pb-2">
           <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-cosmic-violet" />
-            Selection Timeline
+            Selection timeline
           </h2>
         </CardHeader>
         <CardContent>
@@ -278,7 +250,7 @@ export default function SortitionDetailPage() {
                 <div key={step.key} className="flex items-center shrink-0">
                   <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                     isActive
-                      ? 'bg-cosmic-violet/20 text-cosmic-violet border-cosmic-violet/30'
+                      ? 'stage-now'
                       : isCompleted
                       ? 'bg-cosmic-success/10 text-cosmic-success border-cosmic-success/20'
                       : 'bg-foreground/5 text-cosmic-muted border-border'
@@ -302,7 +274,7 @@ export default function SortitionDetailPage() {
           <CardHeader className="pb-2">
             <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Shield className="w-5 h-5 text-cosmic-amber" />
-              Selection Criteria
+              Selection criteria
             </h2>
           </CardHeader>
           <CardContent>
@@ -328,7 +300,7 @@ export default function SortitionDetailPage() {
                   setVolunteerDialogOpen(true);
                 }}
               >
-                <Handshake className="w-4 h-4 mr-2" /> Volunteer Now
+                <Handshake className="w-4 h-4 mr-2" /> Volunteer now
               </Button>
             </div>
           </CardContent>
@@ -341,7 +313,7 @@ export default function SortitionDetailPage() {
           <CardHeader className="pb-2">
             <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Play className="w-5 h-5 text-cosmic-amber" />
-              Run Selection (Admin)
+              Run the draw (admins)
             </h2>
           </CardHeader>
           <CardContent>
@@ -355,7 +327,7 @@ export default function SortitionDetailPage() {
               disabled={runningSelection || (pool.candidates?.length || 0) === 0}
             >
               {runningSelection ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Dices className="w-4 h-4 mr-2" />}
-              Run Democratic Lottery
+              Run the lottery
             </Button>
           </CardContent>
         </Card>
@@ -408,7 +380,7 @@ export default function SortitionDetailPage() {
           <CardHeader className="pb-2">
             <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-cosmic-amber" />
-              Demographic Breakdown
+              Demographic breakdown
             </h2>
           </CardHeader>
           <CardContent>
@@ -492,7 +464,7 @@ export default function SortitionDetailPage() {
                     </Avatar>
                     <div className="min-w-0 flex-grow">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground truncate">{candidate.user.name || 'Anonymous'}</span>
+                        <span className="text-sm font-medium text-foreground truncate">{candidate.user.name || 'A volunteer'}</span>
                         <Badge className={`${sc} text-[9px] border`}>{candidate.status}</Badge>
                       </div>
                       {Object.keys(demo).length > 0 && (
@@ -530,7 +502,7 @@ export default function SortitionDetailPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-cosmic-muted mb-1 block">Age Group</label>
+                      <label className="text-xs text-cosmic-muted mb-1 block">Age group</label>
                       <Select value={volunteerForm.ageGroup} onValueChange={(v) => setVolunteerForm((f) => ({ ...f, ageGroup: v }))}>
                         <SelectTrigger aria-label="Select" className="bg-foreground/5 border-border text-foreground">
                           <SelectValue placeholder="Select" />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { apiUser, apiFailure, ApiError, rateLimit } from '@/lib/api-server';
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -27,28 +28,36 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(orgs);
 }
 
+const RESERVED = new Set(['new', 'join', 'edit', 'settings', 'admin']);
+const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,48}[a-z0-9])?$/;
+
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
   try {
-    const { name, slug, description } = await req.json();
-    if (!name || !slug) return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 });
-
-    const existing = await db.organization.findUnique({ where: { slug } });
-    if (existing) return NextResponse.json({ error: 'Slug already taken' }, { status: 409 });
+    const user = await apiUser();
+    await rateLimit('community-create', user.id, 10, 3600);
+    const body = await req.json().catch(() => ({}));
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const slug = typeof body.slug === 'string' ? body.slug.trim().toLowerCase() : '';
+    const description = typeof body.description === 'string' ? body.description.trim() : '';
+    if (name.length < 2 || name.length > 80)
+      throw new ApiError(400, 'Give the community a name between 2 and 80 characters.');
+    if (!SLUG.test(slug))
+      throw new ApiError(400, 'The link name can use lowercase letters, numbers and dashes (up to 50).');
+    if (RESERVED.has(slug))
+      throw new ApiError(400, 'That link name is reserved. Try another.');
+    if (description.length > 1000)
+      throw new ApiError(400, 'Keep the description under 1,000 characters.');
+    if (await db.organization.findUnique({ where: { slug } }))
+      throw new ApiError(409, 'That link name is taken. Try another.');
 
     const org = await db.organization.create({
-      data: { name, slug, description: description || null, createdBy: session.id },
+      data: { name, slug, description: description || null, createdBy: user.id },
     });
-
     await db.membership.create({
-      data: { userId: session.id, organizationId: org.id, role: 'admin' },
+      data: { userId: user.id, organizationId: org.id, role: 'admin' },
     });
-
     return NextResponse.json(org, { status: 201 });
   } catch (error) {
-    console.error('Create org error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return apiFailure(error);
   }
 }

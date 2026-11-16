@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { DetailHeading } from '@/components/WorkspaceHeading';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -58,7 +59,6 @@ interface Survey {
   createdBy: string;
   creator: { id: string; name: string | null; avatarUrl: string | null };
   questions: SurveyQuestion[];
-  responses: { id: string; userId: string | null; answers: string; completedAt: string; createdAt: string }[];
   _count: { responses: number };
 }
 
@@ -101,6 +101,8 @@ export default function SurveyDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [canManage, setCanManage] = useState(false);
+  const [opening, setOpening] = useState(false);
 
   // Form answers
   const [answers, setAnswers] = useState<Record<string, { value: string | string[]; otherText?: string }>>({});
@@ -114,6 +116,7 @@ export default function SurveyDetailPage() {
         setSurvey(data.survey);
         setHasResponded(data.hasResponded);
         setQuestionStats(data.questionStats || []);
+        setCanManage(Boolean(data.canManage));
       } else {
         setError('Survey not found');
       }
@@ -131,6 +134,20 @@ export default function SurveyDetailPage() {
   const isClosed = survey?.status === 'closed' || survey?.status === 'analyzed';
   const showForm = survey && isActive && !hasResponded && !submitted;
   const showResults = survey && (hasResponded || isClosed || submitted);
+
+  const openSurvey = async () => {
+    setOpening(true);
+    try {
+      const res = await fetch(`/api/surveys/${surveyId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'active' }),
+      });
+      if (res.ok) await fetchSurvey();
+    } finally {
+      setOpening(false);
+    }
+  };
 
   // Progress calculation
   const totalQuestions = survey?.questions.length || 0;
@@ -190,10 +207,10 @@ export default function SurveyDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <AlertCircle className="w-12 h-12 text-cosmic-rose/50 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">Survey Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Survey not found</h3>
         <p className="text-cosmic-muted text-sm mb-4">{error || 'This survey does not exist or has been removed.'}</p>
         <Button className="bg-foreground/10 text-foreground hover:bg-foreground/20" onClick={() => router.push('/dashboard/participation/surveys')}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Surveys
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to surveys
         </Button>
       </div>
     );
@@ -205,57 +222,48 @@ export default function SurveyDetailPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-[fadeIn_0.5s_ease-out]">
-      {/* Header */}
-      <div className="flex items-start gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="shrink-0 text-cosmic-muted hover:text-foreground hover:bg-foreground/5 mt-0.5"
-          onClick={() => router.push('/dashboard/participation/surveys')}
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-grow min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-2">
-            <Badge className={`${catConfig.bgColor} ${catConfig.color} ${catConfig.borderColor} border text-[10px]`}>
-              <CatIcon className="w-3 h-3 mr-1" />
-              {catConfig.label}
-            </Badge>
-            <Badge className={`${statusConfig.color} border text-[10px]`}>
-              {statusConfig.label}
-            </Badge>
-            {survey.anonymous && (
-              <Badge className="bg-foreground/5 text-cosmic-muted border-border border text-[10px]">
-                Anonymous
-              </Badge>
-            )}
-          </div>
-          <h1 className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1">
-            {survey.title}
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base">
-            {survey.description}
-          </p>
-          <div className="flex items-center gap-4 mt-3 flex-wrap">
-            <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
-              <Users className="w-3.5 h-3.5" />
-              {survey._count.responses} responses
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
-              <ClipboardList className="w-3.5 h-3.5" />
-              {survey.questionCount} questions
-            </div>
+      <DetailHeading
+        look="surveys"
+        section="Survey"
+        title={survey.title}
+        description={survey.description}
+        back={{ href: '/dashboard/participation/surveys', label: 'All surveys' }}
+        meta={
+          <>
+            <span>{catConfig.label}</span>
+            <span>{statusConfig.label}</span>
+            {survey.anonymous && <span>Anonymous</span>}
+            <span>{survey._count.responses} responses</span>
+            <span>{survey.questionCount} questions</span>
             {survey.closesAt && (
-              <div className="flex items-center gap-1.5 text-xs text-cosmic-muted">
-                <Clock className="w-3.5 h-3.5" />
+              <span>
                 {new Date(survey.closesAt) > new Date()
-                  ? `Closes ${new Date(survey.closesAt).toLocaleDateString('en-GB')}`
+                  ? `Closes ${new Date(survey.closesAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
                   : 'Closed'}
-              </div>
+              </span>
             )}
-          </div>
+          </>
+        }
+      />
+
+      {/* Not open yet */}
+      {survey.status === 'draft' && (
+        <div className="org-panel">
+          <h2>This survey isn&apos;t open yet</h2>
+          {canManage ? (
+            <>
+              <p className="org-panel-note">
+                Nobody can answer it until you open it. Check the questions first: once answers come in, changing them would make the results unfair.
+              </p>
+              <button type="button" className="civic-button" style={{ marginTop: 12 }} onClick={openSurvey} disabled={opening}>
+                {opening ? 'Opening…' : 'Open the survey'}
+              </button>
+            </>
+          ) : (
+            <p className="org-panel-note">Its author is still preparing it. Come back once it opens.</p>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Submitted Success */}
       {submitted && (
@@ -263,7 +271,7 @@ export default function SurveyDetailPage() {
           <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center bg-cosmic-teal/20 glow-teal">
             <CheckCircle2 className="w-8 h-8 text-cosmic-teal" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Thank You!</h3>
+          <h3 className="text-lg font-semibold text-foreground">Thank you!</h3>
           <p className="text-cosmic-muted text-sm">Your response has been recorded. Check out the results below.</p>
         </div>
       )}
@@ -576,7 +584,7 @@ export default function SurveyDetailPage() {
             <div className="glass-card-violet p-4 sm:p-6 rounded-xl">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-5 h-5 text-cosmic-violet" />
-                <h3 className="font-heading text-sm font-semibold text-foreground">AI Summary</h3>
+                <h3 className="font-heading text-sm font-semibold text-foreground">AI summary</h3>
               </div>
               <p className="text-sm text-cosmic-muted leading-relaxed">{survey.aiSummary}</p>
             </div>
@@ -688,7 +696,7 @@ export default function SurveyDetailPage() {
                   {question.type === 'scale' && stat.averageValue !== undefined && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-cosmic-muted">Average Value</span>
+                        <span className="text-xs text-cosmic-muted">Average value</span>
                         <span className="text-lg font-bold text-cosmic-accent font-heading">{stat.averageValue}</span>
                       </div>
                       <div className="relative h-3 bg-foreground/5 rounded-full overflow-hidden">
@@ -733,7 +741,7 @@ export default function SurveyDetailPage() {
                     <div className="mt-3 p-3 rounded-lg bg-cosmic-violet/5 border border-cosmic-violet/10">
                       <div className="flex items-center gap-1.5 mb-1">
                         <Sparkles className="w-3 h-3 text-cosmic-violet" />
-                        <span className="text-[11px] text-cosmic-violet font-medium">AI Insight</span>
+                        <span className="text-[11px] text-cosmic-violet font-medium">AI insight</span>
                       </div>
                       <p className="text-xs text-cosmic-muted">{question.aiInsight}</p>
                     </div>
@@ -747,7 +755,7 @@ export default function SurveyDetailPage() {
           {survey._count.responses === 0 && (
             <div className="glass-card p-8 rounded-2xl text-center">
               <BarChart3 className="w-10 h-10 text-cosmic-muted/20 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-foreground mb-1">No Responses Yet</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-1">No responses yet</h3>
               <p className="text-xs text-cosmic-muted">Results will appear here once people start responding.</p>
             </div>
           )}

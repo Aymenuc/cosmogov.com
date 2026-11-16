@@ -287,7 +287,7 @@ export default function LocationSelector({ value, onChange, compact = false, sho
           disabled={loadingMyLocation}
         >
           {loadingMyLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
-          <span className="ml-1.5 text-xs">Use My Location</span>
+          <span className="ml-1.5 text-xs">Use my location</span>
         </Button>
       </div>
 

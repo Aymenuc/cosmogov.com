@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { DetailHeading } from '@/components/WorkspaceHeading';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -72,14 +73,14 @@ interface Proposal {
 const TYPE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   binding_proposal: { label: 'Formal proposal', color: 'text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20', icon: Gavel },
   binding_referendum: { label: 'Referendum request', color: 'text-cosmic-violet bg-cosmic-violet/10 border-cosmic-violet/20', icon: Scale },
-  citizen_bill: { label: 'Citizen Bill', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: FileSignature },
+  citizen_bill: { label: 'Citizen bill', color: 'text-cosmic-amber bg-cosmic-amber/10 border-cosmic-amber/20', icon: FileSignature },
 };
 
 const STATUS_STEPS = [
   { key: 'collecting', label: 'Collecting' },
-  { key: 'threshold_reached', label: 'Threshold Reached' },
-  { key: 'government_review', label: 'Gov. Review' },
-  { key: 'government_response', label: 'Gov. Response' },
+  { key: 'threshold_reached', label: 'Threshold reached' },
+  { key: 'government_review', label: 'Government review' },
+  { key: 'government_response', label: 'Government response' },
   { key: 'scheduled_vote', label: 'Vote' },
   { key: 'enacted', label: 'Enacted' },
 ];
@@ -159,10 +160,10 @@ export default function BindingProposalDetailPage() {
     return (
       <div className="glass-card p-12 rounded-2xl text-center">
         <Gavel className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">Proposal Not Found</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Proposal not found</h3>
         <Link href="/dashboard/participation/binding-proposals">
           <Button className="bg-cosmic-rose text-foreground hover:bg-cosmic-rose/90">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Proposals
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to proposals
           </Button>
         </Link>
       </div>
@@ -177,41 +178,20 @@ export default function BindingProposalDetailPage() {
 
   return (
     <div className="space-y-4 sm:space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Back navigation */}
-      <Link href="/dashboard/participation/binding-proposals" className="inline-flex items-center gap-1.5 text-sm text-cosmic-muted hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Formal response proposals
-      </Link>
-
-      {/* Header — Title, type badge, category badge */}
-      <div className="relative overflow-hidden rounded-xl sm:rounded-2xl glass-card-rose p-4 sm:p-6 lg:p-8">
-        <div className="absolute inset-0 starfield opacity-20" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <Badge className={`${typeConfig.color} text-[10px] border`}>
-              <TypeIcon className="w-3 h-3 mr-1" />
-              {typeConfig.label}
-            </Badge>
-            {proposal.category && (
-              <Badge className="text-cosmic-muted bg-foreground/5 border-border text-[10px] border capitalize">
-                {proposal.category}
-              </Badge>
-            )}
-            {proposal.isBinding && (
-              <Badge className="text-cosmic-rose bg-cosmic-rose/10 border-cosmic-rose/20 text-[10px] border">
-                <Shield className="w-3 h-3 mr-1" />
-                Binding
-              </Badge>
-            )}
-          </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            {proposal.title}
-          </h1>
-          <p className="text-cosmic-muted text-sm sm:text-base max-w-3xl">
-            {proposal.description}
-          </p>
-        </div>
-      </div>
+      <DetailHeading
+        look="binding"
+        section="Formal response proposal"
+        title={proposal.title}
+        description={proposal.description}
+        back={{ href: '/dashboard/participation/binding-proposals', label: 'All formal proposals' }}
+        meta={
+          <>
+            <span>{typeConfig.label}</span>
+            {proposal.category && <span>{proposal.category.charAt(0).toUpperCase() + proposal.category.slice(1)}</span>}
+            {proposal.isBinding && <span>Binding</span>}
+          </>
+        }
+      />
 
       {/* LARGE Reviewed signature progress Bar */}
       <Card className="glass-card rounded-2xl border-cosmic-rose/20">
@@ -262,7 +242,7 @@ export default function BindingProposalDetailPage() {
         <CardHeader className="pb-2">
           <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-cosmic-rose" />
-            Status Timeline
+            Status timeline
           </h2>
         </CardHeader>
         <CardContent>
@@ -274,7 +254,7 @@ export default function BindingProposalDetailPage() {
                 <div key={step.key} className="flex items-center shrink-0">
                   <div className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-medium border transition-all ${
                     isActive
-                      ? 'bg-cosmic-rose/20 text-cosmic-rose border-cosmic-rose/30'
+                      ? 'stage-now'
                       : isCompleted
                       ? 'bg-cosmic-success/10 text-cosmic-success border-cosmic-success/20'
                       : 'bg-foreground/5 text-cosmic-muted border-border'
@@ -299,7 +279,7 @@ export default function BindingProposalDetailPage() {
           <CardHeader className="pb-2">
             <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <Building2 className="w-5 h-5 text-cosmic-teal" />
-              Government Response
+              Government response
               {proposal.responseDate && (
                 <span className="text-xs text-cosmic-muted font-normal ml-2">
                   {new Date(proposal.responseDate).toLocaleDateString('en-GB')}
@@ -321,7 +301,7 @@ export default function BindingProposalDetailPage() {
           <CardHeader className="pb-2">
             <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-cosmic-amber" />
-              Legal Reference
+              Legal reference
             </h2>
           </CardHeader>
           <CardContent>
@@ -338,7 +318,7 @@ export default function BindingProposalDetailPage() {
           <CardHeader className="pb-2">
             <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-cosmic-violet" />
-              Impact Assessment
+              Impact assessment
             </h2>
           </CardHeader>
           <CardContent>
@@ -362,7 +342,7 @@ export default function BindingProposalDetailPage() {
             }}
           >
             <FileSignature className="w-5 h-5 mr-2" />
-            Sign This Proposal
+            Sign this proposal
           </Button>
         )}
         <Button
@@ -371,7 +351,7 @@ export default function BindingProposalDetailPage() {
           onClick={handleShare}
         >
           <Share2 className="w-5 h-5 mr-2" />
-          Share to Collect Signatures
+          Share to collect signatures
         </Button>
       </div>
 
@@ -428,7 +408,7 @@ export default function BindingProposalDetailPage() {
               <AlertTriangle className="w-5 h-5 text-cosmic-amber" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-foreground">Government Response Deadline</h3>
+              <h3 className="text-sm font-bold text-foreground">Government response deadline</h3>
               <p className="text-xs text-cosmic-muted mt-0.5">
                 The government must respond by {new Date(proposal.responseDeadline).toLocaleDateString('en-GB')}.
                 {new Date(proposal.responseDeadline) > new Date()
@@ -449,7 +429,7 @@ export default function BindingProposalDetailPage() {
                 <Gavel className="w-5 h-5 text-cosmic-violet" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-foreground">Scheduled Vote</h3>
+                <h3 className="text-sm font-bold text-foreground">Scheduled vote</h3>
                 <p className="text-xs text-cosmic-muted mt-0.5">
                   This proposal will be put to vote on {new Date(proposal.voteDate).toLocaleDateString('en-GB')}.
                 </p>
@@ -486,7 +466,7 @@ export default function BindingProposalDetailPage() {
               <DialogHeader>
                 <DialogTitle className="text-foreground flex items-center gap-2">
                   <FileSignature className="w-5 h-5 text-cosmic-rose" />
-                  Sign This Proposal
+                  Sign this proposal
                 </DialogTitle>
                 <DialogDescription className="text-cosmic-muted">
                   Add your signature to force government response
@@ -557,7 +537,7 @@ export default function BindingProposalDetailPage() {
                     variant="ghost"
                     onClick={() => setSignDialogOpen(false)}
                   >
-                    <Share2 className="w-4 h-4 mr-2" /> Share to Collect Signatures
+                    <Share2 className="w-4 h-4 mr-2" /> Share to collect signatures
                   </Button>
                 </div>
               )}

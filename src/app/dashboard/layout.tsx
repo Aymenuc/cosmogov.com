@@ -45,7 +45,6 @@ import {
   Dices,
   Gavel,
   Eye,
-  Activity,
   Star,
 } from "lucide-react";
 import Brand, { BrandMark } from "@/components/Brand";
@@ -115,8 +114,6 @@ const toolGroups: { label: string; items: [string, string, LucideIcon][] }[] = [
       ["Decision log", "/dashboard/decisions", Target],
       ["Community discussions", "/dashboard/chat", MessageCircle],
       ["Assembly hall", "/dashboard/assembly-hall", Building2],
-      ["Global explorer", "/dashboard/explore", Globe2],
-      ["Governance pulse", "/dashboard/pulse", Activity],
       ["Analytics", "/dashboard/analytics", BarChart3],
     ],
   },
@@ -130,6 +127,11 @@ const toolGroups: { label: string; items: [string, string, LucideIcon][] }[] = [
     ],
   },
 ];
+// Pages still built on the older card kit get the house look through the
+// .legacy-ui bridge in portal.css.
+const LEGACY_UI =
+  /^\/dashboard\/(participation\/((budget|legislation|surveys|initiatives|assemblies|meetings|sortition|binding-proposals|accountability)\/[^/]+|(?!(?:budget|legislation|surveys|initiatives|assemblies|meetings|sortition|binding-proposals|accountability)$)[^/]+)$|organizations\/.+|proposals\/(new|[^/]+\/edit)$|assistant$|chat$|assembly-hall$|settings$|search$|admin$|gov-portal$)/;
+
 const allLabels = [
   ...mainLinks.map((item) => [item.href, item.label]),
   ...toolGroups.flatMap((group) =>
@@ -380,7 +382,7 @@ export default function DashboardLayout({
             </div>
           </header>
           <main className="workspace-main" id="main-content">
-            <div className="workspace-content">
+            <div className={`workspace-content${LEGACY_UI.test(pathname) ? " legacy-ui" : ""}`}>
               {user && !user.emailVerifiedAt && <VerifyEmailBanner email={user.email} />}
               {error && (
                 <p className="form-error" role="alert">

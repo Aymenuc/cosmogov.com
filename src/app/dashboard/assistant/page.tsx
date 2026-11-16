@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import WorkspaceHeading from '@/components/WorkspaceHeading';
 import { AI_LIMITS } from '@/lib/ai-limits';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,7 +19,7 @@ const DAILY_QUESTIONS = AI_LIMITS.assistant.day;
 
 const modes = [
   { id: 'chat', name: 'Chat', icon: MessageSquare, desc: 'Questions about taking part', color: 'cosmic-accent' },
-  { id: 'proposal_draft', name: 'Proposal Draft', icon: FileText, desc: 'Help drafting a proposal', color: 'cosmic-teal' },
+  { id: 'proposal_draft', name: 'Proposal draft', icon: FileText, desc: 'Help drafting a proposal', color: 'cosmic-teal' },
   { id: 'analysis', name: 'Analysis', icon: BarChart3, desc: 'Think through options you describe', color: 'cosmic-violet' },
   { id: 'coaching', name: 'Coaching', icon: Target, desc: 'Tips for fair meetings and decisions', color: 'cosmic-amber' },
 ];
@@ -43,7 +44,8 @@ export default function AssistantPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    // Follow the conversation; an empty box stays at the top so its tips read from the start.
+    if (messages.length) scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
   const handleSend = async () => {
@@ -90,48 +92,38 @@ export default function AssistantPage() {
   const currentMode = modes.find(m => m.id === mode)!;
 
   return (
-    <div className="max-w-3xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cosmic-teal/10 flex items-center justify-center">
-            <Brain className="w-5 h-5 text-cosmic-teal" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold font-heading">AI Assistant</h1>
-            <p className="text-xs text-cosmic-teal">An AI helper. It can be wrong, and people decide.</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {messages.length > 0 && (
-            <Button variant="ghost" size="sm" className="text-cosmic-muted hover:text-cosmic-rose" onClick={clearChat}>
-              <Trash2 className="w-3 h-3 mr-1" /> Clear
-            </Button>
-          )}
-        </div>
-      </div>
-
+    <div>
+      <WorkspaceHeading
+        look="assistant"
+        title="AI assistant"
+        description="Ask about a community matter, get help drafting a proposal, or think through options you describe."
+      >
+        {messages.length > 0 && (
+          <button type="button" className="civic-button outline" onClick={clearChat}>
+            <Trash2 size={14} aria-hidden="true" /> Clear the conversation
+          </button>
+        )}
+      </WorkspaceHeading>
+      <div className="max-w-3xl mx-auto flex flex-col mt-5">
       {/* Mode Selector */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-1" role="group" aria-label="What kind of help">
         {modes.map(m => (
           <button
             key={m.id}
+            type="button"
             onClick={() => setMode(m.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border ${
-              mode === m.id
-                ? `border-${m.color}/30 bg-${m.color}/10 text-${m.color}`
-                : 'border-border text-cosmic-muted hover:text-foreground hover:border-border'
-            }`}
-            style={mode === m.id ? { borderColor: `var(--color-${m.color})30`, background: `var(--color-${m.color})15`, color: `var(--color-${m.color})` } : {}}
+            aria-pressed={mode === m.id}
+            title={m.desc}
+            className={`assistant-mode${mode === m.id ? ' is-active' : ''}`}
           >
-            <m.icon className="w-3.5 h-3.5" />
+            <m.icon className="w-3.5 h-3.5" aria-hidden="true" />
             {m.name}
           </button>
         ))}
       </div>
 
       {/* Chat Area */}
-      <Card className="bg-card border-border flex-grow mb-4 overflow-hidden">
+      <Card className="bg-card border-border mb-4 overflow-hidden assistant-chat">
         <div ref={scrollRef} className="h-full overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-12">
@@ -180,7 +172,7 @@ export default function AssistantPage() {
                     <div className="w-1.5 h-1.5 rounded-full bg-cosmic-accent animate-bounce" style={{ animationDelay: '150ms' }} />
                     <div className="w-1.5 h-1.5 rounded-full bg-cosmic-violet animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
-                  <span className="text-xs text-cosmic-muted">Thinking...</span>
+                  <span className="text-xs text-cosmic-muted" role="status">Thinking…</span>
                 </div>
               </div>
             </div>
@@ -197,6 +189,7 @@ export default function AssistantPage() {
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
             placeholder={mode === 'chat' ? 'Ask about a community matter...' : mode === 'proposal_draft' ? 'Describe the proposal you want to create...' : mode === 'analysis' ? 'Describe the options your community is weighing...' : 'Ask about running a fair meeting...'}
             maxLength={1500}
+            aria-label="Your question"
             className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50 resize-none pr-10"
             rows={2}
           />
@@ -210,6 +203,7 @@ export default function AssistantPage() {
         For community matters only, up to {dailyLimit} questions a day
         {remaining !== null ? ` · ${remaining} left today` : ''}.
       </p>
+      </div>
     </div>
   );
 }

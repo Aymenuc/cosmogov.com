@@ -142,6 +142,28 @@ export const toolLooks: Record<ToolArtName, ToolLook> = {
     headline: "Answer your community on the record",
     cheer: "Every reply carries your name, and the people who signed are told when you respond.",
   },
+  process: {
+    tint: "sky",
+    headline: "Shared work, in stages",
+    cheer: "Each stage builds on the last, so it's worth joining early.",
+  },
+  debates: {
+    tint: "sky",
+    headline: "Talk it through, with a little help",
+    cheer: "AI helpers summarise, translate and simplify. People make every decision.",
+    nudge: ["good-neighbor", "thinking-out-loud"],
+  },
+  assistant: {
+    tint: "sun",
+    headline: "A little clarity, with AI",
+    cheer: "Ask about a community matter. It can be wrong, so check what matters.",
+  },
+  discussions: {
+    tint: "mint",
+    headline: "Chat with your neighbours",
+    cheer: "Small conversations are where most good ideas start.",
+    nudge: ["thinking-out-loud"],
+  },
   activity: {
     tint: "sun",
     headline: "Celebrate the regulars",

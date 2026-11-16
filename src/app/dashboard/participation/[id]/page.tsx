@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { DetailHeading } from '@/components/WorkspaceHeading';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import {
   Megaphone, Users, FileText, Wallet, Clock, ArrowLeft, ThumbsUp, ThumbsDown,
-  MessageSquare, Plus, Orbit, Eye, Calendar, CheckCircle2, Circle, Loader2,
+  MessageSquare, Plus, Eye, Calendar, CheckCircle2, Loader2,
   MapPin, Send, ChevronDown, ChevronUp, Building2, TreePine, GraduationCap,
   Landmark, Globe2, Sparkles, AlertCircle,
 } from 'lucide-react';
@@ -275,83 +276,49 @@ export default function ProcessDetailPage() {
 
   return (
     <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
-      {/* Back Navigation */}
-      <Link href="/dashboard/participation" className="inline-flex items-center gap-2 text-sm text-cosmic-muted hover:text-cosmic-teal transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Participation Hub
-      </Link>
+      <DetailHeading
+        look="process"
+        section="Participatory process"
+        title={process.title}
+        description={process.description}
+        back={{ href: '/dashboard/participation', label: 'Explore participation' }}
+        meta={
+          <>
+            <span>{PHASE_LABELS[process.currentPhase]}</span>
+            {process.organization && <span>{process.organization.name}</span>}
+            <span>{process.scope.charAt(0).toUpperCase() + process.scope.slice(1)}</span>
+            <span>{process.participantCount} participants</span>
+            <span>{process.processProposals.length} proposals</span>
+            {process.totalBudget > 0 && <span>{formatCurrency(process.totalBudget, process.currency)} budget</span>}
+            <span>Started {new Date(process.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          </>
+        }
+      />
 
-      {/* Process Header */}
-      <div className="glass-card rounded-2xl p-6 lg:p-8">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-grow">
-            <div className="flex items-center gap-2 mb-3">
-              <Badge className="bg-cosmic-teal/10 text-cosmic-teal border border-cosmic-teal/20 text-[10px]">
-                {PHASE_LABELS[process.currentPhase]}
-              </Badge>
-              {process.organization && (
-                <Badge className="bg-foreground/5 text-cosmic-muted border border-border text-[10px]">
-                  <Building2 className="w-3 h-3 mr-1" /> {process.organization.name}
-                </Badge>
-              )}
-              <Badge variant="outline" className="text-[10px] border-border text-cosmic-muted capitalize">
-                <Globe2 className="w-3 h-3 mr-1" /> {process.scope}
-              </Badge>
-            </div>
-            <h1 className="font-heading text-2xl lg:text-3xl font-bold text-foreground mb-2">{process.title}</h1>
-            <p className="text-cosmic-muted text-sm max-w-3xl">{process.description}</p>
-
-            {/* Meta */}
-            <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-cosmic-muted">
-              <div className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {process.participantCount} participants</div>
-              <div className="flex items-center gap-1"><FileText className="w-3.5 h-3.5" /> {process.processProposals.length} proposals</div>
-              {process.totalBudget > 0 && (
-                <div className="flex items-center gap-1 text-cosmic-amber"><Wallet className="w-3.5 h-3.5" /> {formatCurrency(process.totalBudget, process.currency)} budget</div>
-              )}
-              <div className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Started {new Date(process.createdAt).toLocaleDateString('en-GB')}</div>
-            </div>
-          </div>
-
-          {/* Phase Stepper - Vertical on desktop */}
-          <div className="lg:w-72 flex-shrink-0">
-            <h3 className="text-xs font-semibold text-cosmic-muted uppercase tracking-wider mb-3">Process Phases</h3>
-            <div className="space-y-0">
-              {phases.filter((p: {id: string}) => p.id !== 'closed').map((phase: {id: string; name: string}, idx: number) => {
-                const phaseIdx = PHASE_ORDER.indexOf(phase.id);
-                const isActive = phase.id === process.currentPhase;
-                const isCompleted = phaseIdx < currentPhaseIdx;
-
-                return (
-                  <div key={phase.id} className="flex items-start gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all ${
-                        isActive ? 'border-cosmic-teal bg-cosmic-teal/20 glow-teal' :
-                        isCompleted ? 'border-cosmic-teal/50 bg-cosmic-teal/10' :
-                        'border-border bg-foreground/5'
-                      }`}>
-                        {isCompleted ? (
-                          <CheckCircle2 className="w-4 h-4 text-cosmic-teal" />
-                        ) : isActive ? (
-                          <Orbit className="w-3.5 h-3.5 text-cosmic-teal" />
-                        ) : (
-                          <Circle className="w-3.5 h-3.5 text-foreground/20" />
-                        )}
-                      </div>
-                      {idx < phases.filter((p: {id: string}) => p.id !== 'closed').length - 1 && (
-                        <div className={`w-0.5 h-6 ${isCompleted ? 'bg-cosmic-teal/40' : 'bg-foreground/10'}`} />
-                      )}
-                    </div>
-                    <div className="pt-0.5">
-                      <p className={`text-sm font-medium ${isActive ? 'text-cosmic-teal' : isCompleted ? 'text-foreground/70' : 'text-foreground/30'}`}>
-                        {phase.name}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Stages, left to right */}
+      <section className="org-panel process-stages" aria-labelledby="process-stages">
+        <h2 id="process-stages">Stages</h2>
+        <ol>
+          {phases.filter((p: {id: string}) => p.id !== 'closed').map((phase: {id: string; name: string}, idx: number) => {
+            const phaseIdx = PHASE_ORDER.indexOf(phase.id);
+            const isActive = phase.id === process.currentPhase;
+            const isCompleted = phaseIdx < currentPhaseIdx;
+            return (
+              <li
+                key={phase.id}
+                className={`process-stage${isActive ? ' is-now' : isCompleted ? ' is-done' : ''}`}
+                aria-current={isActive ? 'step' : undefined}
+              >
+                <span className="process-stage-dot" aria-hidden="true">
+                  {isCompleted ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
+                </span>
+                {phase.name}
+                {isActive && <span className="sr-only"> (current stage)</span>}
+              </li>
+            );
+          })}
+        </ol>
+      </section>
 
       {/* Tab Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -373,13 +340,13 @@ export default function ProcessDetailPage() {
         {/* Proposals Tab */}
         <TabsContent value="proposals" className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg font-bold text-foreground">Community Proposals</h2>
+            <h2 className="font-heading text-lg font-bold text-foreground">Community proposals</h2>
             {process.allowProposals && process.currentPhase !== 'closed' && (
               <Button
                 onClick={() => setShowNewProposal(!showNewProposal)}
                 className="bg-cosmic-teal text-primary-foreground hover:bg-cosmic-teal/90 text-sm"
               >
-                <Plus className="w-4 h-4 mr-1.5" /> New Proposal
+                <Plus className="w-4 h-4 mr-1.5" /> New proposal
               </Button>
             )}
           </div>
@@ -388,7 +355,7 @@ export default function ProcessDetailPage() {
           {showNewProposal && (
             <Card className="glass-card-teal rounded-2xl">
               <CardContent className="p-6 space-y-4">
-                <h3 className="font-heading font-semibold text-foreground">Submit a Proposal</h3>
+                <h3 className="font-heading font-semibold text-foreground">Submit a proposal</h3>
                 <Input
                   placeholder="Proposal title"
                   className="bg-foreground/5 border-border text-foreground placeholder:text-cosmic-muted/50"
@@ -426,7 +393,7 @@ export default function ProcessDetailPage() {
           {process.processProposals.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <FileText className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">No Proposals Yet</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No proposals yet</h3>
               <p className="text-cosmic-muted text-sm">Be the first to submit a proposal for this process.</p>
             </div>
           ) : (
@@ -555,10 +522,10 @@ export default function ProcessDetailPage() {
         {/* Budget Tab */}
         <TabsContent value="budget" className="mt-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg font-bold text-foreground">Budget Projects</h2>
+            <h2 className="font-heading text-lg font-bold text-foreground">Budget projects</h2>
             {process.totalBudget > 0 && (
               <div className="glass-card-amber px-4 py-2 rounded-xl">
-                <div className="text-xs text-cosmic-amber">Total Budget</div>
+                <div className="text-xs text-cosmic-amber">Total budget</div>
                 <div className="text-lg font-bold text-cosmic-amber font-heading">{formatCurrency(process.totalBudget, process.currency)}</div>
               </div>
             )}
@@ -567,7 +534,7 @@ export default function ProcessDetailPage() {
           {process.budgetProjects.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <Wallet className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">No Budget Projects</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No budget projects</h3>
               <p className="text-cosmic-muted text-sm">Budget projects will appear here when proposed.</p>
             </div>
           ) : (
@@ -602,12 +569,12 @@ export default function ProcessDetailPage() {
         {/* Accountability Tab */}
         <TabsContent value="accountability" className="mt-4 space-y-4">
           <h2 className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-            <Eye className="w-5 h-5 text-cosmic-violet" /> Implementation Tracking
+            <Eye className="w-5 h-5 text-cosmic-violet" /> Implementation tracking
           </h2>
           {process.milestones.length === 0 ? (
             <div className="glass-card p-12 rounded-2xl text-center">
               <Eye className="w-12 h-12 text-cosmic-muted/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">No Milestones Yet</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No milestones yet</h3>
               <p className="text-cosmic-muted text-sm">Milestones will be added as proposals are implemented.</p>
             </div>
           ) : (
@@ -622,7 +589,7 @@ export default function ProcessDetailPage() {
                         <div className="flex items-center gap-3 mt-1 text-xs text-cosmic-muted">
                           <span className="capitalize">{milestone.status.replace('_', ' ')}</span>
                           {milestone.dueDate && (
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due {new Date(milestone.dueDate).toLocaleDateString('en-GB')}</span>
+                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due {new Date(milestone.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                           )}
                         </div>
                       </div>
@@ -643,15 +610,15 @@ export default function ProcessDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card className="glass-card rounded-2xl">
               <CardHeader className="pb-2">
-                <h3 className="font-heading font-semibold text-foreground">About This Process</h3>
+                <h3 className="font-heading font-semibold text-foreground">About this process</h3>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-cosmic-muted">{process.description}</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between"><span className="text-cosmic-muted">Scope</span><span className="text-foreground capitalize">{process.scope}</span></div>
                   <div className="flex justify-between"><span className="text-cosmic-muted">Category</span><span className="text-foreground capitalize">{(process.category || 'General').replace('_', ' ')}</span></div>
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Current Phase</span><span className={PHASE_COLORS[process.currentPhase]}>{PHASE_LABELS[process.currentPhase]}</span></div>
-                  <div className="flex justify-between"><span className="text-cosmic-muted">Created</span><span className="text-foreground">{new Date(process.createdAt).toLocaleDateString('en-GB')}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Current phase</span><span className={PHASE_COLORS[process.currentPhase]}>{PHASE_LABELS[process.currentPhase]}</span></div>
+                  <div className="flex justify-between"><span className="text-cosmic-muted">Created</span><span className="text-foreground">{new Date(process.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div>
                   <div className="flex justify-between"><span className="text-cosmic-muted">Organizer</span><span className="text-foreground">{process.creator.name || 'Unknown'}</span></div>
                 </div>
               </CardContent>
@@ -659,7 +626,7 @@ export default function ProcessDetailPage() {
 
             <Card className="glass-card rounded-2xl">
               <CardHeader className="pb-2">
-                <h3 className="font-heading font-semibold text-foreground">Process Rules</h3>
+                <h3 className="font-heading font-semibold text-foreground">Process rules</h3>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2 text-sm">

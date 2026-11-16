@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Loader2, Plus, Sprout } from 'lucide-react';
+import { CheckCircle2, FileText, Loader2, Plus, Sprout, Vote } from 'lucide-react';
 import WorkspaceHeading from '@/components/WorkspaceHeading';
 
 interface Analytics {
@@ -16,6 +16,22 @@ interface Analytics {
     reachedQuorum: number;
     medianHoursOpen: number | null;
   };
+}
+
+interface Pulse {
+  sentiment: { score: number; mood: string };
+  metrics: { activeProposals: number; ballotsLast24h: number; votersLast7d: number };
+  activityFeed: { id: string; type: 'vote' | 'proposal' | 'pass' | 'streak'; description: string; detail: string; timestamp: string }[];
+}
+
+const FEED_ICON = { vote: Vote, proposal: FileText, pass: CheckCircle2, streak: CheckCircle2 } as const;
+
+function ago(iso: string) {
+  const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 48) return `${hours} h ago`;
+  return `${Math.round(hours / 24)} days ago`;
 }
 
 function formatDuration(hours: number) {
@@ -35,6 +51,7 @@ function dayLabel(date: string) {
 export default function AnalyticsPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [error, setError] = useState('');
+  const [pulse, setPulse] = useState<Pulse | null>(null);
 
   useEffect(() => {
     fetch('/api/analytics')
@@ -43,6 +60,10 @@ export default function AnalyticsPage() {
         setData(await r.json());
       })
       .catch(() => setError('Analytics could not be loaded. Please refresh to try again.'));
+    fetch('/api/pulse')
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setPulse)
+      .catch(() => setPulse(null));
   }, []);
 
   const week = data?.lastSevenDays ?? [];
@@ -83,6 +104,46 @@ export default function AnalyticsPage() {
               </div>
             ))}
           </div>
+
+          <section id="this-week" className="analytics-week" aria-labelledby="this-week-heading">
+            <div className="analytics-week-head">
+              <h2 id="this-week-heading" className="font-heading text-base font-semibold">This week</h2>
+              <span className="text-sm text-cosmic-muted">
+                {pulse ? `${pulse.metrics.ballotsLast24h} ballots in the last 24 h · ${pulse.metrics.votersLast7d} people voted this week` : 'Loading…'}
+              </span>
+            </div>
+            {pulse && (
+              <div className="analytics-week-grid">
+                <div className="analytics-lean">
+                  <span className="text-xs text-cosmic-muted">Leaning on open proposals</span>
+                  <p className="font-heading text-xl font-bold">{pulse.sentiment.mood}</p>
+                  {pulse.sentiment.mood !== 'No ballots yet' ? (
+                    <>
+                      <div className="analytics-lean-bar" role="img" aria-label={`${pulse.sentiment.score}% of ballots on open proposals were for`}>
+                        <span style={{ width: `${pulse.sentiment.score}%` }} />
+                      </div>
+                      <span className="text-xs text-cosmic-muted">{pulse.sentiment.score}% of ballots were &ldquo;for&rdquo;</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-cosmic-muted">The bar fills once people vote on open proposals.</span>
+                  )}
+                </div>
+                <ol className="analytics-feed">
+                  {pulse.activityFeed.length === 0 && <li className="text-sm text-cosmic-muted">Nothing new yet this week.</li>}
+                  {pulse.activityFeed.slice(0, 8).map((e) => {
+                    const Icon = FEED_ICON[e.type] ?? FileText;
+                    return (
+                      <li key={e.id}>
+                        <span className={`analytics-feed-icon ${e.type}`}><Icon size={15} aria-hidden="true" /></span>
+                        <span className="analytics-feed-text">{e.description}</span>
+                        <span className="text-xs text-cosmic-muted">{ago(e.timestamp)}</span>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+            )}
+          </section>
 
           <section className="glass-card rounded-2xl border border-border p-5 sm:p-6" aria-labelledby="week-heading">
             <div className="mb-5 flex flex-wrap items-baseline justify-between gap-2">

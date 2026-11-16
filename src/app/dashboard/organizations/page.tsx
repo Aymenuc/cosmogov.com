@@ -75,7 +75,7 @@ export default function OrganizationsPage() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        <Link href="/dashboard/explore" className="following-filter">
+        <Link href="/dashboard/participation" className="following-filter">
           <Globe2 size={15} />
           Explore participation
         </Link>
@@ -152,7 +152,7 @@ export default function OrganizationsPage() {
               : "Create a space for your neighborhood, organization, or group to work together."}
           </p>
           <Link
-            href={query ? "/dashboard/explore" : "/dashboard/organizations/new"}
+            href={query ? "/dashboard/participation" : "/dashboard/organizations/new"}
             className="civic-button outline"
           >
             {query

@@ -761,3 +761,133 @@ a.sticker-state:hover {
 .verify-banner .civic-button {
   min-height: 36px;
 }
+
+/* Analytics → This week (what used to be the separate Pulse page) */
+.workspace-shell .analytics-week { display: grid; gap: 14px; padding: 20px; border: 2px solid #29223d; border-radius: 22px; background: #fffdf7; box-shadow: 4px 5px 0 #29223d; scroll-margin-top: 90px; }
+.workspace-shell .analytics-week-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+.workspace-shell .analytics-week-grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 14px; }
+.workspace-shell .analytics-lean { display: grid; gap: 6px; align-content: start; padding: 14px; border-radius: 16px; background: #fff1c6; }
+.workspace-shell .analytics-lean-bar { height: 14px; border: 2px solid #29223d; border-radius: 999px; background: #ffe6df; overflow: hidden; }
+.workspace-shell .analytics-lean-bar span { display: block; height: 100%; background: #28745b; }
+.workspace-shell .analytics-feed { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.workspace-shell .analytics-feed li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1.5px solid #e6e0ee; border-radius: 12px; background: #fff; }
+.workspace-shell .analytics-feed-text { min-width: 0; font-size: 14px; overflow-wrap: anywhere; }
+.workspace-shell .analytics-feed-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: #ece5ff; color: #5b34c9; }
+.workspace-shell .analytics-feed-icon.pass { background: #e3f6ea; color: #1f5a46; }
+@media (max-width: 760px) { .workspace-shell .analytics-week-grid { grid-template-columns: 1fr; } }
+
+/* ─── Bridge: pages built on the older card kit get the house look ───
+   The layout adds .legacy-ui to pages that still use the shared shadcn
+   cards, buttons, tabs and fields (detail pages, assistant, discussions,
+   assembly hall, settings…). Ink outlines, paper, sticker shadows. */
+.workspace-shell .legacy-ui [data-slot="card"],
+.workspace-shell .legacy-ui .glass-card {
+  background: #fffdf7;
+  border: 2px solid #29223d;
+  border-radius: 20px;
+  box-shadow: 4px 5px 0 #29223d;
+}
+.workspace-shell .legacy-ui [data-slot="card"] [data-slot="card"],
+.workspace-shell .legacy-ui [data-slot="card"] .glass-card,
+.workspace-shell .legacy-ui .glass-card .glass-card,
+.workspace-shell .legacy-ui .glass-card [data-slot="card"] {
+  border: 1.5px solid #e6e0ee;
+  border-radius: 14px;
+  box-shadow: none;
+  background: #fff;
+}
+.workspace-shell .legacy-ui [data-slot="button"] { border-radius: 999px; font-weight: 700; }
+.workspace-shell .legacy-ui [data-slot="button"][class*="shadow-xs"] {
+  border: 2px solid #29223d;
+  box-shadow: 2px 3px 0 #29223d;
+}
+.workspace-shell .legacy-ui [data-slot="button"][class*="shadow-xs"]:active:not(:disabled) { transform: translate(1px, 1px); box-shadow: 1px 2px 0 #29223d; }
+.workspace-shell .legacy-ui [data-slot="input"],
+.workspace-shell .legacy-ui [data-slot="textarea"],
+.workspace-shell .legacy-ui [data-slot="select-trigger"],
+.workspace-shell .legacy-ui select,
+.workspace-shell .legacy-ui textarea:not([data-slot]) {
+  border: 2px solid #29223d;
+  border-radius: 12px;
+  background: #fff;
+}
+.workspace-shell .legacy-ui [data-slot="tabs-list"] {
+  height: auto;
+  padding: 4px;
+  border: 2px solid #29223d;
+  border-radius: 999px;
+  background: #fffdf7;
+}
+.workspace-shell .legacy-ui [data-slot="tabs-trigger"] { border-radius: 999px; font-weight: 700; }
+.workspace-shell .legacy-ui [data-slot="tabs-trigger"][data-state="active"] { background: #29223d; color: #fffdf7; }
+.workspace-shell .legacy-ui [data-slot="badge"] { border: 1.5px solid #29223d; font-weight: 700; }
+
+/* Detail pages: same face as their section, smaller drawing, the item's title. */
+.workspace-shell .detail-hero .tool-hero-panel { grid-template-columns: minmax(0, 1fr) minmax(120px, 170px); padding: 22px 26px; }
+.workspace-shell .detail-hero h1 { font-size: clamp(24px, 2.7vw, 34px); }
+.workspace-shell .detail-hero-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.workspace-shell .detail-hero-meta > * { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border: 1.5px solid #29223d; border-radius: 999px; background: #fffdf7; font-size: 12.5px; font-weight: 700; }
+@media (max-width: 720px) { .workspace-shell .detail-hero .tool-hero-art { max-width: 140px; } }
+
+/* One community: proposals and members side by side. */
+.workspace-shell .org-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+@media (max-width: 860px) { .workspace-shell .org-detail-grid { grid-template-columns: 1fr; } }
+.workspace-shell .org-panel { background: #fffdf7; border: 2px solid #29223d; border-radius: 20px; box-shadow: 4px 5px 0 #29223d; padding: 18px 20px; min-width: 0; }
+.workspace-shell .org-panel h2 { font-size: 17px; font-weight: 800; margin: 0 0 12px; }
+.workspace-shell .org-panel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 380px; overflow-y: auto; }
+.workspace-shell .org-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid #e6e0ee; border-radius: 14px; background: #fff; color: inherit; text-decoration: none; }
+.workspace-shell a.org-row:hover, .workspace-shell a.org-row:focus-visible { border-color: #29223d; }
+.workspace-shell .org-row-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.workspace-shell .org-chip { flex: none; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; border: 1.5px solid #29223d; background: #f3eefe; }
+.workspace-shell .org-chip.is-open { background: #d9f5e6; }
+.workspace-shell .org-avatar { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 2px solid #29223d; background: #ffe9a8; display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+.workspace-shell .org-panel-note { color: #5d566d; font-size: 14px; margin: 0; }
+
+/* AI assistant: chat box under the section's face. */
+.workspace-shell .assistant-chat { height: min(560px, 62vh); }
+.workspace-shell .assistant-chat > div { height: 100%; }
+.workspace-shell .assistant-mode { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border: 2px solid #29223d; border-radius: 999px; background: #fffdf7; color: #29223d; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.workspace-shell .assistant-mode:hover { background: #fff3c4; }
+.workspace-shell .assistant-mode.is-active { background: #29223d; color: #fffdf7; }
+
+/* Compact section face for full-height tools (discussions). */
+.workspace-shell .compact-hero .tool-hero-panel { grid-template-columns: minmax(0, 1fr) 120px; padding: 14px 22px; gap: 10px 20px; }
+.workspace-shell .compact-hero h1 { font-size: clamp(20px, 2.2vw, 27px); margin: 6px 0 2px; }
+.workspace-shell .compact-hero p { margin: 0; }
+.workspace-shell .compact-hero .tool-hero-art { max-height: 92px; }
+@media (max-width: 720px) { .workspace-shell .compact-hero .tool-hero-art { display: none; } }
+.workspace-shell .chat-panes { height: max(480px, calc(100dvh - 17rem)); margin-top: 16px; }
+
+/* A process's stages as a left-to-right track. */
+.workspace-shell .process-stages { margin-top: 18px; }
+.workspace-shell .process-stages ol { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.workspace-shell .process-stage { display: inline-flex; align-items: center; gap: 8px; padding: 5px 13px 5px 5px; border: 1.5px solid #e6e0ee; border-radius: 999px; background: #fff; color: #6b6479; font-size: 14px; font-weight: 600; }
+.workspace-shell .process-stage.is-done { border-color: #29223d; color: #29223d; }
+.workspace-shell .process-stage.is-now { background: #29223d; border-color: #29223d; color: #fffdf7; }
+.workspace-shell .process-stage-dot { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid #29223d; background: #f3eefe; color: #29223d; font-size: 12px; font-weight: 800; }
+.workspace-shell .process-stage.is-now .process-stage-dot { background: #ffe9a8; }
+
+/* Plain headings on bridged pages (forms, settings, search) need air below. */
+.workspace-shell .legacy-ui .workspace-heading:not(.tool-hero) { margin-bottom: 20px; }
+
+/* Phones: detail and compact faces stack like the full ones. */
+@media (max-width: 720px) {
+  .workspace-shell .detail-hero .tool-hero-panel,
+  .workspace-shell .compact-hero .tool-hero-panel { grid-template-columns: 1fr; padding: 18px 18px 20px; }
+  .workspace-shell .detail-hero .tool-hero-art { width: min(160px, 50%); max-height: 110px; }
+}
+
+/* Phones: a long row of bridged tabs scrolls inside its pill instead of spilling out. */
+@media (max-width: 720px) {
+  .workspace-shell .legacy-ui [data-slot="tabs-list"] { max-width: 100%; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+  .workspace-shell .legacy-ui [data-slot="tabs-trigger"] { flex: 0 0 auto; }
+}
+
+/* Stage pills on detail pages: the current one in ink, upcoming ones readable. */
+.workspace-shell .legacy-ui .stage-now { background: #29223d; color: #fffdf7; border-color: #29223d; }
+.workspace-shell .legacy-ui .stage-upcoming { color: #6b6479; }
+/* Bridged pages: teal text a shade darker, and white text on the strong violet/rose buttons, for contrast. */
+.workspace-shell .legacy-ui .text-cosmic-teal { color: #10626a; }
+.workspace-shell .legacy-ui .bg-cosmic-violet,
+.workspace-shell .legacy-ui .bg-cosmic-rose { color: #fff; }
+.workspace-shell .legacy-ui .text-cosmic-rose { color: #a3283d; }

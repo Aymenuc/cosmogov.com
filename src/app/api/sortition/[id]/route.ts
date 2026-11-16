@@ -29,7 +29,25 @@ export async function GET(
       return NextResponse.json({ error: 'Sortition pool not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ pool });
+    // Volunteering is personal. Organisers see the list; everyone else sees
+    // the group mix (for the balance chart), their own entry and the people
+    // actually picked, never the other volunteers' names.
+    const canManage =
+      pool.createdBy === viewer.id || viewer.role === 'admin' || viewer.role === 'super_admin';
+    const candidates = canManage
+      ? pool.candidates
+      : pool.candidates.map((c) =>
+          c.userId === viewer.id || c.status === 'selected'
+            ? c
+            : {
+                ...c,
+                userId: '',
+                motivation: null,
+                user: { id: '', name: null, avatarUrl: null, ageGroup: c.user.ageGroup },
+              },
+        );
+
+    return NextResponse.json({ pool: { ...pool, candidates }, canManage });
   } catch (error) {
     console.error('Error fetching sortition pool:', error);
     return NextResponse.json({ error: 'Failed to fetch sortition pool' }, { status: 500 });
@@ -52,11 +70,24 @@ export async function PATCH(
     if (!existing) {
       return NextResponse.json({ error: 'Sortition pool not found' }, { status: 404 });
     }
+    // Only the organiser or an admin may change a pool, and the people picked
+    // can only come from the server-side draw (POST /select), never from here.
+    const isAdmin = session.role === 'admin' || session.role === 'super_admin';
+    if (existing.createdBy !== session.id && !isAdmin) {
+      return NextResponse.json({ error: 'Only the organiser can change this pool.' }, { status: 403 });
+    }
+    if (selectedMembers !== undefined) {
+      return NextResponse.json({ error: 'The panel is chosen by the draw, not set by hand.' }, { status: 400 });
+    }
+    // After the draw a panel can start work and later finish; it can't go
+    // back to recruiting (that would allow re-drawing until a result suits).
+    const NEXT: Record<string, string[]> = { selected: ['active', 'completed'], active: ['completed'] };
+    if (status !== undefined && !(NEXT[existing.status] ?? []).includes(status)) {
+      return NextResponse.json({ error: 'That change is not allowed at this stage.' }, { status: 400 });
+    }
 
     const data: Record<string, unknown> = {};
     if (status) data.status = status;
-    if (selectedMembers) data.selectedMembers = JSON.stringify(selectedMembers);
-    if (status === 'selected') data.selectionDate = new Date();
 
     const pool = await db.sortitionPool.update({
       where: { id },

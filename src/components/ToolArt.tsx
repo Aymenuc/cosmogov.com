@@ -23,7 +23,11 @@ export type ToolArtName =
   | "reputation"
   | "activity"
   | "explore"
-  | "government";
+  | "government"
+  | "process"
+  | "debates"
+  | "assistant"
+  | "discussions";
 
 const INK = "#302248";
 const VIOLET = "#6741D9";
@@ -417,6 +421,83 @@ const art: Record<ToolArtName, () => ReactNode> = {
         <path d="M128 22h44a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-26l-10 9v-9h-8a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8Z" fill={MINT} stroke={INK} strokeWidth="2.5" {...line} />
         <path d="M140 40l7 7 13-14" stroke={GREEN} strokeWidth="3.5" fill="none" {...line} />
       </g>
+    </>
+  ),
+  process: () => (
+    <>
+      {/* A winding path with a flag at each stage. */}
+      <path className="tool-art-trace" d="M30 128c30-6 40-22 60-30s52-6 58-26-14-26 4-42" stroke={INK} strokeWidth="10" fill="none" {...line} opacity="0.12" />
+      <path d="M30 128c30-6 40-22 60-30s52-6 58-26-14-26 4-42" stroke={PAPER} strokeWidth="7" fill="none" strokeDasharray="2 9" {...line} />
+      {[
+        [44, 124, CORAL],
+        [92, 96, SUN],
+        [146, 72, MINT],
+        [152, 30, VIOLET],
+      ].map(([x, y, c], i) => (
+        <g key={i} className="tool-art-pop">
+          <path d={`M${x} ${y}v-26`} stroke={INK} strokeWidth="3" {...line} />
+          <path d={`M${x} ${Number(y) - 26}h18l-5 7 5 7h-18Z`} fill={String(c)} stroke={INK} strokeWidth="2.5" {...line} />
+        </g>
+      ))}
+    </>
+  ),
+  debates: () => (
+    <>
+      {/* A round table talk, with a small helper tool lending a hand. */}
+      <ellipse cx="100" cy="104" rx="58" ry="18" fill={SUN} stroke={INK} strokeWidth="3" />
+      <path d="M62 116v14M138 116v14" stroke={INK} strokeWidth="3" {...line} />
+      {[
+        [56, 84, VIOLET, "#D99770"],
+        [100, 76, CORAL, "#8D5A3B"],
+        [144, 84, GREEN, "#F1C27D"],
+      ].map(([x, y, shirt, skin], i) => (
+        <g key={i}>
+          <path d={`M${Number(x) - 14} ${Number(y) + 20}a14 14 0 0 1 28 0Z`} fill={String(shirt)} stroke={INK} strokeWidth="2.5" />
+          <circle cx={Number(x)} cy={Number(y)} r="9" fill={String(skin)} stroke={INK} strokeWidth="2.5" />
+        </g>
+      ))}
+      <g className="tool-art-pop">
+        <path d="M30 26h40a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H48l-8 8v-8h-10a8 8 0 0 1-8-8V34a8 8 0 0 1 8-8Z" fill={PAPER} stroke={INK} strokeWidth="2.5" {...line} />
+        <path d="M34 38h30M34 46h20" stroke={INK} strokeWidth="2.5" {...line} />
+      </g>
+      <g className="tool-art-pop">
+        <path d="M128 22h38a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8h-8v8l-8-8h-22a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8Z" fill={MINT} stroke={INK} strokeWidth="2.5" {...line} />
+        <path d="M133 34h28M133 42h16" stroke={INK} strokeWidth="2.5" {...line} />
+      </g>
+      <g className="tool-art-pop">
+        <circle cx="100" cy="40" r="11" fill={SKY} stroke={INK} strokeWidth="2.5" />
+        <path d="M95 40l4 4 7-8" stroke={INK} strokeWidth="2.5" fill="none" {...line} />
+      </g>
+    </>
+  ),
+  assistant: () => (
+    <>
+      {/* A lightbulb: a little clarity. */}
+      <path d="M100 26c-22 0-38 16-38 36 0 14 8 22 14 30 4 6 6 10 6 16h36c0-6 2-10 6-16 6-8 14-16 14-30 0-20-16-36-38-36Z" fill={SUN} stroke={INK} strokeWidth="3" {...line} />
+      <rect x="82" y="108" width="36" height="8" rx="3" fill={PAPER} stroke={INK} strokeWidth="2.5" />
+      <rect x="85" y="116" width="30" height="8" rx="3" fill={PAPER} stroke={INK} strokeWidth="2.5" />
+      <path d="M92 124h16l-3 6h-10Z" fill={INK} />
+      <path d="M90 92c0-12 4-20 10-28 6 8 10 16 10 28" stroke={INK} strokeWidth="2.5" fill="none" {...line} />
+      <g className="tool-art-pop">
+        <path d="M44 38l-10-6M156 38l10-6M38 66H26M162 66h12M48 92l-8 6M152 92l8 6" stroke={CORAL} strokeWidth="3.5" {...line} />
+      </g>
+      <Sparkle x={140} y={22} s={8} color={VIOLET} />
+    </>
+  ),
+  discussions: () => (
+    <>
+      {/* Neighbours chatting: bubbles going back and forth. */}
+      <g className="tool-art-pop">
+        <path d="M36 30h70a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H62l-14 12V74H36a10 10 0 0 1-10-10V40a10 10 0 0 1 10-10Z" fill={LILAC} stroke={INK} strokeWidth="3" {...line} />
+        <circle cx="52" cy="52" r="4" fill={INK} />
+        <circle cx="70" cy="52" r="4" fill={INK} />
+        <circle cx="88" cy="52" r="4" fill={INK} />
+      </g>
+      <g className="tool-art-pop">
+        <path d="M94 76h70a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10h-12v12l-14-12H94a10 10 0 0 1-10-10V86a10 10 0 0 1 10-10Z" fill={MINT} stroke={INK} strokeWidth="3" {...line} />
+        <path d="M100 92h52M100 102h32" stroke={INK} strokeWidth="3" {...line} />
+      </g>
+      <path d="M150 38c4-6 12-6 14 0 2 6-6 10-14 16-8-6-16-10-14-16 2-6 10-6 14 0Z" fill={CORAL} stroke={INK} strokeWidth="2.5" {...line} />
     </>
   ),
 };

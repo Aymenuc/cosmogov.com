@@ -83,3 +83,44 @@ export function ToolEmpty({ look, children }: { look: ToolArtName; children?: Re
     </div>
   );
 }
+
+/**
+ * Header for one item inside a section (a survey, a draft rule, a community):
+ * the section's colour and drawing, with the item's own title.
+ */
+export function DetailHeading({
+  look,
+  section,
+  title,
+  description,
+  back,
+  meta,
+  children,
+}: {
+  look: ToolArtName;
+  section: string;
+  title: string;
+  description?: string | null;
+  back: { href: string; label: string };
+  meta?: ReactNode;
+  children?: ReactNode;
+}) {
+  const identity = toolLooks[look];
+  return (
+    <header className={`workspace-heading tool-hero detail-hero tint-${identity.tint}`} data-look={look}>
+      <Link href={back.href} className="workspace-back-link">
+        <ArrowLeft size={16} aria-hidden="true" /> {back.label}
+      </Link>
+      <div className="tool-hero-panel">
+        <div className="tool-hero-text">
+          <span className="tool-hero-eyebrow">{section}</span>
+          <h1>{title}</h1>
+          {description && <p>{description}</p>}
+          {meta && <div className="detail-hero-meta">{meta}</div>}
+          {children && <div className="tool-hero-actions">{children}</div>}
+        </div>
+        <ToolArt name={look} className="tool-hero-art" />
+      </div>
+    </header>
+  );
+}
