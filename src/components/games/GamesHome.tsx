@@ -39,8 +39,71 @@ export default function GamesHome({ games }: { games: Card[] }) {
       <WorkspaceHeading
         look="games"
         title="Civic games"
-        description="Six short games that train the skills good community decisions need: weighing trade-offs, finding common ground, reading numbers and spotting weak arguments."
+        description="Play together, laugh at the near misses, and get to know your neighbours. Start with a 3D party round, build your dream street, or try a civic challenge."
       />
+      <Link
+        href="/dashboard/games/block-party"
+        className="gh-feature"
+        style={{ background: "#e9e0fb" }}
+      >
+        <div className="gh-feature-text">
+          <span className="gh-skill">
+            NEW · REAL 3D · 1–2 PLAYERS ON ONE DEVICE
+          </span>
+          <h2>Block Party</h2>
+          <p>
+            Leap between rooftops. Dodge giant sweepers. Bounce a ball into a
+            moving goal. Two neighbours, one score, and 75 seconds of glorious
+            chaos.
+          </p>
+          <span className="gh-play">
+            Let’s play <ArrowRight size={15} />
+          </span>
+        </div>
+        <svg
+          viewBox="0 0 280 200"
+          role="img"
+          aria-label="Colourful rooftop islands with golden rings"
+          style={{ width: "100%", maxWidth: 280, margin: "auto" }}
+        >
+          <ellipse cx="140" cy="177" rx="115" ry="15" fill="#263a4615" />
+          {[
+            [30, 95],
+            [110, 55],
+            [190, 85],
+          ].map(([x, y], i) => (
+            <g key={x}>
+              <path
+                d={`M${x} ${y}l48 -24 37 24 -48 25z`}
+                fill="#fff8e4"
+                stroke="#293c58"
+                strokeWidth="2"
+              />
+              <path
+                d={`M${x} ${y}v42l37 25V${y + 25}z`}
+                fill={i % 2 ? "#a392f2" : "#ff789f"}
+                stroke="#293c58"
+                strokeWidth="2"
+              />
+              <path
+                d={`M${x + 37} ${y + 25}l48 -25v42l-48 25z`}
+                fill="#54dcb1"
+                stroke="#293c58"
+                strokeWidth="2"
+              />
+              <ellipse
+                cx={x + 42}
+                cy={y - 23}
+                rx="10"
+                ry="15"
+                fill="none"
+                stroke="#e7a823"
+                strokeWidth="7"
+              />
+            </g>
+          ))}
+        </svg>
+      </Link>
       <div className="workspace-tool-stats">
         <div className="glass-card">
           <span className="text-xs text-cosmic-muted">Today&apos;s challenges done</span>
