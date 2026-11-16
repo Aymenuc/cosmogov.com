@@ -102,6 +102,10 @@ export default function GamesHome({ games }: { games: Card[] }) {
           ))}
         </svg>
       </Link>
+      <Link href="/dashboard/games/one-more-block" className="gh-feature" style={{ background: '#e8eedb' }}>
+        <div className="gh-feature-text"><span className="gh-skill">NEW · SLIDE, COMBINE, SHARE · TAKE TURNS</span><h2>One More Block</h2><p>A shared neighbourhood puzzle. Combine spaces into something bigger, then decide when to share them. Meet everyone’s needs in 36 turns. Same board, a different plan every time.</p><span className="gh-play">Build our block <ArrowRight size={15} /></span></div>
+        <div aria-hidden="true" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 70px)', gap: 10, transform: 'rotate(-7deg)', margin: 'auto' }}>{[1, 2, 4, 8].map((n,i)=><span key={n} style={{ display: 'grid', placeItems: 'center', height: 70, borderRadius: 12, fontSize: 30, fontWeight: 900, background: ['#f6cda6','#d6ccf2','#bde0c9','#f6cda6'][i], boxShadow: '0 5px 0 #30402a32', border: '1px solid #293b3430' }}>{n}</span>)}</div>
+      </Link>
       <div className="workspace-tool-stats">
         <div className="glass-card">
           <span className="text-xs text-cosmic-muted">Today&apos;s challenges done</span>
