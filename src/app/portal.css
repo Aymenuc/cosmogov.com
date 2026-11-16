@@ -891,3 +891,19 @@ a.sticker-state:hover {
 .workspace-shell .legacy-ui .bg-cosmic-violet,
 .workspace-shell .legacy-ui .bg-cosmic-rose { color: #fff; }
 .workspace-shell .legacy-ui .text-cosmic-rose { color: #a3283d; }
+
+/* Community invites and member management. */
+.workspace-shell .org-invite { margin-top: 18px; }
+.workspace-shell .org-panel h2 { display: flex; align-items: center; gap: 8px; }
+.workspace-shell .org-invite-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.workspace-shell .org-invite-row input { flex: 1 1 280px; min-width: 0; padding: 10px 14px; border: 2px solid #29223d; border-radius: 12px; background: #fff; font: inherit; font-size: 14px; color: #29223d; }
+.workspace-shell .org-invite-actions { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; }
+.workspace-shell .org-text-button { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13.5px; font-weight: 700; color: #4b2fb3; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.workspace-shell .org-text-button.is-danger { color: #a3283d; }
+.workspace-shell .org-text-button:disabled { opacity: 0.55; cursor: default; }
+.workspace-shell .org-row-actions { display: inline-flex; gap: 12px; flex: none; }
+.workspace-shell .org-plain-list { list-style: disc; padding-left: 20px; display: grid; gap: 6px; color: #3d3650; max-height: none; }
+@media (max-width: 520px) {
+  .workspace-shell .org-row { flex-wrap: wrap; }
+  .workspace-shell .org-row-actions { width: 100%; justify-content: flex-end; }
+}

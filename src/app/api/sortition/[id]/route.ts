@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { visiblePools } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -12,8 +13,8 @@ export async function GET(
 
   try {
     const { id } = await params;
-    const pool = await db.sortitionPool.findUnique({
-      where: { id },
+    const pool = await db.sortitionPool.findFirst({
+      where: { AND: [{ id }, await visiblePools(viewer.id)] },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true, role: true } },
         candidates: {

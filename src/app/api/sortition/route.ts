@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { visiblePools } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
@@ -17,12 +18,12 @@ export async function GET(request: NextRequest) {
     if (purpose && purpose !== 'all') where.purpose = purpose;
 
     const pools = await db.sortitionPool.findMany({
-      where,
+      where: { AND: [where, await visiblePools(viewer.id)] },
       orderBy: { createdAt: 'desc' },
       include: {
         creator: { select: { id: true, name: true, avatarUrl: true } },
         candidates: {
-          select: { id: true, status: true, userId: true, demographics: true },
+          select: { id: true, status: true, demographics: true },
         },
       },
     });

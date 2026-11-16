@@ -42,7 +42,6 @@ import Link from 'next/link';
 interface Candidate {
   id: string;
   status: string;
-  userId: string;
   demographics: string;
 }
 
@@ -239,10 +238,12 @@ export default function SortitionPage() {
           {PURPOSE_TABS.map((tab) => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setPurposeFilter(tab.key)}
+              aria-pressed={purposeFilter === tab.key}
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all whitespace-nowrap ${
                 purposeFilter === tab.key
-                  ? 'bg-cosmic-violet/20 text-cosmic-violet border-cosmic-violet/30'
+                  ? 'bg-[#29223d] text-[#fffdf7] border-[#29223d]'
                   : 'bg-foreground/5 text-cosmic-muted border-border hover:text-foreground hover:border-border'
               }`}
             >

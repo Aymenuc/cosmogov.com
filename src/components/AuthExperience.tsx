@@ -255,7 +255,17 @@ export default function AuthExperience({
           </form>
           <p className="auth-switch">
             {signup ? "Already part of the conversation?" : "New to Cosmogov?"}{" "}
-            <Link href={signup ? "/auth/login" : "/auth/signup"}>
+            <Link
+              href={signup ? "/auth/login" : "/auth/signup"}
+              onClick={(e) => {
+                // Keep where the person was heading (an invite link, say) when they switch forms.
+                const next = new URLSearchParams(window.location.search).get("redirect");
+                if (next) {
+                  e.preventDefault();
+                  router.push(`${signup ? "/auth/login" : "/auth/signup"}?redirect=${encodeURIComponent(next)}`);
+                }
+              }}
+            >
               {signup ? "Sign in" : "Join the community"}
               <ArrowUpRight size={12} />
             </Link>

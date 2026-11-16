@@ -43,3 +43,21 @@ export const debateVisibility = (
 export const inVisibleProcess = (userId: string) => ({
   OR: [{ processId: null }, { process: processVisibility(userId) }],
 });
+
+/**
+ * Lottery pools store a processId without a database link to the process,
+ * so the process filter above can't be nested. Look up the processes this
+ * person can't see and leave pools inside them out.
+ */
+export async function visiblePools(
+  userId: string,
+): Promise<Prisma.SortitionPoolWhereInput> {
+  const { db } = await import("./db");
+  const hidden = await db.participatoryProcess.findMany({
+    where: { NOT: processVisibility(userId) },
+    select: { id: true },
+  });
+  return hidden.length
+    ? { OR: [{ processId: null }, { processId: { notIn: hidden.map((p) => p.id) } }] }
+    : {};
+}
