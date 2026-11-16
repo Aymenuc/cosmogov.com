@@ -12,6 +12,8 @@ const ART: Record<GameSlug, ToolArtName> = {
   "signal-detective": "accountability",
   "cognitive-warfare": "legislation",
   "chrono-autopsy": "meetings",
+  "town-planner": "explore",
+  "true-or-not": "surveys",
 };
 
 /** The game's drawing, floating gently in 3D. */

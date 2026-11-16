@@ -25,6 +25,7 @@ model User {
   emailVerifiedAt      DateTime?
   emailVerifications   EmailVerification[]
   streetWish           StreetWish?
+  priorityPick         PriorityPick?
   sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
@@ -1303,4 +1304,36 @@ model StreetWish {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([cityName])
+}
+
+/// My top three: a person's three neighbourhood priorities, in order. Shown to others only as totals.
+model PriorityPick {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  picks     String   // JSON array of 3 priority ids, first = most important
+  cityName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([cityName])
+}
+
+/// A council room: up to four neighbours play "A year at the town hall" together, one per resident group.
+model CouncilRoom {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  seed      Int
+  hostId    String
+  status    String   @default("lobby") // lobby, playing, done
+  players   String   @default("[]") // JSON [{ userId, name, group }]
+  decisions String   @default("[]") // JSON [{ choice, asked }]
+  reactions String   @default("{}") // JSON { month: { userId: { option: "good"|"ok"|"bad" } } }
+  votes     String   @default("{}") // JSON { month: { userId: option } }
+  version   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt])
 }

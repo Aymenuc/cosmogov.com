@@ -1,6 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { sessionSecret } from "@/lib/session-token";
-import type { GameSlug } from "./catalogue";
 
 /**
  * A run is described by a signed token (who, which game, which seed, when),
@@ -9,13 +8,13 @@ import type { GameSlug } from "./catalogue";
  */
 export interface RunClaims {
   u: string; // user id
-  g: GameSlug;
+  g: string; // game slug
   s: number; // seed
   d: 0 | 1; // daily challenge?
   t: number; // started at (ms)
 }
 
-const MAX_AGE_MS = 2 * 60 * 60 * 1000;
+const MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
 function sign(body: string) {
   return createHmac("sha256", `games:${sessionSecret()}`).update(body).digest("base64url");

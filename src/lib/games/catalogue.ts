@@ -6,6 +6,7 @@
 import { rng, seedFrom, type Rng } from "./rng";
 import { TRAPS } from "./thinking-traps";
 import { STORIES } from "./turning-points";
+import { CLAIMS } from "./true-or-not";
 
 export type GameSlug =
   | "cognitive-warfare"
@@ -13,7 +14,9 @@ export type GameSlug =
   | "strategic-command"
   | "chrono-autopsy"
   | "oracle-protocol"
-  | "neural-consensus";
+  | "neural-consensus"
+  | "town-planner"
+  | "true-or-not";
 
 /** What the browser sees for one round. */
 export type PublicRound =
@@ -21,7 +24,9 @@ export type PublicRound =
   | { kind: "timeline"; prompt: string; context: string; events: string[] }
   | { kind: "allocate"; prompt: string; budget: number; areas: string[]; projects: { id: string; name: string; area: string; cost: number; helps: number }[] }
   | { kind: "estimate"; prompt: string; sample: boolean[]; townSize: number }
-  | { kind: "residents"; prompt: string; residents: { name: string; wants: string; refuses: string }[]; options: { label: string; features: string[] }[] };
+  | { kind: "residents"; prompt: string; residents: { name: string; wants: string; refuses: string }[]; options: { label: string; features: string[] }[] }
+  | { kind: "grid"; prompt: string; size: number; homes: string[]; blocked: string[]; place: number; reach: number; facility: string; facilities: string }
+  | { kind: "swipe"; prompt: string; statement: string; options: [string, string] };
 
 export type Answer = number | string[] | { value: number; low: number; high: number };
 
@@ -306,6 +311,96 @@ function commonGround(r: Rng): BuiltRound[] {
   return rounds;
 }
 
+/* ── 7. Town planner ───────────────────────────────────────────── */
+const FACILITIES = ["school", "health clinic", "bus stop", "library", "playground"];
+const PLURAL: Record<string, string> = {
+  school: "schools",
+  "health clinic": "health clinics",
+  "bus stop": "bus stops",
+  library: "libraries",
+  playground: "playgrounds",
+};
+function townPlanner(r: Rng): BuiltRound[] {
+  const plan = [
+    { place: 2, reach: 2 },
+    { place: 3, reach: 2 },
+    { place: 3, reach: 1 },
+  ];
+  const size = 8;
+  const cell = (row: number, col: number) => `${row}-${col}`;
+  const dist = (a: string, b: string) => {
+    const [ar, ac] = a.split("-").map(Number);
+    const [br, bc] = b.split("-").map(Number);
+    return Math.abs(ar - br) + Math.abs(ac - bc);
+  };
+  return plan.map(({ place, reach }) => {
+    const all = Array.from({ length: size * size }, (_, i) => cell(Math.floor(i / size), i % size));
+    const shuffled = r.shuffle(all);
+    const blocked = shuffled.slice(0, 7);
+    const homes = shuffled.slice(7, 7 + r.int(16, 22));
+    const free = all.filter((c) => !blocked.includes(c) && !homes.includes(c));
+    const covered = (spots: string[]) => homes.filter((h) => spots.some((s) => dist(h, s) <= reach)).length;
+    let best = 0;
+    let bestSpots: string[] = [];
+    const pick = (start: number, chosen: string[]) => {
+      if (chosen.length === place) {
+        const c = covered(chosen);
+        if (c > best) {
+          best = c;
+          bestSpots = [...chosen];
+        }
+        return;
+      }
+      for (let i = start; i < free.length; i++) pick(i + 1, [...chosen, free[i]]);
+    };
+    pick(0, []);
+    const facility = r.pick(FACILITIES);
+    return {
+      public: {
+        kind: "grid",
+        prompt: `Place ${place} ${place > 1 ? PLURAL[facility] : facility} so as many homes as possible are within ${reach} ${reach === 1 ? "block's" : "blocks'"} walk.`,
+        size,
+        homes,
+        blocked,
+        place,
+        reach,
+        facility,
+        facilities: PLURAL[facility],
+      },
+      check: (a) => {
+        const spots = (Array.isArray(a) ? a : []).filter((x): x is string => typeof x === "string" && free.includes(x)).slice(0, place);
+        const got = covered(spots);
+        const points = best ? Math.round((got / best) * 100) : 0;
+        return {
+          points,
+          correct: points === 100,
+          headline: points === 100 ? `Perfect: ${got} of ${homes.length} homes reached` : `${got} homes reached; the best layout reaches ${best}`,
+          explanation: "Services work best where most people can walk to them. Spreading them out usually reaches more homes than clustering them together.",
+          extra: points === 100 ? undefined : `One best layout: ${bestSpots.map((c) => { const [row, col] = c.split("-").map(Number); return `row ${row + 1}, column ${col + 1}`; }).join("; ")}.`,
+        };
+      },
+    };
+  });
+}
+
+/* ── 8. True or not? ───────────────────────────────────────────── */
+function trueOrNot(r: Rng): BuiltRound[] {
+  return r.shuffle(CLAIMS).slice(0, 8).map((c) => ({
+    public: { kind: "swipe", prompt: "True or not?", statement: c.text, options: ["Not true", "True"] },
+    check: (a) => {
+      const answerIndex = c.truth ? 1 : 0;
+      const correct = a === answerIndex;
+      return {
+        points: correct ? 100 : 0,
+        correct,
+        answerIndex,
+        headline: correct ? (c.truth ? "Right, it's true" : "Right, it's not true") : c.truth ? "Actually, it's true" : "Actually, it's not true",
+        explanation: c.why,
+      };
+    },
+  }));
+}
+
 export const GAMES: Record<GameSlug, GameInfo> = {
   "cognitive-warfare": {
     slug: "cognitive-warfare",
@@ -373,9 +468,33 @@ export const GAMES: Record<GameSlug, GameInfo> = {
     rounds: 4,
     build: commonGround,
   },
+  "town-planner": {
+    slug: "town-planner",
+    name: "Town planner",
+    tagline: "Put services where people can walk to them",
+    skill: "Planning",
+    how: "Tap the map to place services. Rings show how far people will walk. Reach as many homes as you can, then compare with the best layout.",
+    learn: "Why the location of services matters as much as having them: the idea behind the 15-minute town.",
+    apply: { href: "/dashboard/cosmic-map", label: "Look at your community map" },
+    rounds: 3,
+    build: townPlanner,
+  },
+  "true-or-not": {
+    slug: "true-or-not",
+    name: "True or not?",
+    tagline: "Swipe your way through how participation works",
+    skill: "Civic know-how",
+    how: "Swipe right if a statement is true, left if it isn't, or use the buttons. Each card explains the answer.",
+    learn: "How samples, petitions, assemblies and fair questions really work, so you can judge any consultation.",
+    apply: { href: "/dashboard/participation", label: "Explore the ways to take part" },
+    rounds: 8,
+    build: trueOrNot,
+  },
 };
 
 export const GAME_ORDER: GameSlug[] = [
+  "town-planner",
+  "true-or-not",
   "strategic-command",
   "neural-consensus",
   "oracle-protocol",

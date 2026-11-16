@@ -346,6 +346,102 @@ function ResidentsBoard({ round, picked, setPicked, feedback }: { round: Extract
   );
 }
 
+function GridBoard({ round, spots, setSpots, feedback }: { round: Extract<PublicRound, { kind: "grid" }>; spots: string[]; setSpots: (s: string[]) => void; feedback: Feedback | null }) {
+  const reduce = useReducedMotion();
+  const dist = (a: string, b: string) => {
+    const [ar, ac] = a.split("-").map(Number);
+    const [br, bc] = b.split("-").map(Number);
+    return Math.abs(ar - br) + Math.abs(ac - bc);
+  };
+  const reached = new Set(round.homes.filter((h) => spots.some((sp) => dist(h, sp) <= round.reach)));
+  const cells = Array.from({ length: round.size * round.size }, (_, i) => `${Math.floor(i / round.size)}-${i % round.size}`);
+  const toggle = (c: string) => {
+    if (feedback || round.homes.includes(c) || round.blocked.includes(c)) return;
+    if (spots.includes(c)) setSpots(spots.filter((x) => x !== c));
+    else if (spots.length < round.place) setSpots([...spots, c]);
+    else setSpots([...spots.slice(1), c]);
+  };
+  return (
+    <div className="gp-board">
+      <div className="gp-town-stats">
+        <span><strong>{reached.size}</strong> of {round.homes.length} homes within reach</span>
+        <span>{spots.length} of {round.place} {round.place > 1 ? round.facilities : round.facility} placed</span>
+      </div>
+      <div className="gp-town-wrap">
+        <motion.div
+          className="gp-town"
+          style={{ gridTemplateColumns: `repeat(${round.size}, 1fr)` }}
+          initial={reduce ? false : { rotateX: 0, rotateZ: 0, opacity: 0 }}
+          animate={{ rotateX: 52, rotateZ: -38, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 50, damping: 14 }}
+        >
+          {cells.map((c) => {
+            const home = round.homes.includes(c);
+            const water = round.blocked.includes(c);
+            const spot = spots.includes(c);
+            const near = !home && !water && !spot && spots.some((sp) => dist(c, sp) <= round.reach);
+            return (
+              <button
+                key={c}
+                type="button"
+                className={`gp-tile${home ? " home" : ""}${water ? " water" : ""}${spot ? " spot" : ""}${near ? " near" : ""}${home && reached.has(c) ? " reached" : ""}`}
+                onClick={() => toggle(c)}
+                disabled={Boolean(feedback) || home || water}
+                aria-label={home ? (reached.has(c) ? "Home, within reach" : "Home") : water ? "Park or water" : spot ? `Remove ${round.facility}` : `Place ${round.facility} here`}
+              >
+                {home && <span className="gp-house" />}
+                {spot && <span className="gp-building" />}
+              </button>
+            );
+          })}
+        </motion.div>
+      </div>
+      <p className="gp-small">Tap an empty square to place, tap again to remove. Shaded squares are within {round.reach} {round.reach === 1 ? "block" : "blocks"}.</p>
+    </div>
+  );
+}
+
+function SwipeBoard({ round, onAnswer, feedback, picked }: { round: Extract<PublicRound, { kind: "swipe" }>; onAnswer: (i: number) => void; feedback: Feedback | null; picked: number | null }) {
+  const [dx, setDx] = useState(0);
+  const verdict = feedback ? (feedback.correct ? "right" : "wrong") : "";
+  return (
+    <div className="gp-board gp-swipe">
+      <div className="gp-swipe-stack">
+        <span className="gp-swipe-shadow two" aria-hidden="true" />
+        <span className="gp-swipe-shadow one" aria-hidden="true" />
+        <motion.div
+          className={`gp-swipe-card ${verdict}`}
+          drag={feedback ? false : "x"}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.9}
+          onDrag={(_, info) => setDx(info.offset.x)}
+          onDragEnd={(_, info) => {
+            setDx(0);
+            if (info.offset.x > 110) onAnswer(1);
+            else if (info.offset.x < -110) onAnswer(0);
+          }}
+          style={{ rotate: dx / 18 }}
+          initial={{ y: 40, opacity: 0, rotateX: 25 }}
+          animate={feedback ? { x: picked === 1 ? 26 : -26, rotate: picked === 1 ? 4 : -4, y: 0, opacity: 1, rotateX: 0 } : { y: 0, opacity: 1, rotateX: 0 }}
+        >
+          <span className="gp-swipe-hint left" style={{ opacity: Math.max(0, -dx / 120) }}>Not true</span>
+          <span className="gp-swipe-hint right" style={{ opacity: Math.max(0, dx / 120) }}>True</span>
+          <p>{round.statement}</p>
+          {feedback && <span className="gp-swipe-stamp">{feedback.answerIndex === 1 ? "TRUE" : "NOT TRUE"}</span>}
+        </motion.div>
+      </div>
+      <div className="gp-swipe-buttons">
+        <button type="button" className="gp-option" disabled={Boolean(feedback)} onClick={() => onAnswer(0)}>
+          <span className="gp-key"><X size={16} /></span> Not true
+        </button>
+        <button type="button" className="gp-option" disabled={Boolean(feedback)} onClick={() => onAnswer(1)}>
+          <span className="gp-key"><Check size={16} /></span> True
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── The player ─────────────────────────────────────────────────── */
 
 export default function GamePlayer({ meta }: { meta: GameMeta }) {
@@ -357,6 +453,7 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [picked, setPicked] = useState<number | null>(null);
   const [chosen, setChosen] = useState<string[]>([]);
+  const [spots, setSpots] = useState<string[]>([]);
   const [guess, setGuess] = useState({ value: 50, spread: 15 });
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [score, setScore] = useState(0);
@@ -390,6 +487,7 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
         setFeedback(null);
         setPicked(null);
         setChosen([]);
+        setSpots([]);
         setGuess({ value: 50, spread: 15 });
         setResult(null);
         setPhase("playing");
@@ -404,12 +502,13 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
   const currentAnswer = (): Answer | null => {
     if (!round) return null;
     if (round.kind === "allocate") return chosen;
+    if (round.kind === "grid") return spots;
     if (round.kind === "estimate") return { value: guess.value, low: Math.max(0, guess.value - guess.spread), high: Math.min(100, guess.value + guess.spread) };
     return picked;
   };
 
-  const submit = async () => {
-    const answer = currentAnswer();
+  const submit = async (override?: Answer) => {
+    const answer = override ?? currentAnswer();
     if (answer === null || busy) return;
     setBusy(true);
     setError("");
@@ -439,6 +538,7 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
       setFeedback(null);
       setPicked(null);
       setChosen([]);
+      setSpots([]);
       setGuess({ value: 50, spread: 15 });
       return;
     }
@@ -466,6 +566,12 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === "INPUT") return;
       const n = Number(e.key);
+      if (!feedback && round?.kind === "swipe" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        const i = e.key === "ArrowRight" ? 1 : 0;
+        setPicked(i);
+        submit(i);
+        return;
+      }
       if (!feedback && n >= 1 && n <= 8 && round && (round.kind === "choice" || round.kind === "timeline" || round.kind === "residents")) {
         const max = round.kind === "timeline" ? round.events.length : round.options.length;
         if (n <= max) setPicked(n - 1);
@@ -473,14 +579,14 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
       if (e.key === "Enter") {
         e.preventDefault();
         if (feedback) next();
-        else submit();
+        else if (round?.kind !== "swipe") submit();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const ready = round ? (round.kind === "allocate" ? chosen.length > 0 : round.kind === "estimate" ? true : picked !== null) : false;
+  const ready = round ? (round.kind === "allocate" ? chosen.length > 0 : round.kind === "grid" ? spots.length === round.place : round.kind === "estimate" ? true : picked !== null) : false;
   const stars = result ? (result.accuracy >= 0.85 ? 3 : result.accuracy >= 0.6 ? 2 : result.accuracy >= 0.3 ? 1 : 0) : 0;
 
   return (
@@ -548,6 +654,19 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
             {round.kind === "allocate" && <AllocateBoard round={round} chosen={chosen} setChosen={setChosen} feedback={feedback} />}
             {round.kind === "estimate" && <EstimateBoard round={round} guess={guess} setGuess={setGuess} feedback={feedback} />}
             {round.kind === "residents" && <ResidentsBoard round={round} picked={picked} setPicked={setPicked} feedback={feedback} />}
+            {round.kind === "grid" && <GridBoard round={round} spots={spots} setSpots={setSpots} feedback={feedback} />}
+            {round.kind === "swipe" && (
+              <SwipeBoard
+                round={round}
+                picked={picked}
+                feedback={feedback}
+                onAnswer={(i) => {
+                  if (feedback || busy) return;
+                  setPicked(i);
+                  submit(i);
+                }}
+              />
+            )}
 
             {error && <p role="alert" className="form-error">{error}</p>}
 
@@ -566,9 +685,9 @@ export default function GamePlayer({ meta }: { meta: GameMeta }) {
 
             <div className="gp-actions">
               {!feedback ? (
-                <button className="civic-button" onClick={submit} disabled={!ready || busy}>
+                <button className="civic-button" onClick={() => submit()} disabled={!ready || busy}>
                   {busy ? <Loader2 size={16} className="animate-spin" /> : null}
-                  {round.kind === "allocate" ? "Fund this plan" : round.kind === "estimate" ? "Lock in my guess" : "Check"}
+                  {round.kind === "allocate" ? "Fund this plan" : round.kind === "grid" ? "Build here" : round.kind === "estimate" ? "Lock in my guess" : "Check"}
                 </button>
               ) : (
                 <button className="civic-button" onClick={next} disabled={busy}>

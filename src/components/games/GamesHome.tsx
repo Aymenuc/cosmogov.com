@@ -21,7 +21,7 @@ interface Overview {
   xp: number;
   plays: number;
 }
-const TINTS = ["mint", "lilac", "sun", "sky", "peach", "mint"];
+const TINTS = ["sun", "lilac", "mint", "sky", "peach", "mint", "lilac", "sun"];
 
 /** The games shelf: today's challenges, personal bests and a card per game. */
 export default function GamesHome({ games }: { games: Card[] }) {
@@ -39,7 +39,7 @@ export default function GamesHome({ games }: { games: Card[] }) {
       <WorkspaceHeading
         look="games"
         title="Civic games"
-        description="Play together, laugh at the near misses, and get to know your neighbours. Start with a 3D party round, build your dream street, or try a civic challenge."
+        description="Play together, laugh at the near misses and get to know your neighbours. Run the town for a year, throw a 3D block party, build your dream street, or sharpen the skills good community decisions need."
       />
       <Link
         href="/dashboard/games/block-party"
@@ -120,6 +120,19 @@ export default function GamesHome({ games }: { games: Card[] }) {
           <p className="font-heading text-2xl font-bold">{data?.xp ?? 0}</p>
         </div>
       </div>
+      <Link href="/dashboard/games/town-hall" className="gh-feature th-feature">
+        <div className="gh-feature-text">
+          <span className="gh-skill">Strategy · solo or with neighbours</span>
+          <h2>A year at the town hall</h2>
+          <p>Run a town for twelve months of real dilemmas. Balance money, trust and nature, and keep every group of residents on side. Play alone, or open a council and decide together with up to three neighbours.</p>
+          <span className="gh-play">Take office <ArrowRight size={15} /></span>
+        </div>
+        <div className="gh-feature-icons" aria-hidden="true">
+          {["🏛️", "👪", "🧓", "🛹", "🛍️", "🌳"].map((e, i) => (
+            <motion.span key={e} initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 + i * 0.08, type: "spring", stiffness: 220, damping: 12 }} style={{ fontSize: 34 }}>{e}</motion.span>
+          ))}
+        </div>
+      </Link>
       <Link href="/dashboard/games/dream-street" className="gh-feature">
         <div className="gh-feature-text">
           <span className="gh-skill">Have your say</span>
@@ -132,6 +145,19 @@ export default function GamesHome({ games }: { games: Card[] }) {
             <motion.span key={id} initial={{ y: -40, opacity: 0, rotate: -10 }} animate={{ y: 0, opacity: 1, rotate: 0 }} transition={{ delay: 0.15 + i * 0.08, type: "spring", stiffness: 220, damping: 12 }}>
               <StreetIcon id={id} size={64} />
             </motion.span>
+          ))}
+        </div>
+      </Link>
+      <Link href="/dashboard/games/top-three" className="gh-feature tt-feature">
+        <div className="gh-feature-text">
+          <span className="gh-skill">Have your say</span>
+          <h2>My top three</h2>
+          <p>Put your neighbourhood&apos;s three biggest priorities on a podium and see what everyone else chose.</p>
+          <span className="gh-play">Choose my three <ArrowRight size={15} /></span>
+        </div>
+        <div className="gh-feature-icons" aria-hidden="true">
+          {["🌳", "🚌", "🏠", "🛹", "🫖", "🎭"].map((e, i) => (
+            <motion.span key={e} initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 + i * 0.08, type: "spring", stiffness: 220, damping: 12 }} style={{ fontSize: 34 }}>{e}</motion.span>
           ))}
         </div>
       </Link>
