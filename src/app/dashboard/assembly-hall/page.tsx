@@ -1,1891 +1,284 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import WorkspaceHeading from '@/components/WorkspaceHeading';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Shield, Star, Brain, Handshake, Globe, Accessibility,
-  Rocket, Sparkles, Users, MessageSquare, Plus, Send,
-  Hand, Vote, Loader2, ChevronRight, X, Eye,
-  ArrowUpRight, Circle, Zap, Waves, Activity,
-  Languages, BookOpen, Maximize2, Minimize2,
-} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ArrowUpRight, Loader2, MessageSquare, Rocket, Users, X } from 'lucide-react';
+import WorkspaceHeading, { ToolEmpty } from '@/components/WorkspaceHeading';
+import DebateRoom, { type RoomDebate } from '@/components/debate/DebateRoom';
+import HelperBadge from '@/components/helpers/HelperBadge';
+import { HELPER_INFO } from '@/components/helpers/helper-info';
+import { HELPER_TYPES } from '@/lib/helper-languages';
 
-/* ═══════════════════════════════════════════
-   Types
-   ═══════════════════════════════════════════ */
-
-interface AvatarConfig {
-  primaryColor: string;
-  secondaryColor: string;
-  shape: string;
-  glowColor: string;
-  particleEffect: string;
-}
-
-interface Agent {
-  id: string;
-  type: string;
-  name: string;
-  description: string;
-  personality: string;
-  capabilities: string;
-  avatarConfig: string;
-  systemPrompt: string;
-  isActive: boolean;
-}
-
-interface DebateParticipant {
-  id: string;
-  displayName: string;
-  role: string;
-  agentType: string | null;
-  stance: string;
-  avatarUrl: string | null;
-  handRaised?: boolean;
-  speaking?: boolean;
-}
-
-interface DebateMessage {
-  id: string;
-  content: string;
-  type: string;
-  agentType: string | null;
-  sentiment: string;
-  simplifiedContent?: string | null;
-  translatedContent?: string | null;
-  targetLang?: string | null;
-  isPinned?: boolean;
-  createdAt: string;
-  participant?: {
-    id: string;
-    displayName: string;
-    role: string;
-    agentType: string | null;
-  } | null;
-  user?: {
-    id: string;
-    name: string;
-    avatarUrl: string | null;
-  } | null;
-}
-
-interface DebateSession {
-  id: string;
-  title: string;
-  description?: string | null;
-  topic: string;
+interface DebateSummary extends RoomDebate {
   status: string;
-  phase: string;
-  maxParticipants: number;
-  participantCount: number;
-  isPublic: boolean;
-  consensusLevel: number;
-  energyLevel: number;
-  aiAgentsActive: string;
-  summary?: string | null;
-  consensusReport?: string | null;
-  createdBy: string;
-  creator?: { id: string; name: string; email: string; avatarUrl: string | null } | null;
-  participants: DebateParticipant[];
-  messages: DebateMessage[];
-  _count?: { messages: number };
   createdAt: string;
-  updatedAt: string;
+  participants?: { role: string }[];
+  _count?: { messages: number };
 }
 
-/* ═══════════════════════════════════════════
-   Constants & Maps
-   ═══════════════════════════════════════════ */
-
-const AGENT_COLORS: Record<string, { primary: string; secondary: string; glow: string }> = {
-  moderator: { primary: '#6366f1', secondary: '#818cf8', glow: 'rgba(99,102,241,0.4)' },
-  facilitator: { primary: '#f59e0b', secondary: '#fbbf24', glow: 'rgba(245,158,11,0.4)' },
-  summarizer: { primary: '#8b5cf6', secondary: '#a78bfa', glow: 'rgba(139,92,246,0.4)' },
-  consensus: { primary: '#10b981', secondary: '#34d399', glow: 'rgba(16,185,129,0.4)' },
-  translator: { primary: '#06b6d4', secondary: '#22d3ee', glow: 'rgba(6,182,212,0.4)' },
-  accessibility: { primary: '#ec4899', secondary: '#f472b6', glow: 'rgba(236,72,153,0.4)' },
-};
-
-const AGENT_ICONS: Record<string, typeof Shield> = {
-  moderator: Shield,
-  facilitator: Star,
-  summarizer: Brain,
-  consensus: Handshake,
-  translator: Globe,
-  accessibility: Accessibility,
-};
-
-// What each helper does, shown under its name.
-const AGENT_ROLES: Record<string, string> = {
-  moderator: 'Keeps it civil',
-  facilitator: 'Welcomes newcomers',
-  summarizer: 'Sums up',
-  consensus: 'Finds common ground',
-  translator: 'Translates',
-  accessibility: 'Plain language',
-};
-
-const AGENT_LABELS: Record<string, string> = {
-  moderator: 'Nexus',
-  facilitator: 'Lumen',
-  summarizer: 'Synthesis',
-  consensus: 'Concord',
-  translator: 'Babel',
-  accessibility: 'Aegis',
-};
-
-const PHASE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  opening: { label: 'Opening', color: 'text-cosmic-accent', bg: 'bg-cosmic-accent/10 border-cosmic-accent/20' },
-  debate: { label: 'Debate', color: 'text-cosmic-amber', bg: 'bg-cosmic-amber/10 border-cosmic-amber/20' },
-  deliberation: { label: 'Deliberation', color: 'text-cosmic-violet', bg: 'bg-cosmic-violet/10 border-cosmic-violet/20' },
-  consensus: { label: 'Consensus', color: 'text-cosmic-success', bg: 'bg-cosmic-success/10 border-cosmic-success/20' },
-  closing: { label: 'Closing', color: 'text-cosmic-muted', bg: 'bg-foreground/5 border-border' },
-};
-
-/* ═══════════════════════════════════════════
-   Utility Functions
-   ═══════════════════════════════════════════ */
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 10) return 'just now';
-  if (seconds < 60) return `${seconds}s ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+function timeAgo(iso: string) {
+  const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} h ago`;
+  const days = Math.round(hours / 24);
+  return days === 1 ? 'yesterday' : `${days} days ago`;
 }
 
-function parseAgentConfig(agent: Agent): AvatarConfig {
-  try {
-    return JSON.parse(agent.avatarConfig);
-  } catch {
-    return { primaryColor: '#6366f1', secondaryColor: '#818cf8', shape: 'default', glowColor: 'rgba(99,102,241,0.4)', particleEffect: 'default' };
-  }
-}
-
-/* ═══════════════════════════════════════════
-   Canvas Drawing Functions
-   ═══════════════════════════════════════════ */
-
-interface Star {
-  x: number; y: number; size: number; speed: number; brightness: number;
-}
-
-interface SpeechBubble {
-  x: number; y: number; text: string; opacity: number; createdAt: number; color: string;
-}
-
-function drawStars(ctx: CanvasRenderingContext2D, stars: Star[], time: number, w: number, h: number) {
-  for (const star of stars) {
-    const twinkle = 0.5 + 0.5 * Math.sin(time * 0.001 * star.speed * 5000 + star.x * 100);
-    const alpha = star.brightness * twinkle;
-    const sx = ((star.x + time * star.speed * 0.02) % 1) * w;
-    const sy = star.y * h;
-    ctx.beginPath();
-    ctx.arc(sx, sy, star.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(200, 220, 255, ${alpha})`;
-    ctx.fill();
-  }
-}
-
-function drawEnergyAura(ctx: CanvasRenderingContext2D, energyLevel: number, w: number, h: number, time: number) {
-  const cx = w / 2;
-  const cy = h / 2;
-  const maxR = Math.max(w, h) * 0.6;
-
-  // Calmer = deep blue, heated = purple/red
-  const r = Math.round(20 + energyLevel * 80);
-  const g = Math.round(10 + (1 - energyLevel) * 30);
-  const b = Math.round(60 + (1 - energyLevel) * 60);
-
-  const pulse = 1 + 0.05 * Math.sin(time * 0.001);
-  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * pulse);
-  grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.12)`);
-  grad.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.05)`);
-  grad.addColorStop(1, 'transparent');
-
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-}
-
-function drawTopicStar(ctx: CanvasRenderingContext2D, topic: string, consensusLevel: number, time: number, cx: number, cy: number, scaleFactor: number = 1) {
-  const baseR = 40 * scaleFactor;
-  const pulse = 1 + 0.08 * Math.sin(time * 0.002);
-  const r = baseR * pulse;
-
-  // Outer glow
-  const outerGrad = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 3);
-  const hue = consensusLevel > 0.6 ? '52, 211, 153' : consensusLevel > 0.3 ? '45, 107, 255' : '155, 92, 255';
-  outerGrad.addColorStop(0, `rgba(${hue}, 0.25)`);
-  outerGrad.addColorStop(0.4, `rgba(${hue}, 0.08)`);
-  outerGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = outerGrad;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r * 3, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Inner star glow
-  const innerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  innerGrad.addColorStop(0, `rgba(255, 255, 255, 0.9)`);
-  innerGrad.addColorStop(0.3, `rgba(${hue}, 0.6)`);
-  innerGrad.addColorStop(0.7, `rgba(${hue}, 0.2)`);
-  innerGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = innerGrad;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Orbital rings around topic
-  ctx.strokeStyle = `rgba(${hue}, 0.15)`;
-  ctx.lineWidth = 1;
-  for (let i = 1; i <= 3; i++) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, r * (1.5 + i * 0.8), 0, Math.PI * 2);
-    ctx.stroke();
-  }
-
-  // Topic text
-  ctx.fillStyle = '#fff';
-  ctx.font = `bold ${Math.round(11 * scaleFactor)}px "Space Grotesk", system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const maxChars = 18;
-  const displayTopic = topic.length > maxChars ? topic.slice(0, maxChars) + '...' : topic;
-  ctx.fillText(displayTopic, cx, cy);
-
-  // Consensus percentage
-  ctx.font = `${Math.round(9 * scaleFactor)}px "Inter", system-ui, sans-serif`;
-  ctx.fillStyle = `rgba(${hue}, 0.9)`;
-  ctx.fillText(`${Math.round(consensusLevel * 100)}% consensus`, cx, cy + r + 16 * scaleFactor);
-}
-
-function drawParticipant(
-  ctx: CanvasRenderingContext2D,
-  participant: DebateParticipant & { index: number; total: number },
-  time: number,
-  cx: number,
-  cy: number,
-  isSpeaking: boolean,
-  scaleFactor: number = 1
-) {
-  const { index, total, stance, displayName } = participant;
-  const angle = (index / Math.max(total, 1)) * Math.PI * 2 + time * 0.0003;
-  const stanceRadius = (stance === 'support' ? 100 : stance === 'oppose' ? 160 : 130) * scaleFactor;
-  const orbitR = stanceRadius + Math.sin(time * 0.001 + index) * 8 * scaleFactor;
-  const x = cx + Math.cos(angle) * orbitR;
-  const y = cy + Math.sin(angle) * orbitR;
-  const avatarR = (isSpeaking ? 18 : 14) * scaleFactor;
-
-  // Stance-based color
-  const stanceColors: Record<string, string> = {
-    support: '#34d399',
-    oppose: '#f87171',
-    neutral: '#94a3b8',
-    unsure: '#fbbf24',
-  };
-  const color = stanceColors[stance] || stanceColors.neutral;
-
-  // Speaking glow
-  if (isSpeaking) {
-    const glowGrad = ctx.createRadialGradient(x, y, avatarR * 0.5, x, y, avatarR * 3);
-    glowGrad.addColorStop(0, `${color}40`);
-    glowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGrad;
-    ctx.beginPath();
-    ctx.arc(x, y, avatarR * 3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Avatar circle with ring
-  ctx.beginPath();
-  ctx.arc(x, y, avatarR, 0, Math.PI * 2);
-  ctx.fillStyle = `${color}20`;
-  ctx.fill();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = isSpeaking ? 2.5 : 1.5;
-  ctx.stroke();
-
-  // Initial letter
-  const initial = (displayName || '?')[0].toUpperCase();
-  ctx.fillStyle = color;
-  ctx.font = `bold ${Math.max(8, Math.round(avatarR * 0.9))}px "Space Grotesk", system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(initial, x, y);
-
-  // Name label
-  ctx.font = `${Math.max(6, Math.round(8 * scaleFactor))}px "Inter", system-ui, sans-serif`;
-  ctx.fillStyle = 'rgba(200, 215, 255, 0.7)';
-  ctx.fillText(displayName.length > 10 ? displayName.slice(0, 10) + '..' : displayName, x, y + avatarR + 10 * scaleFactor);
-
-  return { x, y };
-}
-
-function drawAIAgent(
-  ctx: CanvasRenderingContext2D,
-  agentType: string,
-  index: number,
-  time: number,
-  w: number,
-  h: number,
-  cx: number,
-  cy: number,
-  isSpeaking: boolean,
-  scaleFactor: number = 1
-) {
-  const colors = AGENT_COLORS[agentType] || AGENT_COLORS.moderator;
-  const agentAngle = (index / 6) * Math.PI * 2 - Math.PI / 2;
-  const agentOrbitR = Math.min(w, h) * 0.38;
-  const drift = Math.sin(time * 0.0005 + index * 1.5) * 12;
-  const x = cx + Math.cos(agentAngle) * agentOrbitR + drift * 0.3;
-  const y = cy + Math.sin(agentAngle) * agentOrbitR + drift * 0.2;
-  const size = (isSpeaking ? 28 : 22) * scaleFactor;
-  const pulse = isSpeaking ? 1 + 0.15 * Math.sin(time * 0.005) : 1;
-
-  // Outer glow
-  const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 2.5 * pulse);
-  glowGrad.addColorStop(0, `${colors.primary}30`);
-  glowGrad.addColorStop(0.5, `${colors.primary}10`);
-  glowGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = glowGrad;
-  ctx.beginPath();
-  ctx.arc(x, y, size * 2.5 * pulse, 0, Math.PI * 2);
-  ctx.fill();
-
-  switch (agentType) {
-    case 'moderator': {
-      // Hexagonal shape
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2 - Math.PI / 2 + time * 0.0002;
-        const px = x + Math.cos(a) * size * pulse;
-        const py = y + Math.sin(a) * size * pulse;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.fillStyle = `${colors.primary}25`;
-      ctx.fill();
-      ctx.strokeStyle = colors.primary;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Inner hex
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2 + time * 0.0003;
-        const px = x + Math.cos(a) * size * 0.6 * pulse;
-        const py = y + Math.sin(a) * size * 0.6 * pulse;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = `${colors.secondary}60`;
-      ctx.lineWidth = 0.8;
-      ctx.setLineDash([3, 3]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Orbital dot
-      const orbAngle = time * 0.003;
-      ctx.beginPath();
-      ctx.arc(x + Math.cos(orbAngle) * size * 1.3, y + Math.sin(orbAngle) * size * 1.3, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = colors.primary;
-      ctx.fill();
-      break;
-    }
-    case 'facilitator': {
-      // Star burst
-      const points = 8;
-      ctx.beginPath();
-      for (let i = 0; i < points * 2; i++) {
-        const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
-        const r = i % 2 === 0 ? size * pulse : size * 0.5 * pulse;
-        const px = x + Math.cos(a) * r;
-        const py = y + Math.sin(a) * r;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.fillStyle = `${colors.primary}25`;
-      ctx.fill();
-      ctx.strokeStyle = colors.primary;
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      // Sparkle particles
-      for (let i = 0; i < 4; i++) {
-        const sa = time * 0.002 + i * 1.57;
-        const sr = size * (0.8 + 0.3 * Math.sin(time * 0.003 + i));
-        const sparkleAlpha = 0.4 + 0.6 * Math.abs(Math.sin(time * 0.004 + i * 0.7));
-        ctx.beginPath();
-        ctx.arc(x + Math.cos(sa) * sr, y + Math.sin(sa) * sr, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(251, 191, 36, ${sparkleAlpha})`;
-        ctx.fill();
-      }
-      break;
-    }
-    case 'summarizer': {
-      // Nebula swirl
-      for (let i = 0; i < 3; i++) {
-        const nebulaAngle = time * 0.001 + i * 2.09;
-        const nebulaR = size * (0.7 + i * 0.15) * pulse;
-        const grad = ctx.createRadialGradient(
-          x + Math.cos(nebulaAngle) * 5,
-          y + Math.sin(nebulaAngle) * 5,
-          0,
-          x, y, nebulaR
-        );
-        grad.addColorStop(0, `${colors.primary}30`);
-        grad.addColorStop(0.5, `${colors.secondary}15`);
-        grad.addColorStop(1, 'transparent');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(x, y, nebulaR, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Dust particles
-      for (let i = 0; i < 6; i++) {
-        const da = time * 0.0008 + i * 1.05;
-        const dr = size * (0.4 + 0.5 * Math.sin(time * 0.002 + i));
-        ctx.beginPath();
-        ctx.arc(x + Math.cos(da) * dr, y + Math.sin(da) * dr, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = `${i % 2 === 0 ? colors.primary : colors.secondary}80`;
-        ctx.fill();
-      }
-      break;
-    }
-    case 'consensus': {
-      // Constellation pattern
-      const nodePositions = [
-        { dx: 0, dy: -size * 0.7 },
-        { dx: -size * 0.6, dy: -size * 0.2 },
-        { dx: size * 0.6, dy: -size * 0.2 },
-        { dx: -size * 0.4, dy: size * 0.5 },
-        { dx: size * 0.4, dy: size * 0.5 },
-        { dx: 0, dy: 0 },
-      ];
-
-      // Lines between nodes
-      const connections = [[0,1],[0,2],[1,3],[2,4],[3,4],[5,0],[5,1],[5,2],[5,3],[5,4]];
-      ctx.strokeStyle = `${colors.primary}40`;
-      ctx.lineWidth = 0.8;
-      for (const [a, b] of connections) {
-        const na = nodePositions[a];
-        const nb = nodePositions[b];
-        ctx.beginPath();
-        ctx.moveTo(x + na.dx * pulse, y + na.dy * pulse);
-        ctx.lineTo(x + nb.dx * pulse, y + nb.dy * pulse);
-        ctx.stroke();
-      }
-
-      // Node dots
-      for (let i = 0; i < nodePositions.length; i++) {
-        const n = nodePositions[i];
-        const nodeAlpha = 0.5 + 0.5 * Math.sin(time * 0.003 + i * 0.8);
-        ctx.beginPath();
-        ctx.arc(x + n.dx * pulse, y + n.dy * pulse, i === 5 ? 4 : 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = i === 5 ? colors.primary : `${colors.secondary}${Math.round(nodeAlpha * 255).toString(16).padStart(2, '0')}`;
-        ctx.fill();
-      }
-      break;
-    }
-    case 'translator': {
-      // Prism triangle
-      ctx.beginPath();
-      ctx.moveTo(x, y - size * pulse);
-      ctx.lineTo(x + size * 0.87 * pulse, y + size * 0.5 * pulse);
-      ctx.lineTo(x - size * 0.87 * pulse, y + size * 0.5 * pulse);
-      ctx.closePath();
-      ctx.fillStyle = `${colors.primary}20`;
-      ctx.fill();
-      ctx.strokeStyle = colors.primary;
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      // Rainbow refraction lines
-      const rainbowColors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
-      for (let i = 0; i < rainbowColors.length; i++) {
-        const lineAlpha = 0.3 + 0.3 * Math.sin(time * 0.003 + i * 0.5);
-        ctx.beginPath();
-        ctx.moveTo(x + size * 0.87 * pulse, y + (i - 2.5) * 3);
-        ctx.lineTo(x + size * 1.6 * pulse, y - size * 0.4 + i * 5);
-        ctx.strokeStyle = rainbowColors[i] + Math.round(lineAlpha * 255).toString(16).padStart(2, '0');
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-      }
-      break;
-    }
-    case 'accessibility': {
-      // Shield shape
-      ctx.beginPath();
-      ctx.moveTo(x, y - size * pulse);
-      ctx.bezierCurveTo(x + size * pulse, y - size * 0.6 * pulse, x + size * 0.9 * pulse, y + size * 0.2 * pulse, x, y + size * pulse);
-      ctx.bezierCurveTo(x - size * 0.9 * pulse, y + size * 0.2 * pulse, x - size * pulse, y - size * 0.6 * pulse, x, y - size * pulse);
-      ctx.fillStyle = `${colors.primary}20`;
-      ctx.fill();
-      ctx.strokeStyle = colors.primary;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Warm aura rings
-      for (let i = 1; i <= 3; i++) {
-        const ringAlpha = 0.15 - i * 0.04;
-        ctx.beginPath();
-        ctx.arc(x, y, (size + i * 8) * pulse, 0, Math.PI * 2);
-        ctx.strokeStyle = `${colors.secondary}${Math.round(Math.max(ringAlpha, 0.03) * 255).toString(16).padStart(2, '0')}`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Floating warm particles
-      for (let i = 0; i < 3; i++) {
-        const pa = time * 0.002 + i * 2.1;
-        const pr = (size + 15) * pulse;
-        ctx.beginPath();
-        ctx.arc(x + Math.cos(pa) * pr, y + Math.sin(pa) * pr, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = `${colors.secondary}80`;
-        ctx.fill();
-      }
-      break;
-    }
-  }
-
-  // Agent label
-  ctx.font = `bold ${Math.max(6, Math.round(8 * scaleFactor))}px "Space Grotesk", system-ui, sans-serif`;
-  ctx.fillStyle = colors.primary;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText(AGENT_LABELS[agentType] || agentType, x, y + size + 6 * scaleFactor);
-}
-
-function drawConsensusLines(
-  ctx: CanvasRenderingContext2D,
-  participantPositions: Array<{ x: number; y: number; stance: string }>,
-  consensusLevel: number
-) {
-  if (consensusLevel <= 0 || participantPositions.length < 2) return;
-
-  const supportNodes = participantPositions.filter(p => p.stance === 'support');
-  if (supportNodes.length < 2) return;
-
-  const alpha = Math.min(consensusLevel * 0.6, 0.4);
-
-  // Connect support nodes
-  for (let i = 0; i < supportNodes.length; i++) {
-    for (let j = i + 1; j < supportNodes.length; j++) {
-      ctx.beginPath();
-      ctx.moveTo(supportNodes[i].x, supportNodes[i].y);
-      ctx.lineTo(supportNodes[j].x, supportNodes[j].y);
-      ctx.strokeStyle = `rgba(52, 211, 153, ${alpha})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  }
-
-  // Connect neutral to support if consensus is high
-  if (consensusLevel > 0.4) {
-    const neutralNodes = participantPositions.filter(p => p.stance === 'neutral' || p.stance === 'unsure');
-    for (const neutral of neutralNodes) {
-      const closest = supportNodes.reduce((best, s) => {
-        const d = Math.hypot(s.x - neutral.x, s.y - neutral.y);
-        return d < best.d ? { node: s, d } : best;
-      }, { node: supportNodes[0], d: Infinity });
-      ctx.beginPath();
-      ctx.moveTo(neutral.x, neutral.y);
-      ctx.lineTo(closest.node.x, closest.node.y);
-      ctx.strokeStyle = `rgba(52, 211, 153, ${alpha * 0.5})`;
-      ctx.lineWidth = 0.5;
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-  }
-}
-
-function drawSpeechBubble(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, opacity: number, color: string) {
-  if (opacity <= 0) return;
-  const maxW = 120;
-  ctx.font = '9px "Inter", system-ui, sans-serif';
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(' ')) {
-    const test = line + (line ? ' ' : '') + word;
-    if (ctx.measureText(test).width > maxW) {
-      if (line) lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  if (lines.length === 0) return;
-
-  const lineH = 13;
-  const padding = 8;
-  const bubbleW = maxW + padding * 2;
-  const bubbleH = lines.length * lineH + padding * 2;
-  const bx = x - bubbleW / 2;
-  const by = y - bubbleH - 20;
-
-  ctx.globalAlpha = opacity;
-
-  // Bubble background
-  ctx.fillStyle = 'rgba(11, 16, 34, 0.9)';
-  ctx.beginPath();
-  ctx.roundRect(bx, by, bubbleW, bubbleH, 8);
-  ctx.fill();
-  ctx.strokeStyle = `${color}60`;
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // Tail
-  ctx.beginPath();
-  ctx.moveTo(x - 4, by + bubbleH);
-  ctx.lineTo(x, by + bubbleH + 6);
-  ctx.lineTo(x + 4, by + bubbleH);
-  ctx.fillStyle = 'rgba(11, 16, 34, 0.9)';
-  ctx.fill();
-
-  // Text
-  ctx.fillStyle = '#F2F5FF';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], bx + padding, by + padding + i * lineH);
-  }
-
-  ctx.globalAlpha = 1;
-}
-
-function drawVignette(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  const grad = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.max(w, h) * 0.7);
-  grad.addColorStop(0, 'transparent');
-  grad.addColorStop(1, 'rgba(4, 5, 11, 0.6)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-}
-
-/* ═══════════════════════════════════════════
-   Cosmic Debate Canvas Component
-   ═══════════════════════════════════════════ */
-
-function CosmicDebateCanvas({
-  debate,
-  speakingId,
-  speechBubbles,
-}: {
-  debate: DebateSession;
-  speakingId: string | null;
-  speechBubbles: SpeechBubble[];
-}) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number | undefined>(undefined);
-  const starsRef = useRef<Star[]>([]);
-  const initializedRef = useRef(false);
-
-  // Initialize stars once
-  if (!initializedRef.current) {
-    starsRef.current = Array.from({ length: 200 }, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      size: Math.random() * 1.8 + 0.2,
-      speed: Math.random() * 0.0002 + 0.00005,
-      brightness: Math.random() * 0.6 + 0.2,
-    }));
-    initializedRef.current = true;
-  }
-
-  // Resize canvas
-  useEffect(() => {
-    const handleResize = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      canvas.width = parent.clientWidth;
-      canvas.height = parent.clientHeight;
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Animation loop
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const humanParticipants = debate.participants?.filter(p => p.role !== 'ai_agent') || [];
-    const aiAgentTypes = ['moderator', 'facilitator', 'summarizer', 'consensus', 'translator', 'accessibility'];
-
-    function animate(time: number) {
-      if (!canvas || !ctx) return;
-      const w = canvas.width;
-      const h = canvas.height;
-      const cx = w / 2;
-      const cy = h / 2;
-
-      // Clear
-      ctx.clearRect(0, 0, w, h);
-
-      // Background
-      ctx.fillStyle = '#04050b';
-      ctx.fillRect(0, 0, w, h);
-
-      // Energy aura
-      drawEnergyAura(ctx, debate.energyLevel || 0.5, w, h, time);
-
-      // Stars
-      drawStars(ctx, starsRef.current, time, w, h);
-
-      const scaleFactor = Math.min(w, h) / 400;
-
-      // Consensus constellation lines
-      const participantPositions: Array<{ x: number; y: number; stance: string }> = [];
-      for (let i = 0; i < humanParticipants.length; i++) {
-        const p = humanParticipants[i];
-        const angle = (i / Math.max(humanParticipants.length, 1)) * Math.PI * 2 + time * 0.0003;
-        const stanceRadius = (p.stance === 'support' ? 100 : p.stance === 'oppose' ? 160 : 130) * scaleFactor;
-        const orbitR = stanceRadius + Math.sin(time * 0.001 + i) * 8 * scaleFactor;
-        participantPositions.push({
-          x: cx + Math.cos(angle) * orbitR,
-          y: cy + Math.sin(angle) * orbitR,
-          stance: p.stance,
-        });
-      }
-      drawConsensusLines(ctx, participantPositions, debate.consensusLevel || 0);
-
-      // Topic star
-      drawTopicStar(ctx, debate.topic, debate.consensusLevel || 0, time, cx, cy, scaleFactor);
-
-      // AI Agent entities
-      for (let i = 0; i < aiAgentTypes.length; i++) {
-        const agentType = aiAgentTypes[i];
-        const agentParticipant = debate.participants?.find(p => p.agentType === agentType);
-        const isSpeaking = speakingId === agentParticipant?.id;
-        drawAIAgent(ctx, agentType, i, time, w, h, cx, cy, isSpeaking, scaleFactor);
-      }
-
-      // Human participants
-      for (let i = 0; i < humanParticipants.length; i++) {
-        const p = humanParticipants[i];
-        const isSpeaking = speakingId === p.id;
-        drawParticipant(ctx, { ...p, index: i, total: humanParticipants.length }, time, cx, cy, isSpeaking, scaleFactor);
-      }
-
-      // Speech bubbles
-      const now = Date.now();
-      for (const bubble of speechBubbles) {
-        const age = now - bubble.createdAt;
-        const maxAge = 3000;
-        if (age < maxAge) {
-          const opacity = age > maxAge * 0.7 ? 1 - (age - maxAge * 0.7) / (maxAge * 0.3) : Math.min(age / 200, 1);
-          drawSpeechBubble(ctx, bubble.x, bubble.y, bubble.text, opacity * 0.9, bubble.color);
-        }
-      }
-
-      // Vignette
-      drawVignette(ctx, w, h);
-
-      animFrameRef.current = requestAnimationFrame(animate);
-    }
-
-    animFrameRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [debate, speakingId, speechBubbles]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full block"
-      style={{ background: '#04050b' }}
-    />
-  );
-}
-
-/* ═══════════════════════════════════════════
-   Agent Preview Card (Lobby)
-   ═══════════════════════════════════════════ */
-
-function AgentPreviewCard({ agent }: { agent: Agent }) {
-  const config = parseAgentConfig(agent);
-  const Icon = AGENT_ICONS[agent.type] || Shield;
-  const label = AGENT_ROLES[agent.type] || agent.type;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <Card className="bg-card border-border hover:border-border transition-all group h-full">
-        <CardContent className="p-4 text-center">
-          {/* Mini cosmic avatar */}
-          <div className="relative w-16 h-16 mx-auto mb-3" style={{ animation: 'floatDrift 4s ease-in-out infinite' }}>
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: `radial-gradient(circle, ${config.glowColor}, transparent 70%)`,
-                animation: 'pulseGlow 3s ease-in-out infinite',
-              }}
-            />
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{ filter: `drop-shadow(0 0 8px ${config.primaryColor})` }}
-            >
-              <Icon className="w-6 h-6" style={{ color: config.primaryColor }} />
-            </div>
-          </div>
-
-          <h4 className="text-sm font-bold font-heading">{agent.name}</h4>
-          <p className="text-[10px] text-cosmic-muted mt-0.5">{label}</p>
-
-          <div className="flex items-center justify-center gap-1.5 mt-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-cosmic-success" style={{ boxShadow: '0 0 4px rgba(52, 211, 153, 0.6)' }} />
-            <span className="text-[9px] text-cosmic-success">Active</span>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   Message Bubble Component
-   ═══════════════════════════════════════════ */
-
-function MessageBubble({ message, isNew }: { message: DebateMessage; isNew: boolean }) {
-  const isAI = !!message.agentType;
-  const agentColors = message.agentType ? AGENT_COLORS[message.agentType] : null;
-  const displayName = message.participant?.displayName || message.user?.name || 'Unknown';
-  const Icon = message.agentType ? (AGENT_ICONS[message.agentType] || Shield) : null;
-
-  return (
-    <motion.div
-      initial={isNew ? { opacity: 0, y: 10, scale: 0.95 } : false}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      className={`flex gap-2.5 ${isAI ? '' : ''}`}
-    >
-      {/* Avatar */}
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-        style={{
-          background: isAI && agentColors ? `${agentColors.primary}20` : 'rgba(45, 107, 255, 0.15)',
-          border: isAI && agentColors ? `1.5px solid ${agentColors.primary}50` : '1.5px solid rgba(45, 107, 255, 0.2)',
-          boxShadow: isAI && agentColors ? `0 0 12px ${agentColors.primary}20` : 'none',
-        }}
-      >
-        {isAI && Icon ? (
-          <Icon className="w-3.5 h-3.5" style={{ color: agentColors?.primary }} />
-        ) : (
-          <span style={{ color: 'rgba(45, 107, 255, 0.9)' }}>{displayName[0].toUpperCase()}</span>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex-grow min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span
-            className="text-xs font-semibold"
-            style={{ color: isAI && agentColors ? agentColors.primary : '#F2F5FF' }}
-          >
-            {displayName}
-          </span>
-          {isAI && (
-            <Badge
-              className="text-[8px] px-1.5 py-0 rounded-full border-0"
-              style={{
-                background: agentColors ? `${agentColors.primary}15` : 'rgba(99,102,241,0.1)',
-                color: agentColors?.primary,
-              }}
-            >
-              AI
-            </Badge>
-          )}
-          <span className="text-[9px] text-cosmic-muted">{timeAgo(message.createdAt)}</span>
-        </div>
-        <div
-          className="text-sm leading-relaxed rounded-lg px-3 py-2"
-          style={{
-            background: isAI && agentColors ? `${agentColors.primary}08` : 'rgba(255,255,255,0.03)',
-            border: isAI && agentColors ? `1px solid ${agentColors.primary}15` : '1px solid rgba(255,255,255,0.05)',
-          }}
-        >
-          {message.content}
-        </div>
-        {/* Show translated/simplified content if available */}
-        {message.simplifiedContent && (
-          <div className="mt-1 text-xs text-cosmic-muted bg-pink-500/5 border border-pink-500/10 rounded-lg px-3 py-1.5">
-            <span className="text-pink-400 font-medium text-[10px] mr-1">Simplified:</span>
-            {message.simplifiedContent}
-          </div>
-        )}
-        {message.translatedContent && (
-          <div className="mt-1 text-xs text-cosmic-muted bg-cyan-500/5 border border-cyan-500/10 rounded-lg px-3 py-1.5">
-            <span className="text-cyan-400 font-medium text-[10px] mr-1">Translated ({message.targetLang}):</span>
-            {message.translatedContent}
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   Create Debate Modal
-   ═══════════════════════════════════════════ */
-
-function CreateDebateModal({
-  open,
-  onClose,
-  onCreate,
-  creating,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onCreate: (data: { title: string; description: string; topic: string; isPublic: boolean; maxParticipants: number }) => void;
-  creating: boolean;
-}) {
+function StartDebate({ onClose, onCreated }: { onClose: () => void; onCreated: (d: RoomDebate) => void }) {
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [topic, setTopic] = useState('');
-  const [isPublic, setIsPublic] = useState(true);
-  const [maxParticipants, setMaxParticipants] = useState(50);
+  const [description, setDescription] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = () => {
-    if (!title.trim() || !topic.trim()) return;
-    onCreate({ title: title.trim(), description: description.trim(), topic: topic.trim(), isPublic, maxParticipants });
-  };
-
-  if (!open) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      >
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: 'spring', duration: 0.5 }}
-          className="relative w-full max-w-lg"
-          style={{
-            background: 'linear-gradient(145deg, rgba(12, 16, 32, 0.95), rgba(5, 8, 19, 0.95))',
-            backdropFilter: 'blur(30px)',
-            border: '1px solid rgba(242, 245, 255, 0.1)',
-            borderRadius: '20px',
-            boxShadow: '0 0 60px rgba(45, 107, 255, 0.1), 0 30px 80px rgba(0,0,0,0.5)',
-          }}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-border">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cosmic-accent/10 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-cosmic-accent" />
-              </div>
-              <div>
-                <h3 className="font-heading font-bold text-base">Launch new assembly</h3>
-                <p className="text-[11px] text-cosmic-muted">Start a debate about a question your community faces</p>
-              </div>
-            </div>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-foreground/5 transition-colors">
-              <X className="w-4 h-4 text-cosmic-muted" />
-            </button>
-          </div>
-
-          {/* Body */}
-          <div className="p-5 space-y-4">
-            <div>
-              <Label className="text-xs text-cosmic-muted mb-1.5 block">Title *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., Budget Allocation for 2026"
-                className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50"
-              />
-            </div>
-
-            <div>
-              <Label className="text-xs text-cosmic-muted mb-1.5 block">Topic *</Label>
-              <Input
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="e.g., How should we distribute the city budget?"
-                className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50"
-              />
-            </div>
-
-            <div>
-              <Label className="text-xs text-cosmic-muted mb-1.5 block">Description</Label>
-              <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Provide context for the debate..."
-                rows={3}
-                className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/50 focus:border-cosmic-accent/50 resize-none"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-xs text-cosmic-muted block">Public assembly</Label>
-                <p className="text-[10px] text-cosmic-muted/60 mt-0.5">Anyone can discover and join</p>
-              </div>
-              <Switch checked={isPublic} onCheckedChange={setIsPublic} />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label className="text-xs text-cosmic-muted">Max participants</Label>
-                <span className="text-xs font-mono text-cosmic-accent">{maxParticipants}</span>
-              </div>
-              <Slider
-                value={[maxParticipants]}
-                onValueChange={([v]) => setMaxParticipants(v)}
-                min={5}
-                max={100}
-                step={5}
-                className="w-full"
-              />
-              <div className="flex justify-between text-[9px] text-cosmic-muted/50 mt-1">
-                <span>5</span>
-                <span>100</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="p-5 border-t border-border flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 border-border text-cosmic-muted hover:text-foreground rounded-xl"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!title.trim() || !topic.trim() || creating}
-              className="flex-1 bg-cosmic-accent text-primary-foreground rounded-xl hover:bg-cosmic-accent/90 relative overflow-hidden"
-            >
-              {creating ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <Rocket className="w-4 h-4 mr-2" />
-              )}
-              {creating ? 'Launching...' : 'Start a debate'}
-            </Button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   Lobby Animated Stars Background
-   ═══════════════════════════════════════════ */
-
-/* ═══════════════════════════════════════════
-   Main Page Component
-   ═══════════════════════════════════════════ */
-
-export default function AssemblyHallPage() {
-  // ── State ──
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [debates, setDebates] = useState<DebateSession[]>([]);
-  const [currentDebate, setCurrentDebate] = useState<DebateSession | null>(null);
-  const [messages, setMessages] = useState<DebateMessage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [messageInput, setMessageInput] = useState('');
-  const [sending, setSending] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [speakingId, setSpeakingId] = useState<string | null>(null);
-  const [speechBubbles, setSpeechBubbles] = useState<SpeechBubble[]>([]);
-  const [targetLang, setTargetLang] = useState('en');
-  const [simplifyLevel, setSimplifyLevel] = useState<string>('');
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [polling, setPolling] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const newMessageIdsRef = useRef<Set<string>>(new Set());
-
-  // ── Fetch initial data ──
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [agentsRes, debatesRes] = await Promise.all([
-          fetch('/api/ai/agents'),
-          fetch('/api/ai/debate?status=active'),
-        ]);
-        const agentsData = await agentsRes.json();
-        const debatesData = await debatesRes.json();
-        setAgents(Array.isArray(agentsData) ? agentsData : []);
-        setDebates(Array.isArray(debatesData) ? debatesData : []);
-      } catch {
-        setAgents([]);
-        setDebates([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  // ── Join a debate ──
-  const joinDebate = useCallback(async (debateId: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch(`/api/ai/debate/${debateId}`);
-      if (!res.ok) throw new Error('Failed to load debate');
-      const data: DebateSession = await res.json();
-      setCurrentDebate(data);
-      setMessages(data.messages || []);
-    } catch {
-      setError('Failed to join debate session');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // ── Create a debate ──
-  const createDebate = useCallback(async (data: {
-    title: string;
-    description: string;
-    topic: string;
-    isPublic: boolean;
-    maxParticipants: number;
-  }) => {
-    setCreating(true);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
     try {
       const res = await fetch('/api/ai/debate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ title, topic, description, isPublic: true }),
       });
-      if (!res.ok) throw new Error('Failed to create debate');
-      const debate: DebateSession = await res.json();
-      setCurrentDebate(debate);
-      setMessages([]);
-      setShowCreateModal(false);
-    } catch {
-      setError('Failed to create debate session');
-    } finally {
-      setCreating(false);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'We couldn’t start the debate. Try again.');
+      onCreated(data);
+    } catch (err) {
+      setError((err as Error).message);
+      setBusy(false);
     }
-  }, []);
-
-  // ── Send message ──
-  const sendMessage = useCallback(async () => {
-    if (!messageInput.trim() || !currentDebate || sending) return;
-
-    const content = messageInput.trim();
-    setMessageInput('');
-    setSending(true);
-    setSpeakingId('user-current');
-
-    // Optimistic message
-    const optimisticId = `opt-${Date.now()}`;
-    const optimisticMsg: DebateMessage = {
-      id: optimisticId,
-      content,
-      type: 'statement',
-      agentType: null,
-      sentiment: 'neutral',
-      createdAt: new Date().toISOString(),
-      participant: { id: 'user-current', displayName: 'You', role: 'participant', agentType: null },
-      user: { id: '', name: 'You', avatarUrl: null },
-    };
-    setMessages(prev => [...prev, optimisticMsg]);
-    newMessageIdsRef.current.add(optimisticId);
-
-    // Add speech bubble
-    setSpeechBubbles(prev => [...prev, {
-      x: 300, y: 250, text: content, opacity: 1, createdAt: Date.now(), color: '#2D6BFF',
-    }]);
-
-    try {
-      const res = await fetch(`/api/ai/debate/${currentDebate.id}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          type: 'statement',
-          targetLang: targetLang !== 'en' ? targetLang : undefined,
-          simplifyLevel: simplifyLevel || undefined,
-        }),
-      });
-
-      if (!res.ok) throw new Error('Failed to send message');
-
-      const data = await res.json();
-
-      // Replace optimistic message with real one
-      if (data.userMessage) {
-        setMessages(prev => prev.map(m => m.id === optimisticId ? data.userMessage : m));
-        newMessageIdsRef.current.delete(optimisticId);
-        newMessageIdsRef.current.add(data.userMessage.id);
-      }
-
-      // Add AI responses with delay for typing effect
-      if (data.aiResponses && Array.isArray(data.aiResponses)) {
-        for (let i = 0; i < data.aiResponses.length; i++) {
-          const aiResp = data.aiResponses[i];
-          const agentColors = AGENT_COLORS[aiResp.agentType];
-          const agentName = AGENT_LABELS[aiResp.agentType] || aiResp.agentType;
-
-          setTimeout(() => {
-            const aiMsg: DebateMessage = {
-              id: aiResp.id,
-              content: aiResp.content,
-              type: aiResp.type,
-              agentType: aiResp.agentType,
-              sentiment: 'neutral',
-              createdAt: new Date().toISOString(),
-              participant: { id: `ai-${aiResp.agentType}`, displayName: agentName, role: 'ai_agent', agentType: aiResp.agentType },
-            };
-
-            setMessages(prev => [...prev, aiMsg]);
-            newMessageIdsRef.current.add(aiMsg.id);
-            setSpeakingId(`ai-${aiResp.agentType}`);
-
-            // AI speech bubble
-            const bubbleAngle = Math.random() * Math.PI * 2;
-            setSpeechBubbles(prev => [...prev, {
-              x: 300 + Math.cos(bubbleAngle) * 120,
-              y: 250 + Math.sin(bubbleAngle) * 120,
-              text: aiResp.content.slice(0, 60),
-              opacity: 1,
-              createdAt: Date.now(),
-              color: agentColors?.primary || '#6366f1',
-            }]);
-
-            setTimeout(() => setSpeakingId(null), 2000);
-          }, 800 + i * 1200);
-        }
-      }
-
-      // Update debate energy
-      if (data.userMessage) {
-        setCurrentDebate(prev => prev ? {
-          ...prev,
-          energyLevel: Math.min(1, (prev.energyLevel || 0.5) + 0.05),
-          status: prev.status === 'waiting' ? 'active' : prev.status,
-        } : null);
-      }
-    } catch {
-      // Remove optimistic message on error
-      setMessages(prev => prev.filter(m => m.id !== optimisticId));
-      newMessageIdsRef.current.delete(optimisticId);
-      setError('Failed to send message. Try again.');
-    } finally {
-      setSending(false);
-      setTimeout(() => setSpeakingId(null), 1500);
-    }
-  }, [messageInput, currentDebate, sending, targetLang, simplifyLevel]);
-
-  // ── Poll for new messages ──
-  useEffect(() => {
-    if (!currentDebate || polling) return;
-
-    const interval = setInterval(async () => {
-      setPolling(true);
-      try {
-        const res = await fetch(`/api/ai/debate/${currentDebate.id}/messages`);
-        if (res.ok) {
-          const data: DebateMessage[] = await res.json();
-          const existingIds = new Set(messages.map(m => m.id));
-          const newMsgs = data.filter(m => !existingIds.has(m.id));
-          if (newMsgs.length > 0) {
-            setMessages(prev => [...prev, ...newMsgs]);
-            newMsgs.forEach(m => newMessageIdsRef.current.add(m.id));
-          }
-        }
-
-        // Also refresh debate state
-        const debateRes = await fetch(`/api/ai/debate/${currentDebate.id}`);
-        if (debateRes.ok) {
-          const debateData: DebateSession = await debateRes.json();
-          setCurrentDebate(prev => prev ? {
-            ...prev,
-            consensusLevel: debateData.consensusLevel,
-            energyLevel: debateData.energyLevel,
-            phase: debateData.phase,
-            status: debateData.status,
-            participants: debateData.participants || prev.participants,
-          } : null);
-        }
-      } catch {
-        // Silently fail on poll errors
-      } finally {
-        setPolling(false);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [currentDebate, messages, polling]);
-
-  // ── Auto-scroll messages ──
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // ── Clean old speech bubbles ──
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSpeechBubbles(prev => prev.filter(b => Date.now() - b.createdAt < 3500));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // ── Leave debate ──
-  const leaveDebate = useCallback(() => {
-    setCurrentDebate(null);
-    setMessages([]);
-    setSpeechBubbles([]);
-    setSpeakingId(null);
-    // Refresh debates list
-    fetch('/api/ai/debate?status=active')
-      .then(r => r.json())
-      .then(data => setDebates(Array.isArray(data) ? data : []))
-      .catch(() => {});
-  }, []);
-
-  // ── Loading state ──
-  if (loading && !currentDebate) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 rounded-full border-2 border-cosmic-accent/20" />
-            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-cosmic-accent" style={{ animation: 'orbitSpin 1s linear infinite' }} />
-            <div className="absolute inset-2 rounded-full border border-transparent border-t-cosmic-teal" style={{ animation: 'orbitSpin 1.5s linear infinite reverse' }} />
-            <Rocket className="absolute inset-0 m-auto w-6 h-6 text-cosmic-accent" />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-cosmic-accent animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full bg-cosmic-teal animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full bg-cosmic-violet animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
-          <span className="text-cosmic-muted text-sm">Entering the assembly hall...</span>
-        </div>
-      </div>
-    );
-  }
-
-  /* ═══════════════════════════════════════════
-     STATE 2: Active Debate Session
-     ═══════════════════════════════════════════ */
-  if (currentDebate) {
-    const phaseConfig = PHASE_CONFIG[currentDebate.phase] || PHASE_CONFIG.opening;
-    const consensusPct = Math.round((currentDebate.consensusLevel || 0) * 100);
-
-    return (
-      <div className={`flex flex-col ${isFullscreen ? 'fixed inset-0 z-50' : '-m-4 lg:-m-8'}`} style={{ background: '#04050b' }}>
-        {/* Top bar */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-2.5 border-b border-border bg-card/80 backdrop-blur-xl">
-          <div className="flex items-center gap-3 min-w-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={leaveDebate}
-              className="text-cosmic-muted hover:text-foreground shrink-0 h-7 px-2"
-            >
-              <ChevronRight className="w-4 h-4 rotate-180 mr-1" />
-              Back
-            </Button>
-            <div className="min-w-0">
-              <h2 className="text-sm font-heading font-bold truncate">{currentDebate.title}</h2>
-              <p className="text-[10px] text-cosmic-muted truncate">{currentDebate.topic}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Phase badge */}
-            <Badge variant="outline" className={`text-[10px] rounded-full border ${phaseConfig.bg} ${phaseConfig.color}`}>
-              <Circle className="w-1.5 h-1.5 mr-1 fill-current" />
-              {phaseConfig.label}
-            </Badge>
-
-            {/* Consensus */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-cosmic-muted hidden sm:block">Consensus</span>
-              <div className="w-20 h-1.5 bg-foreground/5 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${consensusPct}%`,
-                    background: consensusPct > 60 ? 'linear-gradient(90deg, #10b981, #34d399)' : consensusPct > 30 ? 'linear-gradient(90deg, #2D6BFF, #5B8FFF)' : 'linear-gradient(90deg, #9B5CFF, #c084fc)',
-                  }}
-                />
-              </div>
-              <span className="text-xs font-mono font-bold text-cosmic-success">{consensusPct}%</span>
-            </div>
-
-            {/* Fullscreen toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsFullscreen(!isFullscreen)}
-              className="text-cosmic-muted hover:text-foreground h-7 w-7 p-0"
-            >
-              {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Main content: Canvas + Chat */}
-        <div className="flex-grow flex flex-col lg:flex-row min-h-0">
-          {/* Left Panel: Cosmic Canvas */}
-          <div className="relative lg:w-[70%] h-[45vh] lg:h-auto min-h-[300px]">
-            <CosmicDebateCanvas
-              debate={currentDebate}
-              speakingId={speakingId}
-              speechBubbles={speechBubbles}
-            />
-
-            {/* Overlay: Participants count */}
-            <div className="absolute top-3 left-3 glass-card rounded-xl px-3 py-2 flex items-center gap-2">
-              <Users className="w-3.5 h-3.5 text-cosmic-teal" />
-              <span className="text-[11px] text-cosmic-muted">
-                {currentDebate.participants?.length || 0} participants
-              </span>
-            </div>
-
-            {/* Overlay: Energy level */}
-            <div className="absolute top-3 right-3 glass-card rounded-xl px-3 py-2 flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-cosmic-amber" />
-              <span className="text-[11px] text-cosmic-muted">
-                Energy: {Math.round((currentDebate.energyLevel || 0.5) * 100)}%
-              </span>
-            </div>
-
-            {/* Legend */}
-            <div className="absolute bottom-3 left-3 glass-card rounded-xl px-3 py-2">
-              <div className="flex items-center gap-3 text-[9px] text-cosmic-muted">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Support</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400" /> Oppose</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-400" /> Neutral</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Panel: Chat/Messages */}
-          <div className="lg:w-[30%] flex flex-col border-l border-border bg-card min-h-0">
-            {/* Chat header */}
-            <div className="shrink-0 px-4 py-3 border-b border-border">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-cosmic-accent" />
-                  <span className="text-sm font-heading font-bold">Assembly chat</span>
-                </div>
-                <Badge variant="outline" className="text-[9px] rounded-full border-border text-cosmic-muted">
-                  {messages.length} messages
-                </Badge>
-              </div>
-
-              {/* Consensus bar */}
-              <div className="mt-2">
-                <div className="flex items-center justify-between text-[10px] mb-1">
-                  <span className="text-cosmic-muted">Consensus level</span>
-                  <span className="text-cosmic-success font-mono font-bold">{consensusPct}%</span>
-                </div>
-                <Progress value={consensusPct} className="h-1.5" />
-              </div>
-            </div>
-
-            {/* Messages list */}
-            <ScrollArea className="flex-grow min-h-0">
-              <div className="p-4 space-y-4">
-                {/* Pinned messages */}
-                {messages.filter(m => m.isPinned).map(m => (
-                  <div key={`pinned-${m.id}`} className="bg-cosmic-amber/5 border border-cosmic-amber/15 rounded-lg p-2.5">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <Eye className="w-3 h-3 text-cosmic-amber" />
-                      <span className="text-[9px] text-cosmic-amber font-medium">Pinned summary</span>
-                    </div>
-                    <p className="text-xs text-cosmic-muted">{m.content}</p>
-                  </div>
-                ))}
-
-                {messages.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="w-12 h-12 rounded-2xl bg-cosmic-accent/10 flex items-center justify-center mx-auto mb-3">
-                      <Waves className="w-6 h-6 text-cosmic-accent/40" />
-                    </div>
-                    <p className="text-sm text-cosmic-muted">The assembly is quiet...</p>
-                    <p className="text-xs text-cosmic-muted/50 mt-1">Be the first to speak!</p>
-                  </div>
-                )}
-
-                {messages.map(m => (
-                  <MessageBubble
-                    key={m.id}
-                    message={m}
-                    isNew={newMessageIdsRef.current.has(m.id)}
-                  />
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
-
-            {/* Input area */}
-            <div className="shrink-0 p-3 border-t border-border bg-card">
-              {/* Options row */}
-              <div className="flex items-center gap-2 mb-2">
-                <Select value={targetLang} onValueChange={setTargetLang}>
-                  <SelectTrigger aria-label="Choose an option" className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
-                    <Languages className="w-3 h-3 mr-1 text-cosmic-teal" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="de">Deutsch</SelectItem>
-                    <SelectItem value="zh">中文</SelectItem>
-                    <SelectItem value="ja">日本語</SelectItem>
-                    <SelectItem value="ar">العربية</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={simplifyLevel} onValueChange={setSimplifyLevel}>
-                  <SelectTrigger aria-label="Simplify" className="h-7 text-[10px] bg-foreground/5 border-border rounded-lg w-[100px]">
-                    <BookOpen className="w-3 h-3 mr-1 text-pink-400" />
-                    <SelectValue placeholder="Simplify" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    <SelectItem value="">Off</SelectItem>
-                    <SelectItem value="simple">Simple</SelectItem>
-                    <SelectItem value="eli5">ELI5</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-[10px] text-cosmic-amber hover:text-cosmic-amber px-2"
-                  title="Raise Hand"
-                >
-                  <Hand className="w-3.5 h-3.5" />
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-[10px] text-cosmic-success hover:text-cosmic-success px-2"
-                  title="Consensus Check"
-                >
-                  <Vote className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-
-              {/* Input row */}
-              <div className="flex items-center gap-2">
-                <Input
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Share your thoughts with the assembly..."
-                  className="bg-foreground/5 border-border text-sm rounded-xl placeholder:text-cosmic-muted/40 focus:border-cosmic-accent/50"
-                  disabled={sending}
-                />
-                <Button
-                  onClick={sendMessage}
-                  disabled={!messageInput.trim() || sending}
-                  size="sm"
-                  className="bg-cosmic-accent text-primary-foreground rounded-xl h-9 w-9 p-0 shrink-0"
-                >
-                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* ═══════════════════════════════════════════
-     STATE 1: Lobby / No active debate
-     ═══════════════════════════════════════════ */
-
-  const activeDebates = debates.filter(d => d.status === 'active' || d.status === 'waiting');
+  };
 
   return (
-    <div className="space-y-8 relative">
-
-      {/* Error banner */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-cosmic-rose/10 border border-cosmic-rose/20 rounded-xl px-4 py-3 flex items-center justify-between"
-        >
-          <span className="text-sm text-cosmic-rose">{error}</span>
-          <button onClick={() => setError(null)} className="text-cosmic-rose hover:text-cosmic-rose/80">
-            <X className="w-4 h-4" />
+    <div
+      className="hall-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="start-debate-title"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose();
+      }}
+    >
+      <div className="hall-modal-backdrop" onClick={onClose} aria-hidden="true" />
+      <form className="org-panel hall-modal-card" onSubmit={submit}>
+        <div className="hall-modal-head">
+          <h2 id="start-debate-title">Start a debate</h2>
+          <button type="button" className="hall-modal-close" onClick={onClose} aria-label="Close">
+            <X size={18} aria-hidden="true" />
           </button>
-        </motion.div>
+        </div>
+        <p className="org-panel-note">Pick one question your community faces. Everyone signed in can find it and take part.</p>
+        <label htmlFor="debate-title">Title</label>
+        <input
+          id="debate-title"
+          required
+          autoFocus
+          minLength={3}
+          maxLength={120}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Should the high street close to cars on market days?"
+        />
+        <label htmlFor="debate-topic">The question, in one line</label>
+        <input
+          id="debate-topic"
+          required
+          minLength={3}
+          maxLength={300}
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="Close the high street to cars every Saturday from 8 to 2"
+        />
+        <label htmlFor="debate-description">Background (optional)</label>
+        <textarea
+          id="debate-description"
+          rows={3}
+          maxLength={2000}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="What people should know before they start: facts, who is affected, any deadline."
+        />
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="hall-modal-actions">
+          <button type="button" className="civic-button outline" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" className="civic-button" disabled={busy || title.trim().length < 3 || topic.trim().length < 3}>
+            {busy ? <Loader2 size={15} className="animate-spin" aria-hidden="true" /> : <Rocket size={15} aria-hidden="true" />}
+            Start the debate
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export default function AssemblyHallPage() {
+  const [debates, setDebates] = useState<DebateSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [current, setCurrent] = useState<RoomDebate | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadDebates = useCallback(
+    () =>
+      fetch('/api/ai/debate')
+        .then((r) => (r.ok ? r.json() : []))
+        .then((d) => setDebates(Array.isArray(d) ? d : []))
+        .catch(() => setDebates([]))
+        .finally(() => setLoading(false)),
+    [],
+  );
+
+  const open = useCallback((debate: RoomDebate) => {
+    setCurrent({ id: debate.id, title: debate.title, topic: debate.topic, description: debate.description });
+    window.history.replaceState(null, '', `?debate=${encodeURIComponent(debate.id)}`);
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    loadDebates();
+    // A shared link (?debate=…) opens that debate straight away.
+    const id = new URLSearchParams(window.location.search).get('debate');
+    if (id)
+      fetch(`/api/ai/debate/${encodeURIComponent(id)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          if (d?.id) open(d);
+          else setError('That debate isn’t available. It may be private or closed.');
+        })
+        .catch(() => setError('We couldn’t open that debate.'));
+  }, [loadDebates, open]);
+
+  const leave = () => {
+    setCurrent(null);
+    window.history.replaceState(null, '', window.location.pathname);
+    loadDebates();
+  };
+
+  if (current) return <DebateRoom debate={current} onLeave={leave} />;
+
+  const live = debates.filter((d) => d.status !== 'ended' && d.status !== 'closed');
+
+  return (
+    <div className="hall">
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
       )}
 
       <WorkspaceHeading
         look="debates"
         title="Assembly hall"
-        description="A shared space to talk an issue through. AI helpers can step in to summarise, translate, simplify or keep things civil, and people make every decision."
+        description="Talk an issue through with your neighbours. When it helps, ask an AI helper to sum up, find common ground, explain, check the tone, simplify or translate. People make every decision."
       >
-        <button type="button" className="civic-button" onClick={() => setShowCreateModal(true)}>
+        <button type="button" className="civic-button" onClick={() => setStarting(true)}>
           <Rocket size={15} aria-hidden="true" /> Start a debate
         </button>
-        {activeDebates.length > 0 && (
-          <button
-            type="button"
-            className="civic-button outline"
-            onClick={() => document.getElementById('active-debates')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            {activeDebates.length} live {activeDebates.length === 1 ? 'debate' : 'debates'} <ArrowUpRight size={14} aria-hidden="true" />
-          </button>
-        )}
       </WorkspaceHeading>
 
-      {/* ── AI Agents Preview ── */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold font-heading flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-cosmic-violet" />
-              The AI helpers
-            </h2>
-            <p className="text-sm text-cosmic-muted mt-1">Six helpers, each with one job. They support the conversation; people decide.</p>
-          </div>
+      <section className="hall-section" aria-labelledby="hall-debates">
+        <div className="hall-section-head">
+          <h2 id="hall-debates">Debates</h2>
+          <p>Open one to read the conversation and take part.</p>
         </div>
-
-        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-4">
-          {agents.length > 0 ? agents.map((agent) => (
-            <AgentPreviewCard key={agent.id} agent={agent} />
-          )) : (
-            // Default agents if API hasn't been seeded
-            ['moderator', 'facilitator', 'summarizer', 'consensus', 'translator', 'accessibility'].map((type) => (
-              <AgentPreviewCard
-                key={type}
-                agent={{
-                  id: type,
-                  type,
-                  name: AGENT_LABELS[type],
-                  description: '',
-                  personality: '{}',
-                  capabilities: '[]',
-                  avatarConfig: JSON.stringify({
-                    primaryColor: AGENT_COLORS[type]?.primary || '#6366f1',
-                    secondaryColor: AGENT_COLORS[type]?.secondary || '#818cf8',
-                    glowColor: AGENT_COLORS[type]?.glow || 'rgba(99,102,241,0.4)',
-                    shape: 'default',
-                    particleEffect: 'default',
-                  }),
-                  systemPrompt: '',
-                  isActive: true,
-                }}
-              />
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* ── Active Debates ── */}
-      <div id="active-debates" className="scroll-mt-24">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-bold font-heading flex items-center gap-2">
-              <Activity className="w-5 h-5 text-cosmic-teal" />
-              Live debates
-            </h2>
-            <p className="text-sm text-cosmic-muted mt-1">Join an active debate or start your own</p>
-          </div>
-        </div>
-
-        {activeDebates.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="p-10 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-cosmic-teal/10 flex items-center justify-center mx-auto mb-4">
-                <Waves className="w-7 h-7 text-cosmic-teal/40" />
-              </div>
-              <h3 className="text-base font-semibold font-heading mb-1">No live debates yet</h3>
-              <p className="text-sm text-cosmic-muted mb-4">Start one about a question your community faces. The helpers join in when they can help.</p>
-              <Button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-cosmic-accent text-primary-foreground rounded-xl"
-              >
-                <Plus className="w-4 h-4 mr-2" /> Start a debate
-              </Button>
-            </CardContent>
-          </Card>
+        {loading ? (
+          <p className="org-panel-note" role="status">
+            Loading debates…
+          </p>
+        ) : live.length === 0 ? (
+          <ToolEmpty look="debates">
+            <button type="button" className="civic-button" onClick={() => setStarting(true)}>
+              <Rocket size={15} aria-hidden="true" /> Start a debate
+            </button>
+          </ToolEmpty>
         ) : (
-          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-            {activeDebates.map((debate, i) => {
-              const pct = Math.round((debate.consensusLevel || 0) * 100);
-              const phaseCfg = PHASE_CONFIG[debate.phase] || PHASE_CONFIG.opening;
+          <div className="hall-debates">
+            {live.map((d) => {
+              const people = d.participants?.filter((p) => p.role !== 'ai_agent').length ?? 0;
               return (
-                <motion.div
-                  key={debate.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1, duration: 0.4 }}
-                >
-                  <Card className="bg-card border-border hover:border-border transition-all group cursor-pointer" onClick={() => joinDebate(debate.id)}>
-                    <CardContent className="p-5">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="min-w-0 flex-grow">
-                          <h4 className="text-sm font-semibold truncate group-hover:text-cosmic-accent transition-colors">{debate.title}</h4>
-                          <p className="text-xs text-cosmic-muted mt-0.5 truncate">{debate.topic}</p>
-                        </div>
-                        <div className="flex items-center gap-1.5 ml-3 shrink-0">
-                          <div className="w-2 h-2 rounded-full bg-cosmic-rose animate-pulse" style={{ boxShadow: '0 0 6px rgba(255, 94, 138, 0.6)' }} />
-                          <span className="text-[10px] text-cosmic-rose font-medium uppercase tracking-wider">Live</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-xs text-cosmic-muted mb-3">
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {debate.participants?.length || debate.participantCount || 0}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageSquare className="w-3 h-3" />
-                          {debate._count?.messages || 0}
-                        </span>
-                        <Badge variant="outline" className={`text-[9px] rounded-full border ${phaseCfg.bg} ${phaseCfg.color} ml-auto`}>
-                          {phaseCfg.label}
-                        </Badge>
-                      </div>
-
-                      {/* Consensus bar */}
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between text-[10px] mb-1">
-                          <span className="text-cosmic-muted">Consensus</span>
-                          <span className="text-cosmic-success font-mono font-bold">{pct}%</span>
-                        </div>
-                        <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                              width: `${pct}%`,
-                              background: 'linear-gradient(90deg, #10b981, #34d399)',
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <Button size="sm" className="w-full bg-cosmic-accent/10 text-cosmic-accent hover:bg-cosmic-accent hover:text-primary-foreground rounded-xl h-8 text-xs transition-all">
-                        Enter assembly <ArrowUpRight className="w-3 h-3 ml-1.5" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                <button key={d.id} type="button" className="hall-debate" onClick={() => open(d)}>
+                  <strong>{d.title}</strong>
+                  <span className="hall-debate-topic">{d.topic}</span>
+                  <span className="hall-debate-meta">
+                    <span>
+                      <Users size={13} aria-hidden="true" /> {people} {people === 1 ? 'person' : 'people'}
+                    </span>
+                    <span>
+                      <MessageSquare size={13} aria-hidden="true" /> {d._count?.messages ?? 0} messages
+                    </span>
+                    <span>Started {timeAgo(d.createdAt)}</span>
+                  </span>
+                  <span className="hall-debate-open">
+                    Open <ArrowUpRight size={14} aria-hidden="true" />
+                  </span>
+                </button>
               );
             })}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* ── How It Works ── */}
-      <div>
-        <div className="mb-6">
-          <h2 className="text-xl font-bold font-heading">How it works</h2>
-          <p className="text-sm text-cosmic-muted mt-1">People talk, the helpers support, people decide.</p>
+      <section className="hall-section" aria-labelledby="hall-helpers">
+        <div className="hall-section-head">
+          <h2 id="hall-helpers">The helpers</h2>
+          <p>
+            Six AI helpers, each with one job. They answer only when someone asks, and they never vote.{' '}
+            <Link href="/dashboard/ai-agents">Try them on your own text</Link>
+          </p>
         </div>
-
-        <div className="grid sm:grid-cols-3 gap-3 sm:gap-6">
-          {[
-            {
-              step: '01',
-              title: 'Start or join',
-              desc: 'Start a debate or join one. AI helpers step in only when they can help: to summarise, translate, simplify or calm things down.',
-              icon: Rocket,
-              color: '#2D6BFF',
-            },
-            {
-              step: '02',
-              title: 'Helpers support',
-              desc: 'Nexus keeps it civil, Lumen welcomes newcomers, Synthesis sums up, Concord looks for common ground, Babel translates and Aegis simplifies.',
-              icon: Sparkles,
-              color: '#9B5CFF',
-            },
-            {
-              step: '03',
-              title: 'People decide',
-              desc: 'Read the summaries and options, then decide together. The helpers never vote.',
-              icon: Handshake,
-              color: '#10b981',
-            },
-          ].map((item, i) => (
-            <motion.div
-              key={item.step}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.15, duration: 0.5 }}
-            >
-              <Card className="bg-card border-border hover:border-border transition-all h-full group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-0.5" style={{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)`, opacity: 0.5 }} />
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${item.color}12` }}>
-                      <item.icon className="w-6 h-6" style={{ color: item.color }} />
-                    </div>
-                    <span aria-hidden="true" className="text-3xl font-bold font-heading text-[#8d879a]">{item.step}</span>
-                  </div>
-                  <h3 className="text-base font-semibold font-heading mb-2">{item.title}</h3>
-                  <p className="text-sm text-cosmic-muted leading-relaxed">{item.desc}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
+        <ul className="hall-helpers">
+          {HELPER_TYPES.map((type) => (
+            <li key={type}>
+              <HelperBadge type={type} size={40} />
+              <span>
+                <strong>{HELPER_INFO[type].name}</strong>
+                <span>{HELPER_INFO[type].role}</span>
+              </span>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
 
-      {/* ── Create Debate Modal ── */}
-      <CreateDebateModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreate={createDebate}
-        creating={creating}
-      />
+      <section className="hall-section" aria-labelledby="hall-how">
+        <div className="hall-section-head">
+          <h2 id="hall-how">How it works</h2>
+        </div>
+        <ol className="hall-steps">
+          <li className="org-panel">
+            <span className="hall-step-n" aria-hidden="true">1</span>
+            <h3>Start or open a debate</h3>
+            <p>Pick a question your community faces, or join one that’s already going.</p>
+          </li>
+          <li className="org-panel">
+            <span className="hall-step-n" aria-hidden="true">2</span>
+            <h3>Ask a helper when it helps</h3>
+            <p>A summary when it gets long, common ground when it’s stuck, a translation for a neighbour.</p>
+          </li>
+          <li className="org-panel">
+            <span className="hall-step-n" aria-hidden="true">3</span>
+            <h3>People decide</h3>
+            <p>Helpers never vote or decide. Take what you agree on to a proposal or a vote.</p>
+          </li>
+        </ol>
+      </section>
+
+      {starting && (
+        <StartDebate
+          onClose={() => setStarting(false)}
+          onCreated={(d) => {
+            setStarting(false);
+            open(d);
+          }}
+        />
+      )}
     </div>
   );
 }

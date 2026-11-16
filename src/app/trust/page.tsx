@@ -154,6 +154,7 @@ export default function TrustPage() {
                 into changing its rules.
               </li>
               <li>On contested choices the helpers lay out options and trade-offs, without taking sides.</li>
+              <li>In debates the helpers only answer when someone asks, and everyone can see the answer. They don’t join in on their own.</li>
               <li>The AI can't see ballots or private spaces. In missions it works only from the sources members add.</li>
               <li>
                 The assistant only helps with community matters. It turns down general
@@ -162,9 +163,9 @@ export default function TrustPage() {
               </li>
               <li>
                 Each person has AI allowances: {AI_LIMITS.assistant.hour} assistant
-                questions an hour and {AI_LIMITS.assistant.day} a day,{" "}
+                questions or helper requests on their own text an hour and {AI_LIMITS.assistant.day} a day,{" "}
                 {AI_LIMITS.mission.hour} mission AI runs an hour and {AI_LIMITS.mission.day} a
-                day, and {AI_LIMITS.debate.hour} debate helper replies an hour and{" "}
+                day, and {AI_LIMITS.debate.hour} helper answers in debates an hour and{" "}
                 {AI_LIMITS.debate.day} a day. The whole site stops using AI for the day after{" "}
                 {AI_SITE_DAILY_LIMIT} requests. Pro and Government plans have higher allowances, listed in Settings. Debate posts are capped at 40 an hour.
               </li>

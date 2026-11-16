@@ -907,3 +907,100 @@ a.sticker-state:hover {
   .workspace-shell .org-row { flex-wrap: wrap; }
   .workspace-shell .org-row-actions { width: 100%; justify-content: flex-end; }
 }
+
+/* AI helpers: one badge style everywhere (hall, room, helpers page). */
+.workspace-shell .helper-badge { display: inline-grid; place-items: center; flex: none; border: 2px solid #29223d; border-radius: 50%; color: #29223d; box-shadow: 2px 2px 0 #29223d; }
+
+/* Assembly hall lobby. */
+.workspace-shell .hall { display: grid; gap: 28px; }
+.workspace-shell .hall-section-head { margin-bottom: 14px; }
+.workspace-shell .hall-section-head h2 { font-size: 20px; font-weight: 800; margin: 0; }
+.workspace-shell .hall-section-head p { margin: 4px 0 0; color: #5d566d; font-size: 14.5px; }
+.workspace-shell .hall-section-head a { color: #4b2fb3; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.workspace-shell .hall-debates { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.workspace-shell .hall-debate { display: grid; gap: 6px; text-align: left; padding: 18px 20px; background: #fffdf7; border: 2px solid #29223d; border-radius: 20px; box-shadow: 4px 5px 0 #29223d; font: inherit; color: #29223d; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+.workspace-shell .hall-debate:hover, .workspace-shell .hall-debate:focus-visible { transform: translate(-1px, -2px); box-shadow: 5px 7px 0 #29223d; }
+.workspace-shell .hall-debate strong { font-size: 16px; font-weight: 800; }
+.workspace-shell .hall-debate-topic { color: #5d566d; font-size: 14px; }
+.workspace-shell .hall-debate-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: #5d566d; margin-top: 4px; }
+.workspace-shell .hall-debate-meta > span { display: inline-flex; align-items: center; gap: 4px; }
+.workspace-shell .hall-debate-open { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; color: #4b2fb3; margin-top: 4px; }
+.workspace-shell .hall-helpers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.workspace-shell .hall-helpers li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #fffdf7; border: 1.5px solid #29223d; border-radius: 16px; }
+.workspace-shell .hall-helpers li > span { display: grid; }
+.workspace-shell .hall-helpers strong { font-size: 14.5px; }
+.workspace-shell .hall-helpers li > span > span { font-size: 12.5px; color: #5d566d; }
+.workspace-shell .hall-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .workspace-shell .hall-steps { grid-template-columns: 1fr; } }
+.workspace-shell .hall-steps h3 { font-size: 16px; font-weight: 800; margin: 10px 0 4px; }
+.workspace-shell .hall-steps p { margin: 0; color: #5d566d; font-size: 14px; }
+.workspace-shell .hall-step-n { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #29223d; background: #fff0c3; font-weight: 800; }
+
+/* Start-a-debate dialog. */
+.workspace-shell .hall-modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; }
+.workspace-shell .hall-modal-backdrop { position: absolute; inset: 0; background: rgba(41, 34, 61, 0.45); }
+.workspace-shell .hall-modal-card { position: relative; width: min(560px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; display: grid; gap: 8px; }
+.workspace-shell .hall-modal-head { display: flex; align-items: center; justify-content: space-between; }
+.workspace-shell .hall-modal-head h2 { margin: 0; }
+.workspace-shell .hall-modal-close { width: 36px; height: 36px; display: grid; place-items: center; border: 2px solid #29223d; border-radius: 50%; background: #fffdf7; cursor: pointer; }
+.workspace-shell .hall-modal-card label { font-weight: 700; font-size: 14px; margin-top: 6px; }
+.workspace-shell .hall-modal-card input, .workspace-shell .hall-modal-card textarea { padding: 10px 14px; border: 2px solid #29223d; border-radius: 12px; background: #fff; font: inherit; font-size: 15px; color: #29223d; }
+.workspace-shell .hall-modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+
+/* Debate room. */
+.workspace-shell .debate-room > .workspace-back-link { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; margin-bottom: 14px; }
+.workspace-shell .debate-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; margin-top: 18px; align-items: start; }
+@media (max-width: 980px) { .workspace-shell .debate-grid { grid-template-columns: 1fr; } }
+.workspace-shell .debate-chat { display: flex; flex-direction: column; }
+.workspace-shell .debate-messages { display: grid; align-content: start; gap: 12px; min-height: 220px; max-height: min(560px, 62vh); overflow-y: auto; padding: 2px 6px 2px 0; }
+.workspace-shell .debate-msg { display: flex; gap: 10px; align-items: flex-start; }
+.workspace-shell .debate-msg-body { flex: 1; min-width: 0; padding: 10px 14px; background: #fff; border: 1.5px solid #e6e0ee; border-radius: 4px 16px 16px 16px; }
+.workspace-shell .debate-msg.is-helper .debate-msg-body { background: #f7f3ff; border-color: #29223d; }
+.workspace-shell .debate-msg-body header { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-bottom: 4px; font-size: 13.5px; }
+.workspace-shell .debate-msg-body time { margin-left: auto; color: #6b6479; font-size: 12px; }
+.workspace-shell .debate-msg-body p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.55; }
+.workspace-shell .debate-ai-tag { font-size: 11.5px; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1.5px solid #29223d; background: #fff0c3; }
+.workspace-shell .debate-composer { display: flex; gap: 10px; margin-top: 14px; align-items: flex-end; }
+.workspace-shell .debate-composer textarea { flex: 1; min-width: 0; resize: vertical; padding: 10px 14px; border: 2px solid #29223d; border-radius: 14px; font: inherit; font-size: 15px; background: #fff; color: #29223d; }
+.workspace-shell .debate-helpers ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+.workspace-shell .debate-helper { display: flex; gap: 10px; align-items: center; padding: 10px; border: 1.5px solid #e6e0ee; border-radius: 14px; background: #fff; }
+.workspace-shell .debate-helper-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.workspace-shell .debate-helper-text strong { font-size: 14px; }
+.workspace-shell .debate-helper-text > span { font-size: 12.5px; color: #5d566d; line-height: 1.35; }
+.workspace-shell .debate-helper-text select { margin-top: 6px; padding: 5px 8px; border: 1.5px solid #29223d; border-radius: 10px; background: #fff; font: inherit; font-size: 13px; width: max-content; max-width: 100%; }
+.workspace-shell .debate-helper-go { flex: none; min-width: 58px; min-height: 36px; padding: 6px 12px; border: 2px solid #29223d; border-radius: 999px; background: #fffdf7; color: #29223d; font-weight: 800; font-size: 13px; box-shadow: 2px 2px 0 #29223d; cursor: pointer; display: inline-grid; place-items: center; }
+.workspace-shell .debate-helper-go:hover:not(:disabled) { background: #fff0c3; }
+.workspace-shell .debate-helper-go:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+.workspace-shell .debate-helpers-wait { margin-top: 10px; }
+
+/* AI helpers page: pick a helper, paste text, read the answer. */
+.workspace-shell .helpers-page { display: grid; gap: 28px; }
+.workspace-shell .helpers-bench { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .workspace-shell .helpers-bench { grid-template-columns: 1fr; } }
+.workspace-shell .helpers-pick { display: grid; gap: 10px; }
+@media (max-width: 900px) { .workspace-shell .helpers-pick { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); } }
+.workspace-shell .helpers-choice { display: flex; align-items: center; gap: 10px; padding: 10px 12px; text-align: left; background: #fffdf7; border: 1.5px solid #29223d; border-radius: 16px; font: inherit; color: #29223d; cursor: pointer; }
+.workspace-shell .helpers-choice > span { display: grid; gap: 1px; }
+.workspace-shell .helpers-choice strong { font-size: 14.5px; }
+.workspace-shell .helpers-choice > span > span { font-size: 12.5px; color: #5d566d; }
+.workspace-shell .helpers-choice:hover { background: #fff8e1; }
+.workspace-shell .helpers-choice.is-on { background: #29223d; color: #fffdf7; box-shadow: 3px 4px 0 #8f7ce0; }
+.workspace-shell .helpers-choice.is-on > span > span { color: #e9e3f7; }
+.workspace-shell .helpers-work { display: grid; gap: 12px; }
+.workspace-shell .helpers-work-head { display: flex; gap: 12px; align-items: flex-start; }
+.workspace-shell .helpers-work-head h3 { margin: 0; font-size: 18px; font-weight: 800; }
+.workspace-shell .helpers-work-head p { margin: 2px 0 0; color: #5d566d; font-size: 14px; }
+.workspace-shell .helpers-work textarea { width: 100%; resize: vertical; min-height: 150px; padding: 12px 14px; border: 2px solid #29223d; border-radius: 14px; background: #fff; font: inherit; font-size: 15px; color: #29223d; }
+.workspace-shell .helpers-work-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+.workspace-shell .helpers-work-row .civic-button { margin-left: auto; }
+.workspace-shell .helpers-lang { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+.workspace-shell .helpers-lang select { padding: 6px 10px; border: 1.5px solid #29223d; border-radius: 10px; background: #fff; font: inherit; }
+.workspace-shell .helpers-count { color: #6b6479; font-size: 12.5px; }
+.workspace-shell .helpers-result { padding: 14px 16px; background: #f7f3ff; border: 1.5px solid #29223d; border-radius: 16px; }
+.workspace-shell .helpers-result-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.workspace-shell .helpers-result-head .org-text-button { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
+.workspace-shell .helpers-result p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; font-size: 15px; }
+.workspace-shell .helpers-left { margin: 0; color: #6b6479; font-size: 12.5px; }
+.workspace-shell .helpers-rules h2 { font-size: 18px; font-weight: 800; margin: 0 0 10px; }
+.workspace-shell .helpers-rules .org-plain-list { list-style: disc; }
+.workspace-shell .debate-helpers ul { max-height: none; overflow: visible; }

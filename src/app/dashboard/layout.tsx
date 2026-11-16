@@ -120,7 +120,7 @@ const toolGroups: { label: string; items: [string, string, LucideIcon][] }[] = [
   {
     label: "Learn & grow",
     items: [
-      ["AI agents", "/dashboard/ai-agents", Sparkles],
+      ["AI helpers", "/dashboard/ai-agents", Sparkles],
       ["Civic games", "/dashboard/games", Gamepad2],
       ["Leaderboards", "/dashboard/leaderboards", Trophy],
       ["My reputation", "/dashboard/reputation", Star],

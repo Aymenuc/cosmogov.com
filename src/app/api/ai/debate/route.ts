@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ApiError, apiFailure, rateLimit } from '@/lib/api-server';
 import { debateVisibility } from '@/lib/visibility';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
@@ -50,14 +51,20 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const body = await request.json();
-    const { title, description, topic, assemblyId, isPublic, maxParticipants } = body;
-
-    if (!title || !topic) {
+    await rateLimit('debate-create', session.id, 10, 3600);
+    const body = await request.json().catch(() => ({}));
+    const { assemblyId, isPublic, maxParticipants } = body;
+    const title = typeof body.title === 'string' ? body.title.trim() : '';
+    const topic = typeof body.topic === 'string' ? body.topic.trim() : '';
+    const description = typeof body.description === 'string' ? body.description.trim() : '';
+    if (title.length < 3 || title.length > 120 || topic.length < 3 || topic.length > 300) {
       return NextResponse.json(
-        { error: 'Title and topic are required' },
+        { error: 'Give the debate a title (up to 120 characters) and a one-line question (up to 300).' },
         { status: 400 }
       );
+    }
+    if (description.length > 2000) {
+      return NextResponse.json({ error: 'Keep the background under 2,000 characters.' }, { status: 400 });
     }
 
     // Create debate session with all 6 AI agents active
@@ -68,7 +75,7 @@ export async function POST(request: NextRequest) {
         topic,
         assemblyId: assemblyId || null,
         isPublic: isPublic !== undefined ? isPublic : true,
-        maxParticipants: maxParticipants || 50,
+        maxParticipants: Math.min(500, Math.max(2, Number(maxParticipants) || 50)),
         aiAgentsActive: JSON.stringify(ALL_AGENT_TYPES),
         createdBy: session.id,
         status: 'waiting',
@@ -84,6 +91,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(debate, { status: 201 });
   } catch (error) {
+    if (error instanceof ApiError) return apiFailure(error);
     console.error('Create debate error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

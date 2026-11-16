@@ -117,7 +117,7 @@ export const toolLooks: Record<ToolArtName, ToolLook> = {
   agents: {
     tint: "lilac",
     headline: "Meet your AI helpers",
-    cheer: "They do the legwork. People make every decision.",
+    cheer: "They help when you ask. People make every decision.",
     nudge: ["first-spark", "your-call"],
   },
   games: {
@@ -150,7 +150,11 @@ export const toolLooks: Record<ToolArtName, ToolLook> = {
   debates: {
     tint: "sky",
     headline: "Talk it through, with a little help",
-    cheer: "AI helpers summarise, translate and simplify. People make every decision.",
+    cheer: "Helpers answer only when someone asks. People make every decision.",
+    empty: {
+      title: "No debates yet",
+      text: "Start one about a question your community faces. Helpers join in only when someone asks.",
+    },
     nudge: ["good-neighbor", "thinking-out-loud"],
   },
   assistant: {
