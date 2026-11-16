@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,17 @@ export default function CreateProposalPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  // Pre-fill from a link (e.g. "Turn my street into a proposal" in Dream street).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('title')?.slice(0, 200);
+    const d = params.get('description')?.slice(0, 4000);
+    if (t || d)
+      Promise.resolve().then(() => {
+        if (t) setTitle(t);
+        if (d) setDescription(d);
+      });
+  }, []);
   const [category, setCategory] = useState('governance');
   const [votingType, setVotingType] = useState('yes_no');
   const [options, setOptions] = useState('For, Against');

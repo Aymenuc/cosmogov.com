@@ -24,6 +24,7 @@ model User {
   stripeSubscriptionId String?
   emailVerifiedAt      DateTime?
   emailVerifications   EmailVerification[]
+  streetWish           StreetWish?
   sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
@@ -1286,4 +1287,20 @@ model EmailVerification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+/// Dream street: a person's ideal street. Shown to others only as counts.
+model StreetWish {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  items     String   // JSON array of item ids, in street order
+  vibe      String
+  note      String?
+  cityName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([cityName])
 }

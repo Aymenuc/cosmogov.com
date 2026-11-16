@@ -3,6 +3,7 @@ import "./globals.css";
 import "./civic.css";
 import "./community.css";
 import "./missions.css";
+import "./games.css";
 import { Toaster } from "@/components/ui/toaster";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
