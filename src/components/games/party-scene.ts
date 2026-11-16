@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import {
   GOALS,
+  BRIDGES,
+  projectAt,
+  supported,
   TILES,
   stepParty,
   type PartyState,
@@ -105,7 +108,7 @@ export function mountPartyScene(
     ctx.font = "bold 54px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(text, 256, 67);
+    ctx.fillText(text, 256, 67, 475);
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     textures.push(texture);
@@ -235,6 +238,36 @@ export function mountPartyScene(
       tag: label(i ? "P2 · MANGO" : "P1 · BLUEBERRY", 0, 2, 0, 2.6),
     };
   });
+  const bridgeMeshes = BRIDGES.map((x) => {
+    const deck = box(1.3, 0.16, 2.5, mat.green, x, -0.08, 0);
+    const guide = box(0.65, 0.04, 2.3, mat.gold, x, -0.02, 0);
+    const sign = label("BUILD · 2 MATERIALS", x - 1, 0.9, 1.2, 2.9);
+    deck.visible = false;
+    guide.visible = sign.visible = state.game === "rally";
+    return { deck, guide, sign };
+  });
+  const visitors = state.visitors.map((_, i) => {
+    const group = new THREE.Group();
+    scene.add(group);
+    group.visible = state.game === "rally";
+    mesh(
+      new THREE.CapsuleGeometry(0.2, 0.25, 4, 10),
+      [mat.green, mat.purple, mat.pink][i],
+      0,
+      0.5,
+      0,
+      group,
+    );
+    sphere(0.2, mat.cream, 0, 0.9, 0, group);
+    if (i === 1) {
+      // A wheeled cart makes the shared route's use visible.
+      box(0.5, 0.4, 0.4, mat.orange, 0.35, 0.3, 0, group);
+      for (const z of [-0.22, 0.22]) sphere(0.1, mat.dark, 0.35, 0.1, z, group);
+    }
+    return group;
+  });
+  const visitorLabel = label("WAITING FOR A SHARED ROUTE", -7.5, 1.65, -1, 4);
+  visitorLabel.visible = state.game === "rally";
   const ball = sphere(0.7, mat.gold, 0, 0.7, 1);
   ball.visible = state.game === "bumpers";
   const belt = mesh(
@@ -246,17 +279,35 @@ export function mountPartyScene(
     ball,
   );
   belt.rotation.x = Math.PI / 2;
-  const goal = mesh(
-    new THREE.TorusGeometry(1.35, 0.15, 12, 40),
-    mat.green,
-    0,
-    0.12,
-    0,
-  );
-  goal.rotation.x = -Math.PI / 2;
-  goal.visible = ball.visible;
-  const goalLabel = label("GOAL", 0, 1.4, 0, 1.7);
-  goalLabel.visible = ball.visible;
+  const goalMeshes = GOALS.map((target, i) => {
+    const ring = mesh(
+      new THREE.TorusGeometry(1.35, 0.15, 12, 40),
+      mat.green,
+      target.x,
+      0.12,
+      target.z,
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.visible = ball.visible;
+    const project = projectAt(state, i);
+    const tag = label(
+      `${i + 1}. ${project.name.toUpperCase()} · ${project.need}`,
+      target.x,
+      1.7,
+      target.z,
+      3.4,
+    );
+    tag.visible = ball.visible;
+    const complete = label("READY ✓", target.x, 2.5, target.z, 1.8);
+    complete.visible = false;
+    const landmark = new THREE.Group();
+    scene.add(landmark);
+    landmark.position.set(target.x, 0, target.z);
+    landmark.visible = false;
+    box(0.7, 0.5, 0.7, mat.purple, 0, 0.3, 0, landmark);
+    sphere(0.5, mat.green, 0, 1, 0, landmark);
+    return { ring, tag, complete, landmark };
+  });
   const sparks = Array.from({ length: 22 }, (_, i) => {
     const o = box(
       0.12,
@@ -324,12 +375,7 @@ export function mountPartyScene(
         );
       shadow.position.set(p.x, 0.04, p.z);
       shadow.visible =
-        p.y >= 0 &&
-        (state.game === "bumpers" ||
-          TILES.some(
-            (tile) =>
-              Math.abs(tile.x - p.x) < 1.65 && Math.abs(tile.z - p.z) < 1.65,
-          ));
+        p.y >= 0 && (state.game === "bumpers" || supported(state, p.x, p.z));
       tag.position.set(p.x, p.y + 2.05, p.z);
     });
     ringMeshes.forEach((r, i) => {
@@ -345,9 +391,21 @@ export function mountPartyScene(
     ball.position.set(state.ball.x, 0.7, state.ball.z);
     ball.rotation.x = state.ball.z;
     ball.rotation.z = -state.ball.x;
-    const target = GOALS[state.goal];
-    goal.position.set(target.x, 0.12, target.z);
-    goalLabel.position.set(target.x, 1.4, target.z);
+    bridgeMeshes.forEach(({ deck, guide, sign }, i) => {
+      deck.visible = state.game === "rally" && state.bridges[i];
+      guide.visible = sign.visible =
+        state.game === "rally" && !state.bridges[i];
+    });
+    visitors.forEach((visitor, i) => {
+      visitor.position.set(state.visitors[i], 0, -0.85);
+    });
+    visitorLabel.visible =
+      state.game === "rally" && !state.bridges.every(Boolean);
+    goalMeshes.forEach(({ ring, complete, landmark }, i) => {
+      const done = state.allocations[i] >= projectAt(state, i).need;
+      ring.material = done ? mat.purple : mat.green;
+      complete.visible = landmark.visible = state.game === "bumpers" && done;
+    });
     sparks.forEach((o, i) => {
       const age = t - effectTime;
       o.visible = !control.reduced && age < 0.7 && state.event > 0;

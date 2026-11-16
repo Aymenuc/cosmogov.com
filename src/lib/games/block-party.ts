@@ -1,7 +1,13 @@
 /** Local party simulation. No account rewards or civic outcomes are awarded. */
 export type PartyGame = "rally" | "bumpers";
 export type PartyMode = "solo" | "duo";
-export type Input = { x: number; z: number; jump: boolean; dash: boolean };
+export type Input = {
+  x: number;
+  z: number;
+  jump: boolean;
+  dash: boolean;
+  build?: boolean;
+};
 export type Actor = {
   x: number;
   z: number;
@@ -14,6 +20,7 @@ export type Actor = {
   checkpoint: { x: number; z: number };
   falls: number;
   jumpHeld: boolean;
+  buildHeld: boolean;
 };
 export type Ring = { x: number; z: number; taken: boolean };
 export const EMPTY_INPUT: Input = { x: 0, z: 0, jump: false, dash: false };
@@ -26,6 +33,67 @@ export const GOALS = [
   { x: 6, z: -4.3 },
   { x: -6, z: 4.3 },
 ];
+export const BRIDGES = [-6, -2, 2, 6];
+export const PROJECTS = [
+  {
+    name: "Cool square",
+    need: 3,
+    reason: "Shade, drinking water and a resting place",
+    lesson:
+      "Heat protection needs three resources, not the same share as every project.",
+  },
+  {
+    name: "Library",
+    need: 2,
+    reason: "Books and a shared reading space",
+    lesson: "Two resources open a shared place to learn.",
+  },
+  {
+    name: "Step-free stop",
+    need: 2,
+    reason: "A ramp and an accessible boarding area",
+    lesson: "Access needs usable infrastructure, not just an invitation.",
+  },
+  {
+    name: "Play street",
+    need: 1,
+    reason: "A traffic barrier for a safe play space",
+    lesson:
+      "This project needs one resource; extra deliveries here leave others waiting.",
+  },
+];
+export const COMMUNITY_BUDGET = PROJECTS.reduce((sum, p) => sum + p.need, 0);
+export function projectAt(s: PartyState, goal: number) {
+  return PROJECTS[(goal + s.seed) % PROJECTS.length];
+}
+export function supported(s: PartyState, x: number, z: number) {
+  return (
+    Boolean(tileAt(x, z)) ||
+    s.bridges.some(
+      (built, i) =>
+        built && Math.abs(x - BRIDGES[i]) <= 0.65 && Math.abs(z) <= 1.25,
+    )
+  );
+}
+export function communityComplete(s: PartyState) {
+  return s.game === "rally"
+    ? s.visitors.every((x) => x >= 8)
+    : s.allocations.every((n, i) => n >= projectAt(s, i).need);
+}
+export function communityProgress(s: PartyState) {
+  return s.game === "rally"
+    ? s.visitors.filter((x) => x >= 8).length
+    : s.allocations.filter((n, i) => n >= projectAt(s, i).need).length;
+}
+export function learningSummary(s: PartyState) {
+  if (s.game === "rally")
+    return `${s.bridges.filter(Boolean).length} of 4 shared bridges built. ${communityProgress(s)} of 3 neighbours crossed. Your jumps only moved you; spending collected materials created a route others could use too.`;
+  const waiting = s.allocations
+    .map((n, i) => ({ n, p: projectAt(s, i) }))
+    .filter(({ n, p }) => n < p.need)
+    .map(({ n, p }) => `${p.name} still needs ${p.need - n}`);
+  return `${s.deliveries} of ${COMMUNITY_BUDGET} shared resources delivered. ${communityProgress(s)} of 4 projects ready. ${waiting.length ? waiting.join("; ") + "." : "Every project has what it needs."} Fairness meant meeting different needs, not giving everyone the same amount.`;
+}
 export interface PartyState {
   game: PartyGame;
   mode: PartyMode;
@@ -43,7 +111,11 @@ export interface PartyState {
     lastTouch: number;
     previousTouch: number;
   };
-  goal: number;
+  bridges: boolean[];
+  materials: number;
+  visitors: number[];
+  allocations: number[];
+  redirects: number;
   score: number;
   deliveries: number;
   assists: number;
@@ -78,12 +150,17 @@ export function createParty(
       checkpoint: { x: i ? 8 : -8, z: 4 },
       falls: 0,
       jumpHeld: false,
+      buildHeld: false,
     })),
     rings: TILES.filter((t) => !(t.z === 4 && Math.abs(t.x) === 8)).map(
       (t) => ({ ...t, taken: false }),
     ),
     ball: { x: 0, z: 1, vx: 0, vz: 0, lastTouch: -1, previousTouch: -1 },
-    goal: seed % GOALS.length,
+    bridges: [false, false, false, false],
+    materials: 0,
+    visitors: [-8, -8.6, -9.2],
+    allocations: [0, 0, 0, 0],
+    redirects: 0,
     score: 0,
     deliveries: 0,
     assists: 0,
@@ -91,8 +168,8 @@ export function createParty(
     lastCollection: -10,
     message:
       game === "rally"
-        ? "Jump the gaps. Grab every golden ring!"
-        : "Bump the ball into the glowing goal!",
+        ? "Collect materials, then build bridges with F. Get everyone across!"
+        : "Eight resources. Four different needs. Choose where to aim!",
     event: 0,
     seed,
   };
@@ -145,7 +222,7 @@ export function stepParty(s: PartyState, inputs: Input[], dt: number) {
       p.dash = 0.2;
       p.cooldown = 1.6;
     }
-    const ground = s.game === "bumpers" || tileAt(p.x, p.z);
+    const ground = s.game === "bumpers" || supported(s, p.x, p.z);
     if (input.jump && !p.jumpHeld && p.y === 0 && ground) p.vy = 8;
     p.jumpHeld = input.jump;
     const speed = p.dash > 0 ? 11 : 5;
@@ -158,7 +235,7 @@ export function stepParty(s: PartyState, inputs: Input[], dt: number) {
       p.y <= 0 &&
       p.y > -0.35 &&
       p.vy <= 0 &&
-      (s.game === "bumpers" || tile)
+      (s.game === "bumpers" || supported(s, p.x, p.z))
     ) {
       p.y = 0;
       p.vy = 0;
@@ -195,6 +272,7 @@ export function stepParty(s: PartyState, inputs: Input[], dt: number) {
         if (!r.taken && Math.hypot(r.x - p.x, r.z - p.z) < 0.85) {
           r.taken = true;
           s.deliveries++;
+          s.materials++;
           s.score += 100;
           const combo =
             s.lastCollector >= 0 &&
@@ -206,15 +284,54 @@ export function stepParty(s: PartyState, inputs: Input[], dt: number) {
           }
           s.lastCollector = i;
           s.lastCollection = s.elapsed;
-          say(s, combo ? "Neighbour combo! +150" : "Ring collected! +100");
+          say(
+            s,
+            combo
+              ? "Shared haul! Material added to your bridge fund."
+              : "Material collected. Two build a bridge for everyone.",
+          );
         }
       });
     }
+    if (
+      s.game === "rally" &&
+      input.build &&
+      !p.buildHeld &&
+      p.y >= 0 &&
+      p.y < 0.4
+    ) {
+      const bridge = BRIDGES.findIndex(
+        (x, n) =>
+          !s.bridges[n] && Math.abs(p.x - x) <= 2.15 && Math.abs(p.z) <= 1.25,
+      );
+      if (bridge < 0)
+        say(s, "Stand beside a dashed crossing on the middle row to build.");
+      else if (s.materials < 2)
+        say(s, "A bridge costs 2 materials. Grab more golden rings together!");
+      else {
+        s.materials -= 2;
+        s.bridges[bridge] = true;
+        s.score += 200;
+        say(s, "Shared bridge open! Your neighbours can cross this gap now.");
+      }
+    }
+    p.buildHeld = Boolean(input.build);
   });
-  if (s.game === "rally" && s.rings.every((r) => r.taken)) {
-    s.score += s.practice ? 0 : Math.ceil(s.remaining) * 10;
-    s.status = "finished";
-    say(s, "Every rooftop conquered!");
+  if (s.game === "rally") {
+    s.visitors = s.visitors.map((x, i) => {
+      if (x >= 8) return 8;
+      const next = Math.min(8, x + dt * 1.15);
+      // People follow the continuous public route; they cannot use the players' jumps.
+      if (!supported(s, next, -0.85)) return x;
+      if (i > 0 && next > s.visitors[i - 1] - 0.55 && s.visitors[i - 1] < 8)
+        return x;
+      return next;
+    });
+    if (communityComplete(s)) {
+      s.score += s.practice ? 0 : Math.ceil(s.remaining) * 10;
+      s.status = "finished";
+      say(s, "Everyone made it! Your shared route opened the neighbourhood.");
+    }
   }
   if (s.game === "bumpers") {
     const b = s.ball;
@@ -253,17 +370,39 @@ export function stepParty(s: PartyState, inputs: Input[], dt: number) {
       b.z = Math.sign(b.z) * 5.5;
       b.vz *= -0.8;
     }
-    const goal = GOALS[s.goal];
-    if (Math.hypot(b.x - goal.x, b.z - goal.z) < 1.35) {
+    const goalIndex = GOALS.findIndex(
+      (goal) => Math.hypot(b.x - goal.x, b.z - goal.z) < 1.35,
+    );
+    if (goalIndex >= 0) {
+      const project = projectAt(s, goalIndex);
+      if (s.allocations[goalIndex] >= project.need) {
+        const goal = GOALS[goalIndex],
+          dx = -goal.x,
+          dz = -goal.z,
+          length = Math.hypot(dx, dz);
+        b.x = goal.x + (dx / length) * 1.55;
+        b.z = goal.z + (dz / length) * 1.55;
+        b.vx = (dx / length) * 5;
+        b.vz = (dz / length) * 5;
+        s.redirects++;
+        say(
+          s,
+          `${project.name} already has enough. This resource is still yours—aim at an unmet need!`,
+        );
+        return;
+      }
       const assist = b.previousTouch >= 0;
       s.score += assist ? 250 : 150;
       s.deliveries++;
+      s.allocations[goalIndex]++;
       if (assist) s.assists++;
+      const complete = s.allocations[goalIndex] === project.need;
       say(
         s,
-        assist ? "Team goal! Both neighbours helped. +250" : "GOOOAL! +150",
+        complete
+          ? `${project.name} is ready! ${project.lesson}`
+          : `${project.name}: ${s.allocations[goalIndex]}/${project.need}. Still waiting for ${project.need - s.allocations[goalIndex]} more.`,
       );
-      s.goal = (s.goal + 1) % GOALS.length;
       Object.assign(b, {
         x: 0,
         z: 1,
@@ -272,9 +411,9 @@ export function stepParty(s: PartyState, inputs: Input[], dt: number) {
         lastTouch: -1,
         previousTouch: -1,
       });
-      if (s.deliveries >= 6) {
+      if (communityComplete(s)) {
         s.status = "finished";
-        say(s, "Six goals. One brilliant team!");
+        say(s, "Every need met. That is a win for the whole block!");
       }
     }
   }

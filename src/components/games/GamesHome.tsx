@@ -52,9 +52,7 @@ export default function GamesHome({ games }: { games: Card[] }) {
           </span>
           <h2>Block Party</h2>
           <p>
-            Leap between rooftops. Dodge giant sweepers. Bounce a ball into a
-            moving goal. Two neighbours, one score, and 75 seconds of glorious
-            chaos.
+            Jump rooftops and build a route everyone can cross. Bounce shared resources into the projects that need them. Two neighbours, one community, and 75 seconds to make it work.
           </p>
           <span className="gh-play">
             Let’s play <ArrowRight size={15} />

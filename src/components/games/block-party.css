@@ -642,3 +642,7 @@
 .bp-page[data-reduced-motion="true"] .bp-callout {
   animation: none;
 }
+
+.bp-civic-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px;background:#f1eee3;border-top:1px solid #ccd2c6}
+.bp-civic-board>div{background:#fffdf7;border:1px solid #d9d6ca;border-radius:9px;padding:10px;font-size:12px}.bp-civic-board strong{display:block;font-size:11px}.bp-civic-board strong span{float:right}.bp-civic-board small{display:block;line-height:1.45;margin-top:5px;font-size:10px;color:#58656c}.bp-civic-board .bp-need-met{background:#dcf2df;border-color:#73a884}.bp-civic-board .bp-route-report{grid-column:1/-1;display:flex;gap:14px;align-items:center}.bp-route-report>span{font-size:11px}.bp-lesson{text-align:left;padding:12px;background:#e6f1e1;border-radius:10px;margin-top:12px}.bp-lesson strong{font-size:12px}.bp-panel .bp-lesson p{font-size:12px;margin-bottom:0}.bp-panel{max-height:100%;overflow:auto}
+@media(max-width:640px){.bp-civic-board{grid-template-columns:1fr 1fr}.bp-civic-board .bp-route-report{display:block}.bp-route-report>span{display:block;margin-top:6px}.bp-touch{padding:10px 8px;gap:6px}.bp-actions{gap:4px}.bp-actions button{min-width:46px;font-size:10px}.bp-dpad{grid-template-columns:repeat(3,40px)}}

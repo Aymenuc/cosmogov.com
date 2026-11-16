@@ -5,6 +5,10 @@ import {
   stepParty,
   EMPTY_INPUT,
   GOALS,
+  projectAt,
+  communityComplete,
+  learningSummary,
+  supported,
 } from "../src/lib/games/block-party.ts";
 
 const tick = (s, input = EMPTY_INPUT, seconds = 1) => {
@@ -66,7 +70,7 @@ test("alternating players collect each ring once and earn a team combo", () => {
   assert.equal(s.score, 250);
   assert.equal(s.assists, 1);
 });
-test("ball contact, team assist and goal relocation happen once per goal", () => {
+test("ball contact and team assists allocate exactly one shared resource", () => {
   const s = createParty("bumpers", "duo");
   Object.assign(s.players[0], { x: 0, z: 1.8 });
   stepParty(s, [], 1 / 120);
@@ -80,7 +84,7 @@ test("ball contact, team assist and goal relocation happen once per goal", () =>
   stepParty(s, [], 1 / 120);
   assert.equal(s.score, 250);
   assert.equal(s.assists, 1);
-  assert.equal(s.goal, 1);
+  assert.equal(s.allocations[0], 1);
   stepParty(s, [], 1 / 120);
   assert.equal(s.deliveries, 1);
 });
@@ -93,7 +97,7 @@ test("timed rounds finish and cannot keep earning points", () => {
   stepParty(s, [], 1 / 120);
   assert.equal(s.score, 0);
 });
-test("free play has no clock and winning stops simulation", () => {
+test("free play has no clock and collecting everything alone does not win", () => {
   const s = createParty("rally", "solo", true);
   tick(s, EMPTY_INPUT, 76);
   assert.equal(s.remaining, 75);
@@ -102,11 +106,83 @@ test("free play has no clock and winning stops simulation", () => {
     r.taken = true;
   });
   stepParty(s, [], 1 / 120);
-  assert.equal(s.status, "finished");
+  assert.equal(s.status, "playing");
+  assert.equal(communityComplete(s), false);
 });
 test("dash recharges instead of staying permanently active", () => {
   const s = createParty("bumpers", "solo");
   tick(s, { ...EMPTY_INPUT, dash: true }, 0.3);
   assert.equal(s.players[0].dash, 0);
   assert.ok(s.players[0].cooldown > 1);
+});
+
+test("shared materials are needed to build, and a held action cannot double-spend", () => {
+  const s = createParty("rally", "duo", true);
+  Object.assign(s.players[0], { x: -8, z: 1 });
+  tick(s, { ...EMPTY_INPUT, build: true }, 0.1);
+  assert.equal(s.bridges[0], false);
+  s.materials = 2;
+  tick(s);
+  tick(s, { ...EMPTY_INPUT, build: true }, 0.1);
+  assert.equal(s.bridges[0], true);
+  assert.equal(s.materials, 0);
+  assert.equal(supported(s, -6, -0.85), true);
+  assert.equal(supported(s, -2, -0.85), false);
+});
+
+test("neighbours stop at missing infrastructure and cross only after a continuous route is built", () => {
+  const s = createParty("rally", "solo", true);
+  tick(s, EMPTY_INPUT, 25);
+  assert.ok(s.visitors.every((x) => x < -6));
+  s.bridges[0] = true;
+  tick(s, EMPTY_INPUT, 25);
+  assert.ok(s.visitors.every((x) => x < -2));
+  assert.equal(communityComplete(s), false);
+  s.bridges.fill(true);
+  tick(s, EMPTY_INPUT, 25);
+  assert.equal(communityComplete(s), true);
+  assert.equal(s.status, "finished");
+  assert.match(learningSummary(s), /3 of 3 neighbours crossed/);
+});
+
+function fund(s, goal) {
+  s.players.forEach((p) => {
+    p.x = 0;
+    p.z = 5;
+  });
+  Object.assign(s.ball, { ...GOALS[goal], vx: 0, vz: 0 });
+  stepParty(s, [], 1 / 120);
+}
+test("equal deliveries cannot win when community needs differ", () => {
+  const s = createParty("bumpers", "solo", true);
+  for (let i = 0; i < 4; i++) {
+    fund(s, i);
+    fund(s, i);
+  }
+  assert.equal(communityComplete(s), false);
+  assert.equal(s.deliveries, 7);
+  assert.match(learningSummary(s), /Cool square still needs 1/);
+  fund(s, 0);
+  assert.equal(communityComplete(s), true);
+  assert.equal(s.deliveries, 8);
+});
+test("overfunding an easy goal cannot farm points or consume someone else’s budget", () => {
+  const s = createParty("bumpers", "duo", true);
+  fund(s, 3);
+  const score = s.score;
+  for (let i = 0; i < 10; i++) fund(s, 3);
+  assert.equal(s.deliveries, 1);
+  assert.equal(s.score, score);
+  assert.equal(s.allocations[3], 1);
+  assert.match(s.message, /already has enough/);
+});
+test("all layouts conserve the eight-resource budget and require every project", () => {
+  for (let seed = 0; seed < 8; seed++) {
+    const s = createParty("bumpers", "solo", true, seed);
+    for (let i = 0; i < 4; i++)
+      for (let n = 0; n < projectAt(s, i).need; n++) fund(s, i);
+    assert.equal(s.status, "finished");
+    assert.equal(s.deliveries, 8);
+    assert.ok(communityComplete(s));
+  }
 });
