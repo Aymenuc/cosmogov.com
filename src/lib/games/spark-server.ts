@@ -1,4 +1,5 @@
 import { randomInt, randomUUID } from "node:crypto";
+import { codeSchema } from "./workshop-code";
 import { z } from "zod";
 import { ApiError } from "@/lib/api-server";
 import {
@@ -11,11 +12,6 @@ import {
 } from "./spark";
 
 const line = (max: number) => z.string().trim().min(1).max(max);
-export const codeSchema = z
-  .string()
-  .trim()
-  .toUpperCase()
-  .regex(/^[A-HJ-NP-Z2-9]{8}$/);
 const idea = z.string().uuid();
 const experiment = z.object({
   step: line(240),
@@ -82,13 +78,6 @@ export function freshGame(): Game {
     winner: null,
     experiment: null,
   };
-}
-export function roomCode() {
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from(
-    { length: 8 },
-    () => letters[randomInt(letters.length)],
-  ).join("");
 }
 const timed = { pitch: 90, remix: 120, debate: 60, ballot: 45 };
 function requireMove(ok: unknown, message: string): asserts ok {

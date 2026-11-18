@@ -49,7 +49,6 @@ export const sampleTopics = [
   "How could colleagues in another time zone shape a decision before the meeting?",
 ];
 export const capacity = 36;
-export const roomLife = 7 * 86400;
 export interface Experiment {
   step: string;
   owner: string;

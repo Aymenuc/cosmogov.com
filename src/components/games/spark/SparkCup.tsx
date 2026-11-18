@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useState } from "react";
+import {useRoom} from "../workshop/useRoom";
+import RoomInvite from "../workshop/RoomInvite";
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   Clock3,
-  Copy,
   Flag,
   Ticket,
   Trophy,
@@ -21,7 +19,6 @@ import {
   labels,
   sampleTopics,
   stages,
-  type RoomSummary,
   type SparkView,
 } from "@/lib/games/spark";
 import { CommitCard, GuestTurn, guide, Recap, type Send } from "./Rounds";
@@ -30,25 +27,6 @@ import { Marquee } from "./Marquee";
 const endpoint = "/api/games/spark";
 const hostPath = "/dashboard/games/spark-cup";
 const joinPath = "/play/spark";
-const message = (err: unknown) =>
-  err instanceof Error ? err.message : "Connection interrupted. Try again.";
-async function request(path: string, body?: Record<string, unknown>) {
-  const res = await fetch(
-    path,
-    body
-      ? {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(body),
-          cache: "no-store",
-        }
-      : { cache: "no-store" },
-  );
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "The room is unavailable.");
-  return data;
-}
-
 function Clock({ room }: { room: SparkView }) {
   const [tick, setTick] = useState(room.now);
   useEffect(() => {
@@ -81,85 +59,6 @@ function Clock({ room }: { room: SparkView }) {
     </div>
   );
 }
-function Invite({ code }: { code: string }) {
-  const base = typeof window === "undefined" ? "" : window.location.origin;
-  const [copied, setCopied] = useState(false);
-  const largeTicket = useRef<HTMLDialogElement>(null);
-  const link = base + joinPath + "?room=" + code;
-  return (
-    <section className="sc-invite" aria-label="Join this game">
-      {base && (
-        <div className="sc-qr">
-          <QRCodeSVG
-            value={link}
-            size={160}
-            level="M"
-            marginSize={4}
-            title="Scan to join this Spark Cup room"
-          />
-        </div>
-      )}
-      <div>
-        <small>Player tickets</small>
-        <h3>Scan to take a seat</h3>
-        <p>
-          Or open{" "}
-          <a href={joinPath}>
-            {base.replace(/^https?:\/\//, "")}
-            {joinPath}
-          </a>{" "}
-          and enter
-        </p>
-        <strong className="sc-code">{code}</strong>
-        <button
-          type="button"
-          className="sc-enlarge"
-          onClick={() => largeTicket.current?.showModal()}
-        >
-          Enlarge QR for the room
-        </button>
-        <dialog
-          ref={largeTicket}
-          className="sc-projection"
-          aria-label="Projected room invitation"
-        >
-          <h2>Join the Spark Cup</h2>
-          <QRCodeSVG
-            value={link}
-            size={500}
-            marginSize={4}
-            level="M"
-            title="Scan the projected invitation"
-          />
-          <p>
-            {base.replace(/^https?:\/\//, "")}
-            {joinPath}
-          </p>
-          <strong className="sc-code">{code}</strong>
-          <button type="button" onClick={() => largeTicket.current?.close()}>
-            Back to host board
-          </button>
-        </dialog>
-        <button
-          type="button"
-          className="sc-link"
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(link);
-              setCopied(true);
-            } catch {
-              window.prompt("Copy the room link", link);
-            }
-          }}
-        >
-          {copied ? <Check size={16} /> : <Copy size={16} />}{" "}
-          {copied ? "Invite link copied" : "Copy invite link"}
-        </button>
-      </div>
-    </section>
-  );
-}
-
 function Board({ room }: { room: SparkView }) {
   const shown = room.stage === "reveal" || room.stage === "recap";
   const ordered = shown
@@ -280,7 +179,7 @@ function Session({
         </div>
       </header>
       {host && (stage === "lobby" || stage === "pitch") && (
-        <Invite code={room.code} />
+        <RoomInvite code={room.code} joinPath={joinPath} name="Spark Cup" />
       )}
       {stage === "recap" && <Recap room={room} />}
       {host && stage in buttons && (
@@ -372,85 +271,9 @@ export default function SparkCup({
   host: boolean;
   initialCode: string;
 }) {
-  const router = useRouter();
-  const code = initialCode.trim().toUpperCase();
-  const [room, setRoom] = useState<SparkView | null>(null);
-  const [rooms, setRooms] = useState<RoomSummary[]>([]);
+  const {active, code, rooms, busy, loaded, error, send} = useRoom<SparkView>(host,initialCode,endpoint,hostPath,joinPath);
   const [topic, setTopic] = useState("");
   const [typed, setTyped] = useState(code);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [loaded, setLoaded] = useState(false);
-  const active = room?.code === code ? room : null;
-  const joined = Boolean(active);
-  const done = active?.stage === "recap";
-  useEffect(() => {
-    let stopped = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const poll = async () => {
-      let again = false;
-      try {
-        if (!code) {
-          if (host) {
-            const list = await request(endpoint);
-            if (!stopped) setRooms(list);
-          }
-        } else {
-          const res = await fetch(
-            endpoint +
-              "?code=" +
-              encodeURIComponent(code) +
-              (host ? "&host=1" : ""),
-            { cache: "no-store" },
-          );
-          if (!(res.status === 403 && !host && !joined)) {
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            if (!stopped)
-              setRoom((old) =>
-                old && old.code === code && old.now > data.now ? old : data,
-              );
-            again = data.stage !== "recap";
-          }
-        }
-        if (!stopped) setError("");
-      } catch (err) {
-        if (!stopped) setError(message(err));
-        again = joined && !done;
-      } finally {
-        if (!stopped) {
-          setLoaded(true);
-          if (again) timer = setTimeout(poll, document.hidden ? 6500 : 2200);
-        }
-      }
-    };
-    void poll();
-    return () => {
-      stopped = true;
-      clearTimeout(timer);
-    };
-  }, [code, host, joined, done]);
-  const [formError, setFormError] = useState("");
-  const send: Send = async (action) => {
-    if (busy) return false;
-    setBusy(true);
-    setFormError("");
-    try {
-      const data = await request(endpoint, { code, ...action });
-      setRoom(data);
-      setError("");
-      if (data.code !== code)
-        router.push((host ? hostPath : joinPath) + "?room=" + data.code, {
-          scroll: false,
-        });
-      return true;
-    } catch (err) {
-      setFormError(message(err));
-      return false;
-    } finally {
-      setBusy(false);
-    }
-  };
   return (
     <div className={"spark-cup" + (host ? "" : " sc-guest")}>
       <nav className="sc-nav">
@@ -466,9 +289,9 @@ export default function SparkCup({
           <Trophy size={16} /> Spark Cup
         </span>
       </nav>
-      {(formError || error) && (
+      {error && (
         <div className="sc-error" role="alert">
-          {formError || error}
+          {error}
         </div>
       )}
       {active ? (

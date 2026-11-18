@@ -1341,6 +1341,7 @@ model CouncilRoom {
 
 // Short-lived workplace games. Guest identities are room-scoped cookie hashes.
 model SparkRoom {
+  game      String   @default("spark")
   code      String   @id
   hostId    String
   host      User     @relation(fields: [hostId], references: [id], onDelete: Cascade)

@@ -1,0 +1,1 @@
+ALTER TABLE "SparkRoom" ADD COLUMN "game" TEXT NOT NULL DEFAULT 'spark';

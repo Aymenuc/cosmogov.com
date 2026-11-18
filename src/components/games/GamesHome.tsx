@@ -8,6 +8,7 @@ import WorkspaceHeading from "@/components/WorkspaceHeading";
 import type { GameSlug } from "@/lib/games/catalogue";
 import GameArt from "./GameArt";
 import StreetIcon from "./StreetIcon";
+import { RackArt } from "./derby/Racetrack";
 import { Marquee } from "./spark/Marquee";
 
 interface Card {
@@ -42,6 +43,11 @@ export default function GamesHome({ games }: { games: Card[] }) {
         title="Civic games"
         description="Play together, laugh at the near misses and get to know your neighbours. Run the town for a year, throw a 3D block party, build your dream street, or sharpen the skills good community decisions need."
       />
+      <Link href="/dashboard/games/deadline-derby" className="gh-feature dd-feature">
+        <div className="gh-feature-text"><span className="gh-skill">Team strategy · Join by QR · 30 minutes</span>
+          <h2>Deadline Derby</h2><p>Get a real project to Friday. Race another crew, wager on a bottleneck and decide who gets your last tow rope.</p>
+          <span className="gh-play">Open the starting grid <ArrowRight size={15}/></span></div><RackArt/>
+      </Link>
       <Link href="/dashboard/games/spark-cup" className="gh-feature sc-feature">
         <div className="gh-feature-text">
           <span className="gh-skill">Team game · Join by QR</span>
