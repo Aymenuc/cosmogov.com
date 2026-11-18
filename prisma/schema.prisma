@@ -26,6 +26,7 @@ model User {
   emailVerifications   EmailVerification[]
   streetWish           StreetWish?
   priorityPick         PriorityPick?
+  sparkRooms           SparkRoom[]
   sessionVersion Int     @default(0)
   role          String   @default("user") // user, gov_official, admin, super_admin
   totalXp       Int      @default(0)
@@ -1336,4 +1337,18 @@ model CouncilRoom {
   updatedAt DateTime @updatedAt
 
   @@index([updatedAt])
+}
+
+// Short-lived workplace games. Guest identities are room-scoped cookie hashes.
+model SparkRoom {
+  code      String   @id
+  hostId    String
+  host      User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  topic     String
+  state     Json
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([hostId, createdAt])
+  @@index([expiresAt])
 }

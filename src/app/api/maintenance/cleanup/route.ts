@@ -16,14 +16,16 @@ export async function GET(req: NextRequest) {
   )
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   const now = new Date();
-  const [answers, limits, revoked] = await db.$transaction([
+  const [answers, limits, rooms, revoked] = await db.$transaction([
     db.missionToolResponse.deleteMany({ where: { expiresAt: { lte: now } } }),
     db.rateLimitBucket.deleteMany({ where: { expiresAt: { lte: now } } }),
+    db.sparkRoom.deleteMany({ where: { expiresAt: { lte: now } } }),
     db.revokedSession.deleteMany({ where: { expiresAt: { lte: now } } }),
   ]);
   return NextResponse.json({
     deletedResponses: answers.count,
     deletedLimits: limits.count,
+    deletedSparkRooms: rooms.count,
     deletedRevocations: revoked.count,
   });
 }
